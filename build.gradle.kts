@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam"
-version = "1.0-BETA-2"
+version = "1.0-BETA-3"
 
 repositories {
     mavenCentral()
