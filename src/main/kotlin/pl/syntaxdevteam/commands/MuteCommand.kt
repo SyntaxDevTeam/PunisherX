@@ -7,7 +7,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.PunisherX
-import pl.syntaxdevteam.helpers.Logger
 import pl.syntaxdevteam.helpers.MessageHandler
 import pl.syntaxdevteam.helpers.TimeHandler
 import pl.syntaxdevteam.helpers.UUIDManager
@@ -15,9 +14,6 @@ import pl.syntaxdevteam.helpers.UUIDManager
 @Suppress("UnstableApiUsage")
 class MuteCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : BasicCommand {
 
-    private var config = plugin.config
-    private var debugMode = config.getBoolean("debug")
-    private val logger = Logger(pluginMetas, debugMode)
     private val uuidManager = UUIDManager(plugin)
     private val messageHandler = MessageHandler(plugin, pluginMetas)
     private val timeHandler = TimeHandler(plugin.config.getString("language") ?: "PL")
@@ -39,7 +35,6 @@ class MuteCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
                     val punishmentType = "MUTE"
                     val start = System.currentTimeMillis()
                     val end: Long? = if (gtime != null) (System.currentTimeMillis() + timeHandler.parseTime(gtime) * 1000) else null
-                    val endText = if (end == null) timeHandler.formatTime(null) else timeHandler.formatTime((end / 1000).toString())
 
                     plugin.databaseHandler.addPunishment(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
                     plugin.databaseHandler.addPunishmentHistory(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
@@ -49,9 +44,13 @@ class MuteCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
                     val muteMessage = messageHandler.getMessage("mute", "mute_message", mapOf("reason" to reason, "time" to timeHandler.formatTime(gtime)))
                     val formattedMessage = MiniMessage.miniMessage().deserialize(muteMessage)
                     targetPlayer?.sendMessage(formattedMessage)
-                    val message = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("mute", "broadcast", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime))))
-                    plugin.server.broadcast(message)
-                    //logger.log(messageHandler.getLogMessage("mute", "broadcast", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime))))
+                    val permission = "punisherx.see_mute"
+                    val broadcastMessage = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("mute", "broadcast", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime))))
+                    plugin.server.onlinePlayers.forEach { onlinePlayer ->
+                        if (onlinePlayer.hasPermission(permission)) {
+                            onlinePlayer.sendMessage(broadcastMessage)
+                        }
+                    }
                 }
             } else {
                 stack.sender.sendRichMessage(messageHandler.getMessage("error", "no_permission"))

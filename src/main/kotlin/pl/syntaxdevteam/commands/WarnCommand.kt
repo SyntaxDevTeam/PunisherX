@@ -49,8 +49,13 @@ class WarnCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
                     val warnMessage = messageHandler.getMessage("warn", "warn_message", mapOf("reason" to reason, "time" to timeHandler.formatTime(gtime), "warn_no" to warnCount.toString()))
                     val formattedMessage = MiniMessage.miniMessage().deserialize(warnMessage)
                     targetPlayer?.sendMessage(formattedMessage)
+                    val permission = "punisherx.see_warns"
                     val broadcastMessage = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("warn", "broadcast", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime), "warn_no" to warnCount.toString())))
-                    plugin.server.broadcast(broadcastMessage)
+                    plugin.server.onlinePlayers.forEach { onlinePlayer ->
+                        if (onlinePlayer.hasPermission(permission)) {
+                            onlinePlayer.sendMessage(broadcastMessage)
+                        }
+                    }
                     //logger.log(messageHandler.getLogMessage("warn", "broadcast", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime), "warn_no" to warnCount.toString())))
                     executeWarnAction(player, warnCount)
                 }

@@ -8,7 +8,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.PunisherX
-import pl.syntaxdevteam.helpers.Logger
 import pl.syntaxdevteam.helpers.MessageHandler
 import pl.syntaxdevteam.helpers.TimeHandler
 import pl.syntaxdevteam.helpers.UUIDManager
@@ -16,9 +15,6 @@ import pl.syntaxdevteam.helpers.UUIDManager
 @Suppress("UnstableApiUsage")
 class BanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : BasicCommand {
 
-    private var config = plugin.config
-    private var debugMode = config.getBoolean("debug")
-    private val logger = Logger(pluginMetas, debugMode)
     private val uuidManager = UUIDManager(plugin)
     private val messageHandler = MessageHandler(plugin, pluginMetas)
     private val timeHandler = TimeHandler(plugin.config.getString("language") ?: "PL")
@@ -40,7 +36,6 @@ class BanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basic
                     val punishmentType = "BAN"
                     val start = System.currentTimeMillis()
                     val end: Long? = if (gtime != null) (System.currentTimeMillis() + timeHandler.parseTime(gtime) * 1000) else null
-                    val endText = if (end == null) timeHandler.formatTime(null) else timeHandler.formatTime((end / 1000).toString())
 
                     plugin.databaseHandler.addPunishment(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
                     plugin.databaseHandler.addPunishmentHistory(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
@@ -62,8 +57,13 @@ class BanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basic
                         targetPlayer.kick(kickMessage.build())
                     }
                     stack.sender.sendRichMessage(messageHandler.getMessage("ban", "ban", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime))))
-                    val message = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("ban", "broadcast", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime))))
-                    plugin.server.broadcast(message)
+                    val permission = "punisherx.see_bans"
+                    val broadcastMessage = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("ban", "broadcast", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime))))
+                    plugin.server.onlinePlayers.forEach { onlinePlayer ->
+                        if (onlinePlayer.hasPermission(permission)) {
+                            onlinePlayer.sendMessage(broadcastMessage)
+                        }
+                    }
                 }
             } else {
                 stack.sender.sendRichMessage(messageHandler.getMessage("error", "no_permission"))
