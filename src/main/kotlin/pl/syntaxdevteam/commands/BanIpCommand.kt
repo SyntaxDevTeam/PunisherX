@@ -56,8 +56,13 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                     }
 
                     stack.sender.sendRichMessage(messageHandler.getMessage("banip", "ban", mapOf("player" to playerOrIpOrUUID, "reason" to reason, "time" to timeHandler.formatTime(gtime))))
-                    val message = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("banip", "ban", mapOf("player" to playerOrIpOrUUID, "reason" to reason, "time" to timeHandler.formatTime(gtime))))
-                    plugin.server.broadcast(message)
+                    val permission = "punisherx.see_banip"
+                    val broadcastMessage = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("banip", "ban", mapOf("player" to playerOrIpOrUUID, "reason" to reason, "time" to timeHandler.formatTime(gtime))))
+                    plugin.server.onlinePlayers.forEach { onlinePlayer ->
+                        if (onlinePlayer.hasPermission(permission)) {
+                            onlinePlayer.sendMessage(broadcastMessage)
+                        }
+                    }
                 }
             } else {
                 stack.sender.sendRichMessage(messageHandler.getMessage("error", "no_permission"))
