@@ -26,6 +26,11 @@ class BanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basic
                     stack.sender.sendRichMessage(messageHandler.getMessage("ban", "usage"))
                 } else {
                     val player = args[0]
+                    val targetPlayer = Bukkit.getPlayer(player)
+                    if (targetPlayer != null && targetPlayer.hasPermission("punisherx.bypass.ban")) {
+                        stack.sender.sendRichMessage(messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
+                        return
+                    }
                     val uuid = uuidManager.getUUID(player)
                     if (uuid == null) {
                         stack.sender.sendRichMessage(messageHandler.getMessage("error", "player_not_found", mapOf("player" to player)))
@@ -46,7 +51,6 @@ class BanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basic
                         val banEndDate = if (gtime != null) Date(System.currentTimeMillis() + timeHandler.parseTime(gtime) * 1000) else null
                         banList.addBan(playerProfile, reason, banEndDate, stack.sender.name)
                     */
-                    val targetPlayer = Bukkit.getPlayer(player)
                     if (targetPlayer != null) {
                         val kickMessages = messageHandler.getComplexMessage("ban", "kick_message", mapOf("reason" to reason, "time" to timeHandler.formatTime(gtime)))
                         val kickMessage = Component.text()

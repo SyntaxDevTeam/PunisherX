@@ -29,6 +29,11 @@ class WarnCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
                     stack.sender.sendRichMessage(messageHandler.getMessage("warn", "usage"))
                 } else {
                     val player = args[0]
+                    val targetPlayer = Bukkit.getPlayer(player)
+                    if (targetPlayer != null && targetPlayer.hasPermission("punisherx.bypass.warn")) {
+                        stack.sender.sendRichMessage(messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
+                        return
+                    }
                     val uuid = uuidManager.getUUID(player)
                     if (uuid == null) {
                         stack.sender.sendRichMessage(messageHandler.getMessage("error", "player_not_found", mapOf("player" to player)))
@@ -45,7 +50,6 @@ class WarnCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
 
                     val warnCount = plugin.databaseHandler.getActiveWarnCount(uuid)
                     stack.sender.sendRichMessage(messageHandler.getMessage("warn", "warn", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime), "warn_no" to warnCount.toString())))
-                    val targetPlayer = Bukkit.getPlayer(player)
                     val warnMessage = messageHandler.getMessage("warn", "warn_message", mapOf("reason" to reason, "time" to timeHandler.formatTime(gtime), "warn_no" to warnCount.toString()))
                     val formattedMessage = MiniMessage.miniMessage().deserialize(warnMessage)
                     targetPlayer?.sendMessage(formattedMessage)
