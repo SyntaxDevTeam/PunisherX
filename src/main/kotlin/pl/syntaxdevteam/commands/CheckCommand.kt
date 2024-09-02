@@ -20,11 +20,13 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (args.isNotEmpty()) {
-            if (stack.sender.hasPermission("punisherx.check")) {
+            val player = args[0]
+            val senderName = stack.sender.name
+
+            if (player.equals(senderName, ignoreCase = true) || stack.sender.hasPermission("punisherx.check")) {
                 if (args.size < 2) {
                     stack.sender.sendRichMessage(messageHandler.getMessage("check", "usage"))
                 } else {
-                    val player = args[0]
                     val type = args[1]
                     val uuid = uuidManager.getUUID(player)
                     if (uuid == null) {
