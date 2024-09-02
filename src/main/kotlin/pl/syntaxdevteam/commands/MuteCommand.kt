@@ -25,6 +25,11 @@ class MuteCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
                     stack.sender.sendRichMessage(messageHandler.getMessage("mute", "usage"))
                 } else {
                     val player = args[0]
+                    val targetPlayer = Bukkit.getPlayer(player)
+                    if (targetPlayer != null && targetPlayer.hasPermission("punisherx.bypass.mute")) {
+                        stack.sender.sendRichMessage(messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
+                        return
+                    }
                     val uuid = uuidManager.getUUID(player)
                     if (uuid == null) {
                         stack.sender.sendRichMessage(messageHandler.getMessage("error", "player_not_found", mapOf("player" to player)))
@@ -40,7 +45,6 @@ class MuteCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
                     plugin.databaseHandler.addPunishmentHistory(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
 
                     stack.sender.sendRichMessage(messageHandler.getMessage("mute", "mute", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime))))
-                    val targetPlayer = Bukkit.getPlayer(player)
                     val muteMessage = messageHandler.getMessage("mute", "mute_message", mapOf("reason" to reason, "time" to timeHandler.formatTime(gtime)))
                     val formattedMessage = MiniMessage.miniMessage().deserialize(muteMessage)
                     targetPlayer?.sendMessage(formattedMessage)

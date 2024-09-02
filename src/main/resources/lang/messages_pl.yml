@@ -4,6 +4,7 @@ error:
   no_permission: "<red>Nie masz uprawnień do tej komendy.</red>"
   player_not_found: "<gold>Nie znaleziono gracza o nicku {player}.</gold>"
   reload: "<red>Wystąpił błąd podczas przełądowania konfiguracji:</red> "
+  bypass: "Gracz {player} nie może otrzymać kary, ze zględu na swoje uprawnienia."
 
 ban:
   ban: "Zbanowałeś {player} za {reason} na czas {time}"

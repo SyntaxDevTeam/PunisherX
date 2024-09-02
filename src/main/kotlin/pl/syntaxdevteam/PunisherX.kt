@@ -18,7 +18,7 @@ import pl.syntaxdevteam.players.PlayerIPManager
 import java.util.*
 
 /* TODO:
-    * Dodać uprawnienia bypass dla poszczególnych komend
+    * Sprawdzić cache dla adresów IP tka aby dodawało każde IP
     * Dodać pominięcie sprawdzania uprawnień punisherx.check jeśli osobą sprawdzaną jest ta sama, którą użyła komendy
     * Sprawdzić działanie pernamentnych wersji wszystkich komend
     * Dodać komendę kick z obsługą wiadomości w pliku językowym

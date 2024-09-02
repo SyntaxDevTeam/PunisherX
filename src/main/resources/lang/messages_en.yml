@@ -4,6 +4,7 @@ error:
   no_permission: "<red>You do not have permission to use this command.</red>"
   player_not_found: "<gold>Player with the nickname {player} not found.</gold>"
   reload: "<red>An error occurred while reloading the configuration:</red> "
+  bypass: “Player {player} cannot be punished due to their permissions.”
 
 ban:
   ban: "You banned {player} for {reason} for {time}"
