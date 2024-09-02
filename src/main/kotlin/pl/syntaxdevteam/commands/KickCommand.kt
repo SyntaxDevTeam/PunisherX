@@ -34,7 +34,7 @@ class KickCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
                         stack.sender.sendRichMessage(messageHandler.getMessage("error", "player_not_found", mapOf("player" to player)))
                         return
                     }
-                    val reason = args[1]
+                    val reason = args.slice(1 until args.size).joinToString(" ")
                     val punishmentType = "KICK"
                     val start = System.currentTimeMillis()
 
