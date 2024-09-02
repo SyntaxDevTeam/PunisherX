@@ -87,6 +87,26 @@ unwarn:
   unwarn: "You removed the warning for {player}"
   usage: "Correct usage is: <gold>/unwarn <player>"
 
+kick:
+  kick: "You kicked {player} for {reason}"
+  usage: "Correct usage is: <gold>/kick <player> <reason>"
+  kick_message:
+    - 'Server Name'
+    - 'PunisherX &8» &7You have been kicked'
+    - '&7'
+    - '&7'
+    - "&cReason &8» &7{reason}"
+    - '&7'
+    - '&7'
+    - '&8You can appeal at:'
+    - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
+  broadcast: "Player {player} has been kicked for {reason}"
+  no_reasons: "no reason"
+  reasons:
+    - "Flood"
+    - "Spamming"
+    - "Offensive language"
+
 check:
   usage: "Correct usage is: <gold>/check <player_name> <all|ban|mute|warn>"
   invalid_type: "Invalid penalty type. Use: all, ban, mute, warn."

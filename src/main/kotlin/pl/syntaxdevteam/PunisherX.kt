@@ -19,9 +19,7 @@ import java.util.*
 
 /* TODO:
     * Sprawdzić cache dla adresów IP tka aby dodawało każde IP
-    * Dodać pominięcie sprawdzania uprawnień punisherx.check jeśli osobą sprawdzaną jest ta sama, którą użyła komendy
     * Sprawdzić działanie pernamentnych wersji wszystkich komend
-    * Dodać komendę kick z obsługą wiadomości w pliku językowym
     * Dodać BanList dla komend ban i banip jako awaryjna metoda w przypadku problemu z łącznością z bazą danych
     * Dodać możliwość użycia wyłącznie BanList zamiast obsługi baz danych do ustawienia w config.yml
     * Sprawdzić wersję eksperymentalną pomysłu na dynamiczne przełączanie między bazą MySQL a SQLite w sytuacji problemu z łącznością.
@@ -76,13 +74,14 @@ class PunisherX : JavaPlugin(), Listener {
             commands.register("punisherx", "PunisherX plugin command. Type /punisherx help to check available commands", PunishesXCommands(this))
             commands.register("prx", "PunisherX plugin command. Type /prx help to check available commands", PunishesXCommands(this))
             commands.register("check", "Checking player penalties" + messageHandler.getMessage("check", "usage"), CheckCommand(this, pluginMetas))
-            commands.register("ban", messageHandler.getMessage("ban", "usage"), BanCommand(this, pluginMetas))
-            commands.register("banip", messageHandler.getMessage("banip", "usage"), BanIpCommand(this, pluginMetas))
-            commands.register("unban", messageHandler.getMessage("ban", "usage"), UnBanCommand(this, pluginMetas))
+            commands.register("kick", messageHandler.getMessage("kick", "usage"), KickCommand(this, pluginMetas))
             commands.register("warn", messageHandler.getMessage("warn", "usage"), WarnCommand(this, pluginMetas))
             commands.register("unwarn", messageHandler.getMessage("unwarn", "usage"), UnWarnCommand(this, pluginMetas))
             commands.register("mute", messageHandler.getMessage("mute", "usage"), MuteCommand(this, pluginMetas))
             commands.register("unmute", messageHandler.getMessage("mute", "usage"), UnMuteCommand(this, pluginMetas))
+            commands.register("ban", messageHandler.getMessage("ban", "usage"), BanCommand(this, pluginMetas))
+            commands.register("banip", messageHandler.getMessage("banip", "usage"), BanIpCommand(this, pluginMetas))
+            commands.register("unban", messageHandler.getMessage("ban", "usage"), UnBanCommand(this, pluginMetas))
         }
         server.pluginManager.registerEvents(PunishmentChecker(this), this)
         pluginManager = PluginManager(this)
