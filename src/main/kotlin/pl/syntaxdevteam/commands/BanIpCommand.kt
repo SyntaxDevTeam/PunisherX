@@ -39,8 +39,18 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                         stack.sender.sendRichMessage(messageHandler.getMessage("error", "bypass", mapOf("player" to playerOrIpOrUUID)))
                         return
                     }
-                    val gtime = if (args.size > 2) args[1] else null
-                    val reason = if (args.size > 2) args.slice(2 until args.size).joinToString(" ") else args[1]
+
+                    var gtime: String?
+                    var reason: String
+                    try {
+                        gtime = args[1]
+                        timeHandler.parseTime(gtime)
+                        reason = args.slice(2 until args.size).joinToString(" ")
+                    } catch (e: NumberFormatException) {
+                        gtime = null
+                        reason = args.slice(1 until args.size).joinToString(" ")
+                    }
+
                     val punishmentType = "BANIP"
                     val start = System.currentTimeMillis()
                     val end: Long? = if (gtime != null) (System.currentTimeMillis() + timeHandler.parseTime(gtime) * 1000) else null
@@ -74,7 +84,6 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
             stack.sender.sendRichMessage(messageHandler.getMessage("banip", "usage"))
         }
     }
-
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
         return when (args.size) {

@@ -39,8 +39,18 @@ class WarnCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
                         stack.sender.sendRichMessage(messageHandler.getMessage("error", "player_not_found", mapOf("player" to player)))
                         return
                     }
-                    val gtime = if (args.size > 2) args[1] else null
-                    val reason = if (args.size > 2) args.slice(2 until args.size).joinToString(" ") else args[1]
+
+                    var gtime: String?
+                    var reason: String
+                    try {
+                        gtime = args[1]
+                        timeHandler.parseTime(gtime)
+                        reason = args.slice(2 until args.size).joinToString(" ")
+                    } catch (e: NumberFormatException) {
+                        gtime = null
+                        reason = args.slice(1 until args.size).joinToString(" ")
+                    }
+
                     val punishmentType = "WARN"
                     val start = System.currentTimeMillis()
                     val end: Long? = if (gtime != null) (System.currentTimeMillis() + timeHandler.parseTime(gtime) * 1000) else null
@@ -60,7 +70,6 @@ class WarnCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
                             onlinePlayer.sendMessage(broadcastMessage)
                         }
                     }
-                    //logger.log(messageHandler.getLogMessage("warn", "broadcast", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime), "warn_no" to warnCount.toString())))
                     executeWarnAction(player, warnCount)
                 }
             } else {
@@ -105,5 +114,4 @@ class WarnCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
             }
         }
     }
-
 }
