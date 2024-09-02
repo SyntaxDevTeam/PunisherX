@@ -87,6 +87,26 @@ unwarn:
   unwarn: "Usunąłeś ostrzeżenie dla gracza {player}"
   usage: "Poprawne użycie to: <gold>/warn <player>"
 
+kick:
+  kick: "Wyrzuciłeś {player} za {reason}"
+  usage: "Poprawne użycie to: <gold>/kick <player> <powód>"
+  kick_message:
+    - 'Nazwa serwera'
+    - 'PunisherX &8» &7Zostałeś/aś wyrzucony/a'
+    - '&7'
+    - '&7'
+    - "&cPowód &8» &7{reason}"
+    - '&7'
+    - '&7'
+    - '&8Możesz zgłosić swój sprzeciw na:'
+    - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
+  broadcast: "Gracz {player} został wyrzucony z powodu {reason}"
+  no_reasons: "bez powodu"
+  reasons:
+    - "Flood"
+    - "Spamowanie"
+    - "Wulgarny język"
+
 check:
   usage: "Poprawne użycie to: <gold>/check <nazwa_gracza> <all|ban|mute|warn>"
   invalid_type: "Nieprawidłowy typ kary. Użyj: all, ban, mute, warn."
