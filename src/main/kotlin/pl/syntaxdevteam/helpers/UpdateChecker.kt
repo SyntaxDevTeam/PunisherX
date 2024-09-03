@@ -1,6 +1,7 @@
 package pl.syntaxdevteam.helpers
 
 import io.ktor.client.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -27,21 +28,32 @@ class UpdateChecker(private val pluginMeta: PluginMeta, private val logger: Logg
         }
 
         runBlocking {
-            val client = HttpClient()
-            val response: HttpResponse = client.get(hangarApiUrl)
-            if (response.status == HttpStatusCode.OK) {
-                val responseBody = response.bodyAsText()
-                val parser = JSONParser()
-                val jsonObject = parser.parse(responseBody) as JSONObject
-                val versions = jsonObject["result"] as JSONArray
-                val latestVersion = versions.firstOrNull() as? JSONObject
-                if (latestVersion != null && isNewerVersion(latestVersion["name"] as String, pluginMeta.version)) {
-                    notifyUpdate(latestVersion)
+            val client = HttpClient {
+                install(HttpTimeout) {
+                    requestTimeoutMillis = 5000
                 }
-            } else {
-                logger.warning("Failed to check for updates: ${response.status}")
             }
-            client.close()
+            try {
+                val response: HttpResponse = client.get(hangarApiUrl)
+                if (response.status == HttpStatusCode.OK) {
+                    val responseBody = response.bodyAsText()
+                    val parser = JSONParser()
+                    val jsonObject = parser.parse(responseBody) as JSONObject
+                    val versions = jsonObject["result"] as JSONArray
+                    val latestVersion = versions.firstOrNull() as? JSONObject
+                    if (latestVersion != null && isNewerVersion(latestVersion["name"] as String, pluginMeta.version)) {
+                        notifyUpdate(latestVersion)
+                    }
+                } else {
+                    logger.warning("Failed to check for updates: ${response.status}")
+                }
+            } catch (e: HttpRequestTimeoutException) {
+                logger.warning("Request timeout while checking for updates: ${e.message}")
+            } catch (e: Exception) {
+                logger.warning("An error occurred while checking for updates: ${e.message}")
+            } finally {
+                client.close()
+            }
         }
     }
 
@@ -85,7 +97,7 @@ class UpdateChecker(private val pluginMeta: PluginMeta, private val logger: Logg
 
     private fun notifyAdmins(message: Component) {
         for (player in Bukkit.getOnlinePlayers()) {
-            if (player.hasPermission("PunisherX.update.notify")) {
+            if (player.hasPermission("${pluginMeta.name}.update.notify")) {
                 player.sendMessage(message)
             }
         }
