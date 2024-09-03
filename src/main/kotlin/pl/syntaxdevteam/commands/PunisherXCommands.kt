@@ -51,6 +51,20 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
                         stack.sender.sendRichMessage("<red>You do not have permission to use this command.</red>")
                     }
                 }
+                args[0].equals("export", ignoreCase = true) -> {
+                    if (stack.sender.hasPermission("punisherx.export")) {
+                        plugin.databaseHandler.exportDatabase()
+                    } else {
+                        stack.sender.sendRichMessage("<red>You do not have permission to use this command.</red>")
+                    }
+                }
+                args[0].equals("import", ignoreCase = true) -> {
+                    if (stack.sender.hasPermission("punisherx.import")) {
+                        plugin.databaseHandler.importDatabase()
+                    } else {
+                        stack.sender.sendRichMessage("<red>You do not have permission to use this command.</red>")
+                    }
+                }
             }
         } else {
             stack.sender.sendRichMessage("<green>Type </green><gold>/punisherx help</gold> <green>to see available commands</green>")

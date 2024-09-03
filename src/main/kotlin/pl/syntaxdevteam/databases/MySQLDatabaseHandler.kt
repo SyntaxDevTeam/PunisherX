@@ -7,6 +7,8 @@ import java.sql.SQLException
 import java.sql.ResultSet
 import org.bukkit.configuration.file.FileConfiguration
 import pl.syntaxdevteam.PunisherX
+import java.io.File
+import java.io.IOException
 
 class MySQLDatabaseHandler(private val plugin: PunisherX, config: FileConfiguration) : DatabaseHandler {
     private var connection: Connection? = null
@@ -70,6 +72,15 @@ class MySQLDatabaseHandler(private val plugin: PunisherX, config: FileConfigurat
         }
     }
 
+    override fun closeConnection() {
+        try {
+            connection?.close()
+            plugin.logger.info("Connection to the database closed.")
+        } catch (e: SQLException) {
+            plugin.logger.err("Failed to close the connection to the database. ${e.message}")
+        }
+    }
+
     override fun addPunishment(name: String, uuid: String, reason: String, operator: String, punishmentType: String, start: Long, end: Long) {
         if (!isConnected()) {
             openConnection()
@@ -127,15 +138,6 @@ class MySQLDatabaseHandler(private val plugin: PunisherX, config: FileConfigurat
             }
         } else {
             plugin.logger.warning("Failed to reconnect to the database.")
-        }
-    }
-
-    override fun closeConnection() {
-        try {
-            connection?.close()
-            plugin.logger.info("Connection to the database closed.")
-        } catch (e: SQLException) {
-            plugin.logger.err("Failed to close the connection to the database. ${e.message}")
         }
     }
 
@@ -259,5 +261,79 @@ class MySQLDatabaseHandler(private val plugin: PunisherX, config: FileConfigurat
             plugin.logger.err("Failed to get active warn count for UUID: $uuid. ${e.message}")
         }
         return punishments.size
+    }
+
+    override fun exportDatabase() {
+        val tables = listOf("punishments", "punishmenthistory")
+        try {
+            connection?.let { conn ->
+                val dumpDir = File(plugin.dataFolder, "dump")
+                if (!dumpDir.exists()) {
+                    dumpDir.mkdirs()
+                }
+                val writer = File(dumpDir, "backup.sql").bufferedWriter()
+                for (table in tables) {
+                    val resultSet = conn.createStatement().executeQuery("SELECT * FROM $table")
+                    val metaData = resultSet.metaData
+                    val columnCount = metaData.columnCount
+
+                    if (!resultSet.isBeforeFirst) {
+                        // Tabela jest pusta, pomijamy eksport
+                        continue
+                    }
+
+                    writer.write("INSERT INTO $table VALUES\n")
+                    var first = true
+                    while (resultSet.next()) {
+                        if (!first) {
+                            writer.write(",\n")
+                        }
+                        first = false
+                        writer.write("(")
+                        for (i in 1..columnCount) {
+                            val value = resultSet.getObject(i)
+                            if (value == null) {
+                                writer.write("NULL")
+                            } else {
+                                writer.write("'${value.toString().replace("'", "''")}'")
+                            }
+                            if (i < columnCount) writer.write(", ")
+                        }
+                        writer.write(")")
+                    }
+                    writer.write(";\n")
+                }
+                writer.close()
+                plugin.logger.success("Database exported to ${dumpDir}/backup.sql")
+            }
+        } catch (e: SQLException) {
+            plugin.logger.err("Failed to export database. ${e.message}")
+        } catch (e: IOException) {
+            plugin.logger.err("Failed to write to file. ${e.message}")
+        }
+    }
+
+
+    override fun importDatabase() {
+        val filePath = File(plugin.dataFolder, "dump/backup.sql").absolutePath
+        try {
+            connection?.let { conn ->
+                val lines = File(filePath).readLines()
+                val statement = conn.createStatement()
+                val sql = StringBuilder()
+                for (line in lines) {
+                    sql.append(line)
+                    if (line.trim().endsWith(";")) {
+                        statement.execute(sql.toString())
+                        sql.setLength(0) // Clear the StringBuilder
+                    }
+                }
+                plugin.logger.success("Database imported from $filePath")
+            }
+        } catch (e: SQLException) {
+            plugin.logger.err("Failed to import database. ${e.message}")
+        } catch (e: IOException) {
+            plugin.logger.err("Failed to read from file. ${e.message}")
+        }
     }
 }

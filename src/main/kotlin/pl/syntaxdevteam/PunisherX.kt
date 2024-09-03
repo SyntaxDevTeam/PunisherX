@@ -18,12 +18,11 @@ import pl.syntaxdevteam.players.PlayerIPManager
 import java.util.*
 
 /* TODO:
-    * Sprawdzić cache dla adresów IP tka aby dodawało każde IP
-    * Sprawdzić działanie pernamentnych wersji wszystkich komend
+    * Dodać automatyczną aktualizację pluginu jeśli ta jest dostępna
     * Dodać BanList dla komend ban i banip jako awaryjna metoda w przypadku problemu z łącznością z bazą danych
     * Dodać możliwość użycia wyłącznie BanList zamiast obsługi baz danych do ustawienia w config.yml
     * Sprawdzić wersję eksperymentalną pomysłu na dynamiczne przełączanie między bazą MySQL a SQLite w sytuacji problemu z łącznością.
-    * Dodać możliwość exportu i importu dla poszczególnych baz oraz migracji przędzy nimi
+    * Dodać możliwość migracji między bazami
 */
 
 @Suppress("UnstableApiUsage")
