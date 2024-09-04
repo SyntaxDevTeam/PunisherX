@@ -15,10 +15,10 @@ import pl.syntaxdevteam.databases.MySQLDatabaseHandler
 import pl.syntaxdevteam.databases.SQLiteDatabaseHandler
 import pl.syntaxdevteam.helpers.*
 import pl.syntaxdevteam.players.PlayerIPManager
+import java.io.File
 import java.util.*
 
 /* TODO:
-    * Dodać automatyczną aktualizację pluginu jeśli ta jest dostępna
     * Dodać BanList dla komend ban i banip jako awaryjna metoda w przypadku problemu z łącznością z bazą danych
     * Dodać możliwość użycia wyłącznie BanList zamiast obsługi baz danych do ustawienia w config.yml
     * Sprawdzić wersję eksperymentalną pomysłu na dynamiczne przełączanie między bazą MySQL a SQLite w sytuacji problemu z łącznością.
@@ -60,8 +60,6 @@ class PunisherX : JavaPlugin(), Listener {
         }
         databaseHandler.openConnection()
         databaseHandler.createTables()
-        updateChecker = UpdateChecker(pluginMetas, logger, config)
-        updateChecker.checkForUpdates()
         messageHandler = MessageHandler(this, pluginMetas)
         playerIPManager = PlayerIPManager(this)
         timeHandler = TimeHandler(this.config.getString("language") ?: "PL")
@@ -93,13 +91,13 @@ class PunisherX : JavaPlugin(), Listener {
         }
 
         statsCollector = StatsCollector(this)
+        updateChecker = UpdateChecker(this, pluginMetas, config)
+        updateChecker.checkForUpdates()
     }
 
-    override fun onDisable() {
-        databaseHandler.closeConnection()
-        AsyncChatEvent.getHandlerList().unregister(this as Plugin)
+    fun getPluginFile(): File {
+        return this.file
     }
-
 
     fun restartGuardianTask() {
         try {
@@ -108,5 +106,10 @@ class PunisherX : JavaPlugin(), Listener {
         } catch (e: Exception) {
             logger.err(messageHandler.getMessage("error", "reload") + e.message)
         }
+    }
+
+    override fun onDisable() {
+        databaseHandler.closeConnection()
+        AsyncChatEvent.getHandlerList().unregister(this as Plugin)
     }
 }
