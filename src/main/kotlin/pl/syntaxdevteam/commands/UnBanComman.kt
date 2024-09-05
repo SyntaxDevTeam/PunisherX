@@ -38,44 +38,40 @@ class UnBanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                         stack.sender.sendRichMessage(messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
                     }
                 } else {
-                    val uuid = uuidManager.getUUID(playerOrIpOrUUID)
+                    val uuid = uuidManager.getUUID(playerOrIpOrUUID).toString()
                     logger.debug("UUID for player $playerOrIpOrUUID: [$uuid]")
-                    if (uuid != null) {
-                        val punishments = plugin.databaseHandler.getPunishments(uuid)
-                        if (punishments.isNotEmpty()) {
-                            punishments.forEach { punishment ->
-                                if (punishment.type == "BAN") {
-                                    plugin.databaseHandler.removePunishment(uuid, punishment.type)
-                                }
+                    val punishments = plugin.databaseHandler.getPunishments(uuid)
+                    if (punishments.isNotEmpty()) {
+                        punishments.forEach { punishment ->
+                            if (punishment.type == "BAN") {
+                                plugin.databaseHandler.removePunishment(uuid, punishment.type)
                             }
-                            stack.sender.sendRichMessage(messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
-                            val message = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
-                            plugin.server.broadcast(message)
-                            logger.info("Player $playerOrIpOrUUID ($uuid) has been unbanned")
-                        } else {
-                            val ip = plugin.playerIPManager.getPlayerIPByName(playerOrIpOrUUID)
-                            logger.debug("Assigned IP for player $playerOrIpOrUUID: [$ip]")
-                            if (ip != null) {
-                                val punishmentsByIP = plugin.databaseHandler.getPunishmentsByIP(ip)
-                                if (punishmentsByIP.isNotEmpty()) {
-                                    punishmentsByIP.forEach { punishment ->
-                                        if (punishment.type == "BANIP") {
-                                            plugin.databaseHandler.removePunishment(ip, punishment.type)
-                                        }
+                        }
+                        stack.sender.sendRichMessage(messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
+                        val message = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
+                        plugin.server.broadcast(message)
+                        logger.info("Player $playerOrIpOrUUID ($uuid) has been unbanned")
+                    } else {
+                        val ip = plugin.playerIPManager.getPlayerIPByName(playerOrIpOrUUID)
+                        logger.debug("Assigned IP for player $playerOrIpOrUUID: [$ip]")
+                        if (ip != null) {
+                            val punishmentsByIP = plugin.databaseHandler.getPunishmentsByIP(ip)
+                            if (punishmentsByIP.isNotEmpty()) {
+                                punishmentsByIP.forEach { punishment ->
+                                    if (punishment.type == "BANIP") {
+                                        plugin.databaseHandler.removePunishment(ip, punishment.type)
                                     }
-                                    stack.sender.sendRichMessage(messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
-                                    val message = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("unban", "unban"))
-                                    plugin.server.broadcast(message)
-                                    logger.log(messageHandler.getLogMessage("unban", "unban"))
-                                } else {
-                                    stack.sender.sendRichMessage(messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
                                 }
+                                stack.sender.sendRichMessage(messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
+                                val message = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("unban", "unban"))
+                                plugin.server.broadcast(message)
+                                logger.log(messageHandler.getLogMessage("unban", "unban"))
                             } else {
                                 stack.sender.sendRichMessage(messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
                             }
+                        } else {
+                            stack.sender.sendRichMessage(messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
                         }
-                    } else {
-                        stack.sender.sendRichMessage(messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
                     }
                 }
             } else {

@@ -29,12 +29,8 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                 } else {
                     val type = args[1]
                     val uuid = uuidManager.getUUID(player)
-                    if (uuid == null) {
-                        stack.sender.sendRichMessage(messageHandler.getMessage("error", "player_not_found", mapOf("player" to player)))
-                        return
-                    }
 
-                    val punishments = plugin.databaseHandler.getPunishments(uuid)
+                    val punishments = plugin.databaseHandler.getPunishments(uuid.toString())
                     val filteredPunishments = when (type.lowercase()) {
                         "all" -> punishments
                         "ban" -> punishments.filter { it.type == "BAN" || it.type == "BANIP" }

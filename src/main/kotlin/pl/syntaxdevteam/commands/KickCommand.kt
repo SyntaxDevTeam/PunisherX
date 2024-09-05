@@ -29,11 +29,7 @@ class KickCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
                         stack.sender.sendRichMessage(messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
                         return
                     }
-                    val uuid = uuidManager.getUUID(player)
-                    if (uuid == null) {
-                        stack.sender.sendRichMessage(messageHandler.getMessage("error", "player_not_found", mapOf("player" to player)))
-                        return
-                    }
+                    val uuid = uuidManager.getUUID(player).toString()
                     val reason = args.slice(1 until args.size).joinToString(" ")
                     val punishmentType = "KICK"
                     val start = System.currentTimeMillis()
