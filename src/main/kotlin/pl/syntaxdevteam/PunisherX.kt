@@ -18,13 +18,6 @@ import pl.syntaxdevteam.players.PlayerIPManager
 import java.io.File
 import java.util.*
 
-/* TODO:
-    * Dodać BanList dla komend ban i banip jako awaryjna metoda w przypadku problemu z łącznością z bazą danych
-    * Dodać możliwość użycia wyłącznie BanList zamiast obsługi baz danych do ustawienia w config.yml
-    * Sprawdzić wersję eksperymentalną pomysłu na dynamiczne przełączanie między bazą MySQL a SQLite w sytuacji problemu z łącznością.
-    * Dodać możliwość migracji między bazami
-*/
-
 @Suppress("UnstableApiUsage")
 class PunisherX : JavaPlugin(), Listener {
     lateinit var logger: Logger

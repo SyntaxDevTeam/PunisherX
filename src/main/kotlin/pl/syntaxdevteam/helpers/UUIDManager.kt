@@ -15,15 +15,15 @@ import pl.syntaxdevteam.PunisherX
 class UUIDManager(private val plugin: PunisherX) {
     private val activeUUIDs: MutableMap<String, String> = HashMap()
 
-    fun getUUID(playerName: String): String? {
+    fun getUUID(playerName: String): Any {
         val player: Player? = Bukkit.getPlayer(playerName)
         if (player != null) {
-            return player.uniqueId.toString()
+            return player.uniqueId
         }
 
         val offlinePlayer: OfflinePlayer = Bukkit.getOfflinePlayer(playerName)
         if (offlinePlayer.hasPlayedBefore()) {
-            return offlinePlayer.uniqueId.toString()
+            return offlinePlayer.uniqueId
         }
 
         val uuid = fetchUUIDFromAPI(playerName)
@@ -75,8 +75,8 @@ class UUIDManager(private val plugin: PunisherX) {
         }
     }
 
-    private fun generateOfflineUUID(playerName: String): String {
-        val offlineUUID = UUID.nameUUIDFromBytes("OfflinePlayer:$playerName".toByteArray()).toString()
+    private fun generateOfflineUUID(playerName: String): UUID {
+        val offlineUUID = UUID.nameUUIDFromBytes("OfflinePlayer:$playerName".toByteArray())
         println("Generated offline UUID for $playerName: $offlineUUID")
         return offlineUUID
     }

@@ -34,11 +34,7 @@ class WarnCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
                         stack.sender.sendRichMessage(messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
                         return
                     }
-                    val uuid = uuidManager.getUUID(player)
-                    if (uuid == null) {
-                        stack.sender.sendRichMessage(messageHandler.getMessage("error", "player_not_found", mapOf("player" to player)))
-                        return
-                    }
+                    val uuid = uuidManager.getUUID(player).toString()
 
                     var gtime: String?
                     var reason: String
