@@ -15,9 +15,6 @@ import pl.syntaxdevteam.helpers.UUIDManager
 @Suppress("UnstableApiUsage")
 class WarnCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : BasicCommand {
 
-    private var config = plugin.config
-    private var debugMode = config.getBoolean("debug")
-    private val logger = Logger(pluginMetas, debugMode)
     private val uuidManager = UUIDManager(plugin)
     private val messageHandler = MessageHandler(plugin, pluginMetas)
     private val timeHandler = TimeHandler(plugin.config.getString("language") ?: "PL")
