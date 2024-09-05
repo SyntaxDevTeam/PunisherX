@@ -4,7 +4,7 @@ interface DatabaseHandler {
     fun openConnection()
     fun closeConnection()
     fun createTables()
-    fun addPunishment(name: String, uuid: String, reason: String, operator: String, punishmentType: String, start: Long, end: Long)
+    fun addPunishment(name: String, uuid: String, reason: String, operator: String, punishmentType: String, start: Long, end: Long): Boolean
     fun addPunishmentHistory(name: String, uuid: String, reason: String, operator: String, punishmentType: String, start: Long, end: Long)
     fun removePunishment(uuidOrIp: String, punishmentType: String, removeAll: Boolean = false)
     fun getPunishments(uuid: String): List<PunishmentData>

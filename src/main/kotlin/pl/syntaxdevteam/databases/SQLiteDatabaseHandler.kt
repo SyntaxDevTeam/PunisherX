@@ -80,7 +80,7 @@ class SQLiteDatabaseHandler(private val plugin: PunisherX) : DatabaseHandler {
         }
     }
 
-    override fun addPunishment(name: String, uuid: String, reason: String, operator: String, punishmentType: String, start: Long, end: Long) {
+    override fun addPunishment(name: String, uuid: String, reason: String, operator: String, punishmentType: String, start: Long, end: Long): Boolean {
         if (!isConnected()) {
             openConnection()
         }
@@ -89,9 +89,9 @@ class SQLiteDatabaseHandler(private val plugin: PunisherX) : DatabaseHandler {
             val query = """
         INSERT INTO `punishments` (name, uuid, reason, operator, punishmentType, start, end)
         VALUES (?, ?, ?, ?, ?, ?, ?)
-    """.trimIndent()
+        """.trimIndent()
 
-            try {
+            return try {
                 val preparedStatement: PreparedStatement = connection!!.prepareStatement(query)
                 preparedStatement.setString(1, name)
                 preparedStatement.setString(2, uuid)
@@ -102,11 +102,14 @@ class SQLiteDatabaseHandler(private val plugin: PunisherX) : DatabaseHandler {
                 preparedStatement.setLong(7, end)
                 preparedStatement.executeUpdate()
                 plugin.logger.debug("Punishment for player $name added to the database.")
+                true
             } catch (e: SQLException) {
                 plugin.logger.err("Failed to add punishment for player $name. ${e.message}")
+                false
             }
         } else {
             plugin.logger.warning("Failed to reconnect to the database.")
+            return false
         }
     }
 
