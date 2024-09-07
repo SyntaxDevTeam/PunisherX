@@ -3,8 +3,7 @@ package pl.syntaxdevteam.commands
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.plugin.configuration.PluginMeta
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.PunisherX
 import pl.syntaxdevteam.helpers.MessageHandler
@@ -45,11 +44,16 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                     if (filteredPunishments.isEmpty()) {
                         stack.sender.sendRichMessage(messageHandler.getMessage("check", "no_punishments", mapOf("player" to player)))
                     } else {
-                        val topHeader = Component.text("----------------------------------").color(NamedTextColor.BLUE)
-                        val header = Component.text("    Aktywne kary dla $player:").color(NamedTextColor.BLUE)
-                        val tableHeader = Component.text("|   Typ  |  Powód  |  Czas").color(NamedTextColor.GOLD)
-                        val br = Component.text(" ").color(NamedTextColor.WHITE)
-                        val hr = Component.text("|").color(NamedTextColor.WHITE)
+                        val types = messageHandler.getLogMessage("check", "type")
+                        val reasons = messageHandler.getLogMessage("check", "reason")
+                        val times = messageHandler.getLogMessage("check", "time")
+                        val title = messageHandler.getLogMessage("check", "title")
+                        val miniMessage = MiniMessage.miniMessage()
+                        val topHeader = miniMessage.deserialize("<blue>--------------------------------------</blue>")
+                        val header = miniMessage.deserialize("<blue>|    $title <gold>$player:</gold></blue>")
+                        val tableHeader = miniMessage.deserialize("<blue>|   $types  |  $reasons  |  $times</blue>")
+                        val br = miniMessage.deserialize("<blue> </blue>")
+                        val hr = miniMessage.deserialize("<blue>|</blue>")
                         stack.sender.sendMessage(br)
                         stack.sender.sendMessage(header)
                         stack.sender.sendMessage(topHeader)
@@ -61,7 +65,7 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                             val remainingTime = (endTime - System.currentTimeMillis()) / 1000
                             val duration = if (endTime == -1L) "permanent" else timeHandler.formatTime(remainingTime.toString())
                             val reason = punishment.reason
-                            val row = Component.text("|   ${punishment.type} | $reason | $duration").color(NamedTextColor.WHITE)
+                            val row = miniMessage.deserialize("<blue>|   <white>${punishment.type}</white> <blue>|</blue> <white>$reason</white> <blue>|</blue> <white>$duration</white>")
                             stack.sender.sendMessage(row)
                         }
                         stack.sender.sendMessage(topHeader)
