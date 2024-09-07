@@ -112,3 +112,7 @@ check:
   invalid_type: "Invalid penalty type. Use: all, ban, mute, warn."
   no_punishments: "Player {player} has no penalties."
   punishment_info: "Type: {type}, Reason: {reason}, Time: {time}"
+  title: "Active penalties for"
+  type: "Type"
+  reason: "Reason"
+  time: "Time"
