@@ -55,7 +55,10 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                     val start = System.currentTimeMillis()
                     val end: Long? = if (gtime != null) (System.currentTimeMillis() + timeHandler.parseTime(gtime) * 1000) else null
 
-                    plugin.databaseHandler.addPunishment(playerOrIpOrUUID, playerIP, reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    val success = plugin.databaseHandler.addPunishment(playerOrIpOrUUID, playerIP, reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    if (!success) {
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban-ip $playerOrIpOrUUID")
+                    }
                     plugin.databaseHandler.addPunishmentHistory(playerOrIpOrUUID, playerIP, reason, stack.sender.name, punishmentType, start, end ?: -1)
 
                     if (targetPlayer != null) {
