@@ -2,24 +2,24 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 
 error:
   no_permission: "<red>You do not have permission to use this command.</red>"
-  player_not_found: "<gold>Player with the nickname {player} not found.</gold>"
+  player_not_found: "<gold>Player with the nickname <gold>{player}</gold> not found.</gold>"
   reload: "<red>An error occurred while reloading the configuration:</red> "
-  bypass: “Player {player} cannot be punished due to their permissions.”
+  bypass: “Player <gold>{player}</gold> cannot be punished due to their permissions.”
 
 ban:
-  ban: "You banned {player} for {reason} for {time}"
+  ban: "You banned <gold>{player}</gold> for <gold>{reason}</gold> for <gold>{time}</gold>"
   usage: "Correct usage is: <gold>/ban <player> (time) <reason>"
   kick_message:
     - 'Server Name'
     - 'PunisherX &8» &7You have been banned'
     - '&7'
     - '&7'
-    - "&cReason &8» &7{reason}"
-    - "&cFor &8» &7{time}"
+    - "&cReason &8» &7<gold>{reason}</gold>"
+    - "&cFor &8» &7<gold>{time}</gold>"
     - '&7'
     - '&8You can appeal at:'
     - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
-  broadcast: "Player {player} has been banned for {reason} for {time}"
+  broadcast: "Player <gold>{player}</gold> has been banned for <gold>{reason}</gold> for <gold>{time}</gold>"
   no_reasons: "no reason"
   reasons:
     - "Cheating"
@@ -28,19 +28,19 @@ ban:
     - "Offensive language"
 
 banip:
-  ban: "You banned the player's IP for {reason} for {time}"
+  ban: "You banned the player's IP for <gold>{reason}</gold> for <gold>{time}</gold>"
   usage: "Correct usage is: <gold>/banip <player/ip> (time) <reason>"
   kick_message:
     - 'Server Name'
     - 'PunisherX &8» &7Your IP has been banned!'
     - '&7'
     - '&7'
-    - "&cReason &8» &7{reason}"
-    - "&cFor &8» &7{time}"
+    - "&cReason &8» &7<gold>{reason}</gold>"
+    - "&cFor &8» &7<gold>{time}</gold>"
     - '&7'
     - '&8You can appeal at:'
     - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.com/discord"
-  broadcast: "Player {player} has been banned for {reason} for {time}"
+  broadcast: "Player <gold>{player}</gold> has been banned for <gold>{reason}</gold> for <gold>{time}</gold>"
   no_reasons: "no reason"
   reasons:
     - "Multiple accounts"
@@ -49,16 +49,16 @@ banip:
     - "Offensive language"
 
 unban:
-  unban: "Player {player} has been unbanned"
+  unban: "Player <gold>{player}</gold> has been unbanned"
   usage: "Correct usage is: <gold>/unban <player>"
-  broadcast: "Player {player} has been unbanned"
+  broadcast: "Player <gold>{player}</gold> has been unbanned"
 
 mute:
-  mute: "You muted {player} for {reason} for {time}"
+  mute: "You muted <gold>{player}</gold> for <gold>{reason}</gold> for <gold>{time}</gold>"
   usage: "Correct usage is: <gold>/mute <player> (time) <reason>"
-  mute_message: "<red>You have been muted for <b>{reason}</b> for <b>{time}</b></red>"
+  mute_message: "<red>You have been muted for <b><gold>{reason}</gold></b> for <b><gold>{time}</gold></b></red>"
   mute_info_message: "You are trying to speak but you have been muted"
-  broadcast: "Player {player} has been muted for {reason} for {time}"
+  broadcast: "Player <gold>{player}</gold> has been muted for <gold>{reason}</gold> for <gold>{time}</gold>"
   no_reasons: "no reason"
   reasons:
     - "Advertising"
@@ -67,15 +67,15 @@ mute:
     - "Offensive language"
 
 unmute:
-  unmute: "You unmuted {player}"
+  unmute: "You unmuted <gold>{player}</gold>"
   usage: "Correct usage is: /unmute <player>"
   unmute_message: "You have been unmuted!"
 
 warn:
-  warn: "You warned ({warn_no} time) {player} for {reason} for {time}"
+  warn: "You warned ({warn_no} time) <gold>{player}</gold> for <gold>{reason}</gold> for <gold>{time}</gold>"
   usage: "Correct usage is: <gold>/warn <player> (time) <reason>"
   warn_message: "<red>You have received <b>{warn_no}</b> warning!</red>"
-  broadcast: "Player {player} has been warned for {reason} for {time}"
+  broadcast: "Player <gold>{player}</gold> has been warned for <gold>{reason}</gold> for <gold>{time}</gold>"
   no_reasons: "no reason"
   reasons:
     - "Advertising"
@@ -84,23 +84,23 @@ warn:
     - "Offensive language"
 
 unwarn:
-  unwarn: "You removed the warning for {player}"
+  unwarn: "You removed the warning for <gold>{player}</gold>"
   usage: "Correct usage is: <gold>/unwarn <player>"
 
 kick:
-  kick: "You kicked {player} for {reason}"
+  kick: "You kicked <gold>{player}</gold> for <gold>{reason}</gold>"
   usage: "Correct usage is: <gold>/kick <player> <reason>"
   kick_message:
     - 'Server Name'
     - 'PunisherX &8» &7You have been kicked'
     - '&7'
     - '&7'
-    - "&cReason &8» &7{reason}"
+    - "&cReason &8» &7<gold>{reason}</gold>"
     - '&7'
     - '&7'
     - '&8You can appeal at:'
     - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
-  broadcast: "Player {player} has been kicked for {reason}"
+  broadcast: "Player <gold>{player}</gold> has been kicked for <gold>{reason}</gold>"
   no_reasons: "no reason"
   reasons:
     - "Flood"
@@ -110,8 +110,8 @@ kick:
 check:
   usage: "Correct usage is: <gold>/check <player_name> <all|ban|mute|warn>"
   invalid_type: "Invalid penalty type. Use: all, ban, mute, warn."
-  no_punishments: "Player {player} has no penalties."
-  punishment_info: "Type: {type}, Reason: {reason}, Time: {time}"
+  no_punishments: "Player <gold>{player}</gold> has no penalties."
+  punishment_info: "Type: {type}, Reason: <gold>{reason}</gold>, Time: <gold>{time}</gold>"
   title: "Active penalties for"
   type: "Type"
   reason: "Reason"
@@ -119,11 +119,19 @@ check:
 
 formatTime:
   undefined: "undefined"
-  second: "second"
-  seconds: "seconds"
-  minute: "minute"
-  minutes: "minutes"
-  hour: "hour"
-  hours: "hours"
-  day: "day"
-  days: "days"
+  minute:
+    one: "minute"
+    few: "minutes"
+    many: "minutes"
+  second:
+    one: "second"
+    few: "seconds"
+    many: "seconds"
+  hour:
+    one: "hour"
+    few: "hours"
+    many: "hours"
+  day:
+    one: "day"
+    few: "days"
+    many: "days"
