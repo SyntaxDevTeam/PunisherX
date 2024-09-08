@@ -55,7 +55,7 @@ class PunisherX : JavaPlugin(), Listener {
         databaseHandler.createTables()
         messageHandler = MessageHandler(this, pluginMetas)
         playerIPManager = PlayerIPManager(this)
-        timeHandler = TimeHandler(this.config.getString("language") ?: "PL")
+        timeHandler = TimeHandler(this, pluginMetas)
         punishmentManager = PunishmentManager()
         server.pluginManager.registerEvents(PlayerIPManager(this), this)
         val manager: LifecycleEventManager<Plugin> = this.lifecycleManager

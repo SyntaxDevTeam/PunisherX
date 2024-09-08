@@ -15,7 +15,7 @@ import pl.syntaxdevteam.helpers.TimeHandler
 class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : BasicCommand {
 
     private val messageHandler = MessageHandler(plugin, pluginMetas)
-    private val timeHandler = TimeHandler(plugin.config.getString("language") ?: "PL")
+    private val timeHandler = TimeHandler(plugin, pluginMetas)
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (args.isNotEmpty()) {
