@@ -24,6 +24,7 @@ class PunisherX : JavaPlugin(), Listener {
     private val pluginMetas = this.pluginMeta
     private var config = getConfig()
     private var debugMode = config.getBoolean("debug")
+    private val language = config.getString("language") ?: "EN"
     private lateinit var pluginManager: PluginManager
     private lateinit var statsCollector: StatsCollector
     lateinit var databaseHandler: DatabaseHandler
@@ -73,6 +74,15 @@ class PunisherX : JavaPlugin(), Listener {
             commands.register("banip", messageHandler.getMessage("banip", "usage"), BanIpCommand(this, pluginMetas))
             commands.register("unban", messageHandler.getMessage("ban", "usage"), UnBanCommand(this, pluginMetas))
         }
+        val author = when (language.lowercase()) {
+            "pl" -> "WieszczY"
+            "en" -> "Syntaxerr"
+            "fr" -> "OpenAI Chat GPT-3.5"
+            "es" -> "OpenAI Chat GPT-3.5"
+            "de" -> "OpenAI Chat GPT-3.5"
+            else -> getServerName()
+        }
+        logger.log("<gray>Loaded language file by: <white><b>$author</b></white>")
         server.pluginManager.registerEvents(PunishmentChecker(this), this)
         pluginManager = PluginManager(this)
         val externalPlugins = pluginManager.fetchPluginsFromExternalSource("https://raw.githubusercontent.com/SyntaxDevTeam/plugins-list/main/plugins.json")
@@ -104,5 +114,22 @@ class PunisherX : JavaPlugin(), Listener {
     override fun onDisable() {
         databaseHandler.closeConnection()
         AsyncChatEvent.getHandlerList().unregister(this as Plugin)
+    }
+
+    private fun getServerName(): String {
+        val properties = Properties()
+        val file = File("server.properties")
+        if (file.exists()) {
+            properties.load(file.inputStream())
+            val serverName = properties.getProperty("server-name")
+            if (serverName != null) {
+                return serverName
+            } else {
+                logger.debug("Właściwość 'server-name' nie została znaleziona w pliku server.properties.")
+            }
+        } else {
+            logger.debug("Plik server.properties nie istnieje.")
+        }
+        return "Unknown Server"
     }
 }
