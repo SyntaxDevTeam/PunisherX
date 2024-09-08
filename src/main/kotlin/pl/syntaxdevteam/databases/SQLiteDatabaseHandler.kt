@@ -148,28 +148,49 @@ class SQLiteDatabaseHandler(private val plugin: PunisherX) : DatabaseHandler {
             openConnection()
         }
         if (isConnected()) {
-            val query = if (removeAll) {
-                """
-            DELETE FROM `punishments` 
-            WHERE `uuid` = ? AND `punishmentType` = ?
-            """.trimIndent()
-            } else {
-                """
-            DELETE FROM `punishments` 
-            WHERE `uuid` = ? AND `punishmentType` = ?
-            ORDER BY `start` DESC
-            LIMIT 1
-            """.trimIndent()
-            }
             try {
-                val preparedStatement: PreparedStatement = connection!!.prepareStatement(query)
-                preparedStatement.setString(1, uuidOrIp)
-                preparedStatement.setString(2, punishmentType)
-                val rowsAffected = preparedStatement.executeUpdate()
-                if (rowsAffected > 0) {
-                    plugin.logger.debug("Punishment of type $punishmentType for UUID/IP: $uuidOrIp removed from the database.")
+                if (removeAll) {
+                    val query = """
+                    DELETE FROM `punishments` 
+                    WHERE `uuid` = ? AND `punishmentType` = ?
+                """.trimIndent()
+                    val preparedStatement: PreparedStatement = connection!!.prepareStatement(query)
+                    preparedStatement.setString(1, uuidOrIp)
+                    preparedStatement.setString(2, punishmentType)
+                    val rowsAffected = preparedStatement.executeUpdate()
+                    if (rowsAffected > 0) {
+                        plugin.logger.debug("Punishment of type $punishmentType for UUID/IP: $uuidOrIp removed from the database.")
+                    } else {
+                        plugin.logger.warning("No punishment of type $punishmentType found for UUID/IP: $uuidOrIp.")
+                    }
                 } else {
-                    plugin.logger.warning("No punishment of type $punishmentType found for UUID/IP: $uuidOrIp.")
+                    val selectQuery = """
+                    SELECT `id` FROM `punishments` 
+                    WHERE `uuid` = ? AND `punishmentType` = ?
+                    ORDER BY `start` DESC
+                    LIMIT 1
+                """.trimIndent()
+                    val selectStatement: PreparedStatement = connection!!.prepareStatement(selectQuery)
+                    selectStatement.setString(1, uuidOrIp)
+                    selectStatement.setString(2, punishmentType)
+                    val resultSet = selectStatement.executeQuery()
+                    if (resultSet.next()) {
+                        val id = resultSet.getInt("id")
+                        val deleteQuery = """
+                        DELETE FROM `punishments` 
+                        WHERE `id` = ?
+                    """.trimIndent()
+                        val deleteStatement: PreparedStatement = connection!!.prepareStatement(deleteQuery)
+                        deleteStatement.setInt(1, id)
+                        val rowsAffected = deleteStatement.executeUpdate()
+                        if (rowsAffected > 0) {
+                            plugin.logger.debug("Punishment of type $punishmentType for UUID/IP: $uuidOrIp removed from the database.")
+                        } else {
+                            plugin.logger.warning("No punishment of type $punishmentType found for UUID/IP: $uuidOrIp.")
+                        }
+                    } else {
+                        plugin.logger.warning("No punishment of type $punishmentType found for UUID/IP: $uuidOrIp.")
+                    }
                 }
             } catch (e: SQLException) {
                 plugin.logger.err("Failed to remove punishment of type $punishmentType for UUID/IP: $uuidOrIp. ${e.message}")
