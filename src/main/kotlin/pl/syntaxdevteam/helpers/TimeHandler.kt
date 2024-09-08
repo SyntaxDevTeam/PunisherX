@@ -4,7 +4,7 @@ import io.papermc.paper.plugin.configuration.PluginMeta
 import pl.syntaxdevteam.PunisherX
 
 @Suppress("UnstableApiUsage")
-class TimeHandler(plugin: PunisherX, pluginMetas: PluginMeta) {
+class TimeHandler(plugin: PunisherX, pluginMetas: PluginMeta, private val language: String) {
     private val messageHandler = MessageHandler(plugin, pluginMetas)
 
     fun parseTime(time: String): Long {
@@ -31,10 +31,10 @@ class TimeHandler(plugin: PunisherX, pluginMetas: PluginMeta) {
             val minutes = (totalSeconds % (60 * 60)) / 60
             val seconds = totalSeconds % 60
 
-            val dayMessage = if (days == 1L) messageHandler.getLogMessage("formatTime", "day") else messageHandler.getLogMessage("formatTime", "days")
-            val hourMessage = if (hours == 1L) messageHandler.getLogMessage("formatTime", "hour") else messageHandler.getLogMessage("formatTime", "hours")
-            val minuteMessage = if (minutes == 1L) messageHandler.getLogMessage("formatTime", "minute") else messageHandler.getLogMessage("formatTime", "minutes")
-            val secondMessage = if (seconds == 1L) messageHandler.getLogMessage("formatTime", "second") else messageHandler.getLogMessage("formatTime", "seconds")
+            val dayMessage = getLocalizedMessage("day", days)
+            val hourMessage = getLocalizedMessage("hour", hours)
+            val minuteMessage = getLocalizedMessage("minute", minutes)
+            val secondMessage = getLocalizedMessage("second", seconds)
 
             val timeComponents = mutableListOf<String>()
             if (days > 0) timeComponents.add("$days $dayMessage")
@@ -49,11 +49,27 @@ class TimeHandler(plugin: PunisherX, pluginMetas: PluginMeta) {
         val unit = time.last()
 
         return when (unit) {
-            's' -> "$amount ${if (amount == 1L) messageHandler.getLogMessage("formatTime", "second") else messageHandler.getLogMessage("formatTime", "seconds")}"
-            'm' -> "$amount ${if (amount == 1L) messageHandler.getLogMessage("formatTime", "minute") else messageHandler.getLogMessage("formatTime", "minutes")}"
-            'h' -> "$amount ${if (amount == 1L) messageHandler.getLogMessage("formatTime", "hour") else messageHandler.getLogMessage("formatTime", "hours")}"
-            'd' -> "$amount ${if (amount == 1L) messageHandler.getLogMessage("formatTime", "day") else messageHandler.getLogMessage("formatTime", "days")}"
+            's' -> "$amount ${getLocalizedMessage("second", amount)}"
+            'm' -> "$amount ${getLocalizedMessage("minute", amount)}"
+            'h' -> "$amount ${getLocalizedMessage("hour", amount)}"
+            'd' -> "$amount ${getLocalizedMessage("day", amount)}"
             else -> messageHandler.getLogMessage("formatTime", "undefined")
+        }
+    }
+
+    private fun getLocalizedMessage(unit: String, amount: Long): String {
+        return if (language == "PL") {
+            when {
+                amount == 1L -> messageHandler.getLogMessage("formatTime.pl.$unit", "one")
+                amount in 2..4 -> messageHandler.getLogMessage("formatTime.pl.$unit", "few")
+                else -> messageHandler.getLogMessage("formatTime.pl.$unit", "many")
+            }
+        } else {
+            when {
+                amount == 1L -> messageHandler.getLogMessage("formatTime.$unit", "one")
+                amount in 2..4 -> messageHandler.getLogMessage("formatTime.$unit", "few")
+                else -> messageHandler.getLogMessage("formatTime.$unit", "many")
+            }
         }
     }
 }
