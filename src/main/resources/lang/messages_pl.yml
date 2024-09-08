@@ -116,3 +116,14 @@ check:
   type: "Typ"
   reason: "Powód"
   time: "Pozostały czas"
+
+formatTime:
+  undefined: "niekreślony"
+  second: "sekunda"
+  seconds: "sekund"
+  minute: "minuta"
+  minutes: "minuty"
+  hour: "godzina"
+  hours: "godziny"
+  day: "dzień"
+  days: "dni"
