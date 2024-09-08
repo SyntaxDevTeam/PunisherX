@@ -1,0 +1,139 @@
+# Fichier traduit à l'aide de Chat GPT, si vous pensez qu'il nécessite des corrections, faites-le nous savoir sur Discord (https://discord.gg/Zk6mxv7eMh).
+
+prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>"
+
+error:
+  no_permission: "<red>Vous n'avez pas la permission d'utiliser cette commande.</red>"
+  player_not_found: "<gold>Joueur avec le pseudo <gold>{player}</gold> non trouvé.</gold>"
+  reload: "<red>Une erreur s'est produite lors du rechargement de la configuration :</red> "
+  bypass: "Le joueur <gold>{player}</gold> ne peut pas être puni en raison de ses permissions."
+
+ban:
+  ban: "Vous avez banni <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
+  usage: "Utilisation correcte : <gold>/ban <player> (temps) <raison>"
+  kick_message:
+    - 'Nom du serveur'
+    - 'PunisherX &8» &7Vous avez été banni'
+    - '&7'
+    - '&7'
+    - "&cRaison &8» &7<gold>{reason}</gold>"
+    - "&cPour &8» &7<gold>{time}</gold>"
+    - '&7'
+    - '&8Vous pouvez faire appel sur :'
+    - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
+  broadcast: "Le joueur <gold>{player}</gold> a été banni pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
+  no_reasons: "sans raison"
+  reasons:
+    - "Tricherie"
+    - "Griefing"
+    - "Spamming"
+    - "Langage offensant"
+
+banip:
+  ban: "Vous avez banni l'IP du joueur pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
+  usage: "Utilisation correcte : <gold>/banip <player/ip> (temps) <raison>"
+  kick_message:
+    - 'Nom du serveur'
+    - 'PunisherX &8» &7Votre IP a été bannie !'
+    - '&7'
+    - '&7'
+    - "&cRaison &8» &7<gold>{reason}</gold>"
+    - "&cPour &8» &7<gold>{time}</gold>"
+    - '&7'
+    - '&8Vous pouvez faire appel sur :'
+    - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.com/discord"
+  broadcast: "Le joueur <gold>{player}</gold> a été banni pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
+  no_reasons: "sans raison"
+  reasons:
+    - "Comptes multiples"
+    - "Griefing"
+    - "Spamming"
+    - "Langage offensant"
+
+unban:
+  unban: "Le joueur <gold>{player}</gold> a été débanni"
+  usage: "Utilisation correcte : <gold>/unban <player>"
+  broadcast: "Le joueur <gold>{player}</gold> a été débanni"
+
+mute:
+  mute: "Vous avez réduit au silence <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
+  usage: "Utilisation correcte : <gold>/mute <player> (temps) <raison>"
+  mute_message: "<red>Vous avez été réduit au silence pour <b><gold>{reason}</gold></b> pendant <b><gold>{time}</gold></b></red>"
+  mute_info_message: "Vous essayez de parler mais vous avez été réduit au silence"
+  broadcast: "Le joueur <gold>{player}</gold> a été réduit au silence pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
+  no_reasons: "sans raison"
+  reasons:
+    - "Publicité"
+    - "Spamming"
+    - "Insulte de joueur"
+    - "Langage offensant"
+
+unmute:
+  unmute: "Vous avez rétabli la voix de <gold>{player}</gold>"
+  usage: "Utilisation correcte : /unmute <player>"
+  unmute_message: "Vous avez été rétabli !"
+
+warn:
+  warn: "Vous avez averti ({warn_no} fois) <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
+  usage: "Utilisation correcte : <gold>/warn <player> (temps) <raison>"
+  warn_message: "<red>Vous avez reçu <b>{warn_no}</b> avertissement !</red>"
+  broadcast: "Le joueur <gold>{player}</gold> a été averti pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
+  no_reasons: "sans raison"
+  reasons:
+    - "Publicité"
+    - "Spamming"
+    - "Insulte de joueur"
+    - "Langage offensant"
+
+unwarn:
+  unwarn: "Vous avez supprimé l'avertissement pour <gold>{player}</gold>"
+  usage: "Utilisation correcte : <gold>/unwarn <player>"
+
+kick:
+  kick: "Vous avez expulsé <gold>{player}</gold> pour <gold>{reason}</gold>"
+  usage: "Utilisation correcte : <gold>/kick <player> <raison>"
+  kick_message:
+    - 'Nom du serveur'
+    - 'PunisherX &8» &7Vous avez été expulsé'
+    - '&7'
+    - '&7'
+    - "&cRaison &8» &7<gold>{reason}</gold>"
+    - '&7'
+    - '&7'
+    - '&8Vous pouvez faire appel sur :'
+    - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
+  broadcast: "Le joueur <gold>{player}</gold> a été expulsé pour <gold>{reason}</gold>"
+  no_reasons: "sans raison"
+  reasons:
+    - "Flood"
+    - "Spamming"
+    - "Langage offensant"
+
+check:
+  usage: "Utilisation correcte : <gold>/check <nom_joueur> <all|ban|mute|warn>"
+  invalid_type: "Type de pénalité invalide. Utilisez : all, ban, mute, warn."
+  no_punishments: "Le joueur <gold>{player}</gold> n'a pas de pénalités."
+  punishment_info: "Type : {type}, Raison : <gold>{reason}</gold>, Temps : <gold>{time}</gold>"
+  title: "Pénalités actives pour"
+  type: "Type"
+  reason: "Raison"
+  time: "Temps"
+
+formatTime:
+  undefined: "indéfini"
+  minute:
+    one: "minute"
+    few: "minutes"
+    many: "minutes"
+  second:
+    one: "seconde"
+    few: "secondes"
+    many: "secondes"
+  hour:
+    one: "heure"
+    few: "heures"
+    many: "heures"
+  day:
+    one: "jour"
+    few: "jours"
+    many: "jours"
