@@ -4,7 +4,7 @@ import io.papermc.paper.plugin.configuration.PluginMeta
 import pl.syntaxdevteam.PunisherX
 
 @Suppress("UnstableApiUsage")
-class TimeHandler(plugin: PunisherX, pluginMetas: PluginMeta, private val language: String) {
+class TimeHandler(plugin: PunisherX, pluginMetas: PluginMeta) {
     private val messageHandler = MessageHandler(plugin, pluginMetas)
 
     fun parseTime(time: String): Long {
@@ -58,18 +58,11 @@ class TimeHandler(plugin: PunisherX, pluginMetas: PluginMeta, private val langua
     }
 
     private fun getLocalizedMessage(unit: String, amount: Long): String {
-        return if (language == "PL") {
-            when {
-                amount == 1L -> messageHandler.getLogMessage("formatTime.pl.$unit", "one")
-                amount in 2..4 -> messageHandler.getLogMessage("formatTime.pl.$unit", "few")
-                else -> messageHandler.getLogMessage("formatTime.pl.$unit", "many")
-            }
-        } else {
-            when {
-                amount == 1L -> messageHandler.getLogMessage("formatTime.$unit", "one")
-                amount in 2..4 -> messageHandler.getLogMessage("formatTime.$unit", "few")
-                else -> messageHandler.getLogMessage("formatTime.$unit", "many")
-            }
+        val unitPath = "formatTime.$unit"
+        return when (amount) {
+            1L -> messageHandler.getLogMessage(unitPath, "one")
+            in 2..4 -> messageHandler.getLogMessage(unitPath, "few")
+            else -> messageHandler.getLogMessage(unitPath, "many")
         }
     }
 }
