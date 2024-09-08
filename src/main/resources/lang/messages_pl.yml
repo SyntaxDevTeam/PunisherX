@@ -118,12 +118,20 @@ check:
   time: "Pozostały czas"
 
 formatTime:
-  undefined: "niekreślony"
-  second: "sekunda"
-  seconds: "sekund"
-  minute: "minuta"
-  minutes: "minuty"
-  hour: "godzina"
-  hours: "godziny"
-  day: "dzień"
-  days: "dni"
+  undefined: "nieokreślony"
+  minute:
+    one: "minuta"
+    few: "minuty"
+    many: "minut"
+  second:
+    one: "sekunda"
+    few: "sekundy"
+    many: "sekund"
+  hour:
+    one: "godzina"
+    few: "godziny"
+    many: "godzin"
+  day:
+    one: "dzień"
+    few: "dni"
+    many: "dni"
