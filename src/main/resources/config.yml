@@ -10,8 +10,10 @@ database:
     username: "user"
     password: "password"
 
-# Plugin language selection. Possible values: "EN", "PL"
+# Plugin language selection. Possible values:  EN, PL, ES, FR, DE
+# If you would like to add your own language file, please contact us on Discord (https://discord.gg/Zk6mxv7eMh).
 language: "EN"
+
 
 # Should private messages also be blocked when MUTE penalty is applied?
 mute_pm: false
