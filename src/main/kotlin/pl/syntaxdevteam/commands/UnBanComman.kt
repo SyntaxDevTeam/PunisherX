@@ -4,6 +4,7 @@ import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.plugin.configuration.PluginMeta
 import net.kyori.adventure.text.minimessage.MiniMessage
+import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.PunisherX
 import pl.syntaxdevteam.helpers.Logger
@@ -45,6 +46,7 @@ class UnBanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                         punishments.forEach { punishment ->
                             if (punishment.type == "BAN") {
                                 plugin.databaseHandler.removePunishment(uuid, punishment.type)
+                                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "pardon $playerOrIpOrUUID")
                             }
                         }
                         stack.sender.sendRichMessage(messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
@@ -60,6 +62,7 @@ class UnBanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                                 punishmentsByIP.forEach { punishment ->
                                     if (punishment.type == "BANIP") {
                                         plugin.databaseHandler.removePunishment(ip, punishment.type)
+                                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "pardon-ip $ip")
                                     }
                                 }
                                 stack.sender.sendRichMessage(messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
