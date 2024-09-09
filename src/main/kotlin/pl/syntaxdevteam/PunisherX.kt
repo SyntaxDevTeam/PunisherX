@@ -7,8 +7,7 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
-import pl.syntaxdevteam.basic.PunishmentChecker
-import pl.syntaxdevteam.basic.PunishmentManager
+import pl.syntaxdevteam.basic.*
 import pl.syntaxdevteam.commands.*
 import pl.syntaxdevteam.databases.DatabaseHandler
 import pl.syntaxdevteam.databases.MySQLDatabaseHandler
@@ -102,7 +101,7 @@ class PunisherX : JavaPlugin(), Listener {
         return this.file
     }
 
-    fun restartGuardianTask() {
+    fun reloadMyConfig() {
         try {
             super.reloadConfig()
             messageHandler.reloadMessages()

@@ -49,7 +49,7 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                         val times = messageHandler.getLogMessage("check", "time")
                         val title = messageHandler.getLogMessage("check", "title")
                         val miniMessage = MiniMessage.miniMessage()
-                        val topHeader = miniMessage.deserialize("<blue>--------------------------------------</blue>")
+                        val topHeader = miniMessage.deserialize("<blue>--------------------------------------------------</blue>")
                         val header = miniMessage.deserialize("<blue>|    $title <gold>$player:</gold></blue>")
                         val tableHeader = miniMessage.deserialize("<blue>|   $types  |  $reasons  |  $times</blue>")
                         val br = miniMessage.deserialize("<blue> </blue>")
