@@ -2,10 +2,9 @@ package pl.syntaxdevteam.helpers
 
 import pl.syntaxdevteam.PunisherX
 import java.net.HttpURLConnection
-import java.net.URL
+import java.net.URI
 
-@Suppress("DEPRECATION")
-class StatsCollector(private val plugin: PunisherX) {
+class StatsCollector(plugin: PunisherX) {
 
     private val serverIP = getExternalIP()
     private val serverPort = plugin.server.port
@@ -21,8 +20,8 @@ class StatsCollector(private val plugin: PunisherX) {
     }
 
     private fun sendPing() {
-        val url = URL(statsUrl)
-        with(url.openConnection() as HttpURLConnection) {
+        val uri = URI(statsUrl)
+        with(uri.toURL().openConnection() as HttpURLConnection) {
             requestMethod = "POST"
             doOutput = true
             outputStream.write("pluginName=$pluginName&serverIP=$serverIP&serverPort=$serverPort&serverVersion=$serverVersion&serverName=$serverName".toByteArray())
@@ -34,7 +33,7 @@ class StatsCollector(private val plugin: PunisherX) {
 
     private fun getExternalIP(): String {
         return try {
-            URL("https://api.ipify.org").readText()
+            URI("https://api.ipify.org").toURL().readText()
         } catch (e: Exception) {
             "unknown"
         }
