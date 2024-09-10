@@ -4,6 +4,7 @@ import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.plugin.configuration.PluginMeta
 import net.kyori.adventure.text.minimessage.MiniMessage
+import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.PunisherX
 import pl.syntaxdevteam.helpers.MessageHandler
@@ -28,7 +29,10 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                 } else {
                     val type = args[1]
                     val uuid = uuidManager.getUUID(player)
-
+                    val targetPlayer = when (Bukkit.getPlayer(player)?.name) {
+                        null -> Bukkit.getOfflinePlayer(uuid).name
+                        else -> Bukkit.getPlayer(player)?.name
+                    }
                     val punishments = plugin.databaseHandler.getPunishments(uuid.toString())
                     val filteredPunishments = when (type.lowercase()) {
                         "all" -> punishments
@@ -48,9 +52,14 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                         val reasons = messageHandler.getLogMessage("check", "reason")
                         val times = messageHandler.getLogMessage("check", "time")
                         val title = messageHandler.getLogMessage("check", "title")
+                        val gamer = if (stack.sender.name == "CONSOLE") {
+                            "<gold>$targetPlayer <gray>[$uuid]</gray>:</gold>"
+                        } else {
+                            "<gold><hover:show_text:'[<white>$uuid</white>]'>$targetPlayer:</gold>"
+                        }
                         val miniMessage = MiniMessage.miniMessage()
                         val topHeader = miniMessage.deserialize("<blue>--------------------------------------------------</blue>")
-                        val header = miniMessage.deserialize("<blue>|    $title <gold>$player:</gold></blue>")
+                        val header = miniMessage.deserialize("<blue>|    $title $gamer</blue>")
                         val tableHeader = miniMessage.deserialize("<blue>|   $types  |  $reasons  |  $times</blue>")
                         val br = miniMessage.deserialize("<blue> </blue>")
                         val hr = miniMessage.deserialize("<blue>|</blue>")
