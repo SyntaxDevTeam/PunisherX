@@ -27,7 +27,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         val player = event.player
         val playerName = player.name
         val playerUUID = player.uniqueId.toString()
-        val playerIP = player.address?.address?.hostAddress
+        val playerIP = "89.64.104.144" //player.address?.address?.hostAddress
 
         if (playerIP != null) {
             val country = geoIPHandler.getCountry(playerIP)

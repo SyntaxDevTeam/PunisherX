@@ -65,14 +65,14 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, priva
 
 
                         val gamer = if (stack.sender.name == "CONSOLE") {
-                            "<gold>$targetPlayer <gray>[$uuid]</gray>:</gold> <gray>($geoLocation)</gray>"
+                            "<gold>$targetPlayer <gray>[$uuid, $geoLocation]</gray>:</gold>"
                         } else {
                             "<gold><hover:show_text:'[<white>$uuid, $geoLocation</white>]'>$targetPlayer:</gold>"
                         }
                         val miniMessage = MiniMessage.miniMessage()
                         val topHeader = miniMessage.deserialize("<blue>--------------------------------------------------</blue>")
                         val header = miniMessage.deserialize("<blue>|    $title $gamer</blue>")
-                        val tableHeader = miniMessage.deserialize("<blue>|   $types  |  $reasons  |  $times</blue>")
+                        val tableHeader = miniMessage.deserialize("<blue>|   ID:  |  $types  |  $reasons  |  $times</blue>")
                         val br = miniMessage.deserialize("<blue> </blue>")
                         val hr = miniMessage.deserialize("<blue>|</blue>")
                         stack.sender.sendMessage(br)
@@ -86,7 +86,7 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, priva
                             val remainingTime = (endTime - System.currentTimeMillis()) / 1000
                             val duration = if (endTime == -1L) "permanent" else timeHandler.formatTime(remainingTime.toString())
                             val reason = punishment.reason
-                            val row = miniMessage.deserialize("<blue>|   <white>${punishment.type}</white> <blue>|</blue> <white>$reason</white> <blue>|</blue> <white>$duration</white>")
+                            val row = miniMessage.deserialize("<blue>|   <white>#${punishment.id}</white> <blue>|</blue> <white>${punishment.type}</white> <blue>|</blue> <white>$reason</white> <blue>|</blue> <white>$duration</white>")
                             stack.sender.sendMessage(row)
                         }
                         stack.sender.sendMessage(topHeader)
