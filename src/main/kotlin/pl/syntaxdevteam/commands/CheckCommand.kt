@@ -10,9 +10,10 @@ import pl.syntaxdevteam.PunisherX
 import pl.syntaxdevteam.helpers.MessageHandler
 import pl.syntaxdevteam.helpers.TimeHandler
 import pl.syntaxdevteam.helpers.UUIDManager
+import pl.syntaxdevteam.players.PlayerIPManager
 
 @Suppress("UnstableApiUsage")
-class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : BasicCommand {
+class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, private val playerIPManager: PlayerIPManager) : BasicCommand {
 
     private val uuidManager = UUIDManager(plugin)
     private val messageHandler = MessageHandler(plugin, pluginMetas)
@@ -52,10 +53,17 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                         val reasons = messageHandler.getLogMessage("check", "reason")
                         val times = messageHandler.getLogMessage("check", "time")
                         val title = messageHandler.getLogMessage("check", "title")
+                        val playerIP = playerIPManager.getPlayerIPByName(player)
+                        val geoLocation = playerIP?.let { ip ->
+                            val country = playerIPManager.geoIPHandler.getCountry(ip)
+                            val city = playerIPManager.geoIPHandler.getCity(ip)
+                            "$city, $country"
+                        } ?: "Unknown location"
+
                         val gamer = if (stack.sender.name == "CONSOLE") {
-                            "<gold>$targetPlayer <gray>[$uuid]</gray>:</gold>"
+                            "<gold>$targetPlayer <gray>[$uuid]</gray>:</gold> <gray>($geoLocation)</gray>"
                         } else {
-                            "<gold><hover:show_text:'[<white>$uuid</white>]'>$targetPlayer:</gold>"
+                            "<gold><hover:show_text:'[<white>$uuid</white>]'>$targetPlayer:</gold> <gray>($geoLocation)</gray>"
                         }
                         val miniMessage = MiniMessage.miniMessage()
                         val topHeader = miniMessage.deserialize("<blue>--------------------------------------------------</blue>")
