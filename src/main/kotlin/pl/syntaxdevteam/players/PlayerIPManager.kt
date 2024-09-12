@@ -43,19 +43,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
     }
 
     private fun isPlayerInfoExists(playerName: String, playerUUID: String, playerIP: String): Boolean {
-        return cacheFile.readLines().any { line ->
-            if (isHexadecimal(line)) {
-                val decryptedData = decrypt(line)
-                val (name, uuid, ip) = decryptedData.split(",")
-                name == playerName && uuid == playerUUID && ip == playerIP
-            } else {
-                false
-            }
-        }
-    }
-
-    private fun isHexadecimal(data: String): Boolean {
-        return data.all { it.isDigit() || it in 'a'..'f' || it in 'A'..'F' }
+        return searchCache(playerName, playerUUID, playerIP) != null
     }
 
     private fun savePlayerInfo(playerName: String, playerUUID: String, playerIP: String, geoLocation: String?) {
@@ -89,30 +77,30 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
 
     fun getPlayerIPByName(playerName: String): String? {
         plugin.logger.debug("Fetching IP for player: $playerName")
-        val ip = searchCache { it[0] == playerName }
+        val ip = searchCache(playerName, "", "")
         plugin.logger.debug("Found IP for player $playerName: $ip")
         return ip
     }
 
-
     fun getPlayerIPByUUID(playerUUID: String): String? {
-        return searchCache { it[1] == playerUUID }
+        plugin.logger.debug("Fetching IP for UUID: $playerUUID")
+        val ip = searchCache("", playerUUID, "")
+        plugin.logger.debug("Found IP for UUID $playerUUID: $ip")
+        return ip
     }
-/*
-    fun getPlayerNamesByIP(playerIP: String): List<String> {
-        return searchCacheMultiple { it[2] == playerIP }
-    }
-*/
-    private fun searchCache(predicate: (List<String>) -> Boolean): String? {
+
+    private fun searchCache(playerName: String, playerUUID: String, playerIP: String): String? {
         plugin.logger.debug("Searching cache")
         val lines = cacheFile.readLines()
         plugin.logger.debug("Number of lines in cache: ${lines.size}")
         for (line in lines) {
             val decryptedLine = decrypt(line)
             plugin.logger.debug("Decrypted line: $decryptedLine")
-            val parts = decryptedLine.split(",")
+            val parts = decryptedLine.split(",").map { it.trim().lowercase() }
             plugin.logger.debug("Split parts: $parts")
-            if (predicate(parts.map { it.lowercase() })) {
+            if ((playerName.isEmpty() || parts[0] == playerName.lowercase()) &&
+                (playerUUID.isEmpty() || parts[1] == playerUUID.lowercase()) &&
+                (playerIP.isEmpty() || parts[2] == playerIP.lowercase())) {
                 plugin.logger.debug("Match found: ${parts[2]}")
                 return parts[2]
             }
@@ -120,9 +108,13 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         plugin.logger.debug("No match found in cache")
         return null
     }
-/*
-    private fun searchCacheMultiple(predicate: (List<String>) -> Boolean): List<String> {
-        return cacheFile.readLines().map { decrypt(it).split(",") }.filter(predicate).map { it[0] }
-    }
-*/
+    /*
+        fun getPlayerNamesByIP(playerIP: String): List<String> {
+            return searchCacheMultiple { it[2] == playerIP }
+        }
+
+        private fun searchCacheMultiple(predicate: (List<String>) -> Boolean): List<String> {
+            return cacheFile.readLines().map { decrypt(it).split(",") }.filter(predicate).map { it[0] }
+        }
+    */
 }

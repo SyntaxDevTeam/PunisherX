@@ -54,16 +54,20 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, priva
                         val times = messageHandler.getLogMessage("check", "time")
                         val title = messageHandler.getLogMessage("check", "title")
                         val playerIP = playerIPManager.getPlayerIPByName(player)
+                        plugin.logger.debug("Player IP: $playerIP")
                         val geoLocation = playerIP?.let { ip ->
                             val country = playerIPManager.geoIPHandler.getCountry(ip)
                             val city = playerIPManager.geoIPHandler.getCity(ip)
+                            plugin.logger.debug("Country: $country, City: $city")
                             "$city, $country"
                         } ?: "Unknown location"
+                        plugin.logger.debug("GeoLocation: $geoLocation")
+
 
                         val gamer = if (stack.sender.name == "CONSOLE") {
                             "<gold>$targetPlayer <gray>[$uuid]</gray>:</gold> <gray>($geoLocation)</gray>"
                         } else {
-                            "<gold><hover:show_text:'[<white>$uuid</white>]'>$targetPlayer:</gold> <gray>($geoLocation)</gray>"
+                            "<gold><hover:show_text:'[<white>$uuid, $geoLocation</white>]'>$targetPlayer:</gold>"
                         }
                         val miniMessage = MiniMessage.miniMessage()
                         val topHeader = miniMessage.deserialize("<blue>--------------------------------------------------</blue>")
