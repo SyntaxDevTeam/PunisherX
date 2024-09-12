@@ -67,7 +67,7 @@ class PunisherX : JavaPlugin(), Listener {
             val commands: Commands = event.registrar()
             commands.register("punisherx", "PunisherX plugin command. Type /punisherx help to check available commands", PunishesXCommands(this))
             commands.register("prx", "PunisherX plugin command. Type /prx help to check available commands", PunishesXCommands(this))
-            commands.register("check", "Checking player penalties" + messageHandler.getMessage("check", "usage"), CheckCommand(this, pluginMetas))
+            commands.register("check", "Checking player penalties" + messageHandler.getMessage("check", "usage"), CheckCommand(this, pluginMetas, playerIPManager))
             commands.register("kick", messageHandler.getMessage("kick", "usage"), KickCommand(this, pluginMetas))
             commands.register("warn", messageHandler.getMessage("warn", "usage"), WarnCommand(this, pluginMetas))
             commands.register("unwarn", messageHandler.getMessage("unwarn", "usage"), UnWarnCommand(this, pluginMetas))
