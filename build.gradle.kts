@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam"
-version = "1.0-PreRelease-3"
+version = "1.0.0-DEV"
 
 repositories {
     mavenCentral()
@@ -30,6 +30,8 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:3.0.0-beta-2")
     implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.0-beta-2")
     implementation("com.googlecode.json-simple:json-simple:1.1.1")
+    implementation("com.maxmind.geoip2:geoip2:4.2.0")
+    implementation("org.apache.commons:commons-compress:1.26.0")
 }
 
 val targetJavaVersion = 21

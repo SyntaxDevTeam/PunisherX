@@ -13,6 +13,7 @@ import pl.syntaxdevteam.databases.DatabaseHandler
 import pl.syntaxdevteam.databases.MySQLDatabaseHandler
 import pl.syntaxdevteam.databases.SQLiteDatabaseHandler
 import pl.syntaxdevteam.helpers.*
+import pl.syntaxdevteam.players.GeoIPHandler
 import pl.syntaxdevteam.players.PlayerIPManager
 import java.io.File
 import java.util.*
@@ -54,10 +55,13 @@ class PunisherX : JavaPlugin(), Listener {
         databaseHandler.openConnection()
         databaseHandler.createTables()
         messageHandler = MessageHandler(this, pluginMetas)
-        playerIPManager = PlayerIPManager(this)
         timeHandler = TimeHandler(this, pluginMetas)
         punishmentManager = PunishmentManager()
-        server.pluginManager.registerEvents(PlayerIPManager(this), this)
+        val licenseKey = config.getString("geoDatabase.licenseKey") ?: throw IllegalArgumentException("License key not found in config.yml")
+        val geoDatabasePath = "${dataFolder.path}/geodata/"
+        val geoLocationManager = GeoIPHandler(this, geoDatabasePath,licenseKey)
+        val playerIPManager = PlayerIPManager(this, geoLocationManager)
+        server.pluginManager.registerEvents(playerIPManager, this)
         val manager: LifecycleEventManager<Plugin> = this.lifecycleManager
         manager.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
             val commands: Commands = event.registrar()
