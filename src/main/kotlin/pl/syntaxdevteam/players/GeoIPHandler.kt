@@ -17,7 +17,7 @@ class GeoIPHandler(plugin: PunisherX, pluginFolder: String, private val licenseK
 
     init {
         if (licenseKey == null) {
-            println("License key not found. GeoIP functionality will be disabled.")
+            plugin.logger.err("License key not found. GeoIP functionality will be disabled.")
         } else {
             val folder = File(pluginFolder)
             if (!folder.exists()) {

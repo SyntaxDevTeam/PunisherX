@@ -10,7 +10,7 @@ import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 import kotlin.text.Charsets.UTF_8
 
-class PlayerIPManager(private val plugin: PunisherX, private val geoIPHandler: GeoIPHandler) : Listener {
+class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHandler) : Listener {
 
     private val cacheFile = File(plugin.dataFolder, "cache")
     private val secretKey: Key = generateKey()
@@ -86,7 +86,6 @@ class PlayerIPManager(private val plugin: PunisherX, private val geoIPHandler: G
             ""
         }
     }
-
 
     fun getPlayerIPByName(playerName: String): String? {
         plugin.logger.debug("Fetching IP for player: $playerName")
