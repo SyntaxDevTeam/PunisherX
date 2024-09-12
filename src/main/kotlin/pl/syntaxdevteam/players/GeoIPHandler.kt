@@ -1,6 +1,7 @@
 package pl.syntaxdevteam.players
 
 import com.maxmind.geoip2.DatabaseReader
+import com.maxmind.geoip2.exception.AddressNotFoundException
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import pl.syntaxdevteam.PunisherX
 import java.io.File
@@ -16,7 +17,7 @@ class GeoIPHandler(plugin: PunisherX, pluginFolder: String, private val licenseK
 
     init {
         if (licenseKey == null) {
-            plugin.logger.err("License key not found. GeoIP functionality will be disabled.")
+            println("License key not found. GeoIP functionality will be disabled.")
         } else {
             val folder = File(pluginFolder)
             if (!folder.exists()) {
@@ -51,17 +52,25 @@ class GeoIPHandler(plugin: PunisherX, pluginFolder: String, private val licenseK
 
     fun getCountry(ip: String): String? {
         if (!cityDatabaseFile.exists()) return null
-        DatabaseReader.Builder(cityDatabaseFile).build().use { reader ->
-            val response = reader.city(InetAddress.getByName(ip))
-            return response.country.name
+        return try {
+            DatabaseReader.Builder(cityDatabaseFile).build().use { reader ->
+                val response = reader.city(InetAddress.getByName(ip))
+                response.country.name
+            }
+        } catch (e: AddressNotFoundException) {
+            "Unknown country"
         }
     }
 
     fun getCity(ip: String): String? {
         if (!cityDatabaseFile.exists()) return null
-        DatabaseReader.Builder(cityDatabaseFile).build().use { reader ->
-            val response = reader.city(InetAddress.getByName(ip))
-            return response.city.name
+        return try {
+            DatabaseReader.Builder(cityDatabaseFile).build().use { reader ->
+                val response = reader.city(InetAddress.getByName(ip))
+                response.city.name
+            }
+        } catch (e: AddressNotFoundException) {
+            "Unknown city"
         }
     }
 }
