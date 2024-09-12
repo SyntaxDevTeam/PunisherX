@@ -212,11 +212,12 @@ class SQLiteDatabaseHandler(private val plugin: PunisherX) : DatabaseHandler {
             preparedStatement.setString(1, uuid)
             val resultSet: ResultSet = preparedStatement.executeQuery()
             while (resultSet.next()) {
+                val id = resultSet.getInt("id")
                 val type = resultSet.getString("punishmentType")
                 val reason = resultSet.getString("reason")
                 val start = resultSet.getLong("start")
                 val end = resultSet.getLong("end")
-                val punishment = PunishmentData(uuid, type, reason, start, end)
+                val punishment = PunishmentData(id, uuid, type, reason, start, end)
                 if (plugin.punishmentManager.isPunishmentActive(punishment)) {
                     punishments.add(punishment)
                 } else {
@@ -241,11 +242,12 @@ class SQLiteDatabaseHandler(private val plugin: PunisherX) : DatabaseHandler {
             preparedStatement.setString(1, ip)
             val resultSet: ResultSet = preparedStatement.executeQuery()
             while (resultSet.next()) {
+                val id = resultSet.getInt("id")
                 val type = resultSet.getString("punishmentType")
                 val reason = resultSet.getString("reason")
                 val start = resultSet.getLong("start")
                 val end = resultSet.getLong("end")
-                val punishment = PunishmentData(ip, type, reason, start, end)
+                val punishment = PunishmentData(id, ip, type, reason, start, end)
                 if (plugin.punishmentManager.isPunishmentActive(punishment)) {
                     punishments.add(punishment)
                 } else {
@@ -270,11 +272,12 @@ class SQLiteDatabaseHandler(private val plugin: PunisherX) : DatabaseHandler {
             preparedStatement.setString(1, uuid)
             val resultSet: ResultSet = preparedStatement.executeQuery()
             while (resultSet.next()) {
+                val id = resultSet.getInt("id")
                 val type = resultSet.getString("punishmentType")
                 val reason = resultSet.getString("reason")
                 val start = resultSet.getLong("start")
                 val end = resultSet.getLong("end")
-                val punishment = PunishmentData(uuid, type, reason, start, end)
+                val punishment = PunishmentData(id, uuid, type, reason, start, end)
                 if (plugin.punishmentManager.isPunishmentActive(punishment)) {
                     punishments.add(punishment)
                 }
