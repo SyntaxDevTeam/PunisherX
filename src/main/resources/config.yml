@@ -57,6 +57,9 @@ WarnActions:
   10: "ban {player} You have received your 10th warning!"
 
 geoDatabase:
+  # To use GeoIP functionality, you need a MaxMind license key.
+  # You can obtain a free license key by creating an account at MaxMind:
+  # https://www.maxmind.com/en/geolite2/signup
   licenseKey: "LICENSEKEY"
 
 # Update check and auto-update settings
