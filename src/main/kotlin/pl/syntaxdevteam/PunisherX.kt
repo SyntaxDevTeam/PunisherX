@@ -31,8 +31,9 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var messageHandler: MessageHandler
     lateinit var timeHandler: TimeHandler
     lateinit var punishmentManager: PunishmentManager
-    lateinit var playerIPManager: PlayerIPManager
     private lateinit var updateChecker: UpdateChecker
+    lateinit var playerIPManager: PlayerIPManager
+    private lateinit var geoIPHandler: GeoIPHandler
 
     override fun onLoad() {
         logger = Logger(pluginMetas, debugMode)
@@ -59,8 +60,8 @@ class PunisherX : JavaPlugin(), Listener {
         punishmentManager = PunishmentManager()
         val licenseKey = config.getString("geoDatabase.licenseKey") ?: throw IllegalArgumentException("License key not found in config.yml")
         val geoDatabasePath = "${dataFolder.path}/geodata/"
-        val geoLocationManager = GeoIPHandler(this, geoDatabasePath,licenseKey)
-        val playerIPManager = PlayerIPManager(this, geoLocationManager)
+        geoIPHandler = GeoIPHandler(this, geoDatabasePath, licenseKey)
+        playerIPManager = PlayerIPManager(this, geoIPHandler)
         server.pluginManager.registerEvents(playerIPManager, this)
         val manager: LifecycleEventManager<Plugin> = this.lifecycleManager
         manager.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
