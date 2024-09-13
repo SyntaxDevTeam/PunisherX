@@ -269,6 +269,36 @@ class MySQLDatabaseHandler(private val plugin: PunisherX, config: FileConfigurat
         return punishments.size
     }
 
+    override fun getPunishmentHistory(uuid: String, limit: Int, offset: Int): List<PunishmentData> {
+        val punishments = mutableListOf<PunishmentData>()
+        if (!isConnected()) {
+            openConnection()
+        }
+
+        val query = "SELECT * FROM punishmentHistory WHERE uuid = ? ORDER BY start DESC LIMIT ? OFFSET ?"
+        try {
+            val preparedStatement: PreparedStatement = connection!!.prepareStatement(query)
+            preparedStatement.setString(1, uuid)
+            preparedStatement.setInt(2, limit)
+            preparedStatement.setInt(3, offset)
+            val resultSet: ResultSet = preparedStatement.executeQuery()
+            while (resultSet.next()) {
+                val id = resultSet.getInt("id")
+                val type = resultSet.getString("punishmentType")
+                val reason = resultSet.getString("reason")
+                val start = resultSet.getLong("start")
+                val end = resultSet.getLong("end")
+                val punishment = PunishmentData(id, uuid, type, reason, start, end)
+                punishments.add(punishment)
+            }
+            resultSet.close()
+            preparedStatement.close()
+        } catch (e: SQLException) {
+            plugin.logger.err("Failed to get punishment history for UUID: $uuid. ${e.message}")
+        }
+        return punishments
+    }
+
     override fun exportDatabase() {
         val tables = listOf("punishments", "punishmenthistory")
         try {

@@ -69,6 +69,7 @@ class PunisherX : JavaPlugin(), Listener {
             commands.register("punisherx", "PunisherX plugin command. Type /punisherx help to check available commands", PunishesXCommands(this))
             commands.register("prx", "PunisherX plugin command. Type /prx help to check available commands", PunishesXCommands(this))
             commands.register("check", "Checking player penalties" + messageHandler.getMessage("check", "usage"), CheckCommand(this, pluginMetas, playerIPManager))
+            commands.register("history", "Checking player all penalties history" + messageHandler.getMessage("history", "usage"), HistoryCommand(this, pluginMetas, playerIPManager))
             commands.register("kick", messageHandler.getMessage("kick", "usage"), KickCommand(this, pluginMetas))
             commands.register("warn", messageHandler.getMessage("warn", "usage"), WarnCommand(this, pluginMetas))
             commands.register("unwarn", messageHandler.getMessage("unwarn", "usage"), UnWarnCommand(this, pluginMetas))
@@ -86,7 +87,7 @@ class PunisherX : JavaPlugin(), Listener {
             "de" -> "OpenAI Chat GPT-3.5"
             else -> getServerName()
         }
-        logger.log("<gray>Loaded language file by: <white><b>$author</b></white>")
+        logger.log("<gray>Loaded \"$language\" language file by: <white><b>$author</b></white>")
         server.pluginManager.registerEvents(PunishmentChecker(this), this)
         pluginManager = PluginManager(this)
         val externalPlugins = pluginManager.fetchPluginsFromExternalSource("https://raw.githubusercontent.com/SyntaxDevTeam/plugins-list/main/plugins.json")

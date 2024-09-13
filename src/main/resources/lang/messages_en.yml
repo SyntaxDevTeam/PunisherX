@@ -12,10 +12,10 @@ ban:
   kick_message:
     - 'Server Name'
     - 'PunisherX &8» &7You have been banned'
-    - '&7'
-    - '&7'
-    - "&cReason &8» &7<gold>{reason}</gold>"
-    - "&cFor &8» &7<gold>{time}</gold>"
+    - ' '
+    - ' '
+    - "<red><b>Reason</b> <gray>» <gold>{reason}</gold>"
+    - "<red>For <gray>» &7<gold>{time}</gold>"
     - '&7'
     - '&8You can appeal at:'
     - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
@@ -111,7 +111,14 @@ check:
   usage: "Correct usage is: <gold>/check <player_name> <all|ban|mute|warn>"
   invalid_type: "Invalid penalty type. Use: all, ban, mute, warn."
   no_punishments: "Player <gold>{player}</gold> has no penalties."
-  punishment_info: "Type: {type}, Reason: <gold>{reason}</gold>, Time: <gold>{time}</gold>"
+  title: "Active penalties for"
+  type: "Type"
+  reason: "Reason"
+  time: "Time"
+
+history:
+  usage: "Correct usage is: <gold>/history <player_name>"
+  no_punishments: "Player <gold>{player}</gold> has no penalties."
   title: "Active penalties for"
   type: "Type"
   reason: "Reason"

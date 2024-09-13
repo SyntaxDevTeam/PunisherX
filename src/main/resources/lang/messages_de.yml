@@ -94,9 +94,9 @@ kick:
   kick_message:
     - 'Servername'
     - 'PunisherX &8» &7Sie wurden gekickt'
-    - '&7'
-    - '&7'
-    - "&cGrund &8» &7<gold>{reason}</gold>"
+    - ' '
+    - ' '
+    - "<red>Grund <gray>» <gold>{reason}</gold>"
     - '&7'
     - '&7'
     - '&8Sie können Berufung einlegen unter:'
@@ -112,7 +112,14 @@ check:
   usage: "Korrekte Verwendung: <gold>/check <player_name> <all|ban|mute|warn>"
   invalid_type: "Ungültiger Strafentyp. Verwenden Sie: all, ban, mute, warn."
   no_punishments: "Spieler <gold>{player}</gold> hat keine Strafen."
-  punishment_info: "Typ: {type}, Grund: <gold>{reason}</gold>, Zeit: <gold>{time}</gold>"
+  title: "Aktive Strafen für"
+  type: "Typ"
+  reason: "Grund"
+  time: "Zeit"
+
+history:
+  usage: "Korrekte Verwendung: <gold>/check <player_name>"
+  no_punishments: "Spieler <gold>{player}</gold> hat keine Strafen."
   title: "Aktive Strafen für"
   type: "Typ"
   reason: "Grund"
