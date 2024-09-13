@@ -299,6 +299,27 @@ class MySQLDatabaseHandler(private val plugin: PunisherX, config: FileConfigurat
         return punishments
     }
 
+    override fun updatePunishmentReason(id: Int, newReason: String): Boolean {
+        if (!isConnected()) {
+            openConnection()
+        }
+
+        val query = "UPDATE punishmentHistory SET reason = ? WHERE id = ?"
+        return try {
+            val preparedStatement: PreparedStatement = connection!!.prepareStatement(query)
+            preparedStatement.setString(1, newReason)
+            preparedStatement.setInt(2, id)
+            val rowsUpdated = preparedStatement.executeUpdate()
+            preparedStatement.close()
+            rowsUpdated > 0
+        } catch (e: SQLException) {
+            plugin.logger.err("Failed to update punishment reason for ID: $id. ${e.message}")
+            false
+        } finally {
+            closeConnection()
+        }
+    }
+
     override fun exportDatabase() {
         val tables = listOf("punishments", "punishmenthistory")
         try {

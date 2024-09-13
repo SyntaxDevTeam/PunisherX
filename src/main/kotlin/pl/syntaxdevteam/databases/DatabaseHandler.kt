@@ -11,6 +11,7 @@ interface DatabaseHandler {
     fun getPunishmentsByIP(ip: String): List<PunishmentData>
     fun getActiveWarnCount(uuid: String): Int
     fun getPunishmentHistory(uuid: String, limit: Int, offset: Int): List<PunishmentData>
+    fun updatePunishmentReason(id: Int, newReason: String): Boolean
     fun exportDatabase()
     fun importDatabase()
 }

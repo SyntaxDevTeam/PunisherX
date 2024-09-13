@@ -126,6 +126,12 @@ history:
   reason: "Raison"
   time: "Temps"
 
+change-reason:
+  usage: "L'utilisation correcte est : <gold>/change-reason <ID_pénalité> <nouvelle_raison>"
+  invalid_id: "Identifiant de pénalité invalide"
+  success: "<green>La raison précédente de la pénalité avec ID : <gold>{id}</gold> a été changée en \"<gold>{reason}</gold>\"</green>"
+  failure: "<red>Échec de la mise à jour de la raison de la pénalité pour l'ID : <gold>{id}</gold></red>"
+
 formatTime:
   undefined: "indéfini"
   minute:

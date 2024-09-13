@@ -125,6 +125,12 @@ history:
   reason: "Grund"
   time: "Zeit"
 
+change-reason:
+  usage: "Die korrekte Verwendung ist: <gold>/change-reason <Straf_ID> <neuer_Grund>"
+  invalid_id: "Ungültiger Strafidentifikator"
+  success: "<green>Der vorherige Grund für die Strafe mit der ID: <gold>{id}</gold> wurde in \"<gold>{reason}</gold>\" geändert</green>"
+  failure: "<red>Fehler beim Aktualisieren des Grundes für die Strafe mit der ID: <gold>{id}</gold></red>"
+
 formatTime:
   undefined: "undefiniert"
   minute:

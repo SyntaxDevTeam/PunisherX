@@ -124,6 +124,12 @@ history:
   reason: "Reason"
   time: "Time"
 
+change-reason:
+  usage: "The correct usage is: <gold>/change-reason <penalty_ID> <new_reason>"
+  invalid_id: "Invalid penalty identifier"
+  success: "<green>The previous reason for the penalty with ID: <gold>{id}</gold> has been changed to \"<gold>{reason}</gold>\"</green>"
+  failure: "<red>Failed to update the reason for the penalty with ID: <gold>{id}</gold></red>"
+
 formatTime:
   undefined: "undefined"
   minute:
