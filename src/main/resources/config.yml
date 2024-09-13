@@ -56,6 +56,19 @@ WarnActions:
   7: "ban {player} 30d You have received your {warn_no}th warning!"
   10: "ban {player} You have received your 10th warning!"
 
+# You can set your own aliases for the commands below
+aliases:
+  check: "cx"
+  history: "hx"
+  kick: "kx"
+  warn: "wx"
+  unwarn: "uw"
+  mute: "mx"
+  unmute: "um"
+  ban: "bx"
+  banip: "bip" # Don't use "ban-ip" for this alias
+  unban: "ub"
+
 geoDatabase:
   # To use GeoIP functionality, you need a MaxMind license key.
   # You can obtain a free license key by creating an account at MaxMind:
