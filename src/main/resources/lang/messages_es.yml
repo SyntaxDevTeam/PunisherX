@@ -113,7 +113,14 @@ check:
   usage: "Uso correcto es: <gold>/check <nombre_jugador> <all|ban|mute|warn>"
   invalid_type: "Tipo de penalización inválido. Usa: all, ban, mute, warn."
   no_punishments: "El jugador <gold>{player}</gold> no tiene penalizaciones."
-  punishment_info: "Tipo: {type}, Razón: <gold>{reason}</gold>, Tiempo: <gold>{time}</gold>"
+  title: "Penalizaciones activas para"
+  type: "Tipo"
+  reason: "Razón"
+  time: "Tiempo"
+
+history:
+  usage: "Uso correcto es: <gold>/check <nombre_jugador>"
+  no_punishments: "El jugador <gold>{player}</gold> no tiene penalizaciones."
   title: "Penalizaciones activas para"
   type: "Tipo"
   reason: "Razón"

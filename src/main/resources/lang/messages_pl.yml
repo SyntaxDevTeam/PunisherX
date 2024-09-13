@@ -111,11 +111,18 @@ check:
   usage: "Poprawne użycie to: <gold>/check <nazwa_gracza> <all|ban|mute|warn>"
   invalid_type: "Nieprawidłowy typ kary. Użyj: all, ban, mute, warn."
   no_punishments: "Gracz {player} nie ma żadnych kar."
-  punishment_info: "Typ: {type}, Powód: {reason}, Czas: {time}"
   title: "Aktywne kary dla"
   type: "Typ"
   reason: "Powód"
   time: "Pozostały czas"
+
+history:
+  usage: "Poprawne użycie to: <gold>/check <nazwa_gracza>"
+  no_punishments: "Gracz {player} nie ma żadnych kar."
+  title: "Aktywne kary dla"
+  type: "Typ"
+  reason: "Powód"
+  time: "Czas"
 
 formatTime:
   undefined: "nieokreślony"
