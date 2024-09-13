@@ -78,6 +78,7 @@ class PunisherX : JavaPlugin(), Listener {
             commands.register("ban", messageHandler.getMessage("ban", "usage"), BanCommand(this, pluginMetas))
             commands.register("banip", messageHandler.getMessage("banip", "usage"), BanIpCommand(this, pluginMetas))
             commands.register("unban", messageHandler.getMessage("ban", "usage"), UnBanCommand(this, pluginMetas))
+            commands.register("change-reason", messageHandler.getMessage("change-reason", "usage"), ChangeReasonCommand(this, pluginMetas))
             val aliases = config.getConfigurationSection("aliases")
             aliases?.getKeys(false)?.forEach { key ->
                 val commandName = aliases.getString(key) ?: key
@@ -92,6 +93,7 @@ class PunisherX : JavaPlugin(), Listener {
                     "ban" -> commands.register(commandName, messageHandler.getMessage("ban", "usage"), BanCommand(this, pluginMetas))
                     "banip" -> commands.register(commandName, messageHandler.getMessage("banip", "usage"), BanIpCommand(this, pluginMetas))
                     "unban" -> commands.register(commandName, messageHandler.getMessage("ban", "usage"), UnBanCommand(this, pluginMetas))
+                    "change-reason" -> commands.register(commandName, messageHandler.getMessage("change-reason", "usage"), ChangeReasonCommand(this, pluginMetas))
                 }
             }
 

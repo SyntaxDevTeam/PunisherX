@@ -124,6 +124,12 @@ history:
   reason: "Powód"
   time: "Czas"
 
+change-reason:
+  usage: "Poprawne użycie to: <gold>/change-reason <ID_kary> <nowy_powód>"
+  invalid_id: "Nieprawidłowy identyfikator kary"
+  success: "<green>Zmieniono dotychczasowy powód kary o ID: <gold>{id}</gold> na \"<gold>{reason}</gold>\"</green>"
+  failure: "<red>Nie udało się zaktualizować powodu kary dla ID: <gold>{id}</gold></red>"
+
 formatTime:
   undefined: "nieokreślony"
   minute:

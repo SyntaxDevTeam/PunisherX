@@ -126,6 +126,12 @@ history:
   reason: "Razón"
   time: "Tiempo"
 
+change-reason:
+  usage: "El uso correcto es: <gold>/change-reason <ID_de_penalización> <nueva_razón>"
+  invalid_id: "Identificador de penalización inválido"
+  success: "<green>La razón anterior de la penalización con ID: <gold>{id}</gold> ha sido cambiada a \"<gold>{reason}</gold>\"</green>"
+  failure: "<red>No se pudo actualizar la razón de la penalización para el ID: <gold>{id}</gold></red>"
+
 formatTime:
   undefined: "indefinido"
   minute:
