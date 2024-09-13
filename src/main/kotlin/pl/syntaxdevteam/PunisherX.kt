@@ -78,6 +78,23 @@ class PunisherX : JavaPlugin(), Listener {
             commands.register("ban", messageHandler.getMessage("ban", "usage"), BanCommand(this, pluginMetas))
             commands.register("banip", messageHandler.getMessage("banip", "usage"), BanIpCommand(this, pluginMetas))
             commands.register("unban", messageHandler.getMessage("ban", "usage"), UnBanCommand(this, pluginMetas))
+            val aliases = config.getConfigurationSection("aliases")
+            aliases?.getKeys(false)?.forEach { key ->
+                val commandName = aliases.getString(key) ?: key
+                when (key) {
+                    "check" -> commands.register(commandName, "Checking player penalties" + messageHandler.getMessage("check", "usage"), CheckCommand(this, pluginMetas, playerIPManager))
+                    "history" -> commands.register(commandName, "Checking player all penalties history" + messageHandler.getMessage("history", "usage"), HistoryCommand(this, pluginMetas, playerIPManager))
+                    "kick" -> commands.register(commandName, messageHandler.getMessage("kick", "usage"), KickCommand(this, pluginMetas))
+                    "warn" -> commands.register(commandName, messageHandler.getMessage("warn", "usage"), WarnCommand(this, pluginMetas))
+                    "unwarn" -> commands.register(commandName, messageHandler.getMessage("unwarn", "usage"), UnWarnCommand(this, pluginMetas))
+                    "mute" -> commands.register(commandName, messageHandler.getMessage("mute", "usage"), MuteCommand(this, pluginMetas))
+                    "unmute" -> commands.register(commandName, messageHandler.getMessage("mute", "usage"), UnMuteCommand(this, pluginMetas))
+                    "ban" -> commands.register(commandName, messageHandler.getMessage("ban", "usage"), BanCommand(this, pluginMetas))
+                    "banip" -> commands.register(commandName, messageHandler.getMessage("banip", "usage"), BanIpCommand(this, pluginMetas))
+                    "unban" -> commands.register(commandName, messageHandler.getMessage("ban", "usage"), UnBanCommand(this, pluginMetas))
+                }
+            }
+
         }
         val author = when (language.lowercase()) {
             "pl" -> "WieszczY"
