@@ -89,7 +89,6 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, priva
                             val row = miniMessage.deserialize("<blue>|   <white>#${punishment.id}</white> <blue>|</blue> <white>${punishment.type}</white> <blue>|</blue> <white>$reason</white> <blue>|</blue> <white>$duration</white>")
                             stack.sender.sendMessage(row)
                         }
-                        stack.sender.sendMessage(topHeader)
                     }
                 }
             } else {
