@@ -66,9 +66,13 @@ class UnBanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                                     }
                                 }
                                 stack.sender.sendRichMessage(messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
-                                val message = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("unban", "unban"))
-                                plugin.server.broadcast(message)
-                                logger.log(messageHandler.getLogMessage("unban", "unban"))
+                                val permission = "punisherx.see.unban"
+                                val broadcastMessage = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("unban", "unban"))
+                                plugin.server.onlinePlayers.forEach { onlinePlayer ->
+                                    if (onlinePlayer.hasPermission(permission)) {
+                                        onlinePlayer.sendMessage(broadcastMessage)
+                                    }
+                                }
                             } else {
                                 stack.sender.sendRichMessage(messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
                             }

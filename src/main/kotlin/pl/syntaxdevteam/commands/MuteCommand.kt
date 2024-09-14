@@ -54,7 +54,7 @@ class MuteCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
                     val muteMessage = messageHandler.getMessage("mute", "mute_message", mapOf("reason" to reason, "time" to timeHandler.formatTime(gtime)))
                     val formattedMessage = MiniMessage.miniMessage().deserialize(muteMessage)
                     targetPlayer?.sendMessage(formattedMessage)
-                    val permission = "punisherx.see_mute"
+                    val permission = "punisherx.see.mute"
                     val broadcastMessage = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("mute", "broadcast", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime))))
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if (onlinePlayer.hasPermission(permission)) {

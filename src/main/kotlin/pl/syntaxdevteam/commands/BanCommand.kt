@@ -39,7 +39,7 @@ class BanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basic
                     var reason: String
                     try {
                         gtime = args[1]
-                        timeHandler.parseTime(gtime) // Sprawdzenie, czy gtime jest poprawnym czasem
+                        timeHandler.parseTime(gtime)
                         reason = args.slice(2 until args.size).joinToString(" ")
                     } catch (e: NumberFormatException) {
                         gtime = null
@@ -69,7 +69,7 @@ class BanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basic
                         targetPlayer.kick(kickMessage.build())
                     }
                     stack.sender.sendRichMessage(messageHandler.getMessage("ban", "ban", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime))))
-                    val permission = "punisherx.see_bans"
+                    val permission = "punisherx.see.ban"
                     val broadcastMessage = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("ban", "broadcast", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime))))
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if (onlinePlayer.hasPermission(permission)) {
