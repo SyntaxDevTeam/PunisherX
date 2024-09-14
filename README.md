@@ -60,6 +60,6 @@ Jeśli masz pytania lub potrzebujesz pomocy, śmiało skontaktuj się z nami na 
 ## Licencja
 Ten plugin jest dostępny na licencji MIT. Szczegóły znajdziesz w pliku LICENSE.
 
-Dziękuję za korzystanie z CleanerX! Mam nadzieję, że spełni twoje oczekiwania. 😊
+Dziękuję za korzystanie z PunisherX! Mam nadzieję, że spełni twoje oczekiwania. 😊
 
 ![syntaxdevteam_logo.png](assets/syntaxdevteam_logo.png)
