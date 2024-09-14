@@ -1,46 +1,56 @@
+# Message formatting:
+# You can use MiniMessage and Legacy (Minecraft) formatting.
+# Examples of how to use MiniMessage: https://docs.advntr.dev/minimessage/format.html
+# Do not mix formats in one message. If you use Legacy, do not insert MiniMessage formatting, otherwise only the latter will be used.
+
 prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>"
 
+# Error messages
 error:
   no_permission: "<red>You do not have permission to use this command.</red>"
-  player_not_found: "<gold>Player with the nickname <gold>{player}</gold> not found.</gold>"
+  player_not_found: "<gold>Player with nickname {player} not found.</gold>"
   reload: "<red>An error occurred while reloading the configuration:</red> "
-  bypass: “Player <gold>{player}</gold> cannot be punished due to their permissions.”
+  bypass: "<red><b>WARNING!</b> Player <gold>{player}<gold/> cannot be punished due to their permissions (OP or bypass).</red>"
 
+# /ban command messages
 ban:
-  ban: "You banned <gold>{player}</gold> for <gold>{reason}</gold> for <gold>{time}</gold>"
+  ban: "<green>You banned <gold>{player}</gold> for <gold>{reason}</gold> for <gold>{time}</green>"
   usage: "Correct usage is: <gold>/ban <player> (time) <reason>"
   kick_message:
+    # You can customize the message for the kicked player
     - 'Server Name'
     - 'PunisherX &8» &7You have been banned'
-    - ' '
-    - ' '
-    - "<red><b>Reason</b> <gray>» <gold>{reason}</gold>"
-    - "<red>For <gray>» &7<gold>{time}</gold>"
+    - '&7'
+    - '&7'
+    - "&cReason &8» &7{reason}"
+    - "&cFor &8» &7{time}"
     - '&7'
     - '&8You can appeal at:'
-    - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
-  broadcast: "Player <gold>{player}</gold> has been banned for <gold>{reason}</gold> for <gold>{time}</gold>"
+    - "&eDiscord &8» &c&nhttps://servername.pl/discord"
+  broadcast: "<dark_gray>Player <gray>{player}</gray> has been banned for <gray>{reason}</gray> for <gray>{time}</gray></dark_gray>"
   no_reasons: "no reason"
-  reasons:
+  reasons: # Add your own reasons that will be suggested when executing the command
     - "Cheating"
     - "Griefing"
     - "Spamming"
     - "Offensive language"
 
+# /banip command messages
 banip:
-  ban: "You banned the player's IP for <gold>{reason}</gold> for <gold>{time}</gold>"
-  usage: "Correct usage is: <gold>/banip <player/ip> (time) <reason>"
+  ban: "<green>You banned the player's IP for <gold>{reason}</gold> for <gold>{time}</green>"
+  usage: "Correct usage is: <gold>/banip <player|ip> (time) <reason>"
   kick_message:
+    # You can customize the message for the kicked player
     - 'Server Name'
     - 'PunisherX &8» &7Your IP has been banned!'
     - '&7'
     - '&7'
-    - "&cReason &8» &7<gold>{reason}</gold>"
-    - "&cFor &8» &7<gold>{time}</gold>"
+    - "&cReason &8» &7{reason}"
+    - "&cFor &8» &7{time}"
     - '&7'
     - '&8You can appeal at:'
-    - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.com/discord"
-  broadcast: "Player <gold>{player}</gold> has been banned for <gold>{reason}</gold> for <gold>{time}</gold>"
+    - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.pl/discord"
+  broadcast: "<dark_gray>Player <gray>{player}</gray> has been banned for <gray>{reason}</gray> for <gray>{time}</gray></dark_gray>"
   no_reasons: "no reason"
   reasons:
     - "Multiple accounts"
@@ -48,88 +58,99 @@ banip:
     - "Spamming"
     - "Offensive language"
 
+# /unban command messages
 unban:
-  unban: "Player <gold>{player}</gold> has been unbanned"
+  unban: "<green>Player <gold>{player}</gold> has been unbanned</green>"
   usage: "Correct usage is: <gold>/unban <player>"
-  broadcast: "Player <gold>{player}</gold> has been unbanned"
+  broadcast: "<dark_gray>Player <gray>{player}</gray> has been unbanned</dark_gray>"
 
+# /mute command messages
 mute:
-  mute: "You muted <gold>{player}</gold> for <gold>{reason}</gold> for <gold>{time}</gold>"
+  mute: "<green>You muted player <gold>{player}</gold> for <gold>{reason}</gold> for <gold>{time}</green>"
   usage: "Correct usage is: <gold>/mute <player> (time) <reason>"
-  mute_message: "<red>You have been muted for <b><gold>{reason}</gold></b> for <b><gold>{time}</gold></b></red>"
-  mute_info_message: "You are trying to speak but you have been muted"
-  broadcast: "Player <gold>{player}</gold> has been muted for <gold>{reason}</gold> for <gold>{time}</gold>"
+  mute_message: "<red>You have been muted for <b>{reason}</b> for <b>{time}</b></red>"
+  mute_info_message: "<red>You are trying to speak but you have been muted</red>"
+  broadcast: "<dark_gray>Player <gray>{player}</gray> has been muted for <gray>{reason}</gray> for <gray>{time}</gray></dark_gray>"
   no_reasons: "no reason"
   reasons:
     - "Advertising"
-    - "Spamming"
+    - "Spam"
     - "Player insult"
     - "Offensive language"
 
+# /unmute command messages
 unmute:
-  unmute: "You unmuted <gold>{player}</gold>"
-  usage: "Correct usage is: /unmute <player>"
-  unmute_message: "You have been unmuted!"
+  unmute: "<green>You unmuted player <gold>{player}</gold></green>"
+  usage: "Correct usage is: <gold>/mute <player>"
+  unmute_message: "<green>You have been unmuted!</green>"
 
+# /warn command messages
 warn:
-  warn: "You warned ({warn_no} time) <gold>{player}</gold> for <gold>{reason}</gold> for <gold>{time}</gold>"
+  warn: "<green>You warned ({warn_no} time) <gold>{player}</gold> for <gold>{reason}</gold> for <gold>{time}</green>"
   usage: "Correct usage is: <gold>/warn <player> (time) <reason>"
-  warn_message: "<red>You have received <b>{warn_no}</b> warning!</red>"
-  broadcast: "Player <gold>{player}</gold> has been warned for <gold>{reason}</gold> for <gold>{time}</gold>"
+  warn_message: "<red>You received <b>{warn_no}</b> warning!</red>"
+  broadcast: "<dark_gray>Player <gray>{player}</gray> received a warning for <gray>{reason}</gray> for <gray>{time}</gray></dark_gray>"
   no_reasons: "no reason"
   reasons:
     - "Advertising"
-    - "Spamming"
+    - "Spam"
     - "Player insult"
     - "Offensive language"
 
+# /unwarn command messages
 unwarn:
-  unwarn: "You removed the warning for <gold>{player}</gold>"
-  usage: "Correct usage is: <gold>/unwarn <player>"
+  unwarn: "<green>You removed the warning for player <gold>{player}</gold></green>"
+  usage: "Correct usage is: <gold>/warn <player>"
 
+# /kick command messages
 kick:
-  kick: "You kicked <gold>{player}</gold> for <gold>{reason}</gold>"
+  kick: "<green>You kicked <gold>{player}</gold> for <gold>{reason}</gold></green>"
   usage: "Correct usage is: <gold>/kick <player> <reason>"
   kick_message:
+    # You can customize the message for the kicked player
     - 'Server Name'
     - 'PunisherX &8» &7You have been kicked'
     - '&7'
     - '&7'
-    - "&cReason &8» &7<gold>{reason}</gold>"
+    - "&cReason &8» &7{reason}"
     - '&7'
     - '&7'
     - '&8You can appeal at:'
-    - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
-  broadcast: "Player <gold>{player}</gold> has been kicked for <gold>{reason}</gold>"
+    - "&eDiscord &8» &c&nhttps://servername.pl/discord"
+  broadcast: "<dark_gray>Player <gray>{player}</gray> has been kicked for <gray>{reason}</gray></dark_gray>"
   no_reasons: "no reason"
   reasons:
     - "Flood"
     - "Spamming"
     - "Offensive language"
 
+# /check command messages
 check:
   usage: "Correct usage is: <gold>/check <player_name> <all|ban|mute|warn>"
-  invalid_type: "Invalid penalty type. Use: all, ban, mute, warn."
-  no_punishments: "Player <gold>{player}</gold> has no penalties."
-  title: "Active penalties for"
-  type: "Type"
-  reason: "Reason"
-  time: "Time"
+  invalid_type: "<red>Invalid punishment type. Use: all, ban, mute, warn.</red>"
+  no_punishments: "<dark_green>Player <gold>{player}</gold> has no punishments.</dark_green>"
+  title: "<dark_gray>Active punishments for</dark_gray>"
+  type: "<dark_gray>Type</dark_gray>"
+  reason: "<dark_gray>Reason</dark_gray>"
+  time: "<dark_gray>Remaining time</dark_gray>"
 
+# /history command messages
 history:
-  usage: "Correct usage is: <gold>/history <player_name>"
-  no_punishments: "Player <gold>{player}</gold> has no penalties."
-  title: "Active penalties for"
-  type: "Type"
-  reason: "Reason"
-  time: "Time"
+  usage: "Correct usage is: <gold>/check <player_name>"
+  no_punishments: "<dark_green>Player <gold>{player}</gold> has no punishments.</dark_green>"
+  title: "<dark_gray>Active punishments for</dark_gray>"
+  type: "<dark_gray>Type</dark_gray>"
+  reason: "<dark_gray>Reason</dark_gray>"
+  time: "<dark_gray>Time</dark_gray>"
 
+# /change-reason command messages
 change-reason:
-  usage: "The correct usage is: <gold>/change-reason <penalty_ID> <new_reason>"
-  invalid_id: "Invalid penalty identifier"
-  success: "<green>The previous reason for the penalty with ID: <gold>{id}</gold> has been changed to \"<gold>{reason}</gold>\"</green>"
-  failure: "<red>Failed to update the reason for the penalty with ID: <gold>{id}</gold></red>"
+  usage: "Correct usage is: <gold>/change-reason <punishment_ID> <new_reason>"
+  invalid_id: "<red>Invalid punishment ID</red>"
+  success: "<green>Changed the current reason for punishment ID: <gold>{id}</gold> to \"<gold>{reason}</gold>\"</green>"
+  failure: "<red>Failed to update the reason for punishment ID: <gold>{id}</gold></red>"
 
+# Time formatting
 formatTime:
   undefined: "undefined"
   minute:

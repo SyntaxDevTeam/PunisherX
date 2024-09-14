@@ -1,137 +1,158 @@
 # Fichier traduit à l'aide de Chat GPT, si vous pensez qu'il nécessite des corrections, faites-le nous savoir sur Discord (https://discord.gg/Zk6mxv7eMh).
 
+# Format des textes des messages :
+# Vous pouvez utiliser le format MiniMessage et Legacy (Minecraft).
+# Exemples sur l'utilisation de MiniMessage : https://docs.advntr.dev/minimessage/format.html
+# Ne mélangez pas les formats dans un seul message. Si vous utilisez Legacy, n'insérez pas de format MiniMessage, sinon seul ce dernier sera utilisé.
+
 prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>"
 
+# Messages d'erreur
 error:
   no_permission: "<red>Vous n'avez pas la permission d'utiliser cette commande.</red>"
-  player_not_found: "<gold>Joueur avec le pseudo <gold>{player}</gold> non trouvé.</gold>"
-  reload: "<red>Une erreur s'est produite lors du rechargement de la configuration :</red> "
-  bypass: "Le joueur <gold>{player}</gold> ne peut pas être puni en raison de ses permissions."
+  player_not_found: "<gold>Joueur avec le pseudo {player} introuvable.</gold>"
+  reload: "<red>Une erreur est survenue lors du rechargement de la configuration :</red>"
+  bypass: "<red><b>ATTENTION !</b> Le joueur <gold>{player}</gold> ne peut pas être sanctionné en raison de ses permissions (OP ou bypass).</red>"
 
+# Messages de la commande /ban
 ban:
-  ban: "Vous avez banni <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
-  usage: "Utilisation correcte : <gold>/ban <player> (temps) <raison>"
+  ban: "<green>Vous avez banni <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold></green>"
+  usage: "Utilisation correcte : <gold>/ban <player> (durée) <raison>"
   kick_message:
+    # Vous pouvez personnaliser le message pour le joueur expulsé
     - 'Nom du serveur'
-    - 'PunisherX &8» &7Vous avez été banni'
+    - 'PunisherX &8» &7Vous avez été banni(e)'
     - '&7'
     - '&7'
-    - "&cRaison &8» &7<gold>{reason}</gold>"
-    - "&cPour &8» &7<gold>{time}</gold>"
+    - "&cRaison &8» &7{reason}"
+    - "&cDurée &8» &7{time}"
     - '&7'
-    - '&8Vous pouvez faire appel sur :'
-    - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
-  broadcast: "Le joueur <gold>{player}</gold> a été banni pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
+    - '&8Vous pouvez contester votre bannissement ici :'
+    - "&eDiscord &8» &c&nhttps://nomduserveur.fr/discord"
+  broadcast: "<dark_gray>Le joueur <gray>{player}</gray> a été banni pour <gray>{reason}</gray> pendant <gray>{time}</gray></dark_gray>"
   no_reasons: "sans raison"
-  reasons:
-    - "Tricherie"
-    - "Griefing"
-    - "Spamming"
+  reasons: # Ajoutez vos propres raisons qui seront suggérées lors de l'exécution de la commande
+    - "Triche"
+    - "Grief"
+    - "Spam"
     - "Langage offensant"
 
+# Messages de la commande /banip
 banip:
-  ban: "Vous avez banni l'IP du joueur pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
-  usage: "Utilisation correcte : <gold>/banip <player/ip> (temps) <raison>"
+  ban: "<green>Vous avez banni l'IP de <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold></green>"
+  usage: "Utilisation correcte : <gold>/banip <player|ip> (durée) <raison>"
   kick_message:
+    # Vous pouvez personnaliser le message pour le joueur expulsé
     - 'Nom du serveur'
     - 'PunisherX &8» &7Votre IP a été bannie !'
     - '&7'
     - '&7'
-    - "&cRaison &8» &7<gold>{reason}</gold>"
-    - "&cPour &8» &7<gold>{time}</gold>"
+    - "&cRaison &8» &7{reason}"
+    - "&cDurée &8» &7{time}"
     - '&7'
-    - '&8Vous pouvez faire appel sur :'
-    - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.com/discord"
-  broadcast: "Le joueur <gold>{player}</gold> a été banni pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
+    - '&8Vous pouvez contester votre bannissement ici :'
+    - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.fr/discord"
+  broadcast: "<dark_gray>Le joueur <gray>{player}</gray> a été banni pour <gray>{reason}</gray> pendant <gray>{time}</gray></dark_gray>"
   no_reasons: "sans raison"
   reasons:
-    - "Comptes multiples"
-    - "Griefing"
-    - "Spamming"
+    - "Multi-compte"
+    - "Grief"
+    - "Spam"
     - "Langage offensant"
 
+# Messages de la commande /unban
 unban:
-  unban: "Le joueur <gold>{player}</gold> a été débanni"
+  unban: "<green>Le joueur <gold>{player}</gold> a été débanni</green>"
   usage: "Utilisation correcte : <gold>/unban <player>"
-  broadcast: "Le joueur <gold>{player}</gold> a été débanni"
+  broadcast: "<dark_gray>Le joueur <gray>{player}</gray> a été débanni</dark_gray>"
 
+# Messages de la commande /mute
 mute:
-  mute: "Vous avez réduit au silence <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
-  usage: "Utilisation correcte : <gold>/mute <player> (temps) <raison>"
-  mute_message: "<red>Vous avez été réduit au silence pour <b><gold>{reason}</gold></b> pendant <b><gold>{time}</gold></b></red>"
-  mute_info_message: "Vous essayez de parler mais vous avez été réduit au silence"
-  broadcast: "Le joueur <gold>{player}</gold> a été réduit au silence pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
+  mute: "<green>Vous avez rendu muet <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold></green>"
+  usage: "Utilisation correcte : <gold>/mute <player> (durée) <raison>"
+  mute_message: "<red>Vous avez été rendu muet pour <b>{reason}</b> pendant <b>{time}</b></red>"
+  mute_info_message: "<red>Vous essayez de parler mais vous avez été rendu muet</red>"
+  broadcast: "<dark_gray>Le joueur <gray>{player}</gray> a été rendu muet pour <gray>{reason}</gray> pendant <gray>{time}</gray></dark_gray>"
   no_reasons: "sans raison"
   reasons:
     - "Publicité"
-    - "Spamming"
-    - "Insulte de joueur"
+    - "Spam"
+    - "Insultes"
     - "Langage offensant"
 
+# Messages de la commande /unmute
 unmute:
-  unmute: "Vous avez rétabli la voix de <gold>{player}</gold>"
-  usage: "Utilisation correcte : /unmute <player>"
-  unmute_message: "Vous avez été rétabli !"
+  unmute: "<green>Vous avez rétabli la voix de <gold>{player}</gold></green>"
+  usage: "Utilisation correcte : <gold>/mute <player>"
+  unmute_message: "<green>Vous avez retrouvé votre voix !</green>"
 
+# Messages de la commande /warn
 warn:
-  warn: "Vous avez averti ({warn_no} fois) <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
-  usage: "Utilisation correcte : <gold>/warn <player> (temps) <raison>"
-  warn_message: "<red>Vous avez reçu <b>{warn_no}</b> avertissement !</red>"
-  broadcast: "Le joueur <gold>{player}</gold> a été averti pour <gold>{reason}</gold> pendant <gold>{time}</gold>"
+  warn: "<green>Vous avez averti ({warn_no}e fois) <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold></green>"
+  usage: "Utilisation correcte : <gold>/warn <player> (durée) <raison>"
+  warn_message: "<red>Vous avez reçu un <b>{warn_no}</b> avertissement !</red>"
+  broadcast: "<dark_gray>Le joueur <gray>{player}</gray> a reçu un avertissement pour <gray>{reason}</gray> pendant <gray>{time}</gray></dark_gray>"
   no_reasons: "sans raison"
   reasons:
     - "Publicité"
-    - "Spamming"
-    - "Insulte de joueur"
+    - "Spam"
+    - "Insultes"
     - "Langage offensant"
 
+# Messages de la commande /unwarn
 unwarn:
-  unwarn: "Vous avez supprimé l'avertissement pour <gold>{player}</gold>"
-  usage: "Utilisation correcte : <gold>/unwarn <player>"
+  unwarn: "<green>Vous avez retiré l'avertissement de <gold>{player}</gold></green>"
+  usage: "Utilisation correcte : <gold>/warn <player>"
 
+# Messages de la commande /kick
 kick:
-  kick: "Vous avez expulsé <gold>{player}</gold> pour <gold>{reason}</gold>"
+  kick: "<green>Vous avez expulsé <gold>{player}</gold> pour <gold>{reason}</gold></green>"
   usage: "Utilisation correcte : <gold>/kick <player> <raison>"
   kick_message:
+    # Vous pouvez personnaliser le message pour le joueur expulsé
     - 'Nom du serveur'
-    - 'PunisherX &8» &7Vous avez été expulsé'
+    - 'PunisherX &8» &7Vous avez été expulsé(e)'
     - '&7'
     - '&7'
-    - "&cRaison &8» &7<gold>{reason}</gold>"
+    - "&cRaison &8» &7{reason}"
     - '&7'
     - '&7'
-    - '&8Vous pouvez faire appel sur :'
-    - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
-  broadcast: "Le joueur <gold>{player}</gold> a été expulsé pour <gold>{reason}</gold>"
+    - '&8Vous pouvez contester votre expulsion ici :'
+    - "&eDiscord &8» &c&nhttps://nomduserveur.fr/discord"
+  broadcast: "<dark_gray>Le joueur <gray>{player}</gray> a été expulsé pour <gray>{reason}</gray></dark_gray>"
   no_reasons: "sans raison"
   reasons:
     - "Flood"
-    - "Spamming"
+    - "Spam"
     - "Langage offensant"
 
+# Messages de la commande /check
 check:
   usage: "Utilisation correcte : <gold>/check <nom_joueur> <all|ban|mute|warn>"
-  invalid_type: "Type de pénalité invalide. Utilisez : all, ban, mute, warn."
-  no_punishments: "Le joueur <gold>{player}</gold> n'a pas de pénalités."
-  title: "Pénalités actives pour"
-  type: "Type"
-  reason: "Raison"
-  time: "Temps"
+  invalid_type: "<red>Type de punition invalide. Utilisez : all, ban, mute, warn.</red>"
+  no_punishments: "<dark_green>Le joueur <gold>{player}</gold> n'a aucune punition.</dark_green>"
+  title: "<dark_gray>Punitions actives pour</dark_gray>"
+  type: "<dark_gray>Type</dark_gray>"
+  reason: "<dark_gray>Raison</dark_gray>"
+  time: "<dark_gray>Temps restant</dark_gray>"
 
+# Messages de la commande /history
 history:
   usage: "Utilisation correcte : <gold>/check <nom_joueur>"
-  no_punishments: "Le joueur <gold>{player}</gold> n'a pas de pénalités."
-  title: "Pénalités actives pour"
-  type: "Type"
-  reason: "Raison"
-  time: "Temps"
+  no_punishments: "<dark_green>Le joueur <gold>{player}</gold> n'a aucune punition.</dark_green>"
+  title: "<dark_gray>Punitions actives pour</dark_gray>"
+  type: "<dark_gray>Type</dark_gray>"
+  reason: "<dark_gray>Raison</dark_gray>"
+  time: "<dark_gray>Temps</dark_gray>"
 
+# Messages de la commande /change-reason
 change-reason:
-  usage: "L'utilisation correcte est : <gold>/change-reason <ID_pénalité> <nouvelle_raison>"
-  invalid_id: "Identifiant de pénalité invalide"
-  success: "<green>La raison précédente de la pénalité avec ID : <gold>{id}</gold> a été changée en \"<gold>{reason}</gold>\"</green>"
-  failure: "<red>Échec de la mise à jour de la raison de la pénalité pour l'ID : <gold>{id}</gold></red>"
+  usage: "Utilisation correcte : <gold>/change-reason <ID_punition> <nouvelle_raison>"
+  invalid_id: "<red>ID de punition invalide</red>"
+  success: "<green>La raison de la punition avec l'ID : <gold>{id}</gold> a été changée en \"<gold>{reason}</gold>\"</green>"
+  failure: "<red>Échec de la mise à jour de la raison de la punition pour l'ID : <gold>{id}</gold></red>"
 
+# Format du temps
 formatTime:
   undefined: "indéfini"
   minute:

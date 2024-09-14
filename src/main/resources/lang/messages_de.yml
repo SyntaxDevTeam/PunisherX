@@ -1,138 +1,159 @@
 # Datei übersetzt mit Chat GPT, wenn Sie der Meinung sind, dass sie Korrekturen benötigt, lassen Sie es uns auf Discord wissen (https://discord.gg/Zk6mxv7eMh).
+# Formatierung der Nachrichtentexte:
+# Sie können MiniMessage- und Legacy (Minecraft)-Formatierung verwenden.
+# Beispiele zur Verwendung von MiniMessage: https://docs.advntr.dev/minimessage/format.html
+# Mischen Sie keine Formate in einer Nachricht. Wenn Sie Legacy verwenden, fügen Sie kein MiniMessage-Format ein, da ansonsten nur letzteres verwendet wird.
+
 prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>"
 
+# Fehlermeldungen
 error:
-  no_permission: "<red>Sie haben keine Berechtigung, diesen Befehl zu verwenden.</red>"
-  player_not_found: "<gold>Spieler mit dem Spitznamen <gold>{player}</gold> nicht gefunden.</gold>"
+  no_permission: "<red>Du hast keine Berechtigung für diesen Befehl.</red>"
+  player_not_found: "<gold>Spieler mit dem Namen {player} nicht gefunden.</gold>"
   reload: "<red>Beim Neuladen der Konfiguration ist ein Fehler aufgetreten:</red> "
-  bypass: "Spieler <gold>{player}</gold> kann aufgrund seiner Berechtigungen nicht bestraft werden."
+  bypass: "<red><b>ACHTUNG!</b> Spieler <gold>{player}<gold/> kann nicht bestraft werden, da er über spezielle Rechte (OP oder Bypass) verfügt.</red>"
 
+# Nachrichten für den /ban-Befehl
 ban:
-  ban: "Sie haben <gold>{player}</gold> für <gold>{reason}</gold> für <gold>{time}</gold> gebannt"
-  usage: "Korrekte Verwendung: <gold>/ban <player> (Zeit) <Grund>"
+  ban: "<green>Du hast <gold>{player}</gold> für <gold>{reason}</gold> für <gold>{time}</gold> gebannt</green>"
+  usage: "Korrekte Verwendung: <gold>/ban <player> (Dauer) <Grund>"
   kick_message:
+    # Sie können die Nachricht für den gekickten Spieler frei anpassen
     - 'Servername'
-    - 'PunisherX &8» &7Sie wurden gebannt'
+    - 'PunisherX &8» &7Du wurdest gebannt'
     - '&7'
     - '&7'
-    - "&cGrund &8» &7<gold>{reason}</gold>"
-    - "&cFür &8» &7<gold>{time}</gold>"
+    - "&cGrund &8» &7{reason}"
+    - "&cDauer &8» &7{time}"
     - '&7'
-    - '&8Sie können Berufung einlegen unter:'
-    - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
-  broadcast: "Spieler <gold>{player}</gold> wurde für <gold>{reason}</gold> für <gold>{time}</gold> gebannt"
-  no_reasons: "kein Grund"
-  reasons:
+    - '&8Du kannst Einspruch einlegen unter:'
+    - "&eDiscord &8» &c&nhttps://servername.de/discord"
+  broadcast: "<dark_gray>Spieler <gray>{player}</gray> wurde für <gray>{reason}</gray> für <gray>{time}</gray> gebannt</dark_gray>"
+  no_reasons: "ohne Grund"
+  reasons: # Fügen Sie benutzerdefinierte Gründe hinzu, die während der Befehlsausführung vorgeschlagen werden
     - "Betrug"
     - "Griefing"
-    - "Spamming"
+    - "Spam"
     - "Beleidigende Sprache"
 
+# Nachrichten für den /banip-Befehl
 banip:
-  ban: "Sie haben die IP des Spielers für <gold>{reason}</gold> für <gold>{time}</gold> gebannt"
-  usage: "Korrekte Verwendung: <gold>/banip <player/ip> (Zeit) <Grund>"
+  ban: "<green>Du hast die IP von {player} für <gold>{reason}</gold> für <gold>{time}</gold> gebannt</green>"
+  usage: "Korrekte Verwendung: <gold>/banip <player|ip> (Dauer) <Grund>"
   kick_message:
+    # Sie können die Nachricht für den gekickten Spieler frei anpassen
     - 'Servername'
-    - 'PunisherX &8» &7Ihre IP wurde gebannt!'
+    - 'PunisherX &8» &7Deine IP wurde gebannt!'
     - '&7'
     - '&7'
-    - "&cGrund &8» &7<gold>{reason}</gold>"
-    - "&cFür &8» &7<gold>{time}</gold>"
+    - "&cGrund &8» &7{reason}"
+    - "&cDauer &8» &7{time}"
     - '&7'
-    - '&8Sie können Berufung einlegen unter:'
-    - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.com/discord"
-  broadcast: "Spieler <gold>{player}</gold> wurde für <gold>{reason}</gold> für <gold>{time}</gold> gebannt"
-  no_reasons: "kein Grund"
+    - '&8Du kannst Einspruch einlegen unter:'
+    - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.de/discord"
+  broadcast: "<dark_gray>Spieler <gray>{player}</gray> wurde wegen <gray>{reason}</gray> für <gray>{time}</gray> gebannt</dark_gray>"
+  no_reasons: "ohne Grund"
   reasons:
-    - "Mehrere Konten"
+    - "Multi-Account"
     - "Griefing"
-    - "Spamming"
+    - "Spam"
     - "Beleidigende Sprache"
 
+# Nachrichten für den /unban-Befehl
 unban:
-  unban: "Spieler <gold>{player}</gold> wurde entbannt"
+  unban: "<green>Spieler <gold>{player}</gold> wurde entbannt</green>"
   usage: "Korrekte Verwendung: <gold>/unban <player>"
-  broadcast: "Spieler <gold>{player}</gold> wurde entbannt"
+  broadcast: "<dark_gray>Spieler <gray>{player}</gray> wurde entbannt</dark_gray>"
 
+# Nachrichten für den /mute-Befehl
 mute:
-  mute: "Sie haben <gold>{player}</gold> für <gold>{reason}</gold> für <gold>{time}</gold> stummgeschaltet"
-  usage: "Korrekte Verwendung: <gold>/mute <player> (Zeit) <Grund>"
-  mute_message: "<red>Sie wurden für <b><gold>{reason}</gold></b> für <b><gold>{time}</gold></b> stummgeschaltet</red>"
-  mute_info_message: "Sie versuchen zu sprechen, aber Sie wurden stummgeschaltet"
-  broadcast: "Spieler <gold>{player}</gold> wurde für <gold>{reason}</gold> für <gold>{time}</gold> stummgeschaltet"
-  no_reasons: "kein Grund"
+  mute: "<green>Du hast Spieler <gold>{player}</gold> für <gold>{reason}</gold> für <gold>{time}</gold> stummgeschaltet</green>"
+  usage: "Korrekte Verwendung: <gold>/mute <player> (Dauer) <Grund>"
+  mute_message: "<red>Du wurdest für <b>{reason}</b> für <b>{time}</b> stummgeschaltet</red>"
+  mute_info_message: "<red>Du versuchst zu sprechen, aber du bist stummgeschaltet</red>"
+  broadcast: "<dark_gray>Spieler <gray>{player}</gray> wurde für <gray>{reason}</gray> für <gray>{time}</gray> stummgeschaltet</dark_gray>"
+  no_reasons: "ohne Grund"
   reasons:
     - "Werbung"
-    - "Spamming"
-    - "Spielerbeleidigung"
+    - "Spam"
+    - "Beleidigung"
     - "Beleidigende Sprache"
 
+# Nachrichten für den /unmute-Befehl
 unmute:
-  unmute: "Sie haben <gold>{player}</gold> stummgeschaltet"
-  usage: "Korrekte Verwendung: /unmute <player>"
-  unmute_message: "Sie wurden entstummt!"
+  unmute: "<green>Du hast Spieler <gold>{player}</gold> entstummt</green>"
+  usage: "Korrekte Verwendung: <gold>/mute <player>"
+  unmute_message: "<green>Du wurdest entstummt!</green>"
 
+# Nachrichten für den /warn-Befehl
 warn:
-  warn: "Sie haben ({warn_no} Mal) <gold>{player}</gold> für <gold>{reason}</gold> für <gold>{time}</gold> gewarnt"
-  usage: "Korrekte Verwendung: <gold>/warn <player> (Zeit) <Grund>"
-  warn_message: "<red>Sie haben <b>{warn_no}</b> Warnung erhalten!</red>"
-  broadcast: "Spieler <gold>{player}</gold> wurde für <gold>{reason}</gold> für <gold>{time}</gold> gewarnt"
-  no_reasons: "kein Grund"
+  warn: "<green>Du hast ({warn_no} Mal) Spieler <gold>{player}</gold> für <gold>{reason}</gold> für <gold>{time}</gold> gewarnt</green>"
+  usage: "Korrekte Verwendung: <gold>/warn <player> (Dauer) <Grund>"
+  warn_message: "<red>Du hast <b>{warn_no}</b> Verwarnung erhalten!</red>"
+  broadcast: "<dark_gray>Spieler <gray>{player}</gray> wurde für <gray>{reason}</gray> für <gray>{time}</gray> verwarnt</dark_gray>"
+  no_reasons: "ohne Grund"
   reasons:
     - "Werbung"
-    - "Spamming"
-    - "Spielerbeleidigung"
+    - "Spam"
+    - "Beleidigung"
     - "Beleidigende Sprache"
 
+# Nachrichten für den /unwarn-Befehl
 unwarn:
-  unwarn: "Sie haben die Warnung für <gold>{player}</gold> entfernt"
-  usage: "Korrekte Verwendung: <gold>/unwarn <player>"
+  unwarn: "<green>Du hast die Verwarnung für Spieler <gold>{player}</gold> entfernt</green>"
+  usage: "Korrekte Verwendung: <gold>/warn <player>"
 
+# Nachrichten für den /kick-Befehl
 kick:
-  kick: "Sie haben <gold>{player}</gold> für <gold>{reason}</gold> gekickt"
+  kick: "<green>Du hast <gold>{player}</gold> für <gold>{reason}</gold> gekickt</green>"
   usage: "Korrekte Verwendung: <gold>/kick <player> <Grund>"
   kick_message:
+    # Sie können die Nachricht für den gekickten Spieler frei anpassen
     - 'Servername'
-    - 'PunisherX &8» &7Sie wurden gekickt'
-    - ' '
-    - ' '
-    - "<red>Grund <gray>» <gold>{reason}</gold>"
+    - 'PunisherX &8» &7Du wurdest gekickt'
     - '&7'
     - '&7'
-    - '&8Sie können Berufung einlegen unter:'
-    - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
-  broadcast: "Spieler <gold>{player}</gold> wurde für <gold>{reason}</gold> gekickt"
-  no_reasons: "kein Grund"
+    - "&cGrund &8» &7{reason}"
+    - '&7'
+    - '&7'
+    - '&8Du kannst Einspruch einlegen unter:'
+    - "&eDiscord &8» &c&nhttps://servername.de/discord"
+  broadcast: "<dark_gray>Spieler <gray>{player}</gray> wurde für <gray>{reason}</gray> gekickt</dark_gray>"
+  no_reasons: "ohne Grund"
   reasons:
     - "Flood"
-    - "Spamming"
+    - "Spam"
     - "Beleidigende Sprache"
 
+# Nachrichten für den /check-Befehl
 check:
   usage: "Korrekte Verwendung: <gold>/check <player_name> <all|ban|mute|warn>"
-  invalid_type: "Ungültiger Strafentyp. Verwenden Sie: all, ban, mute, warn."
-  no_punishments: "Spieler <gold>{player}</gold> hat keine Strafen."
-  title: "Aktive Strafen für"
-  type: "Typ"
-  reason: "Grund"
-  time: "Zeit"
+  invalid_type: "<red>Ungültiger Strafentyp. Verwenden Sie: all, ban, mute, warn.</red>"
+  no_punishments: "<dark_green>Spieler <gold>{player}</gold> hat keine Strafen.</dark_green>"
+  title: "<dark_gray>Aktive Strafen für</dark_gray>"
+  type: "<dark_gray>Typ</dark_gray>"
+  reason: "<dark_gray>Grund</dark_gray>"
+  time: "<dark_gray>Verbleibende Zeit</dark_gray>"
 
+# Nachrichten für den /history-Befehl
 history:
   usage: "Korrekte Verwendung: <gold>/check <player_name>"
-  no_punishments: "Spieler <gold>{player}</gold> hat keine Strafen."
-  title: "Aktive Strafen für"
-  type: "Typ"
-  reason: "Grund"
-  time: "Zeit"
+  no_punishments: "<dark_green>Spieler <gold>{player}</gold> hat keine Strafen.</dark_green>"
+  title: "<dark_gray>Aktive Strafen für</dark_gray>"
+  type: "<dark_gray>Typ</dark_gray>"
+  reason: "<dark_gray>Grund</dark_gray>"
+  time: "<dark_gray>Zeit</dark_gray>"
 
+# Nachrichten für den /change-reason-Befehl
 change-reason:
-  usage: "Die korrekte Verwendung ist: <gold>/change-reason <Straf_ID> <neuer_Grund>"
-  invalid_id: "Ungültiger Strafidentifikator"
-  success: "<green>Der vorherige Grund für die Strafe mit der ID: <gold>{id}</gold> wurde in \"<gold>{reason}</gold>\" geändert</green>"
-  failure: "<red>Fehler beim Aktualisieren des Grundes für die Strafe mit der ID: <gold>{id}</gold></red>"
+  usage: "Korrekte Verwendung: <gold>/change-reason <Strafe-ID> <neuer Grund>"
+  invalid_id: "<red>Ungültige Strafe-ID</red>"
+  success: "<green>Der Grund für die Strafe mit ID: <gold>{id}</gold> wurde in \"<gold>{reason}</gold>\" geändert</green>"
+  failure: "<red>Der Grund für die Strafe mit ID: <gold>{id}</gold> konnte nicht aktualisiert werden</red>"
 
+# Zeitformatierung
 formatTime:
-  undefined: "undefiniert"
+  undefined: "unbestimmt"
   minute:
     one: "Minute"
     few: "Minuten"
