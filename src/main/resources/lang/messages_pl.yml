@@ -1,15 +1,23 @@
+# Formatowanie tekstów wiadomości:
+# Można używać formatowania MiniMessage oraz Legacy (Minecraft).
+# Przykłady jak stosować MiniMessage: https://docs.advntr.dev/minimessage/format.html
+# Nie mieszaj formatów w jednej wiadomości. Jeśli używasz Legacy, nie wstawiaj formatowania MiniMessage, w przeciwnym wypadku zostanie użyty tylko ten drugi.
+
 prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>"
 
+# Wiadomości obsługi błędów
 error:
   no_permission: "<red>Nie masz uprawnień do tej komendy.</red>"
   player_not_found: "<gold>Nie znaleziono gracza o nicku {player}.</gold>"
   reload: "<red>Wystąpił błąd podczas przełądowania konfiguracji:</red> "
-  bypass: "Gracz {player} nie może otrzymać kary, ze zględu na swoje uprawnienia."
+  bypass: "<red><b>UWAGA!</b>Gracz <gold>{player}<gold/> nie może otrzymać kary, ze zględu na swoje uprawnienia (OP lub bypass).</red>"
 
+# Wiadomości komendy /ban
 ban:
-  ban: "Zbanowałeś {player} za {reason} na czas {time}"
+  ban: "<green>Zbanowałeś <gold>{player}</gold> za <gold>{reason}</gold> na czas <gold>{time}</green>"
   usage: "Poprawne użycie to: <gold>/ban <player> (czas) <powód>"
   kick_message:
+    # Możesz dowolnie dostosować komunikat dla wyrzuconego gracza
     - 'Nazwa serwera'
     - 'PunisherX &8» &7Zostałeś/aś zbanowany/a'
     - '&7'
@@ -19,18 +27,20 @@ ban:
     - '&7'
     - '&8Możesz zgłosić swój sprzeciw na:'
     - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
-  broadcast: "Gracz {player} został zbanowany z powodu {reason} na czas {time}"
+  broadcast: "<dark_gray>Gracz <gray>{player}</gray> został zbanowany z powodu <gray>{reason}</gray> na czas <gray>{time}</gray></dark_gray>"
   no_reasons: "bez powodu"
-  reasons:
+  reasons: # Dodaj własne powody jakie będą podpowiadane w trakcie wykonywania komendy
     - "Oszystwo"
     - "Griefing"
     - "Spamowanie"
     - "Wulgarny język"
 
+# Wiadomości komendy /banip
 banip:
-  ban: "Zbanowałeś IP gracza za {reason} na czas {time}"
+  ban: "<green>Zbanowałeś IP gracza za <gold>{reason}</gold> na czas <gold>{time}</green>"
   usage: "Poprawne użycie to: <gold>/banip <player|ip> (czas) <powód>"
   kick_message:
+    # Możesz dowolnie dostosować komunikat dla wyrzuconego gracza
     - 'Nazwa serwera'
     - 'PunisherX &8» &7Twoje IP zostało zbanowane!'
     - '&7'
@@ -40,7 +50,7 @@ banip:
     - '&7'
     - '&8Możesz zgłosić swój sprzeciw na:'
     - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.pl/discord"
-  broadcast: "Gracz {player} został zbanowany z powodu {reason} na czas {time}"
+  broadcast: "<dark_gray>Gracz <gray>{player}</gray> został zbanowany z powodu <gray>{reason}</gray> na czas <gray>{time}</gray></dark_gray>"
   no_reasons: "bez powodu"
   reasons:
     - "Multikonto"
@@ -48,17 +58,19 @@ banip:
     - "Spamowanie"
     - "Wulgarny język"
 
+# Wiadomości komendy /unban
 unban:
-  unban: "Gracz {player} został odbanowany"
+  unban: "<green>Gracz <gold>{player}</gold> został odbanowany</green>"
   usage: "Poprawne użycie to: <gold>/unban <player>"
-  broadcast: "Gracz {player} został odbanowany"
+  broadcast: "<dark_gray>Gracz <gray>{player}</gray> został odbanowany</dark_gray>"
 
+# Wiadomości komendy /mute
 mute:
-  mute: "Wyciszyłeś gracza {player} za {reason} na czas {time}"
+  mute: "<green>Wyciszyłeś gracza <gold>{player}</gold> za <gold>{reason}</gold> na czas <gold>{time}</green>"
   usage: "Poprawne użycie to: <gold>/mute <player> (time) <reason>"
   mute_message: "<red>Zostałeś/aś wyciszony/a za <b>{reason}</b> na czas <b>{time}</b></red>"
-  mute_info_message: "Próbujesz coś powiedzieć ale zostałeś/aś wyciszony/a"
-  broadcast: "Gracz {player} został wyciszony za {reason} na czas {time}"
+  mute_info_message: "<red>Próbujesz coś powiedzieć ale zostałeś/aś wyciszony/a</red>"
+  broadcast: "<dark_gray>Gracz <gray>{player}</gray> został wyciszony za <gray>{reason}</gray> na czas <gray>{time}</gray></dark_gray>"
   no_reasons: "bez powodu"
   reasons:
     - "Reklama"
@@ -66,31 +78,36 @@ mute:
     - "Obraza gracza"
     - "Wulgarny język"
 
+# Wiadomości komendy /unmute
 unmute:
-  unmute: "Odwyciszyłeś gracza {player}"
-  usage: "Poprawne użycie to: /mute <player>"
-  unmute_message: "Zostałeś/aś odwyciszony/a!"
+  unmute: "<green>Odwyciszyłeś gracza <gold>{player}</gold></green>"
+  usage: "Poprawne użycie to: <gold>/mute <player>"
+  unmute_message: "<green>Zostałeś/aś odwyciszony/a!</green>"
 
+# Wiadomości komendy /warn
 warn:
-  warn: Ostrzegłeś ({warn_no} raz) {player} za {reason} na czas {time}
+  warn: "<green>Ostrzegłeś ({warn_no} raz) <gold>{player}</gold> za <gold>{reason}</gold> na czas <gold>{time}</green>"
   usage: "Poprawne użycie to: <gold>/warn <player> (czas) <powód>"
   warn_message: "<red>Dostałeś/aś <b>{warn_no}</b> ostrzeżenie!</red>"
-  broadcast: "Gracz {player} otrzymał ostrzeżenie za {reason} na czas {time}"
+  broadcast: "<dark_gray>Gracz <gray>{player}</gray> otrzymał ostrzeżenie za <gray>{reason}</gray> na czas <gray>{time}</gray></dark_gray>"
   no_reasons: "bez powodu"
   reasons:
     - "Reklama"
     - "Spam"
     - "Obraza gracza"
     - "Wulgarny język"
-
+    -
+# Wiadomości komendy /unwarn
 unwarn:
-  unwarn: "Usunąłeś ostrzeżenie dla gracza {player}"
+  unwarn: "<green>Usunąłeś ostrzeżenie dla gracza <gold>{player}</gold></green>"
   usage: "Poprawne użycie to: <gold>/warn <player>"
 
+# Wiadomości komendy /kick
 kick:
-  kick: "Wyrzuciłeś {player} za {reason}"
+  kick: "<green>Wyrzuciłeś <gold>{player}</gold> za <gold>{reason}</gold></green>"
   usage: "Poprawne użycie to: <gold>/kick <player> <powód>"
   kick_message:
+    # Możesz dowolnie dostosować komunikat dla wyrzuconego gracza
     - 'Nazwa serwera'
     - 'PunisherX &8» &7Zostałeś/aś wyrzucony/a'
     - '&7'
@@ -100,36 +117,40 @@ kick:
     - '&7'
     - '&8Możesz zgłosić swój sprzeciw na:'
     - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
-  broadcast: "Gracz {player} został wyrzucony z powodu {reason}"
+  broadcast: "<dark_gray>Gracz <gray>{player}</gray> został wyrzucony z powodu <gray>{reason}</gray></dark_gray>"
   no_reasons: "bez powodu"
   reasons:
     - "Flood"
     - "Spamowanie"
     - "Wulgarny język"
 
+# Wiadomości komendy /check
 check:
   usage: "Poprawne użycie to: <gold>/check <nazwa_gracza> <all|ban|mute|warn>"
-  invalid_type: "Nieprawidłowy typ kary. Użyj: all, ban, mute, warn."
-  no_punishments: "Gracz {player} nie ma żadnych kar."
-  title: "Aktywne kary dla"
-  type: "Typ"
-  reason: "Powód"
-  time: "Pozostały czas"
+  invalid_type: "<red>Nieprawidłowy typ kary. Użyj: all, ban, mute, warn.</red>"
+  no_punishments: "<dark_green>Gracz <gold>{player}</gold> nie ma żadnych kar.</dark_green>"
+  title: "<dark_gray>Aktywne kary dla</dark_gray>"
+  type: "<dark_gray>Typ</dark_gray>"
+  reason: "<dark_gray>Powód</dark_gray>"
+  time: "<dark_gray>Pozostały czas</dark_gray>"
 
+# Wiadomości komendy /history
 history:
   usage: "Poprawne użycie to: <gold>/check <nazwa_gracza>"
-  no_punishments: "Gracz {player} nie ma żadnych kar."
-  title: "Aktywne kary dla"
-  type: "Typ"
-  reason: "Powód"
-  time: "Czas"
+  no_punishments: "<dark_green>Gracz <gold>{player}</gold> nie ma żadnych kar.</dark_green>"
+  title: "<dark_gray>Aktywne kary dla</dark_gray>"
+  type: "<dark_gray>Typ</dark_gray>"
+  reason: "<dark_gray>Powód</dark_gray>"
+  time: "<dark_gray>Czas</dark_gray>"
 
+# Wiadomości komendy /change-reason
 change-reason:
   usage: "Poprawne użycie to: <gold>/change-reason <ID_kary> <nowy_powód>"
-  invalid_id: "Nieprawidłowy identyfikator kary"
+  invalid_id: "<red>Nieprawidłowy identyfikator kary</red>"
   success: "<green>Zmieniono dotychczasowy powód kary o ID: <gold>{id}</gold> na \"<gold>{reason}</gold>\"</green>"
   failure: "<red>Nie udało się zaktualizować powodu kary dla ID: <gold>{id}</gold></red>"
 
+# Formatowanie czasu
 formatTime:
   undefined: "nieokreślony"
   minute:
