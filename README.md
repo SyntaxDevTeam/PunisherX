@@ -27,7 +27,7 @@ Jeśli masz jakieś pytania, być może znajdziesz na nie rozwiązanie na naszym
 * Umieść plik JAR w folderze plugins na swoim serwerze.
 * Uruchom serwer Minecraft.
 * Konfiguracja: 
-  W pliku [config.yml](https://github.com/SyntaxDevTeam/PunisherX/blob/main/src/main/resources/config.yml) znajdziesz opcje konfiguracyjne, takie jak listę zakazanych słów czy tryb pełnej cenzury.
+  W pliku [config.yml](https://github.com/SyntaxDevTeam/PunisherX/blob/main/src/main/resources/config.yml) znajdziesz bogaty zasób opcji konfiguracyjnych.
 
 ## Komendy
 
