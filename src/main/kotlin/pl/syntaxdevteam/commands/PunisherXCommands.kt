@@ -72,7 +72,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
     }
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
         return when (args.size) {
-            1 -> listOf("help", "version", "reload")
+            1 -> listOf("help", "version", "reload", "export", "import")
             else -> emptyList()
         }
     }

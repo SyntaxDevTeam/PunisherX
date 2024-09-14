@@ -46,7 +46,7 @@ class KickCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
                         targetPlayer.kick(kickMessage.build())
                     }
                     stack.sender.sendRichMessage(messageHandler.getMessage("kick", "kick", mapOf("player" to player, "reason" to reason)))
-                    val permission = "punisherx.see_kicks"
+                    val permission = "punisherx.see.kick"
                     val broadcastMessage = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("kick", "broadcast", mapOf("player" to player, "reason" to reason)))
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if (onlinePlayer.hasPermission(permission)) {
