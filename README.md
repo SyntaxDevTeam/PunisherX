@@ -11,9 +11,9 @@ Wtyczka jest zoptymalizowana dla serwerów Paper i ich rozwidleń, takich jak Pu
 * [x] Wymaga Javy 21 lub nowszej, aby działać poprawnie
 * [x] Napisany w nowoczesnym języku programowania Kotlin, który jest bardziej ekspresyjny i bezpieczny niż Java.
 * [x] Plik językowy z pełnym wspraciem formatowania [Minimessage](https://docs.advntr.dev/minimessage/format.html) oraz Legacy (Minecraft)
-* [x] Rozbudowany plik konfiguracyjny dla elastyczności ustawień
-* [x] System powiadomień o aktualizacjach z możliwością ustawienia autoamtycznego uaktualniania pluginu.
-
+* [x] Rozbudowany plik konfiguracyjny dla elastyczności ustawień. Sprawdź domyślne ustawienia [tutaj]()
+* [x] System powiadomień o aktualizacjach z możliwością ustawienia automatycznego uaktualniania pluginu.
+* [x] Geolokalizacja do wglądu dla administracji. Należy jednak ustawić w configu odpowiedni klucz licencji.
 
 Jeśli masz jakieś pytania, być może znajdziesz na nie rozwiązanie na naszym [discordzie](https://discord.gg/KNstae3UEV)
 
@@ -26,8 +26,8 @@ Jeśli masz jakieś pytania, być może znajdziesz na nie rozwiązanie na naszym
 * Pobierz najnowszą wersję pluginu z sekcji wydań.
 * Umieść plik JAR w folderze plugins na swoim serwerze.
 * Uruchom serwer Minecraft.
-* Konfiguracja
-  W pliku config.yml znajdziesz opcje konfiguracyjne, takie jak listę zakazanych słów czy tryb pełnej cenzury.
+* Konfiguracja: 
+  W pliku [config.yml](https://github.com/SyntaxDevTeam/PunisherX/blob/main/src/main/resources/config.yml) znajdziesz opcje konfiguracyjne, takie jak listę zakazanych słów czy tryb pełnej cenzury.
 
 ## Komendy
 
@@ -53,10 +53,41 @@ WarnActions:
 * `/change-reason <id_kary> <nowy_powód>` - Zmienia powód kary o danym ID
 * `/check <gracz> <warn|mute|ban|all>` - Sprawdza aktywne kare danego gracza. Dostępne opcje do sprawdzenia tylko dla warn|mute|ban lub wszystkie rodzaje przez "all"
 * `/history <gracz> (X)` - Sprawdza całą historie kar danego gracza od początku posortowane od najnowsej do najstarszej z podziałem na strony. Można nawigować w oknie czatu w grze klikajac w odpowiednie pole [NEXT]|[Previous] lub dodając numer strony jako argument do komendy.
-* `/punisherx|prx <help|version|reload>` - Domyślna komenda wyświetlająca w zależności od argumentu wyświetla ekran pomoc z dostępnymi komendami, aktualną wersję pluginu wraz z informacjami o nim oraz przeładowującą plik config.
+* `/punisherx|prx <help|version|reload|export|import>` - Domyślna komenda wyświetlająca w zależności od argumentu wyświetla ekran pomoc z dostępnymi komendami, aktualną wersję pluginu wraz z informacjami o nim oraz przeładowującą plik config. Dodakowo argumenty export|import pozwalają na wykonanie zrzutu (kopi zapasowej) bazy danych lub jej importu w katalogu pluginu.
 
 ## Uprawnienia
 
+* Komendy:
+  * `punisherx.warn`
+  * `punisherx.unwarn`
+  * `punisherx.mute`
+  * `punisherx.unmute`
+  * `punisherx.ban`
+  * `punisherx.banip`
+  * `punisherx.unban`
+  * `punisherx.kick`
+  * `punisherx.check` - Nie jest wymagane jeśli gracz sprawdza samego siebie.
+    * `punisherx.view_ip` - Dodatkowe uprawnienie pozwalające na wgląd w IP gracza w komendzie `/check`
+  * `punisherx.history` - Nie jest wymagane jeśli gracz sprawdza samego siebie.
+  * `punisherx.help`
+  * `punisherx.version`
+  * `punisherx.reload`
+  * `punisherx.export`
+  * `punisherx.import`
+
+* Komunikaty wykonywanych komend/kar:
+  * `punisherx.see.ban`
+  * `punisherx.see.banip`
+  * `punisherx.see.unban`
+  * `punisherx.see.mute`
+  * `punisherx.see.warns`
+  * `punisherx.see.kick`
+
+* Uprawnienia bypass (nie pozwalają na wykonanie na uprawnionych danej komendy):
+  * `punisherx.bypass.warn`
+  * `punisherx.bypass.mute`
+  * `punisherx.bypass.ban`
+  * `punisherx.bypass.banip` - nie działa w przypadku użycia bezpośrenio numeru IP
 
 ## Kontakt
 Jeśli masz pytania lub potrzebujesz pomocy, śmiało skontaktuj się z nami na naszym [discordzie](https://discord.gg/KNstae3UEV) lub napisz bezpośrednio na PM
