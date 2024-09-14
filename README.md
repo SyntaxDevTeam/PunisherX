@@ -3,13 +3,17 @@
 To wszechstronny system kar, który oferuje ostrzeżenia, wyciszenia, bany, ipbany (w tym tymczasowe) oraz kicki.
 Dzięki funkcji Check możesz szybko sprawdzić aktualne kary nałożone na gracza. Wtyczka zawiera konfigurowalne szablony powodów kar, co ułatwia ich szybkie wymierzanie.
 PunisherX oferuje pełny plik wiadomości, który umożliwia modyfikację i tłumaczenie wszystkich komunikatów z pełnym wsparciem dla Minimessage. Dodatkowo, wtyczka posiada szczegółowy plik konfiguracyjny z wieloma przydatnymi ustawieniami.
-Wtyczka jest zoptymalizowana dla serwerów Paper i ich rozwidleń, takich jak Pufferfish czy Purpur. Obsługuje zarówno MySQL umożliwiając synchornizację miedzy kilkoma serwerami, jak i lokalną bazę danych SQLite zapewniając wysoką wydajność.
+Wtyczka jest zoptymalizowana dla serwerów Paper i ich rozwidleń, takich jak Pufferfish czy Purpur. Obsługuje zarówno MySQL/MariaDB umożliwiając synchornizację miedzy kilkoma serwerami, jak i lokalną bazę danych SQLite zapewniając wysoką wydajność.
 
 ## Informacje
 * [x] PunisherX został zaprojektowany specjalnie pod najnowszą wersję Minecraft od 1.20.6 do 1.21+
 * [x] Napisany i zoptymalizowano pod silnik Paper a zatem tez pod jego modyfikacje tj. Pufferfish i Purpur
 * [x] Wymaga Javy 21 lub nowszej, aby działać poprawnie
 * [x] Napisany w nowoczesnym języku programowania Kotlin, który jest bardziej ekspresyjny i bezpieczny niż Java.
+* [x] Plik językowy z pełnym wspraciem formatowania [Minimessage](https://docs.advntr.dev/minimessage/format.html) oraz Legacy (Minecraft)
+* [x] Rozbudowany plik konfiguracyjny dla elastyczności ustawień
+* [x] System powiadomień o aktualizacjach z możliwością ustawienia autoamtycznego uaktualniania pluginu.
+
 
 Jeśli masz jakieś pytania, być może znajdziesz na nie rozwiązanie na naszym [discordzie](https://discord.gg/KNstae3UEV)
 
