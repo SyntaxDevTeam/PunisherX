@@ -11,7 +11,7 @@ This is a comprehensive punishment system that offers warnings, mutes, bans, IP 
 * [x] Update notification system with the option to set automatic plugin updates.
 * [x] Geolocation for administration insight. However, you need to set the appropriate license key in the config.
 
-If you have any questions, you might find the solution on our Discord
+If you have any questions, you might find the solution on our [Discord](https://discord.gg/Zk6mxv7eMh)
 
 ## Download
 * Always up-to-date stable version available for download on Hangar [![Available on Hangar](https://img.shields.io/hangar/dt/PunisherX)](https://hangar.papermc.io/SyntaxDevTeam/PunisherX)
@@ -80,7 +80,7 @@ WarnActions:
 * `punisherx.bypass.banip` - does not work when using the IP number directly
 
 ## Contact
-If you have any questions or need help, feel free to contact us on our [Discord](https://discord.gg/KNstae3UEV) or write directly on PM
+If you have any questions or need help, feel free to contact us on our [Discord](https://discord.gg/Zk6mxv7eMh) or write directly on PM
 
 ## License
 This plugin is available under the MIT license. Details can be found in the LICENSE file.
@@ -110,7 +110,7 @@ Wtyczka jest zoptymalizowana dla serwerów Paper i ich rozwidleń, takich jak Pu
 * [x] System powiadomień o aktualizacjach z możliwością ustawienia automatycznego uaktualniania pluginu.
 * [x] Geolokalizacja do wglądu dla administracji. Należy jednak ustawić w configu odpowiedni klucz licencji.
 
-Jeśli masz jakieś pytania, być może znajdziesz na nie rozwiązanie na naszym [discordzie](https://discord.gg/KNstae3UEV)
+Jeśli masz jakieś pytania, być może znajdziesz na nie rozwiązanie na naszym [discordzie](https://discord.gg/Zk6mxv7eMh)
 
 ## Pobierz
 * Zawsze aktualna wersja stabilna do pobrania na Hangar [![Available on Hangar](https://img.shields.io/hangar/dt/PunisherX)](https://hangar.papermc.io/SyntaxDevTeam/PunisherX)
@@ -183,7 +183,7 @@ WarnActions:
 * `punisherx.bypass.banip` - nie działa w przypadku użycia bezpośrednio numeru IP
 
 ## Kontakt
-Jeśli masz pytania lub potrzebujesz pomocy, śmiało skontaktuj się z nami na naszym [discordzie](https://discord.gg/KNstae3UEV) lub napisz bezpośrednio na PM
+Jeśli masz pytania lub potrzebujesz pomocy, śmiało skontaktuj się z nami na naszym [discordzie](https://discord.gg/Zk6mxv7eMh) lub napisz bezpośrednio na PM
 
 ## Licencja
 Ten plugin jest dostępny na licencji MIT. Szczegóły znajdziesz w pliku LICENSE.
