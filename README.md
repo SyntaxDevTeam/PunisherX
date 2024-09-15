@@ -10,6 +10,7 @@ This is a comprehensive punishment system that offers warnings, mutes, bans, IP 
 * [x] Extensive configuration file for flexible settings. Check the default settings here
 * [x] Update notification system with the option to set automatic plugin updates.
 * [x] Geolocation for administration insight. However, you need to set the appropriate license key in the config.
+
 If you have any questions, you might find the solution on our Discord
 
 ## Download
