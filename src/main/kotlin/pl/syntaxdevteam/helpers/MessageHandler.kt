@@ -6,11 +6,11 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.plugin.java.JavaPlugin
+import pl.syntaxdevteam.PunisherX
 import java.io.File
 
 @Suppress("UnstableApiUsage")
-class MessageHandler(private val plugin: JavaPlugin, pluginMetas: PluginMeta) {
+class MessageHandler(private val plugin: PunisherX, pluginMetas: PluginMeta) {
     private val language = plugin.config.getString("language") ?: "EN"
     private var messages: FileConfiguration
     private var config = plugin.config

@@ -1,36 +1,30 @@
 package pl.syntaxdevteam.helpers
 
-import io.ktor.client.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.Json
-import org.bukkit.plugin.java.JavaPlugin
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
+import pl.syntaxdevteam.PunisherX
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URI
 
 data class PluginInfo(val name: String, val uuid: String, val prior: Int)
 
 @Suppress("UnstableApiUsage")
-class PluginManager(private val plugin: JavaPlugin) {
+class PluginManager(private val plugin: PunisherX) {
 
-    private val client = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-            })
-        }
-    }
+    fun fetchPluginsFromExternalSource(urlString: String): List<PluginInfo> {
+        return try {
+            val uri = URI(urlString)
+            val url = uri.toURL()
+            val connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = "GET"
+            connection.connectTimeout = 5000
 
-    fun fetchPluginsFromExternalSource(url: String): List<PluginInfo> {
-        return runBlocking {
-            val response: HttpResponse = client.get(url)
-            if (response.status == HttpStatusCode.OK) {
-                val responseBody = response.bodyAsText()
+            val responseCode = connection.responseCode
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                val responseBody = BufferedReader(InputStreamReader(connection.inputStream)).use { it.readText() }
                 val parser = JSONParser()
                 val jsonArray = parser.parse(responseBody) as JSONArray
                 jsonArray.map { jsonObject ->
@@ -44,6 +38,9 @@ class PluginManager(private val plugin: JavaPlugin) {
             } else {
                 emptyList()
             }
+        } catch (e: Exception) {
+            plugin.logger.warning("An error occurred while fetching plugins: ${e.message}")
+            emptyList()
         }
     }
 

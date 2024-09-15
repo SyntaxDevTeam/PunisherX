@@ -1,14 +1,6 @@
 package pl.syntaxdevteam.helpers
 
-import io.ktor.client.*
-import io.ktor.client.plugins.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.util.cio.*
-import io.ktor.utils.io.*
 import io.papermc.paper.plugin.configuration.PluginMeta
-import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
@@ -17,6 +9,10 @@ import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import pl.syntaxdevteam.PunisherX
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URI
 import java.io.File
 
 @Suppress("UnstableApiUsage")
@@ -31,36 +27,33 @@ class UpdateChecker(private val plugin: PunisherX, private val pluginMetas: Plug
             return
         }
 
-        runBlocking {
-            val client = HttpClient {
-                install(HttpTimeout) {
-                    requestTimeoutMillis = 5000
-                }
-            }
-            try {
-                val response: HttpResponse = client.get(hangarApiUrl)
-                if (response.status == HttpStatusCode.OK) {
-                    val responseBody = response.bodyAsText()
-                    val parser = JSONParser()
-                    val jsonObject = parser.parse(responseBody) as JSONObject
-                    val versions = jsonObject["result"] as JSONArray
-                    val latestVersion = versions.firstOrNull() as? JSONObject
-                    if (latestVersion != null && isNewerVersion(latestVersion["name"] as String, pluginMetas.version)) {
-                        notifyUpdate(latestVersion)
-                        if (config.getBoolean("autoDownloadUpdates", false)) {
-                            downloadUpdate(latestVersion, client)
-                        }
+        try {
+            val uri = URI(hangarApiUrl)
+            val url = uri.toURL()
+            val connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = "GET"
+            connection.connectTimeout = 5000
+
+            val responseCode = connection.responseCode
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                val responseBody = BufferedReader(InputStreamReader(connection.inputStream)).use { it.readText() }
+                val parser = JSONParser()
+                val jsonObject = parser.parse(responseBody) as JSONObject
+                val versions = jsonObject["result"] as JSONArray
+                val latestVersion = versions.firstOrNull() as? JSONObject
+                if (latestVersion != null && isNewerVersion(latestVersion["name"] as String, pluginMetas.version)) {
+                    notifyUpdate(latestVersion)
+                    if (config.getBoolean("autoDownloadUpdates", false)) {
+                        downloadUpdate(latestVersion)
                     }
-                } else {
-                    plugin.logger.warning("Failed to check for updates: ${response.status}")
+                }else{
+                    plugin.logger.success("Your version is up to date")
                 }
-            } catch (e: HttpRequestTimeoutException) {
-                plugin.logger.warning("Request timeout while checking for updates: ${e.message}")
-            } catch (e: Exception) {
-                plugin.logger.warning("An error occurred while checking for updates: ${e.message}")
-            } finally {
-                client.close()
+            } else {
+                plugin.logger.warning("Failed to check for updates: $responseCode")
             }
+        } catch (e: Exception) {
+            plugin.logger.warning("An error occurred while checking for updates: ${e.message}")
         }
     }
 
@@ -102,8 +95,7 @@ class UpdateChecker(private val plugin: PunisherX, private val pluginMetas: Plug
         notifyAdmins(component)
     }
 
-    @OptIn(InternalAPI::class)
-    private suspend fun downloadUpdate(version: JSONObject, client: HttpClient) {
+    private fun downloadUpdate(version: JSONObject) {
         val versionName = version["name"] as String
         val downloadUrl = (version["downloads"] as JSONObject)["PAPER"] as JSONObject
         val fileUrl = downloadUrl["downloadUrl"] as String
@@ -112,16 +104,26 @@ class UpdateChecker(private val plugin: PunisherX, private val pluginMetas: Plug
         val currentFile = plugin.getPluginFile()
 
         try {
-            val response: HttpResponse = client.get(fileUrl)
-            if (response.status == HttpStatusCode.OK) {
-                response.content.copyAndClose(newFile.writeChannel())
+            val uri = URI(fileUrl)
+            val url = uri.toURL()
+            val connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = "GET"
+            connection.connectTimeout = 5000
+
+            val responseCode = connection.responseCode
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                url.openStream().use { input ->
+                    newFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
                 plugin.logger.success("Downloaded new version $versionName to ${newFile.absolutePath}")
                 if (currentFile.exists() && currentFile != newFile) {
                     currentFile.delete()
-                    plugin.logger.success("Deleted old version ${currentFile.name}")
+                    plugin.logger.success("Deleted old version ${currentFile.name}. Restart your server to enjoy the latest plugin version")
                 }
             } else {
-                plugin.logger.warning("Failed to download new version $versionName: ${response.status}")
+                plugin.logger.warning("Failed to download new version $versionName: $responseCode")
             }
         } catch (e: Exception) {
             plugin.logger.warning("Failed to download new version $versionName: ${e.message}")

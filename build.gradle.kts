@@ -24,11 +24,6 @@ dependencies {
 
     compileOnly("org.mariadb.jdbc:mariadb-java-client:3.3.2-SNAPSHOT")
     compileOnly("org.postgresql:postgresql:42.7.3")
-
-    implementation("io.ktor:ktor-client-core:3.0.0-beta-2")
-    implementation("io.ktor:ktor-client-cio:3.0.0-beta-2")
-    implementation("io.ktor:ktor-client-content-negotiation:3.0.0-beta-2")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.0-beta-2")
     implementation("com.googlecode.json-simple:json-simple:1.1.1")
     implementation("com.maxmind.geoip2:geoip2:4.2.0")
     implementation("org.apache.commons:commons-compress:1.26.0")

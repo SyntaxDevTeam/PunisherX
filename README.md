@@ -72,6 +72,7 @@ WarnActions:
 * `punisherx.see.mute`
 * `punisherx.see.warns`
 * `punisherx.see.kick`
+* `punisherx.update.notify`
 ### Bypass permissions (do not allow the command to be executed on authorized users):
 * `punisherx.bypass.warn`
 * `punisherx.bypass.mute`
@@ -174,6 +175,7 @@ WarnActions:
 * `punisherx.see.mute`
 * `punisherx.see.warns`
 * `punisherx.see.kick`
+* `punisherx.update.notify`
 
 ### Uprawnienia bypass (nie pozwalają na wykonanie na uprawnionych danej komendy):
 * `punisherx.bypass.warn`
