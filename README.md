@@ -58,7 +58,7 @@ WarnActions:
 * `punisherx.unban`
 * `punisherx.kick`
 * `punisherx.check` - Not required if the player checks themselves.
-* `punisherx.view_ip` - Additional permission allowing to view the player’s IP in the /check command
+* `punisherx.view_ip` - Additional permission allowing to view the player’s IP in the /check|history command
 * `punisherx.history` - Not required if the player checks themselves.
 * `punisherx.help`
 * `punisherx.version`
@@ -159,7 +159,7 @@ WarnActions:
 * `punisherx.unban`
 * `punisherx.kick`
 * `punisherx.check` - Nie jest wymagane, jeśli gracz sprawdza samego siebie.
-  * `punisherx.view_ip` - Dodatkowe uprawnienie pozwalające na wgląd w IP gracza w komendzie `/check`
+  * `punisherx.view_ip` - Dodatkowe uprawnienie pozwalające na wgląd w IP gracza w komendzie `/check|history`
 * `punisherx.history` - Nie jest wymagane, jeśli gracz sprawdza samego siebie.
 * `punisherx.help`
 * `punisherx.version`
