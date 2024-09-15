@@ -334,8 +334,6 @@ class SQLiteDatabaseHandler(private val plugin: PunisherX) : DatabaseHandler {
         } catch (e: SQLException) {
             plugin.logger.err("Failed to update punishment reason for ID: $id. ${e.message}")
             false
-        } finally {
-            closeConnection()
         }
     }
 

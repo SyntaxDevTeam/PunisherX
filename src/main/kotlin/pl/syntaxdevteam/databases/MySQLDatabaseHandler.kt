@@ -315,8 +315,6 @@ class MySQLDatabaseHandler(private val plugin: PunisherX, config: FileConfigurat
         } catch (e: SQLException) {
             plugin.logger.err("Failed to update punishment reason for ID: $id. ${e.message}")
             false
-        } finally {
-            closeConnection()
         }
     }
 
