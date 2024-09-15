@@ -49,6 +49,7 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, priva
                     if (filteredPunishments.isEmpty()) {
                         stack.sender.sendRichMessage(messageHandler.getMessage("check", "no_punishments", mapOf("player" to player)))
                     } else {
+                        val id = messageHandler.getLogMessage("check", "id")
                         val types = messageHandler.getLogMessage("check", "type")
                         val reasons = messageHandler.getLogMessage("check", "reason")
                         val times = messageHandler.getLogMessage("check", "time")
@@ -62,17 +63,19 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, priva
                             "$city, $country"
                         } ?: "Unknown location"
                         plugin.logger.debug("GeoLocation: $geoLocation")
-
-
+                        val fullGeoLocation = when (stack.sender.hasPermission("punisherx.view_ip")) {
+                            true -> "$playerIP ($geoLocation)"
+                            else -> geoLocation
+                        }
                         val gamer = if (stack.sender.name == "CONSOLE") {
-                            "<gold>$targetPlayer <gray>[$uuid, $geoLocation]</gray>:</gold>"
+                            "<gold>$targetPlayer <gray>[$uuid, $fullGeoLocation]</gray>:</gold>"
                         } else {
-                            "<gold><hover:show_text:'[<white>$uuid, $geoLocation</white>]'>$targetPlayer:</gold>"
+                            "<gold><hover:show_text:'[<white>$uuid, $fullGeoLocation</white>]'>$targetPlayer:</gold>"
                         }
                         val miniMessage = MiniMessage.miniMessage()
                         val topHeader = miniMessage.deserialize("<blue>--------------------------------------------------</blue>")
                         val header = miniMessage.deserialize("<blue>|    $title $gamer</blue>")
-                        val tableHeader = miniMessage.deserialize("<blue>|   ID:  |  $types  |  $reasons  |  $times</blue>")
+                        val tableHeader = miniMessage.deserialize("<blue>|   $id  |  $types  |  $reasons  |  $times</blue>")
                         val br = miniMessage.deserialize("<blue> </blue>")
                         val hr = miniMessage.deserialize("<blue>|</blue>")
                         stack.sender.sendMessage(br)
