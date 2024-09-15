@@ -53,7 +53,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
     }
 
     private fun generateKey(): Key {
-        val keyString = "M424PmX84WlDDXLb" // Stały klucz szyfrowania (16 znaków dla AES-128)
+        val keyString = "M424PmX84WlDDXLb" // Fixed encryption key (16 characters for AES-128) if you are using the developer version remember to change it to your own
         return SecretKeySpec(keyString.toByteArray(UTF_8), "AES")
     }
 
