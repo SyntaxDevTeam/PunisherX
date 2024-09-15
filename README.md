@@ -13,8 +13,8 @@ This is a comprehensive punishment system that offers warnings, mutes, bans, IP 
 If you have any questions, you might find the solution on our Discord
 
 ## Download
-Always up-to-date stable version available for download on Hangar [![Available on Hangar](https://img.shields.io/hangar/dt/PunisherX)](https://hangar.papermc.io/SyntaxDevTeam/PunisherX)
-You can also build the development version yourself from [![Available on GitHub](https://img.shields.io/badge/GitHub.com-PunisherX-green)](https://github.com/SyntaxDevTeam/PunisherX)
+* Always up-to-date stable version available for download on Hangar [![Available on Hangar](https://img.shields.io/hangar/dt/PunisherX)](https://hangar.papermc.io/SyntaxDevTeam/PunisherX)
+* You can also build the development version yourself from [![Available on GitHub](https://img.shields.io/badge/GitHub.com-PunisherX-green)](https://github.com/SyntaxDevTeam/PunisherX)
 
 ## Installation
 * Download the latest version of the plugin from the releases section.
@@ -24,12 +24,12 @@ You can also build the development version yourself from [![Available on GitHub]
 
 ## Commands
 
-`/ban <player> (time) <reason>` - Command to ban a player. Immediately bans and kicks the player if they are online. The command is additionally secured against database connection loss by using the built-in Paper engine - BanList.
-`/banip <ip|player> (time) <reason>` - Command to ban a player’s IP. Immediately bans and kicks the player if they are online, based on their IP or nickname. The command is additionally secured against database connection loss by using the built-in Paper engine command “/ban-ip”.
-`/unban <ip|player>` - Cancels the ban for a given player depending on the usage by their nickname or IP.
-`/mute <player> (time) <reason>` - Command to mute a player. The player cannot write anything publicly in the chat. In the config file, you can also set whether attempts to communicate in private messages should be blocked and the set of blocked commands for those messages.
-`/unmute <player>` - Cancels the mute for a player.
-`/warn <player> (time) <reason>` - Command to give a warning to a player. You can warn a player by giving them a warning for minor offenses. In the config file, you can set the reaction that should occur after a certain number of warnings, e.g., whether to kick or ban for a certain time. You can set any command available on your server, omitting the “/” sign.
+* `/ban <player> (time) <reason>` - Command to ban a player. Immediately bans and kicks the player if they are online. The command is additionally secured against database connection loss by using the built-in Paper engine - BanList.
+* `/banip <ip|player> (time) <reason>` - Command to ban a player’s IP. Immediately bans and kicks the player if they are online, based on their IP or nickname. The command is additionally secured against database connection loss by using the built-in Paper engine command “/ban-ip”.
+* `/unban <ip|player>` - Cancels the ban for a given player depending on the usage by their nickname or IP.
+* `/mute <player> (time) <reason>` - Command to mute a player. The player cannot write anything publicly in the chat. In the config file, you can also set whether attempts to communicate in private messages should be blocked and the set of blocked commands for those messages.
+* `/unmute <player>` - Cancels the mute for a player.
+* `/warn <player> (time) <reason>` - Command to give a warning to a player. You can warn a player by giving them a warning for minor offenses. In the config file, you can set the reaction that should occur after a certain number of warnings, e.g., whether to kick or ban for a certain time. You can set any command available on your server, omitting the “/” sign.
 ```YAML
 WarnActions:
 3: "kick {player} You have received your 3rd warning!"
@@ -39,12 +39,12 @@ WarnActions:
 7: "ban {player} 30d You have received your {warn_no}th warning!"
 10: "ban {player} You have received your 10th warning!"
 ```
-`/unwarn <player>` - Cancels the last warning each time, which is in the database
-`/kick <player> <reason>` - Command that immediately kicks the player from the server with a specified reason.
-`/change-reason <penalty_id> <new_reason>` - Changes the reason for the penalty with the given ID
-`/check <player> <warn|mute|ban|all>` - Checks the active penalties of a given player. Available options to check only for warn|mute|ban or all types through “all”
-`/history <player> (X)` - Checks the entire penalty history of a given player from the beginning sorted from newest to oldest with page division. You can navigate in the game chat window by clicking the appropriate field [NEXT]|[Previous] or adding the page number as an argument to the command.
-`/punisherx|prx <help|version|reload|export|import>` - Default command displaying depending on the argument shows the help screen with available commands, the current version of the plugin with information about it, and reloading the config file. Additionally, the export|import arguments allow you to make a database backup or import it in the plugin directory.
+* `/unwarn <player>` - Cancels the last warning each time, which is in the database
+* `/kick <player> <reason>` - Command that immediately kicks the player from the server with a specified reason.
+* `/change-reason <penalty_id> <new_reason>` - Changes the reason for the penalty with the given ID
+* `/check <player> <warn|mute|ban|all>` - Checks the active penalties of a given player. Available options to check only for warn|mute|ban or all types through “all”
+* `/history <player> (X)` - Checks the entire penalty history of a given player from the beginning sorted from newest to oldest with page division. You can navigate in the game chat window by clicking the appropriate field [NEXT]|[Previous] or adding the page number as an argument to the command.
+* `/punisherx|prx <help|version|reload|export|import>` - Default command displaying depending on the argument shows the help screen with available commands, the current version of the plugin with information about it, and reloading the config file. Additionally, the export|import arguments allow you to make a database backup or import it in the plugin directory.
 > Arguments specified in <> are required, and those in round brackets () are optional. When using time (temporary punishment), you must specify in the available formats, i.e., Xs|Xm|Xh|Xd specifying X time in seconds|minutes|hours|days. Leaving the time field empty automatically assigns an indefinite punishment that never expires unless a command is used to cancel the punishment.
 
 ## Permissions
@@ -81,12 +81,11 @@ WarnActions:
 ## Contact
 If you have any questions or need help, feel free to contact us on our [Discord](https://discord.gg/KNstae3UEV) or write directly on PM
 
-License
+## License
 This plugin is available under the MIT license. Details can be found in the LICENSE file.
 
 
-
-Thank you for using PunisherX! I hope it meets your expectations. 😊
+**Thank you for using PunisherX! I hope it meets your expectations. 😊**
 
 ![syntaxdevteam_logo.png](assets/syntaxdevteam_logo.png)
 ---
@@ -125,8 +124,6 @@ W pliku [config.yml](https://github.com/SyntaxDevTeam/PunisherX/blob/main/src/ma
 
 ## Komendy
 
-Argumenty określone w <> są wymagane, a te w nawiasach okrągłych () są opcjonalne. Używając czasu (kara na czas określony) musisz określić w dostępnych formatach, czyli Xs|Xm|Xh|Xd określając X czasu w sekundach|minutach|godzinach|dniach. Pozostawienie pustego pola w miejscu czasu automatycznie nadaje kare na czas nieokreślony i nigdy ona nie wygaśnie, chyba że zostanie użyta komenda kasująca daną karę.
-
 * `/ban <gracz> (czas) <powód>` - Komenda banująca gracza. Natychmiast banuje i wyrzuca gracza, jeśli ten jest online. Komenda jest dodatkowo zabezpieczona na wypadek zerwania połączenia z bazą danych przez użycie wbudowanej w silniku Paper - BanList.
 * `/banip <ip|gracz> (czas) <powód>` - Komenda banująca ip gracza. Natychmiast banuje i wyrzuca gracza, jeśli ten jest online, na podstawie jego IP lub jego nicku. Komenda jest dodatkowo zabezpieczona na wypadek zerwania połączenia z bazą danych przez użycie wbudowanej w silniku Paper komendy "/ban-ip".
 * `/unban <ip|gracz>` - Kasuje bana dla danego gracza w zależności od sposobu użycia po jego nicku lub IP.
@@ -148,6 +145,7 @@ WarnActions:
 * `/check <gracz> <warn|mute|ban|all>` - Sprawdza aktywne kare danego gracza. Dostępne opcje do sprawdzenia tylko dla warn|mute|ban lub wszystkie rodzaje przez "all"
 * `/history <gracz> (X)` - Sprawdza całą historię kar danego gracza od początku posortowane od najnowszej do najstarszej z podziałem na strony. Można nawigować w oknie czatu w grze klikając w odpowiednie pole [NEXT]|[Previous] lub dodając numer strony jako argument do komendy.
 * `/punisherx|prx <help|version|reload|export|import>` - Domyślna komenda wyświetlająca w zależności od argumentu wyświetla ekran pomoc z dostępnymi komendami, aktualną wersję pluginu wraz z informacjami o nim oraz przeładowującą plik config. Dodatkowo argumenty export|import pozwalają na wykonanie zrzutu (kopii zapasowej) bazy danych lub jej importu w katalogu pluginu.
+> Argumenty określone w <> są wymagane, a te w nawiasach okrągłych () są opcjonalne. Używając czasu (kara na czas określony) musisz określić w dostępnych formatach, czyli Xs|Xm|Xh|Xd określając X czasu w sekundach|minutach|godzinach|dniach. Pozostawienie pustego pola w miejscu czasu automatycznie nadaje kare na czas nieokreślony i nigdy ona nie wygaśnie, chyba że zostanie użyta komenda kasująca daną karę.
 
 ## Uprawnienia
 
