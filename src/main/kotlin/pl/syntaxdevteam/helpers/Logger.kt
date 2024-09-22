@@ -52,27 +52,20 @@ class Logger(pluginMetas: PluginMeta, private val debugMode: Boolean) {
 
     fun pluginStart(pluginsByPriority: List<Pair<String, String>>) {
         clear("")
-        clear("&9-------------------------------------------------------------------------------")
         clear("")
-        clear("&9    _____             _             _____          _______                   ")
-        clear("&9   / ____|           | |           |  __ \\        |__   __|                  ")
-        clear("&9  | (___  _   _ _ __ | |_ __ ___  _| |  | | _____   _| | ___  __ _ _ __ ___  ")
-        clear("&9   \\___ \\| | | | '_ \\| __/ _` \\ \\/ / |  | |/ _ \\ \\ / / |/ _ \\/ _` | '_ ` _ \\ ")
-        clear("&9   ____) | |_| | | | | || (_| |>  <| |__| |  __/\\ V /| |  __/ (_| | | | | | |")
-        clear("&9  |_____/ \\__, |_| |_|\\__\\__,_/_/\\_\\_____/ \\___| \\_/ |_|\\___|\\__,_|_| |_| |_|")
-        clear("&9           __/ |                                                             ")
-        clear("&9          |___/                                                              ")
-        clear("&9                                                                             ")
-        clear("&9    ... is proud to present and enable:")
-        clear("&9                   &f * &f&l${plName} v${plVer}")
+        clear("&9    __                   __        ___            ")
+        clear("&9   (_      _  |_  _     |  \\  _     |   _  _   _  ")
+        clear("&9   __) \\/ | ) |_ (_| )( |__/ (- \\/  |  (- (_| ||| ")
+        clear("&9       /                                          ")
+        clear("&9           ... is proud to present and enable:")
+        clear("&9                     &f * &f&l${plName} v${plVer}")
         for ((pluginName, pluginVersion) in pluginsByPriority) {
-            clear("&9                   &f * $pluginName v$pluginVersion")
+            clear("&9                     &f * $pluginName v$pluginVersion")
         }
         clear("&9                 utilizing all the optimizations of your server engine!         ")
         clear("")
         clear("&a    Join our Discord! &9&lhttps://discord.gg/Zk6mxv7eMh")
         clear("")
-        clear("&9-------------------------------------------------------------------------------")
         clear("")
     }
 }
