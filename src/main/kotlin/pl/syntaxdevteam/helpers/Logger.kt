@@ -52,7 +52,6 @@ class Logger(pluginMetas: PluginMeta, private val debugMode: Boolean) {
 
     fun pluginStart(pluginsByPriority: List<Pair<String, String>>) {
         clear("")
-        clear("")
         clear("&9    __                   __        ___            ")
         clear("&9   (_      _  |_  _     |  \\  _     |   _  _   _  ")
         clear("&9   __) \\/ | ) |_ (_| )( |__/ (- \\/  |  (- (_| ||| ")
