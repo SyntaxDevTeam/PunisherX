@@ -4,5 +4,5 @@ main: pl.syntaxdevteam.PunisherX
 api-version: '1.20'
 folia-support: true
 authors: [SyntaxDevTeam]
-description: System kar serwera
+description: Advanced punishment system for Minecraft servers with warnings, mutes, bans, kicks and more.
 website: https://github.com/SyntaxDevTeam
