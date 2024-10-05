@@ -23,7 +23,7 @@ dependencies {
     testImplementation("dev.folia:folia-api:1.20.6-R0.1-SNAPSHOT")
 
     compileOnly("org.mariadb.jdbc:mariadb-java-client:3.3.2-SNAPSHOT")
-    compileOnly("org.postgresql:postgresql:42.7.3")
+    compileOnly("org.postgresql:postgresql:42.7.4")
     implementation("com.googlecode.json-simple:json-simple:1.1.1")
     implementation("com.maxmind.geoip2:geoip2:4.2.1")
     implementation("org.apache.commons:commons-compress:1.26.0")
