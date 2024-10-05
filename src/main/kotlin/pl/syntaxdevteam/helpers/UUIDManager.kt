@@ -1,5 +1,7 @@
 package pl.syntaxdevteam.helpers
 
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URI
@@ -7,12 +9,11 @@ import java.util.*
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
-import org.json.simple.JSONObject
-import org.json.simple.parser.JSONParser
 import pl.syntaxdevteam.PunisherX
 
 class UUIDManager(private val plugin: PunisherX) {
     private val activeUUIDs: MutableMap<String, UUID> = HashMap()
+    private val gson = Gson()
 
     fun getUUID(playerName: String): UUID {
         val player: Player? = Bukkit.getPlayer(playerName)
@@ -60,9 +61,8 @@ class UUIDManager(private val plugin: PunisherX) {
 
     private fun parseUUIDFromResponse(response: String): UUID? {
         return try {
-            val parser = JSONParser()
-            val jsonObject = parser.parse(response) as JSONObject
-            val rawUUID = jsonObject["id"] as String
+            val jsonObject = gson.fromJson(response, JsonObject::class.java)
+            val rawUUID = jsonObject.get("id").asString
             plugin.logger.debug("Raw UUID from API: $rawUUID")
             UUID.fromString(rawUUID.replaceFirst(
                 "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)".toRegex(),
