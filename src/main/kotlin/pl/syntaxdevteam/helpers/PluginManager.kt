@@ -1,8 +1,7 @@
 package pl.syntaxdevteam.helpers
 
-import org.json.simple.JSONArray
-import org.json.simple.JSONObject
-import org.json.simple.parser.JSONParser
+import com.google.gson.Gson
+import com.google.gson.JsonArray
 import pl.syntaxdevteam.PunisherX
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -13,6 +12,8 @@ data class PluginInfo(val name: String, val uuid: String, val prior: Int)
 
 @Suppress("UnstableApiUsage")
 class PluginManager(private val plugin: PunisherX) {
+
+    private val gson = Gson()
 
     fun fetchPluginsFromExternalSource(urlString: String): List<PluginInfo> {
         return try {
@@ -25,14 +26,13 @@ class PluginManager(private val plugin: PunisherX) {
             val responseCode = connection.responseCode
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 val responseBody = BufferedReader(InputStreamReader(connection.inputStream)).use { it.readText() }
-                val parser = JSONParser()
-                val jsonArray = parser.parse(responseBody) as JSONArray
-                jsonArray.map { jsonObject ->
-                    val json = jsonObject as JSONObject
+                val jsonArray = gson.fromJson(responseBody, JsonArray::class.java)
+                jsonArray.map { jsonElement ->
+                    val json = jsonElement.asJsonObject
                     PluginInfo(
-                        name = json["name"] as String,
-                        uuid = json["uuid"] as String,
-                        prior = (json["prior"] as Long).toInt()
+                        name = json.get("name").asString,
+                        uuid = json.get("uuid").asString,
+                        prior = json.get("prior").asInt
                     )
                 }
             } else {
@@ -48,7 +48,7 @@ class PluginManager(private val plugin: PunisherX) {
         val plugins = mutableListOf<Pair<String, String>>()
         for (plugin in plugin.server.pluginManager.plugins) {
             if (plugin.pluginMeta.authors.contains("SyntaxDevTeam")) {
-                plugins.add(Pair(plugin.name, plugin.pluginMeta.version))
+                plugins.add(Pair(plugin.pluginMeta.name, plugin.pluginMeta.version))
             }
         }
         return plugins

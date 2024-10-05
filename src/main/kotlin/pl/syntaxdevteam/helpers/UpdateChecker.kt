@@ -1,13 +1,12 @@
 package pl.syntaxdevteam.helpers
 
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import io.papermc.paper.plugin.configuration.PluginMeta
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
-import org.json.simple.JSONArray
-import org.json.simple.JSONObject
-import org.json.simple.parser.JSONParser
 import pl.syntaxdevteam.PunisherX
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -20,6 +19,7 @@ class UpdateChecker(private val plugin: PunisherX, private val pluginMetas: Plug
 
     private val hangarApiUrl = "https://hangar.papermc.io/api/v1/projects/${pluginMetas.name}/versions"
     private val pluginUrl = "https://hangar.papermc.io/SyntaxDevTeam/${pluginMetas.name}"
+    private val gson = Gson()
 
     fun checkForUpdates() {
         if (!config.getBoolean("checkForUpdates", true)) {
@@ -37,16 +37,15 @@ class UpdateChecker(private val plugin: PunisherX, private val pluginMetas: Plug
             val responseCode = connection.responseCode
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 val responseBody = BufferedReader(InputStreamReader(connection.inputStream)).use { it.readText() }
-                val parser = JSONParser()
-                val jsonObject = parser.parse(responseBody) as JSONObject
-                val versions = jsonObject["result"] as JSONArray
-                val latestVersion = versions.firstOrNull() as? JSONObject
-                if (latestVersion != null && isNewerVersion(latestVersion["name"] as String, pluginMetas.version)) {
+                val jsonObject = gson.fromJson(responseBody, JsonObject::class.java)
+                val versions = jsonObject.getAsJsonArray("result")
+                val latestVersion = versions.firstOrNull()?.asJsonObject
+                if (latestVersion != null && isNewerVersion(latestVersion.get("name").asString, pluginMetas.version)) {
                     notifyUpdate(latestVersion)
                     if (config.getBoolean("autoDownloadUpdates", false)) {
                         downloadUpdate(latestVersion)
                     }
-                }else{
+                } else {
                     plugin.logger.success("Your version is up to date")
                 }
             } else {
@@ -82,9 +81,9 @@ class UpdateChecker(private val plugin: PunisherX, private val pluginMetas: Plug
         return latestParts.size > currentParts.size
     }
 
-    private fun notifyUpdate(version: JSONObject) {
-        val versionName = version["name"] as String
-        val channel = (version["channel"] as JSONObject)["name"] as String
+    private fun notifyUpdate(version: JsonObject) {
+        val versionName = version.get("name").asString
+        val channel = version.getAsJsonObject("channel").get("name").asString
         val message = when (channel) {
             "Release" -> "<green>New release version <bold>$versionName</bold> is available on <click:open_url:'$pluginUrl'>Hangar</click>!"
             "Snapshot" -> "<yellow>New snapshot version <bold>$versionName</bold> is available on <click:open_url:'$pluginUrl'>Hangar</click>!"
@@ -95,16 +94,15 @@ class UpdateChecker(private val plugin: PunisherX, private val pluginMetas: Plug
         notifyAdmins(component)
     }
 
-    private fun downloadUpdate(version: JSONObject) {
-        val versionName = version["name"] as String
-        val downloadUrl = (version["downloads"] as JSONObject)["PAPER"] as JSONObject
-        val fileUrl = downloadUrl["downloadUrl"] as String
-        val fileName = downloadUrl["fileInfo"] as JSONObject
-        val newFile = File(plugin.dataFolder.parentFile, fileName["name"] as String)
+    private fun downloadUpdate(version: JsonObject) {
+        val versionName = version.get("name").asString
+        val downloadUrl = version.getAsJsonObject("downloads").getAsJsonObject("PAPER").get("downloadUrl").asString
+        val fileName = version.getAsJsonObject("downloads").getAsJsonObject("PAPER").getAsJsonObject("fileInfo").get("name").asString
+        val newFile = File(plugin.dataFolder.parentFile, fileName)
         val currentFile = plugin.getPluginFile()
 
         try {
-            val uri = URI(fileUrl)
+            val uri = URI(downloadUrl)
             val url = uri.toURL()
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
