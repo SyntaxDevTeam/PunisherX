@@ -20,13 +20,13 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("dev.folia:folia-api:1.20.6-R0.1-SNAPSHOT")
+    compileOnly("dev.folia:folia-api:1.20.1-R0.1-SNAPSHOT")
 
     compileOnly("org.mariadb.jdbc:mariadb-java-client:3.4.1")
     compileOnly("org.postgresql:postgresql:42.7.4")
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("com.maxmind.geoip2:geoip2:4.2.1")
-    implementation("org.apache.commons:commons-compress:1.27.1")
+    implementation("org.apache.ant:ant:1.10.15")
 }
 
 val targetJavaVersion = 21
