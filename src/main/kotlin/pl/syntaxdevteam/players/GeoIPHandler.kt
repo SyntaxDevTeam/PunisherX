@@ -1,9 +1,10 @@
 package pl.syntaxdevteam.players
 
+import pl.syntaxdevteam.PunisherX
 import com.maxmind.geoip2.DatabaseReader
 import com.maxmind.geoip2.exception.AddressNotFoundException
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
-import pl.syntaxdevteam.PunisherX
+import org.apache.tools.tar.TarEntry
+import org.apache.tools.tar.TarInputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -35,18 +36,41 @@ class GeoIPHandler(private val plugin: PunisherX, pluginFolder: String, private 
     private fun downloadAndExtractDatabase() {
         if (licenseKey == null) return
 
+        if (cityDatabaseFile.exists()) {
+            plugin.logger.info("GeoIP database already exists. Skipping download.")
+            return
+        }
+
         val cityUri = URI("https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=$licenseKey&suffix=tar.gz")
 
         val connection = cityUri.toURL().openConnection() as HttpURLConnection
         try {
             connection.inputStream.use { input ->
                 GZIPInputStream(input).use { gzip ->
-                    TarArchiveInputStream(gzip).use { tar ->
-                        var entry = tar.nextEntry
+                    TarInputStream(gzip).use { tar ->
+                        var entry: TarEntry? = tar.nextEntry
                         while (entry != null) {
+                            plugin.logger.debug("Found entry: ${entry.name}")
                             if (entry.name.endsWith(".mmdb")) {
-                                FileOutputStream(cityDatabaseFile).use { output ->
-                                    tar.copyTo(output)
+                                plugin.logger.debug("Extracting MMDB file: ${entry.name}")
+
+                                if (!cityDatabaseFile.parentFile.exists()) {
+                                    plugin.logger.debug("Creating directories: ${cityDatabaseFile.parentFile.absolutePath}")
+                                    cityDatabaseFile.parentFile.mkdirs()
+                                }
+                                try {
+                                    FileOutputStream(cityDatabaseFile).use { output ->
+                                        tar.copyTo(output)
+                                    }
+                                    plugin.logger.debug("Extracted file size: ${cityDatabaseFile.length()} bytes")
+                                    if (cityDatabaseFile.length() == 0L) {
+                                        plugin.logger.severe("Extracted MMDB file is empty!")
+                                    } else {
+                                        plugin.logger.debug("MMDB file saved successfully.")
+                                    }
+                                } catch (e: IOException) {
+                                    plugin.logger.severe("Failed to write MMDB file: ${e.message}")
+                                    throw e
                                 }
                             }
                             entry = tar.nextEntry
@@ -58,6 +82,7 @@ class GeoIPHandler(private val plugin: PunisherX, pluginFolder: String, private 
             if (connection.responseCode == 401) {
                 plugin.logger.severe("Unauthorized access. Please check your license key.")
             } else {
+                plugin.logger.severe("Failed to download GeoIP database: ${e.message}")
                 throw e
             }
         }
