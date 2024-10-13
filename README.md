@@ -3,7 +3,7 @@ This is a comprehensive punishment system that offers warnings, mutes, bans, IP 
 
 ## Information
 * [x] PunisherX is designed specifically for the latest version of Minecraft from 1.20.6 to 1.21+
-* [x] Written and optimized for the Paper engine, and thus also for its modifications such as Pufferfish and Purpur* 
+* [x] Written and optimized for the Paper engine, and thus also for its modifications such as Pufferfish, Purpur and Leaves
 * [x] Requires Java 21 or newer to work properly
 * [x] Written in the modern programming language Kotlin, which is more expressive and safer than Java.
 * [x] Language file with full support for Minimessage and Legacy (Minecraft) formatting
@@ -103,7 +103,7 @@ Wtyczka jest zoptymalizowana dla serwerów Paper i ich rozwidleń, takich jak Pu
 
 ## Informacje
 * [x] PunisherX został zaprojektowany specjalnie pod najnowszą wersję Minecraft od 1.20.6 do 1.21+
-* [x] Napisany i zoptymalizowano pod silnik Paper, a zatem tez pod jego modyfikacje tj. Pufferfish i Purpur
+* [x] Napisany i zoptymalizowano pod silnik Paper, a zatem tez pod jego modyfikacje tj. Pufferfish, Purpur i Leaves
 * [x] Wymaga Javy 21 lub nowszej, aby działać poprawnie
 * [x] Napisany w nowoczesnym języku programowania Kotlin, który jest bardziej ekspresyjny i bezpieczny niż Java.
 * [x] Plik językowy z pełnym wsparciem formatowania [Minimessage](https://docs.advntr.dev/minimessage/format.html) oraz Legacy (Minecraft)
