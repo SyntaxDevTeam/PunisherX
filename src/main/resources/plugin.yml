@@ -8,5 +8,6 @@ authors: [SyntaxDevTeam]
 description: Advanced punishment system for Minecraft servers with warnings, mutes, bans, kicks and more.
 website: https://github.com/SyntaxDevTeam
 
-loader: pl.syntaxdevteam.loader.SyntaxLoader
 load before: [RewarderX]
+
+loader: pl.syntaxdevteam.loader.SyntaxLoader
