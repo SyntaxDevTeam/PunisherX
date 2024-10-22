@@ -38,7 +38,14 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
                 }
                 args[0].equals("version", ignoreCase = true) -> {
                     if (stack.sender.hasPermission("punisherx.version")) {
-                        stack.sender.sendRichMessage("\n<gray>#################################################\n#\n#   <gold>→ <bold>" + pluginMeta.name + "</bold> ←\n<gray>#   <white>Author: <bold><gold>" + pdf.authors + "</gold></bold>\n<gray>#   <white>Website: <bold><gold><click:open_url:'" + pdf.website + "'>"  + pdf.website + "</click></gold></bold>\n<gray>#   <white>Version: <bold><gold>" + pluginMeta.version + "</gold></bold><gray>\n#\n#################################################")
+                        stack.sender.sendRichMessage("\n<gray>#################################################\n" +
+                                "#\n" +
+                                "<gray>#   <gold>→ <bold>" + pluginMeta.name + "</bold> ←\n" +
+                                "<gray>#   <white>Author: <bold><gold>" + pdf.authors + "</gold></bold>\n" +
+                                "<gray>#   <white>Website: <bold><gold><click:open_url:'" + pdf.website + "'>"  + pdf.website + "</click></gold></bold>\n" +
+                                "<gray>#   <white>Version: <bold><gold>" + pluginMeta.version + "</gold></bold>\n" +
+                                "<gray>#" +
+                                "\n#################################################")
                     } else {
                         stack.sender.sendRichMessage("<red>You do not have permission to use this command.</red>")
                     }
