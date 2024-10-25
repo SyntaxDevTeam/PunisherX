@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.1.0-DEV"
+version = "1.1.1-DEV"
 
 repositories {
     mavenCentral()
