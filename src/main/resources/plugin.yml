@@ -1,6 +1,6 @@
 name: PunisherX
 version: '${version}'
-main: pl.syntaxdevteam.PunisherX
+main: pl.syntaxdevteam.punisher.PunisherX
 api-version: '1.20'
 folia-support: true
 
@@ -11,3 +11,4 @@ website: https://github.com/SyntaxDevTeam
 load before: [RewarderX]
 
 loader: pl.syntaxdevteam.loader.SyntaxLoader
+has-open-classloader: false
