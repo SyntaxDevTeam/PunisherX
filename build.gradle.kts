@@ -25,7 +25,7 @@ dependencies {
     implementation("org.eclipse.aether:aether-api:1.1.0")
     implementation("org.yaml:snakeyaml:2.0")
 
-    compileOnly("org.mariadb.jdbc:mariadb-java-client:3.4.1")
+    compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.0")
     compileOnly("org.postgresql:postgresql:42.7.4")
     compileOnly("com.h2database:h2:2.3.232")
     compileOnly("com.google.code.gson:gson:2.11.0")
