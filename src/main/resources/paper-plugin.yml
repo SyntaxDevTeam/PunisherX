@@ -2,12 +2,13 @@ name: PunisherX
 version: '${version}'
 main: pl.syntaxdevteam.punisher.PunisherX
 api-version: '1.20'
-folia-support: true
+folia-supported: true
+softdepend: [Folia]
 
 authors: [SyntaxDevTeam]
 description: Advanced punishment system for Minecraft servers with warnings, mutes, bans, kicks and more.
 website: https://github.com/SyntaxDevTeam
 
-loader: pl.syntaxdevteam.loader.SyntaxLoader
+loader: pl.syntaxdevteam.punisher.loader.SyntaxLoader
 has-open-classloader: false
 load before: [RewarderX]
