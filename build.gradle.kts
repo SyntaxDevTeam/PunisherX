@@ -23,7 +23,7 @@ dependencies {
     compileOnly("dev.folia:folia-api:1.20.1-R0.1-SNAPSHOT")
 
     implementation("org.eclipse.aether:aether-api:1.1.0")
-    implementation("org.yaml:snakeyaml:2.0")
+    implementation("org.yaml:snakeyaml:2.3")
 
     compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.0")
     compileOnly("org.postgresql:postgresql:42.7.4")
