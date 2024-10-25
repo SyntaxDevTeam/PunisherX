@@ -10,7 +10,7 @@ import org.yaml.snakeyaml.Yaml
 import java.io.IOException
 import java.io.InputStream
 
-@Suppress("UnstableApiUsage")
+@Suppress("UnstableApiUsage", "unused")
 class SyntaxLoader : PluginLoader {
 
     override fun classloader(pluginClasspath: PluginClasspathBuilder) {
