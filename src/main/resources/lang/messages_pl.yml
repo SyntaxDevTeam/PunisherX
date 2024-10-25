@@ -10,7 +10,7 @@ error:
   no_permission: "<red>Nie masz uprawnień do tej komendy.</red>"
   player_not_found: "<gold>Nie znaleziono gracza o nicku {player}.</gold>"
   reload: "<red>Wystąpił błąd podczas przełądowania konfiguracji:</red> "
-  bypass: "<red><b>UWAGA!</b>Gracz <gold>{player}<gold/> nie może otrzymać kary, ze zględu na swoje uprawnienia (OP lub bypass).</red>"
+  bypass: "<red><b>UWAGA!</b> Gracz <gold>{player}<gold/> <red>nie może otrzymać kary, ze zględu na swoje uprawnienia (OP lub bypass).</red>"
 
 # Wiadomości komendy /ban
 ban:

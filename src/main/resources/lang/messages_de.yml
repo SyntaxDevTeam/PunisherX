@@ -11,7 +11,7 @@ error:
   no_permission: "<red>Du hast keine Berechtigung für diesen Befehl.</red>"
   player_not_found: "<gold>Spieler mit dem Namen {player} nicht gefunden.</gold>"
   reload: "<red>Beim Neuladen der Konfiguration ist ein Fehler aufgetreten:</red> "
-  bypass: "<red><b>ACHTUNG!</b> Spieler <gold>{player}<gold/> kann nicht bestraft werden, da er über spezielle Rechte (OP oder Bypass) verfügt.</red>"
+  bypass: "<red><b>ACHTUNG!</b> Spieler <gold>{player}<gold/> <red>kann nicht bestraft werden, da er über spezielle Rechte (OP oder Bypass) verfügt.</red>"
 
 # Nachrichten für den /ban-Befehl
 ban:

@@ -10,7 +10,7 @@ error:
   no_permission: "<red>You do not have permission to use this command.</red>"
   player_not_found: "<gold>Player with nickname {player} not found.</gold>"
   reload: "<red>An error occurred while reloading the configuration:</red> "
-  bypass: "<red><b>WARNING!</b> Player <gold>{player}<gold/> cannot be punished due to their permissions (OP or bypass).</red>"
+  bypass: "<red><b>WARNING!</b> Player <gold>{player}<gold/> <red>cannot be punished due to their permissions (OP or bypass).</red>"
 
 # /ban command messages
 ban:
