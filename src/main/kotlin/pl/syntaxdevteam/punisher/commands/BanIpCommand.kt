@@ -9,7 +9,7 @@ import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.helpers.MessageHandler
-import pl.syntaxdevteam.punisher.helpers.TimeHandler
+import pl.syntaxdevteam.punisher.basic.TimeHandler
 
 @Suppress("UnstableApiUsage")
 class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : BasicCommand {
