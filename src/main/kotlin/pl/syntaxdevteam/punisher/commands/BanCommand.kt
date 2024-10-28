@@ -11,7 +11,7 @@ import org.bukkit.ban.ProfileBanList
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.helpers.MessageHandler
-import pl.syntaxdevteam.punisher.helpers.TimeHandler
+import pl.syntaxdevteam.punisher.basic.TimeHandler
 import pl.syntaxdevteam.punisher.helpers.UUIDManager
 import java.util.*
 
