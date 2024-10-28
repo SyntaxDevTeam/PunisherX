@@ -25,7 +25,7 @@ class PunisherX : JavaPlugin(), Listener {
     private val language = config.getString("language") ?: "EN"
     private lateinit var pluginManager: PluginManager
     private lateinit var statsCollector: StatsCollector
-    lateinit var databaseHandler: pl.syntaxdevteam.punisher.databases.DatabaseHandler
+    lateinit var databaseHandler: DatabaseHandler
     lateinit var messageHandler: MessageHandler
     lateinit var timeHandler: TimeHandler
     lateinit var punishmentManager: PunishmentManager
@@ -74,7 +74,7 @@ class PunisherX : JavaPlugin(), Listener {
             commands.register("unwarn", messageHandler.getMessage("unwarn", "usage"), UnWarnCommand(this, pluginMetas))
             commands.register("mute", messageHandler.getMessage("mute", "usage"), MuteCommand(this, pluginMetas))
             commands.register("unmute", messageHandler.getMessage("mute", "usage"),
-                pl.syntaxdevteam.punisher.commands.UnMuteCommand(this, pluginMetas)
+                UnMuteCommand(this, pluginMetas)
             )
             commands.register("ban", messageHandler.getMessage("ban", "usage"), BanCommand(this, pluginMetas))
             commands.register("banip", messageHandler.getMessage("banip", "usage"), BanIpCommand(this, pluginMetas))
@@ -91,7 +91,7 @@ class PunisherX : JavaPlugin(), Listener {
                     "unwarn" -> commands.register(commandName, messageHandler.getMessage("unwarn", "usage"), UnWarnCommand(this, pluginMetas))
                     "mute" -> commands.register(commandName, messageHandler.getMessage("mute", "usage"), MuteCommand(this, pluginMetas))
                     "unmute" -> commands.register(commandName, messageHandler.getMessage("mute", "usage"),
-                        pl.syntaxdevteam.punisher.commands.UnMuteCommand(this, pluginMetas)
+                        UnMuteCommand(this, pluginMetas)
                     )
                     "ban" -> commands.register(commandName, messageHandler.getMessage("ban", "usage"), BanCommand(this, pluginMetas))
                     "banip" -> commands.register(commandName, messageHandler.getMessage("banip", "usage"), BanIpCommand(this, pluginMetas))
@@ -100,6 +100,16 @@ class PunisherX : JavaPlugin(), Listener {
                 }
             }
 
+        }
+
+        server.pluginManager.registerEvents(PunishmentChecker(this), this)
+        pluginManager = PluginManager(this)
+        val externalPlugins = pluginManager.fetchPluginsFromExternalSource("https://raw.githubusercontent.com/SyntaxDevTeam/plugins-list/main/plugins.json")
+        val loadedPlugins = pluginManager.fetchLoadedPlugins()
+        val highestPriorityPlugin = pluginManager.getHighestPriorityPlugin(externalPlugins, loadedPlugins)
+        if (highestPriorityPlugin == pluginMetas.name) {
+            val syntaxDevTeamPlugins = loadedPlugins.filter { it.first != pluginMetas.name }
+            logger.pluginStart(syntaxDevTeamPlugins)
         }
         val author = when (language.lowercase()) {
             "pl" -> "WieszczY"
@@ -110,16 +120,6 @@ class PunisherX : JavaPlugin(), Listener {
             else -> getServerName()
         }
         logger.log("<gray>Loaded \"$language\" language file by: <white><b>$author</b></white>")
-        server.pluginManager.registerEvents(PunishmentChecker(this), this)
-        pluginManager = PluginManager(this)
-        val externalPlugins = pluginManager.fetchPluginsFromExternalSource("https://raw.githubusercontent.com/SyntaxDevTeam/plugins-list/main/plugins.json")
-        val loadedPlugins = pluginManager.fetchLoadedPlugins()
-        val highestPriorityPlugin = pluginManager.getHighestPriorityPlugin(externalPlugins, loadedPlugins)
-        if (highestPriorityPlugin == pluginMetas.name) {
-            val syntaxDevTeamPlugins = loadedPlugins.filter { it.first != pluginMetas.name }
-            logger.pluginStart(syntaxDevTeamPlugins)
-        }
-
         statsCollector = StatsCollector(this)
         updateChecker = UpdateChecker(this, pluginMetas, config)
         updateChecker.checkForUpdates()
@@ -130,12 +130,27 @@ class PunisherX : JavaPlugin(), Listener {
     }
 
     fun reloadMyConfig() {
+        databaseHandler.closeConnection()
         try {
             super.reloadConfig()
             messageHandler.reloadMessages()
         } catch (e: Exception) {
             logger.err(messageHandler.getMessage("error", "reload") + e.message)
         }
+        databaseHandler = when (config.getString("database.type")?.lowercase(Locale.getDefault())) {
+            "mysql", "mariadb" -> {
+                MySQLDatabaseHandler(this, this.config)
+            }
+            "sqlite" -> {
+                SQLiteDatabaseHandler(this)
+            }
+            else -> {
+                logger.warning("Invalid database type in configuration. Using default SQLite database.")
+                SQLiteDatabaseHandler(this)
+            }
+        }
+        databaseHandler.openConnection()
+        databaseHandler.createTables()
     }
 
     override fun onDisable() {
@@ -162,7 +177,7 @@ class PunisherX : JavaPlugin(), Listener {
     }
 
     fun getPunishmentHistory(player: Player): List<PunishmentData> {
-        val uuid = uuidManager.getUUID(player.toString())
+        val uuid = uuidManager.getUUID(player.name)
         return databaseHandler.getLastTenPunishments(uuid.toString())
     }
 }
