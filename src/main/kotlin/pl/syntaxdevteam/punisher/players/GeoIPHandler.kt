@@ -64,12 +64,12 @@ class GeoIPHandler(private val plugin: PunisherX, pluginFolder: String, private 
                                     }
                                     plugin.logger.debug("Extracted file size: ${cityDatabaseFile.length()} bytes")
                                     if (cityDatabaseFile.length() == 0L) {
-                                        plugin.logger.severe("Extracted MMDB file is empty!")
+                                        plugin.logger.severe("[GeoLite2] Extracted MMDB file is empty!")
                                     } else {
                                         plugin.logger.debug("MMDB file saved successfully.")
                                     }
                                 } catch (e: IOException) {
-                                    plugin.logger.severe("Failed to write MMDB file: ${e.message}")
+                                    plugin.logger.severe("[GeoLite2] Failed to write MMDB file: ${e.message}")
                                     throw e
                                 }
                             }
@@ -80,9 +80,9 @@ class GeoIPHandler(private val plugin: PunisherX, pluginFolder: String, private 
             }
         } catch (e: IOException) {
             if (connection.responseCode == 401) {
-                plugin.logger.severe("Unauthorized access. Please check your license key.")
+                plugin.logger.severe("[GeoLite2] Unauthorized access. Please check your license key.")
             } else {
-                plugin.logger.severe("Failed to download GeoIP database: ${e.message}")
+                plugin.logger.severe("[GeoLite2] Failed to download GeoIP database: ${e.message}")
                 throw e
             }
         }
