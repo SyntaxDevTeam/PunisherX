@@ -4,6 +4,7 @@ import pl.syntaxdevteam.punisher.PunisherX
 import java.net.HttpURLConnection
 import java.net.URI
 
+@Suppress("UnstableApiUsage")
 class StatsCollector(plugin: PunisherX) {
 
     private val serverIP = getExternalIP()
@@ -11,7 +12,7 @@ class StatsCollector(plugin: PunisherX) {
     private val serverVersion = plugin.server.version
     private val serverName = plugin.server.name
     private val statsUrl = "https://syntaxdevteam.pl/ping.php"
-    private val pluginName = plugin.name
+    private val pluginName = "${plugin.name} ${plugin.pluginMetas.version}"
 
     init {
         if (plugin.config.getBoolean("stats.enabled")) {
@@ -27,7 +28,7 @@ class StatsCollector(plugin: PunisherX) {
             outputStream.write("pluginName=$pluginName&serverIP=$serverIP&serverPort=$serverPort&serverVersion=$serverVersion&serverName=$serverName".toByteArray())
             outputStream.flush()
             outputStream.close()
-            responseCode // To trigger the request
+            responseCode
         }
     }
 
