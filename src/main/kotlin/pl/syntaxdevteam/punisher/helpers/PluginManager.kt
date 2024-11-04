@@ -8,16 +8,24 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URI
 
-data class PluginInfo(val name: String, val uuid: String, val prior: Int)
-
 @Suppress("UnstableApiUsage")
 class PluginManager(private val plugin: PunisherX) {
 
     private val gson = Gson()
 
-    fun fetchPluginsFromExternalSource(urlString: String): List<PluginInfo> {
+    init {
+        val externalPlugins = fetchPluginsFromExternalSource()
+        val loadedPlugins = fetchLoadedPlugins()
+        val highestPriorityPlugin = getHighestPriorityPlugin(externalPlugins, loadedPlugins)
+        if (highestPriorityPlugin == plugin.pluginMetas.name) {
+            val syntaxDevTeamPlugins = loadedPlugins.filter { it.first != plugin.pluginMetas.name }
+            plugin.logger.pluginStart(syntaxDevTeamPlugins)
+        }
+    }
+
+    private fun fetchPluginsFromExternalSource(): List<PluginInfo> {
         return try {
-            val uri = URI(urlString)
+            val uri = URI("https://raw.githubusercontent.com/SyntaxDevTeam/plugins-list/main/plugins.json")
             val url = uri.toURL()
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
@@ -44,7 +52,7 @@ class PluginManager(private val plugin: PunisherX) {
         }
     }
 
-    fun fetchLoadedPlugins(): List<Pair<String, String>> {
+    private fun fetchLoadedPlugins(): List<Pair<String, String>> {
         val plugins = mutableListOf<Pair<String, String>>()
         for (plugin in plugin.server.pluginManager.plugins) {
             if (plugin.pluginMeta.authors.contains("SyntaxDevTeam")) {
@@ -54,7 +62,7 @@ class PluginManager(private val plugin: PunisherX) {
         return plugins
     }
 
-    fun getHighestPriorityPlugin(externalPlugins: List<PluginInfo>, loadedPlugins: List<Pair<String, String>>): String? {
+    private fun getHighestPriorityPlugin(externalPlugins: List<PluginInfo>, loadedPlugins: List<Pair<String, String>>): String? {
         val matchedPlugins = externalPlugins.filter { externalPlugin ->
             loadedPlugins.any { it.first == externalPlugin.name }
         }
