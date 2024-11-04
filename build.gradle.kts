@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.1.0-Beta2"
+    kotlin("jvm") version "2.1.0-RC"
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0-Beta2")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0-RC")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 
     compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
