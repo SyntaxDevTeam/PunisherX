@@ -13,28 +13,26 @@ import java.net.InetAddress
 import java.net.URI
 import java.util.zip.GZIPInputStream
 
-class GeoIPHandler(private val plugin: PunisherX, pluginFolder: String, private val licenseKey: String?) {
+class GeoIPHandler(private val plugin: PunisherX) {
+
+    private val licenseKey = plugin.config.getString("geoDatabase.licenseKey") ?: throw IllegalArgumentException("License key not found in config.yml. GeoIP functionality will be disabled.")
+    private val pluginFolder = "${plugin.dataFolder.path}/geodata/"
 
     private val cityDatabaseFile = File(pluginFolder, "GeoLite2-City.mmdb")
 
     init {
-        if (licenseKey == null) {
-            plugin.logger.warning("License key not found. GeoIP functionality will be disabled.")
-        } else {
-            val folder = File(pluginFolder)
-            if (!folder.exists()) {
-                folder.mkdirs()
-            }
-            try {
-                downloadAndExtractDatabase()
-            } catch (e: IOException) {
-                plugin.logger.severe("Failed to download GeoIP database: ${e.message}")
-            }
+        val folder = File(pluginFolder)
+        if (!folder.exists()) {
+            folder.mkdirs()
+        }
+        try {
+            downloadAndExtractDatabase()
+        } catch (e: IOException) {
+            plugin.logger.severe("Failed to download GeoIP database: ${e.message}")
         }
     }
 
     private fun downloadAndExtractDatabase() {
-        if (licenseKey == null) return
 
         if (cityDatabaseFile.exists()) {
             plugin.logger.info("GeoIP database already exists. Skipping download.")

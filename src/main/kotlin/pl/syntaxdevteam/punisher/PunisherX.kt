@@ -19,7 +19,7 @@ import java.util.*
 @Suppress("UnstableApiUsage", "unused")
 class PunisherX : JavaPlugin(), Listener {
     lateinit var logger: Logger
-    private val pluginMetas = this.pluginMeta
+    val pluginMetas = this.pluginMeta
     private var config = getConfig()
     private var debugMode = config.getBoolean("debug")
     private val language = config.getString("language") ?: "EN"
@@ -57,9 +57,7 @@ class PunisherX : JavaPlugin(), Listener {
         messageHandler = MessageHandler(this, pluginMetas)
         timeHandler = TimeHandler(this, pluginMetas)
         punishmentManager = PunishmentManager()
-        val licenseKey = config.getString("geoDatabase.licenseKey") ?: throw IllegalArgumentException("License key not found in config.yml")
-        val geoDatabasePath = "${dataFolder.path}/geodata/"
-        geoIPHandler = GeoIPHandler(this, geoDatabasePath, licenseKey)
+        geoIPHandler = GeoIPHandler(this)
         playerIPManager = PlayerIPManager(this, geoIPHandler)
         server.pluginManager.registerEvents(playerIPManager, this)
         val manager: LifecycleEventManager<Plugin> = this.lifecycleManager
@@ -104,13 +102,7 @@ class PunisherX : JavaPlugin(), Listener {
 
         server.pluginManager.registerEvents(PunishmentChecker(this), this)
         pluginManager = PluginManager(this)
-        val externalPlugins = pluginManager.fetchPluginsFromExternalSource("https://raw.githubusercontent.com/SyntaxDevTeam/plugins-list/main/plugins.json")
-        val loadedPlugins = pluginManager.fetchLoadedPlugins()
-        val highestPriorityPlugin = pluginManager.getHighestPriorityPlugin(externalPlugins, loadedPlugins)
-        if (highestPriorityPlugin == pluginMetas.name) {
-            val syntaxDevTeamPlugins = loadedPlugins.filter { it.first != pluginMetas.name }
-            logger.pluginStart(syntaxDevTeamPlugins)
-        }
+
         val author = when (language.lowercase()) {
             "pl" -> "WieszczY"
             "en" -> "Syntaxerr"
