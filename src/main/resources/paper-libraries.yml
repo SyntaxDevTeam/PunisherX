@@ -7,4 +7,4 @@ libraries:
   - org.mariadb.jdbc:mariadb-java-client:3.5.0
   - org.postgresql:postgresql:42.7.4
   - com.h2database:h2:2.3.232
-  - com.zaxxer:HikariCP:6.0.0
+  - com.zaxxer:HikariCP:6.1.0
