@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.1.2-DEV"
+version = "1.1.2"
 
 repositories {
     mavenCentral()
@@ -21,7 +21,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 
     compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
-    compileOnly("dev.folia:folia-api:1.20.1-R0.1-SNAPSHOT")
+    compileOnly("dev.folia:folia-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.3")
     compileOnly("com.google.code.gson:gson:2.11.0")
