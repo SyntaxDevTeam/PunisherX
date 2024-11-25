@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.helpers
+package pl.syntaxdevteam.punisher.common
 
 import io.papermc.paper.plugin.configuration.PluginMeta
 import org.bukkit.Bukkit

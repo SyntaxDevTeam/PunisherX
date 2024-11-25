@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.helpers
+package pl.syntaxdevteam.punisher.common
 
 import pl.syntaxdevteam.punisher.PunisherX
 import java.net.HttpURLConnection

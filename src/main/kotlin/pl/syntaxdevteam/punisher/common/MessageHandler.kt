@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.helpers
+package pl.syntaxdevteam.punisher.common
 
 import io.papermc.paper.plugin.configuration.PluginMeta
 import net.kyori.adventure.text.Component
@@ -20,6 +20,18 @@ class MessageHandler(private val plugin: PunisherX, pluginMetas: PluginMeta) {
     init {
         copyDefaultMessages()
         messages = loadMessages()
+    }
+
+    fun initial() {
+        val author = when (language.lowercase()) {
+            "pl" -> "WieszczY"
+            "en" -> "Syntaxerr"
+            "fr" -> "OpenAI Chat GPT-3.5"
+            "es" -> "OpenAI Chat GPT-3.5"
+            "de" -> "OpenAI Chat GPT-3.5"
+            else -> plugin.getServerName()
+        }
+        logger.log("<gray>Loaded \"$language\" language file by: <white><b>$author</b></white>")
     }
 
     private fun copyDefaultMessages() {
