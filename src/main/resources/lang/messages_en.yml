@@ -152,6 +152,12 @@ change-reason:
   success: "<green>Changed the current reason for punishment ID: <gold>{id}</gold> to \"<gold>{reason}</gold>\"</green>"
   failure: "<red>Failed to update the reason for punishment ID: <gold>{id}</gold></red>"
 
+# Messages for the /clearall command
+clear:
+  usage: "The correct usage is: <gold>/clearall <player>"
+  clearall: "<green>All active punishments for player </green><gold>{player}</gold><green> have been cleared</green>"
+  clear_message: "<green>All your active punishments have been canceled! </green><dark_gray>Pssst! Do you have some connections with the admins or something?"
+
 # Time formatting
 formatTime:
   undefined: "undefined"

@@ -2,7 +2,7 @@
 # Formatierung der Nachrichtentexte:
 # Sie können MiniMessage- und Legacy (Minecraft)-Formatierung verwenden.
 # Beispiele zur Verwendung von MiniMessage: https://docs.advntr.dev/minimessage/format.html
-# Mischen Sie keine Formate in einer Nachricht. Wenn Sie Legacy verwenden, fügen Sie kein MiniMessage-Format ein, da ansonsten nur letzteres verwendet wird.
+# Mischen Sie keine Formate in einer Nachricht. Wenn Sie Legacy verwenden, fügen Sie kein MiniMessage-Format ein, da ansonsten nur Letzteres verwendet wird.
 
 prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>"
 
@@ -152,6 +152,12 @@ change-reason:
   invalid_id: "<red>Ungültige Strafe-ID</red>"
   success: "<green>Der Grund für die Strafe mit ID: <gold>{id}</gold> wurde in \"<gold>{reason}</gold>\" geändert</green>"
   failure: "<red>Der Grund für die Strafe mit ID: <gold>{id}</gold> konnte nicht aktualisiert werden</red>"
+
+# Nachrichten für den Befehl /clearall
+clear:
+  usage: "Die korrekte Nutzung lautet: <gold>/clearall <player>"
+  clearall: "<green>Alle aktiven Strafen für Spieler </green><gold>{player}</gold><green> wurden gelöscht</green>"
+  clear_message: "<green>Alle deine aktiven Strafen wurden aufgehoben! </green><dark_gray>Pssst! Hast du irgendwelche Kontakte zur Administration oder so?"
 
 # Zeitformatierung
 formatTime:

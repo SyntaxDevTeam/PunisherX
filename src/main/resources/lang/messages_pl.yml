@@ -15,7 +15,7 @@ error:
 # Wiadomości komendy /ban
 ban:
   ban: "<green>Zbanowałeś <gold>{player}</gold> za <gold>{reason}</gold> na czas <gold>{time}</green>"
-  usage: "Poprawne użycie to: <gold>/ban <player> (czas) <powód>"
+  usage: "Poprawne użycie to: <gold>/ban <nazwa_gracza> (czas) <powód>"
   kick_message:
     # Możesz dowolnie dostosować komunikat dla wyrzuconego gracza
     - 'Nazwa serwera'
@@ -61,13 +61,13 @@ banip:
 # Wiadomości komendy /unban
 unban:
   unban: "<green>Gracz <gold>{player}</gold> został odbanowany</green>"
-  usage: "Poprawne użycie to: <gold>/unban <player>"
+  usage: "Poprawne użycie to: <gold>/unban <nazwa_gracza>"
   broadcast: "<dark_gray>Gracz <gray>{player}</gray> został odbanowany</dark_gray>"
 
 # Wiadomości komendy /mute
 mute:
   mute: "<green>Wyciszyłeś gracza <gold>{player}</gold> za <gold>{reason}</gold> na czas <gold>{time}</green>"
-  usage: "Poprawne użycie to: <gold>/mute <player> (time) <reason>"
+  usage: "Poprawne użycie to: <gold>/mute <nazwa_gracza> (time) <reason>"
   mute_message: "<red>Zostałeś/aś wyciszony/a za <b>{reason}</b> na czas <b>{time}</b></red>"
   mute_info_message: "<red>Próbujesz coś powiedzieć ale zostałeś/aś wyciszony/a</red>"
   broadcast: "<dark_gray>Gracz <gray>{player}</gray> został wyciszony za <gray>{reason}</gray> na czas <gray>{time}</gray></dark_gray>"
@@ -81,13 +81,13 @@ mute:
 # Wiadomości komendy /unmute
 unmute:
   unmute: "<green>Odwyciszyłeś gracza <gold>{player}</gold></green>"
-  usage: "Poprawne użycie to: <gold>/mute <player>"
+  usage: "Poprawne użycie to: <gold>/mute <nazwa_gracza>"
   unmute_message: "<green>Zostałeś/aś odwyciszony/a!</green>"
 
 # Wiadomości komendy /warn
 warn:
   warn: "<green>Ostrzegłeś ({warn_no} raz) <gold>{player}</gold> za <gold>{reason}</gold> na czas <gold>{time}</green>"
-  usage: "Poprawne użycie to: <gold>/warn <player> (czas) <powód>"
+  usage: "Poprawne użycie to: <gold>/warn <nazwa_gracza> (czas) <powód>"
   warn_message: "<red>Dostałeś/aś <b>{warn_no}</b> ostrzeżenie!</red>"
   broadcast: "<dark_gray>Gracz <gray>{player}</gray> otrzymał ostrzeżenie za <gray>{reason}</gray> na czas <gray>{time}</gray></dark_gray>"
   no_reasons: "bez powodu"
@@ -100,12 +100,12 @@ warn:
 # Wiadomości komendy /unwarn
 unwarn:
   unwarn: "<green>Usunąłeś ostrzeżenie dla gracza <gold>{player}</gold></green>"
-  usage: "Poprawne użycie to: <gold>/warn <player>"
+  usage: "Poprawne użycie to: <gold>/warn <nazwa_gracza>"
 
 # Wiadomości komendy /kick
 kick:
   kick: "<green>Wyrzuciłeś <gold>{player}</gold> za <gold>{reason}</gold></green>"
-  usage: "Poprawne użycie to: <gold>/kick <player> <powód>"
+  usage: "Poprawne użycie to: <gold>/kick <nazwa_gracza> <powód>"
   kick_message:
     # Możesz dowolnie dostosować komunikat dla wyrzuconego gracza
     - 'Nazwa serwera'
@@ -151,6 +151,12 @@ change-reason:
   invalid_id: "<red>Nieprawidłowy identyfikator kary</red>"
   success: "<green>Zmieniono dotychczasowy powód kary o ID: <gold>{id}</gold> na \"<gold>{reason}</gold>\"</green>"
   failure: "<red>Nie udało się zaktualizować powodu kary dla ID: <gold>{id}</gold></red>"
+
+# Wiadomości komendy /clearall
+clear:
+  usage: "Poprawne użycie to: <gold>/clearall <nazwa_gracza>"
+  clearall: "<green>Wszystkie aktywne kary gracza </green><gold>{player}</gold><green> zostały wyczyszczone</green>"
+  clear_message: "<green>Wszystkie Twoje aktywne kary zostały anulowane!</green> <grey>Pssssyt! Masz jakieś układy z administracją czy coś?"
 
 # Formatowanie czasu
 formatTime:
