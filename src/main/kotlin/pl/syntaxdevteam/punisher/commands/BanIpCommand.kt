@@ -8,7 +8,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.helpers.MessageHandler
+import pl.syntaxdevteam.punisher.common.MessageHandler
 import pl.syntaxdevteam.punisher.basic.TimeHandler
 
 @Suppress("UnstableApiUsage")

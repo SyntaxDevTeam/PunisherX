@@ -2,7 +2,7 @@ package pl.syntaxdevteam.punisher.basic
 
 import io.papermc.paper.plugin.configuration.PluginMeta
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.helpers.MessageHandler
+import pl.syntaxdevteam.punisher.common.MessageHandler
 
 @Suppress("UnstableApiUsage")
 class TimeHandler(plugin: PunisherX, pluginMetas: PluginMeta) {
