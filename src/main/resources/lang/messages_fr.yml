@@ -154,6 +154,12 @@ change-reason:
   success: "<green>La raison de la punition avec l'ID : <gold>{id}</gold> a été changée en \"<gold>{reason}</gold>\"</green>"
   failure: "<red>Échec de la mise à jour de la raison de la punition pour l'ID : <gold>{id}</gold></red>"
 
+# Messages pour la commande /clearall
+clear:
+  usage: "L'utilisation correcte est : <gold>/clearall <player>"
+  clearall: "<green>Toutes les sanctions actives pour le joueur </green><gold>{player}</gold><green> ont été effacées</green>"
+  clear_message: "<green>Toutes vos sanctions actives ont été annulées ! </green><dark_gray>Pssst ! Vous avez des relations avec les admins ou quoi ?"
+
 # Format du temps
 formatTime:
   undefined: "indéfini"
