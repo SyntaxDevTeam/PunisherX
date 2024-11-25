@@ -1,13 +1,14 @@
+#Config version 1.0.2
+
 # Settings for connecting to the database
 database:
-  # Available options: mariadb, mysql, sqlite
+  # Available options: mariadb, mysql, sqlite, h2, postgresql*
   type: "sqlite"
-  # Data for connecting to the MariaDB/MySQL server
   sql:
     host: "localhost"
-    port: 3306
+    port: 3306 # 5432 if you use PostgreSQL default for MySQL is 3306
     dbname: "my_database"
-    username: "user"
+    username: "root"
     password: "password"
 
 # Plugin language selection. Possible values:  EN, PL, ES, FR, DE
@@ -85,3 +86,6 @@ debug: false
 # Should StatsCollector be enabled? Recommended setting: true
 stats:
   enabled: true
+
+
+# * - Warning! The PostgreSQL database type is still in the testing phase and is not recommended for use. We recommend using any of the available options, such as SQLite.
