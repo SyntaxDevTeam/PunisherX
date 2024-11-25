@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0-RC")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0-RC2")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 
     compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
