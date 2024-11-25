@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.helpers
+package pl.syntaxdevteam.punisher.common
 
 import com.google.gson.Gson
 import com.google.gson.JsonArray
