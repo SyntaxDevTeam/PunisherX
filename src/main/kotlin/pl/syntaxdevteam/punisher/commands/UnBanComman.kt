@@ -6,9 +6,9 @@ import io.papermc.paper.plugin.configuration.PluginMeta
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.helpers.Logger
-import pl.syntaxdevteam.punisher.helpers.MessageHandler
-import pl.syntaxdevteam.punisher.helpers.UUIDManager
+import pl.syntaxdevteam.punisher.common.Logger
+import pl.syntaxdevteam.punisher.common.MessageHandler
+import pl.syntaxdevteam.punisher.common.UUIDManager
 
 @Suppress("UnstableApiUsage")
 class UnBanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : BasicCommand {

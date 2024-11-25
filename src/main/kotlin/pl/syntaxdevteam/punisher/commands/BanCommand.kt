@@ -10,9 +10,9 @@ import org.bukkit.Bukkit
 import org.bukkit.ban.ProfileBanList
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.helpers.MessageHandler
+import pl.syntaxdevteam.punisher.common.MessageHandler
 import pl.syntaxdevteam.punisher.basic.TimeHandler
-import pl.syntaxdevteam.punisher.helpers.UUIDManager
+import pl.syntaxdevteam.punisher.common.UUIDManager
 import java.util.*
 
 @Suppress("UnstableApiUsage")

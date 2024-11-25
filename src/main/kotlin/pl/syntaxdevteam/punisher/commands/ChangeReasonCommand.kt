@@ -5,7 +5,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.plugin.configuration.PluginMeta
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.helpers.MessageHandler
+import pl.syntaxdevteam.punisher.common.MessageHandler
 
 @Suppress("UnstableApiUsage")
 class ChangeReasonCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : BasicCommand {
