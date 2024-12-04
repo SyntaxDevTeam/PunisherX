@@ -3,6 +3,7 @@ package pl.syntaxdevteam.punisher.basic
 import io.papermc.paper.event.player.AsyncChatEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
@@ -51,9 +52,12 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
     @EventHandler
     fun onPlayerChat(event: AsyncChatEvent) {
         val player = event.player
-        val uuid = player.uniqueId.toString()
-
+        val playerName = event.player.name
+        val uuid = plugin.uuidManager.getUUID(playerName).toString()
+        val messageComponent = event.message()
+        val plainMessage = PlainTextComponentSerializer.plainText().serialize(messageComponent)
         val punishments = plugin.databaseHandler.getPunishments(uuid)
+
         punishments.forEach { punishment ->
             if (punishment.type == "MUTE" && plugin.punishmentManager.isPunishmentActive(punishment)) {
                 val endTime = punishment.end
@@ -63,6 +67,9 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                 event.isCancelled = true
                 val muteMessage = plugin.messageHandler.getMessage("mute", "mute_info_message", mapOf("reason" to reason, "time" to duration))
                 val formattedMessage = MiniMessage.miniMessage().deserialize(muteMessage)
+                val logMessage = plugin.messageHandler.getComponentMessage("mute", "log", mapOf("player" to playerName, "message" to plainMessage))
+                val logFormattedMessage = MiniMessage.miniMessage().deserialize(logMessage)
+                plugin.logger.clearLog(logFormattedMessage)
                 player.sendMessage(formattedMessage)
             } else {
                 plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
@@ -70,6 +77,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             }
         }
     }
+
 
     @EventHandler
     fun onPlayerCommand(event: PlayerCommandPreprocessEvent) {
