@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
@@ -49,32 +50,38 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerChat(event: AsyncChatEvent) {
-        val player = event.player
-        val playerName = event.player.name
-        val uuid = plugin.uuidManager.getUUID(playerName).toString()
-        val messageComponent = event.message()
-        val plainMessage = PlainTextComponentSerializer.plainText().serialize(messageComponent)
-        val punishments = plugin.databaseHandler.getPunishments(uuid)
+        try {
+            val player = event.player
+            val playerName = player.name
+            val uuid = plugin.uuidManager.getUUID(playerName).toString()
+            val messageComponent = event.message()
+            val plainMessage = PlainTextComponentSerializer.plainText().serialize(messageComponent)
+            val punishments = plugin.databaseHandler.getPunishments(uuid)
 
-        punishments.forEach { punishment ->
-            if (punishment.type == "MUTE" && plugin.punishmentManager.isPunishmentActive(punishment)) {
-                val endTime = punishment.end
-                val remainingTime = (endTime - System.currentTimeMillis()) / 1000
-                val duration = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(remainingTime.toString())
-                val reason = punishment.reason
-                event.isCancelled = true
-                val muteMessage = plugin.messageHandler.getMessage("mute", "mute_info_message", mapOf("reason" to reason, "time" to duration))
-                val formattedMessage = MiniMessage.miniMessage().deserialize(muteMessage)
-                val logMessage = plugin.messageHandler.getComponentMessage("mute", "log", mapOf("player" to playerName, "message" to plainMessage))
-                val logFormattedMessage = MiniMessage.miniMessage().deserialize(logMessage)
-                plugin.logger.clearLog(logFormattedMessage)
-                player.sendMessage(formattedMessage)
-            } else {
-                plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
-                plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
+            punishments.forEach { punishment ->
+                if (punishment.type == "MUTE" && plugin.punishmentManager.isPunishmentActive(punishment)) {
+                    val endTime = punishment.end
+                    val remainingTime = (endTime - System.currentTimeMillis()) / 1000
+                    val duration = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(remainingTime.toString())
+                    val reason = punishment.reason
+                    event.isCancelled = true
+                    val muteMessage = plugin.messageHandler.getMessage("mute", "mute_info_message", mapOf("reason" to reason, "time" to duration))
+                    val formattedMessage = MiniMessage.miniMessage().deserialize(muteMessage)
+                    val logMessage = plugin.messageHandler.getComponentMessage("mute", "log", mapOf("player" to playerName, "message" to plainMessage))
+                    val logFormattedMessage = MiniMessage.miniMessage().deserialize(logMessage)
+                    plugin.logger.clearLog(logFormattedMessage)
+                    player.sendMessage(formattedMessage)
+                    return
+                } else {
+                    plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
+                    plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
+                }
             }
+        } catch (e: Exception) {
+            plugin.logger.severe("Error in onPlayerChat: ${e.message}")
+            e.printStackTrace()
         }
     }
 
