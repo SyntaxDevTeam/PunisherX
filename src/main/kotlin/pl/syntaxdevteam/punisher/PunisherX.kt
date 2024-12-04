@@ -10,11 +10,12 @@ import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import pl.syntaxdevteam.punisher.basic.*
 import pl.syntaxdevteam.punisher.commands.*
+import pl.syntaxdevteam.punisher.common.*
 import pl.syntaxdevteam.punisher.databases.*
-import pl.syntaxdevteam.punisher.helpers.*
 import pl.syntaxdevteam.punisher.players.*
 import java.io.File
 import java.util.*
+
 
 @Suppress("UnstableApiUsage", "unused")
 class PunisherX : JavaPlugin(), Listener {
@@ -32,7 +33,7 @@ class PunisherX : JavaPlugin(), Listener {
     private lateinit var updateChecker: UpdateChecker
     lateinit var playerIPManager: PlayerIPManager
     private lateinit var geoIPHandler: GeoIPHandler
-    private val uuidManager = UUIDManager(this)
+    val uuidManager = UUIDManager(this)
 
     override fun onLoad() {
         logger = Logger(pluginMetas, debugMode)
@@ -40,21 +41,11 @@ class PunisherX : JavaPlugin(), Listener {
 
     override fun onEnable() {
         saveDefaultConfig()
-        databaseHandler = when (config.getString("database.type")?.lowercase(Locale.getDefault())) {
-            "mysql", "mariadb" -> {
-                MySQLDatabaseHandler(this, this.config)
-            }
-            "sqlite" -> {
-                SQLiteDatabaseHandler(this)
-            }
-            else -> {
-                logger.warning("Invalid database type in configuration. Using default SQLite database.")
-                SQLiteDatabaseHandler(this)
-            }
-        }
+        databaseHandler = DatabaseHandler(this, this.config)
         databaseHandler.openConnection()
         databaseHandler.createTables()
         messageHandler = MessageHandler(this, pluginMetas)
+        messageHandler.initial()
         timeHandler = TimeHandler(this, pluginMetas)
         punishmentManager = PunishmentManager()
         geoIPHandler = GeoIPHandler(this)
@@ -78,6 +69,7 @@ class PunisherX : JavaPlugin(), Listener {
             commands.register("banip", messageHandler.getMessage("banip", "usage"), BanIpCommand(this, pluginMetas))
             commands.register("unban", messageHandler.getMessage("ban", "usage"), UnBanCommand(this, pluginMetas))
             commands.register("change-reason", messageHandler.getMessage("change-reason", "usage"), ChangeReasonCommand(this, pluginMetas))
+            commands.register("clearall", messageHandler.getMessage("clear", "usage"), ClearAllCommand(this))
             val aliases = config.getConfigurationSection("aliases")
             aliases?.getKeys(false)?.forEach { key ->
                 val commandName = aliases.getString(key) ?: key
@@ -95,9 +87,9 @@ class PunisherX : JavaPlugin(), Listener {
                     "banip" -> commands.register(commandName, messageHandler.getMessage("banip", "usage"), BanIpCommand(this, pluginMetas))
                     "unban" -> commands.register(commandName, messageHandler.getMessage("ban", "usage"), UnBanCommand(this, pluginMetas))
                     "change-reason" -> commands.register(commandName, messageHandler.getMessage("change-reason", "usage"), ChangeReasonCommand(this, pluginMetas))
+                    "clearall" -> commands.register(commandName, messageHandler.getMessage("clear", "usage"), ClearAllCommand(this))
                 }
             }
-
         }
 
         server.pluginManager.registerEvents(PunishmentChecker(this), this)
@@ -129,29 +121,19 @@ class PunisherX : JavaPlugin(), Listener {
         } catch (e: Exception) {
             logger.err(messageHandler.getMessage("error", "reload") + e.message)
         }
-        databaseHandler = when (config.getString("database.type")?.lowercase(Locale.getDefault())) {
-            "mysql", "mariadb" -> {
-                MySQLDatabaseHandler(this, this.config)
-            }
-            "sqlite" -> {
-                SQLiteDatabaseHandler(this)
-            }
-            else -> {
-                logger.warning("Invalid database type in configuration. Using default SQLite database.")
-                SQLiteDatabaseHandler(this)
-            }
-        }
+        databaseHandler = DatabaseHandler(this, this.config)
         databaseHandler.openConnection()
         databaseHandler.createTables()
+
     }
 
     override fun onDisable() {
         databaseHandler.closeConnection()
         AsyncChatEvent.getHandlerList().unregister(this as Plugin)
-        logger.err(pluginMetas.name + " Disabled Version " + pluginMetas.version)
+        logger.err(pluginMetas.name + " " + pluginMetas.version + " has been disabled ☹️")
     }
 
-    private fun getServerName(): String {
+    fun getServerName(): String {
         val properties = Properties()
         val file = File("server.properties")
         if (file.exists()) {
