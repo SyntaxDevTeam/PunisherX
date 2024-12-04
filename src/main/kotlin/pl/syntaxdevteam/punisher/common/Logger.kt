@@ -43,6 +43,11 @@ class Logger(pluginMetas: PluginMeta, private val debugMode: Boolean) {
         Bukkit.getConsoleSender().sendMessage(Component.text("[$plName] ").append(component))
     }
 
+    fun clearLog(component: Component) {
+        val coloredMessage = LegacyComponentSerializer.legacySection().serialize(component)
+        Bukkit.getConsoleSender().sendMessage("[$plName] $coloredMessage")
+    }
+
     fun debug(s: String) {
         if (debugMode) {
             Bukkit.getConsoleSender().sendMessage(Component.text("[$plName] [DEBUG] ").color(NamedTextColor.YELLOW).append(Component.text(s).color(NamedTextColor.YELLOW).decorate(
