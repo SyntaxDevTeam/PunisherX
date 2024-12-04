@@ -71,6 +71,7 @@ mute:
   mute_message: "<red>Zostałeś/aś wyciszony/a za <b>{reason}</b> na czas <b>{time}</b></red>"
   mute_info_message: "<red>Próbujesz coś powiedzieć ale zostałeś/aś wyciszony/a</red>"
   broadcast: "<dark_gray>Gracz <gray>{player}</gray> został wyciszony za <gray>{reason}</gray> na czas <gray>{time}</gray></dark_gray>"
+  log: "<dark_gray>Wyciszony gracz <gray>{player}</gray> <dark_gray>wysłał wiadomość: <gray>{message}</gray>"
   no_reasons: "bez powodu"
   reasons:
     - "Reklama"
