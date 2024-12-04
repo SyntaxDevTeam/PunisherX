@@ -30,6 +30,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
                                 " <gray>|  <gold>/unban <player/ip> <gray>- <white>Unbans a player\n" +
                                 " <gray>|  <gold>/check <player> <all/warn/mute/ban>\n" +
                                 " <gray>|      - <white>Checks and displays the punishments of a given player\n" +
+                                " <gray>|  <gold>/clearall <player> - Clears all active penalties\n" +
                                 " <gray>|\n" +
                                 " <gray>|\n-------------------------------------------------")
                     } else {
