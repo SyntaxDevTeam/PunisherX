@@ -69,7 +69,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                     event.isCancelled = true
                     val muteMessage = plugin.messageHandler.getMessage("mute", "mute_info_message", mapOf("reason" to reason, "time" to duration))
                     val formattedMessage = MiniMessage.miniMessage().deserialize(muteMessage)
-                    val logMessage = plugin.messageHandler.getComponentMessage("mute", "log", mapOf("player" to playerName, "message" to plainMessage))
+                    val logMessage = plugin.messageHandler.getLogMessage("mute", "log", mapOf("player" to playerName, "message" to plainMessage))
                     val logFormattedMessage = MiniMessage.miniMessage().deserialize(logMessage)
                     plugin.logger.clearLog(logFormattedMessage)
                     player.sendMessage(formattedMessage)
