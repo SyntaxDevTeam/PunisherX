@@ -84,4 +84,11 @@ class UnBanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
             stack.sender.sendRichMessage(messageHandler.getMessage("ban", "usage_unban"))
         }
     }
+
+    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        return when (args.size) {
+            1 -> plugin.server.onlinePlayers.map { it.name }
+            else -> emptyList()
+        }
+    }
 }

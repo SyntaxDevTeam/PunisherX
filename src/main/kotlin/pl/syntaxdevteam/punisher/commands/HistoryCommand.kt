@@ -94,4 +94,11 @@ class HistoryCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, pri
             stack.sender.sendRichMessage(messageHandler.getMessage("history", "usage"))
         }
     }
+
+    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        return when (args.size) {
+            1 -> plugin.server.onlinePlayers.map { it.name }
+            else -> emptyList()
+        }
+    }
 }

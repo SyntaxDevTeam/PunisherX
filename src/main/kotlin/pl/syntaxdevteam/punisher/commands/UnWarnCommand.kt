@@ -38,4 +38,11 @@ class UnWarnCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Ba
             stack.sender.sendRichMessage(messageHandler.getMessage("unwarn", "usage_unwarn"))
         }
     }
+
+    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        return when (args.size) {
+            1 -> plugin.server.onlinePlayers.map { it.name }
+            else -> emptyList()
+        }
+    }
 }

@@ -50,4 +50,23 @@ class ChangeReasonCommand(private val plugin: PunisherX, pluginMetas: PluginMeta
             stack.sender.sendRichMessage(messageHandler.getMessage("ban", "usage"))
         }
     }
+
+    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        return when (args.size) {
+            1 -> plugin.server.onlinePlayers.map { it.name }
+            2 -> generateTimeSuggestions()
+            else -> emptyList()
+        }
+    }
+
+    private fun generateTimeSuggestions(): List<String> {
+        val units = listOf("s", "m", "h", "d")
+        val suggestions = mutableListOf<String>()
+        for (i in 1..999) {
+            for (unit in units) {
+                suggestions.add("$i$unit")
+            }
+        }
+        return suggestions
+    }
 }
