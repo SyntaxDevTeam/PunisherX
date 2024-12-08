@@ -14,39 +14,44 @@ import java.util.*
 
 class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerPreLogin(event: AsyncPlayerPreLoginEvent) {
-        plugin.logger.debug("Checking punishment for player: ${event.name}")
+        try {
+            plugin.logger.debug("Checking punishment for player: ${event.name}")
 
-        val uuid = event.uniqueId.toString()
-        val ip = event.address.hostAddress
+            val uuid = event.uniqueId.toString()
+            val ip = event.address.hostAddress
 
-        val punishments = plugin.databaseHandler.getPunishments(uuid) + plugin.databaseHandler.getPunishmentsByIP(ip)
-        punishments.forEach { punishment ->
-            if (plugin.punishmentManager.isPunishmentActive(punishment)) {
-                if (punishment.type == "BAN" || punishment.type == "BANIP") {
-                    val endTime = punishment.end
-                    val remainingTime = (endTime - System.currentTimeMillis()) / 1000
-                    val duration = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(remainingTime.toString())
-                    val reason = punishment.reason
-                    val kickMessages = when (punishment.type) {
-                        "BAN" -> plugin.messageHandler.getComplexMessage("ban", "kick_message", mapOf("reason" to reason, "time" to duration))
-                        "BANIP" -> plugin.messageHandler.getComplexMessage("banip", "kick_message", mapOf("reason" to reason, "time" to duration))
-                        else -> emptyList()
+            val punishments = plugin.databaseHandler.getPunishments(uuid) + plugin.databaseHandler.getPunishmentsByIP(ip)
+            punishments.forEach { punishment ->
+                if (plugin.punishmentManager.isPunishmentActive(punishment)) {
+                    if (punishment.type == "BAN" || punishment.type == "BANIP") {
+                        val endTime = punishment.end
+                        val remainingTime = (endTime - System.currentTimeMillis()) / 1000
+                        val duration = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(remainingTime.toString())
+                        val reason = punishment.reason
+                        val kickMessages = when (punishment.type) {
+                            "BAN" -> plugin.messageHandler.getComplexMessage("ban", "kick_message", mapOf("reason" to reason, "time" to duration))
+                            "BANIP" -> plugin.messageHandler.getComplexMessage("banip", "kick_message", mapOf("reason" to reason, "time" to duration))
+                            else -> emptyList()
+                        }
+                        val kickMessage = Component.text()
+                        kickMessages.forEach { line ->
+                            kickMessage.append(line)
+                            kickMessage.append(Component.newline())
+                        }
+                        event.loginResult = AsyncPlayerPreLoginEvent.Result.KICK_BANNED
+                        event.kickMessage(kickMessage.build())
+                        plugin.logger.debug("Player ${event.name} was kicked for: $reason")
                     }
-                    val kickMessage = Component.text()
-                    kickMessages.forEach { line ->
-                        kickMessage.append(line)
-                        kickMessage.append(Component.newline())
-                    }
-                    event.loginResult = AsyncPlayerPreLoginEvent.Result.KICK_BANNED
-                    event.kickMessage(kickMessage.build())
-                    plugin.logger.debug("Player ${event.name} was kicked for: $reason")
+                } else {
+                    plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
+                    plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
                 }
-            } else {
-                plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
-                plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
             }
+        } catch (e: Exception) {
+            plugin.logger.severe("Error in onPlayerPreLogin, report it urgently to the plugin author with the message: ${event.name}: ${e.message}")
+            e.printStackTrace()
         }
     }
 
@@ -80,38 +85,43 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                 }
             }
         } catch (e: Exception) {
-            plugin.logger.severe("Error in onPlayerChat: ${e.message}")
+            plugin.logger.severe("Error in onPlayerChat, report it urgently to the plugin author with the message: ${e.message}")
             e.printStackTrace()
         }
     }
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerCommand(event: PlayerCommandPreprocessEvent) {
-        val player = event.player
-        val uuid = player.uniqueId.toString()
-        val command = event.message.split(" ")[0].lowercase(Locale.getDefault()).removePrefix("/")
+        try {
+            val player = event.player
+            val uuid = player.uniqueId.toString()
+            val command = event.message.split(" ")[0].lowercase(Locale.getDefault()).removePrefix("/")
 
-        if (plugin.config.getBoolean("mute_pm")) {
-            val muteCommands = plugin.config.getStringList("mute_cmd")
-            if (muteCommands.contains(command)) {
-                val punishments = plugin.databaseHandler.getPunishments(uuid)
-                punishments.forEach { punishment ->
-                    if (punishment.type == "MUTE" && plugin.punishmentManager.isPunishmentActive(punishment)) {
-                        val endTime = punishment.end
-                        val remainingTime = (endTime - System.currentTimeMillis()) / 1000
-                        val duration = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(remainingTime.toString())
-                        val reason = punishment.reason
-                        event.isCancelled = true
-                        val muteMessage = plugin.messageHandler.getMessage("mute", "mute_message", mapOf("reason" to reason, "time" to duration))
-                        val formattedMessage = MiniMessage.miniMessage().deserialize(muteMessage)
-                        player.sendMessage(formattedMessage)
-                    } else {
-                        plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
-                        plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
+            if (plugin.config.getBoolean("mute_pm")) {
+                val muteCommands = plugin.config.getStringList("mute_cmd")
+                if (muteCommands.contains(command)) {
+                    val punishments = plugin.databaseHandler.getPunishments(uuid)
+                    punishments.forEach { punishment ->
+                        if (punishment.type == "MUTE" && plugin.punishmentManager.isPunishmentActive(punishment)) {
+                            val endTime = punishment.end
+                            val remainingTime = (endTime - System.currentTimeMillis()) / 1000
+                            val duration = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(remainingTime.toString())
+                            val reason = punishment.reason
+                            event.isCancelled = true
+                            val muteMessage = plugin.messageHandler.getMessage("mute", "mute_message", mapOf("reason" to reason, "time" to duration))
+                            val formattedMessage = MiniMessage.miniMessage().deserialize(muteMessage)
+                            player.sendMessage(formattedMessage)
+                        } else {
+                            plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
+                            plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
+                        }
                     }
                 }
             }
+        } catch (e: Exception) {
+            plugin.logger.severe("Error in onPlayerCommand, report it urgently to the plugin author with the message: ${event.player.name}: ${e.message}")
+            e.printStackTrace()
         }
     }
 }
