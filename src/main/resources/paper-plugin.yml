@@ -1,14 +1,143 @@
 name: PunisherX
-version: '${version}'
 main: pl.syntaxdevteam.punisher.PunisherX
+version: ${version}
+description: ${description}
 api-version: '1.20'
 folia-supported: true
-softdepend: [Folia]
 
 authors: [SyntaxDevTeam]
-description: Advanced punishment system for Minecraft servers with warnings, mutes, bans, kicks and more.
-website: https://github.com/SyntaxDevTeam
+website: https://github.com/SyntaxDevTeam/PunisherX
+support:
+  issues: https://github.com/SyntaxDevTeam/PunisherX/issues
+  updates: https://github.com/SyntaxDevTeam/PunisherX/releases
+
+localization:
+  available: [en_US, pl_PL, fr_FR, es_ES, de_DE]
+  default: en_US
 
 loader: pl.syntaxdevteam.punisher.loader.SyntaxLoader
 has-open-classloader: false
 load before: [RewarderX]
+load after: [NBTAPI]
+
+softdepend: [Folia]
+
+features:
+  debug: true
+
+commands:
+  ban:
+    description: Bans a player for a specified time with a reason.
+    usage: /ban <player> (time) <reason>
+    permission: punisherx.ban
+  banip:
+    description: Bans a player's IP for a specified time with a reason.
+    usage: /banip <ip|player> (time) <reason>
+    permission: punisherx.banip
+  unban:
+    description: Unbans a player or IP.
+    usage: /unban <ip|player>
+    permission: punisherx.unban
+  mute:
+    description: Mutes a player for a specified time with a reason.
+    usage: /mute <player> (time) <reason>
+    permission: punisherx.mute
+  unmute:
+    description: Unmutes a player.
+    usage: /unmute <player>
+    permission: punisherx.unmute
+  warn:
+    description: Issues a warning to a player with an optional duration and reason.
+    usage: /warn <player> (time) <reason>
+    permission: punisherx.warn
+  unwarn:
+    description: Removes the last warning issued to a player.
+    usage: /unwarn <player>
+    permission: punisherx.unwarn
+  clearall:
+    description: Clears all active penalties for a player.
+    usage: /clearall <player>
+    permission: punisherx.clearall
+  kick:
+    description: Kicks a player from the server with a reason.
+    usage: /kick <player> <reason>
+    permission: punisherx.kick
+  change-reason:
+    description: Updates the reason for a specific penalty by ID.
+    usage: /change-reason <penalty_id> <new_reason>
+    permission: punisherx.help
+  check:
+    description: Checks the active penalties for a player.
+    usage: /check <player> <warn|mute|ban|all>
+    permission: punisherx.check
+  history:
+    description: Displays the full penalty history for a player.
+    usage: /history <player> (page)
+    permission: punisherx.history
+  punisherx:
+    aliases: [prx]
+    description: Base command for PunisherX with subcommands for help, version, reload, export, and import.
+    usage: /punisherx <help|version|reload|export|import>
+    permission: punisherx.help
+
+permissions:
+  punisherx.warn:
+    description: Allows issuing a warning to a player.
+    default: op
+  punisherx.unwarn:
+    description: Allows removing the last warning from a player.
+    default: op
+  punisherx.mute:
+    description: Allows muting a player.
+    default: op
+  punisherx.unmute:
+    description: Allows unmuting a player.
+    default: op
+  punisherx.ban:
+    description: Allows banning a player.
+    default: op
+  punisherx.banip:
+    description: Allows banning a player's IP.
+    default: op
+  punisherx.unban:
+    description: Allows unbanning a player or IP.
+    default: op
+  punisherx.clearall:
+    description: Allows clearing all active penalties for a player.
+    default: op
+  punisherx.kick:
+    description: Allows kicking a player from the server.
+    default: op
+  punisherx.check:
+    description: Allows checking penalties for a player. Not required for self-check.
+    default: true
+  punisherx.view_ip:
+    description: Allows viewing a player's IP in the /check command.
+    default: op
+  punisherx.history:
+    description: Allows viewing a player's penalty history. Not required for self-check.
+    default: true
+  punisherx.help:
+    description: Allows using the PunisherX help command.
+    default: true
+  punisherx.version:
+    description: Allows viewing the PunisherX version.
+    default: op
+  punisherx.reload:
+    description: Allows reloading the PunisherX config.
+    default: op
+  punisherx.export:
+    description: Allows exporting the database.
+    default: op
+  punisherx.import:
+    description: Allows importing the database.
+    default: op
+  punisherx.see.*:
+    description: Allows visibility of various punishment chat notifications.
+    default: op
+  punisherx.update.notify:
+    description: Notifies about PunisherX updates.
+    default: op
+  punisherx.bypass.*:
+    description: Prevents punishments from being applied to the user.
+    default: false
