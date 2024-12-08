@@ -94,16 +94,6 @@ class PunisherX : JavaPlugin(), Listener {
 
         server.pluginManager.registerEvents(PunishmentChecker(this), this)
         pluginManager = PluginManager(this)
-
-        val author = when (language.lowercase()) {
-            "pl" -> "WieszczY"
-            "en" -> "Syntaxerr"
-            "fr" -> "OpenAI Chat GPT-3.5"
-            "es" -> "OpenAI Chat GPT-3.5"
-            "de" -> "OpenAI Chat GPT-3.5"
-            else -> getServerName()
-        }
-        logger.log("<gray>Loaded \"$language\" language file by: <white><b>$author</b></white>")
         statsCollector = StatsCollector(this)
         updateChecker = UpdateChecker(this, pluginMetas, config)
         updateChecker.checkForUpdates()
