@@ -4,6 +4,7 @@ import io.papermc.paper.plugin.configuration.PluginMeta
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import pl.syntaxdevteam.punisher.PunisherX
@@ -19,8 +20,10 @@ class MessageHandler(private val plugin: PunisherX, pluginMetas: PluginMeta) {
 
     init {
         copyDefaultMessages()
+        updateLanguageFile()
         messages = loadMessages()
     }
+
 
     fun initial() {
         val author = when (language.lowercase()) {
@@ -39,6 +42,42 @@ class MessageHandler(private val plugin: PunisherX, pluginMetas: PluginMeta) {
         if (!messageFile.exists()) {
             messageFile.parentFile.mkdirs()
             plugin.saveResource("lang/messages_${language.lowercase()}.yml", false)
+        }
+    }
+
+    private fun updateLanguageFile() {
+        val langFile = File(plugin.dataFolder, "lang/messages_${language.lowercase()}.yml")
+        val defaultLangStream = plugin.getResource("lang/messages_${language.lowercase()}.yml")
+
+        if (defaultLangStream == null) {
+            logger.err("Default language file for $language not found in plugin resources!")
+            return
+        }
+
+        val defaultConfig = YamlConfiguration.loadConfiguration(defaultLangStream.reader())
+        val currentConfig = YamlConfiguration.loadConfiguration(langFile)
+
+        var updated = false
+
+        fun synchronizeSections(defaultSection: ConfigurationSection, currentSection: ConfigurationSection) {
+            for (key in defaultSection.getKeys(false)) {
+                if (!currentSection.contains(key)) {
+                    currentSection[key] = defaultSection[key]
+                    updated = true
+                } else if (defaultSection.isConfigurationSection(key)) {
+                    synchronizeSections(
+                        defaultSection.getConfigurationSection(key)!!,
+                        currentSection.getConfigurationSection(key)!!
+                    )
+                }
+            }
+        }
+
+        synchronizeSections(defaultConfig, currentConfig)
+
+        if (updated) {
+            logger.success("Updating language file: messages_${language.lowercase()}.yml with missing entries.")
+            currentConfig.save(langFile)
         }
     }
 
