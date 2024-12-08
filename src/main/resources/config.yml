@@ -2,7 +2,7 @@
 
 # Settings for connecting to the database
 database:
-  # Available options: mariadb, mysql, sqlite, h2, postgresql*
+  # Available options: mariadb, mysql, postgresql, sqlite, h2
   type: "sqlite"
   sql:
     host: "localhost"
@@ -15,10 +15,8 @@ database:
 # If you would like to add your own language file, please contact us on Discord (https://discord.gg/Zk6mxv7eMh).
 language: "EN"
 
-
 # Should private messages also be blocked when MUTE penalty is applied?
 mute_pm: false
-
 # If you set mute_pm to TRUE, you can edit which commands for private messages should be blocked here
 mute_cmd:
   - 'me'
@@ -69,6 +67,7 @@ aliases:
   ban: "bx"
   banip: "bip" # Don't use "ban-ip" for this alias
   unban: "ub"
+  clearall: "ca"
 
 geoDatabase:
   # To use GeoIP functionality, you need a MaxMind license key.
@@ -86,6 +85,3 @@ debug: false
 # Should StatsCollector be enabled? Recommended setting: true
 stats:
   enabled: true
-
-
-# * - Warning! The PostgreSQL database type is still in the testing phase and is not recommended for use. We recommend using any of the available options, such as SQLite.
