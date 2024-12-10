@@ -21,7 +21,8 @@ import java.util.*
 class PunisherX : JavaPlugin(), Listener {
     lateinit var logger: Logger
     val pluginMetas = this.pluginMeta
-    private var config = getConfig()
+    private var configHandler = ConfigHandler(this)
+    private var config = configHandler.getConfig()
     private var debugMode = config.getBoolean("debug")
     private val language = config.getString("language") ?: "EN"
     private lateinit var pluginManager: PluginManager
@@ -40,7 +41,7 @@ class PunisherX : JavaPlugin(), Listener {
     }
 
     override fun onEnable() {
-        saveDefaultConfig()
+        //saveDefaultConfig()
         databaseHandler = DatabaseHandler(this, this.config)
         databaseHandler.openConnection()
         databaseHandler.createTables()
@@ -94,9 +95,13 @@ class PunisherX : JavaPlugin(), Listener {
 
         server.pluginManager.registerEvents(PunishmentChecker(this), this)
         pluginManager = PluginManager(this)
+        logger.info("Debug mode: $debugMode")
         statsCollector = StatsCollector(this)
         updateChecker = UpdateChecker(this, pluginMetas, config)
         updateChecker.checkForUpdates()
+    }
+    fun onReload() {
+        configHandler.reloadConfig()
     }
 
     fun getPluginFile(): File {
