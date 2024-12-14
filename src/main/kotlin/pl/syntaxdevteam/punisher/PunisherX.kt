@@ -17,11 +17,11 @@ import java.util.*
 
 @Suppress("UnstableApiUsage", "unused")
 class PunisherX : JavaPlugin(), Listener {
-    lateinit var logger: Logger
     val pluginMetas = this.pluginMeta
     private val configHandler by lazy { ConfigHandler(this) }
     private val config: FileConfiguration = configHandler.getConfig()
     private var debugMode = config.getBoolean("debug")
+    var logger: Logger = Logger(pluginMetas, debugMode)
     private val language = config.getString("language") ?: "EN"
     private lateinit var pluginsManager: PluginManager
     private lateinit var statsCollector: StatsCollector
@@ -30,21 +30,17 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var timeHandler: TimeHandler
     lateinit var punishmentManager: PunishmentManager
     private lateinit var updateChecker: UpdateChecker
-    lateinit var playerIPManager: PlayerIPManager
-    private lateinit var geoIPHandler: GeoIPHandler
+    private var geoIPHandler: GeoIPHandler = GeoIPHandler(this)
+    var playerIPManager: PlayerIPManager = PlayerIPManager(this, geoIPHandler)
     val uuidManager = UUIDManager(this)
     private lateinit var commandManager: CommandManager
-
-    override fun onLoad() {
-        logger = Logger(pluginMetas, debugMode)
-    }
 
     override fun onEnable() {
         setupConfig()
         setupDatabase()
         setupHandlers()
-        registerCommands()
         registerEvents()
+        registerCommands()
         checkForUpdates()
     }
 
@@ -83,7 +79,7 @@ class PunisherX : JavaPlugin(), Listener {
     }
 
     private fun registerEvents() {
-        server.pluginManager.registerEvents(PlayerIPManager(this, geoIPHandler), this)
+        server.pluginManager.registerEvents(playerIPManager, this)
         server.pluginManager.registerEvents(PunishmentChecker(this), this)
     }
 
