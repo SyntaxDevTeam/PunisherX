@@ -14,15 +14,21 @@ import java.util.*
 
 class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerPreLogin(event: AsyncPlayerPreLoginEvent) {
         try {
             plugin.logger.debug("Checking punishment for player: ${event.name}")
 
-            val uuid = event.uniqueId.toString()
+            val uuid = plugin.uuidManager.getUUID(event.name).toString()
             val ip = event.address.hostAddress
 
             val punishments = plugin.databaseHandler.getPunishments(uuid) + plugin.databaseHandler.getPunishmentsByIP(ip)
+            if (punishments.isEmpty()) {
+                plugin.logger.debug("No punishments found for player: ${event.name}")
+                return
+            }
+
             punishments.forEach { punishment ->
                 if (plugin.punishmentManager.isPunishmentActive(punishment)) {
                     if (punishment.type == "BAN" || punishment.type == "BANIP") {
@@ -64,6 +70,10 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             val messageComponent = event.message()
             val plainMessage = PlainTextComponentSerializer.plainText().serialize(messageComponent)
             val punishments = plugin.databaseHandler.getPunishments(uuid)
+            if (punishments.isEmpty()) {
+                plugin.logger.debug("No punishments found for player: ${player.name}")
+                return
+            }
 
             punishments.forEach { punishment ->
                 if (punishment.type == "MUTE" && plugin.punishmentManager.isPunishmentActive(punishment)) {
