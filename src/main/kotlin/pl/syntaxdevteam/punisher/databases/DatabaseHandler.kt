@@ -70,7 +70,7 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
         logger.debug("Setting up data source for database type: $dbType")
         try {
             dataSource = HikariDataSource(hikariConfig)
-            logger.info("HikariCP data source initialized successfully for $dbType.")
+            logger.debug("HikariCP data source initialized successfully for $dbType.")
         } catch (e: Exception) {
             logger.err("Failed to initialize HikariCP data source: ${e.message}")
             throw e
