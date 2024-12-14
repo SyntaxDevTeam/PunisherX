@@ -53,13 +53,29 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
 
             else -> throw IllegalArgumentException("Unsupported database type: $dbType")
         }
+        if (dbType == "sqlite") {
+            hikariConfig.maximumPoolSize = 2
+            hikariConfig.minimumIdle = 1
+            hikariConfig.connectionTimeout = 30000
+            hikariConfig.idleTimeout = 10000
+            hikariConfig.maxLifetime = 60000
+        } else {
+            hikariConfig.maximumPoolSize = 10
+            hikariConfig.minimumIdle = 2
+            hikariConfig.connectionTimeout = 30000
+            hikariConfig.idleTimeout = 600000
+            hikariConfig.maxLifetime = 1800000
+            hikariConfig.leakDetectionThreshold = 2000
+        }
+        logger.debug("Setting up data source for database type: $dbType")
+        try {
+            dataSource = HikariDataSource(hikariConfig)
+            logger.info("HikariCP data source initialized successfully for $dbType.")
+        } catch (e: Exception) {
+            logger.err("Failed to initialize HikariCP data source: ${e.message}")
+            throw e
+        }
 
-        hikariConfig.maximumPoolSize = 10
-        hikariConfig.minimumIdle = 2
-        hikariConfig.connectionTimeout = 30000
-
-        dataSource = HikariDataSource(hikariConfig)
-        logger.debug("Connection to the ${dbType.uppercase()} database established")
     }
 
     fun openConnection() {
@@ -71,24 +87,42 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
     fun closeConnection() {
         try {
             dataSource?.close()
-            logger.info("Connection to the database closed.")
+            logger.info("HikariCP pool shut down. Total=${dataSource?.hikariPoolMXBean?.totalConnections}, Active=${dataSource?.hikariPoolMXBean?.activeConnections}, Idle=${dataSource?.hikariPoolMXBean?.idleConnections}")
         } catch (e: SQLException) {
-            logger.err("Failed to close the connection. ${e.message}")
+            logger.err("Error while closing HikariCP pool: ${e.message}")
         }
     }
 
     private fun getConnection(): Connection? {
         return try {
-            logger.debug("Database connection established")
-            dataSource?.connection
+            val connection = dataSource?.connection
+            if (connection != null && dbType == "sqlite") {
+                enableSQLiteWAL(connection)
+            }
+            logger.debug("Connection obtained: Active=${dataSource?.hikariPoolMXBean?.activeConnections}, Idle=${dataSource?.hikariPoolMXBean?.idleConnections}")
+            connection
         } catch (e: SQLException) {
             logger.err("Failed to get connection. ${e.message}")
             null
         }
     }
 
+    private fun enableSQLiteWAL(connection: Connection) {
+        logger.debug("SQLite connection detected! I'm enabling WAL mode")
+        try {
+            connection.createStatement().use { statement ->
+                statement.execute("PRAGMA journal_mode=WAL;")
+                logger.debug("SQLite WAL mode enabled.")
+            }
+        } catch (e: SQLException) {
+            logger.err("Failed to enable SQLite WAL mode. ${e.message}")
+        }
+    }
+
+
     fun createTables() {
         getConnection()?.use { conn ->
+            logger.debug("Database connection established from createTables")
             conn.createStatement().use { statement ->
                 try {
                     val createTablesPunishments = when (dbType) {
@@ -213,6 +247,7 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
     fun addPunishment(name: String, uuid: String, reason: String, operator: String, punishmentType: String, start: Long, end: Long): Boolean {
         return try {
             getConnection()?.use { conn ->
+                logger.debug("Database connection established from addPunishment")
                 val query = """
                 INSERT INTO punishments (name, uuid, reason, operator, punishmentType, start, endTime)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -236,10 +271,10 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
         }
     }
 
-
     fun addPunishmentHistory(name: String, uuid: String, reason: String, operator: String, punishmentType: String, start: Long, end: Long) {
         try {
             getConnection()?.use { conn ->
+                logger.debug("Database connection established from addPunishmentHistory")
                 val query = """
                 INSERT INTO punishmenthistory (name, uuid, reason, operator, punishmentType, start, endTime)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -263,12 +298,14 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
 
     fun getPunishments(uuid: String): List<PunishmentData> {
         val punishments = mutableListOf<PunishmentData>()
+        logger.debug("Database connection established from getPunishments")
         try {
             getConnection()?.use { conn ->
                 val query = "SELECT * FROM punishments WHERE uuid = ?"
                 conn.prepareStatement(query).use { preparedStatement ->
                     preparedStatement.setString(1, uuid)
                     val resultSet: ResultSet = preparedStatement.executeQuery()
+                    val punishmentsToRemove = mutableListOf<Pair<String, String>>()
                     while (resultSet.next()) {
                         val id = resultSet.getInt("id")
                         val type = resultSet.getString("punishmentType")
@@ -276,11 +313,16 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
                         val start = resultSet.getLong("start")
                         val end = resultSet.getLong("endTime")
                         val punishment = PunishmentData(id, uuid, type, reason, start, end)
+
+
                         if (plugin.punishmentManager.isPunishmentActive(punishment)) {
                             punishments.add(punishment)
                         } else {
-                            removePunishment(uuid, type)
+                            punishmentsToRemove.add(uuid to type) // Zbieramy dane do usunięcia
                         }
+                    }
+                    punishmentsToRemove.forEach { (uuid, type) ->
+                        removePunishment(uuid, type)
                     }
                 }
             } ?: throw SQLException("No connection available")
@@ -294,6 +336,7 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
         val punishments = mutableListOf<PunishmentData>()
         try {
             getConnection()?.use { conn ->
+            logger.debug("Database connection established from getPunishmentsByIP")
             val query = "SELECT * FROM punishments WHERE uuid = ?"
                 conn.prepareStatement(query).use { preparedStatement ->
                     preparedStatement.setString(1, ip)
@@ -323,6 +366,7 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
     fun removePunishment(uuidOrIp: String, punishmentType: String, removeAll: Boolean = false) {
         try {
             getConnection()?.use { conn ->
+                logger.debug("Database connection established from removePunishment")
                 val query = when (dbType) {
                     "postgresql", "h2", "sqlite" -> if (removeAll) {
                         """
@@ -374,6 +418,7 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
         val punishments = mutableListOf<PunishmentData>()
         try {
             getConnection()?.use { conn ->
+                logger.debug("Database connection established from getActiveWarnCount")
                 val query = "SELECT * FROM punishments WHERE uuid = ? AND punishmentType = 'WARN'"
                 conn.prepareStatement(query).use { preparedStatement ->
                     preparedStatement.setString(1, uuid)
@@ -401,6 +446,7 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
         val punishments = mutableListOf<PunishmentData>()
         try {
             getConnection()?.use { conn ->
+                logger.debug("Database connection established from getPunishmentHistory")
                 val query = "SELECT * FROM punishmentHistory WHERE uuid = ? ORDER BY start DESC LIMIT ? OFFSET ?"
                 conn.prepareStatement(query).use { preparedStatement ->
                     preparedStatement.setString(1, uuid)
@@ -430,6 +476,7 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
         val punishments = mutableListOf<PunishmentData>()
         try {
             getConnection()?.use { conn ->
+                logger.debug("Database connection established from getLastTenPunishments")
                 val query = "SELECT * FROM punishmenthistory WHERE uuid = ? ORDER BY start DESC LIMIT 10"
                 conn.prepareStatement(query).use { preparedStatement ->
                     preparedStatement.setString(1, uuid)
@@ -456,6 +503,7 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
     fun updatePunishmentReason(id: Int, newReason: String): Boolean {
         return try {
             getConnection()?.use { conn ->
+                logger.debug("Database connection established from updatePunishmentReason")
                 val query = "UPDATE punishmentHistory SET reason = ? WHERE id = ?"
                 conn.prepareStatement(query).use { preparedStatement ->
                     preparedStatement.setString(1, newReason)
