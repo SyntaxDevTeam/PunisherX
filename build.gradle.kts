@@ -1,10 +1,13 @@
+import io.papermc.hangarpublishplugin.model.Platforms
+
 plugins {
     kotlin("jvm") version "2.1.0"
     id("com.gradleup.shadow") version "9.0.0-beta4"
+    id("io.papermc.hangar-publish-plugin") version "0.1.2"
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.3.0-DEV"
+version = "1.2.2"
 description = "Advanced punishment system for Minecraft servers with warnings, mutes, bans, kicks and more."
 
 repositories {
@@ -37,6 +40,10 @@ kotlin {
     jvmToolchain(targetJavaVersion)
 }
 
+tasks.shadowJar {
+    archiveClassifier.set("all")
+}
+
 tasks.build {
     dependsOn("shadowJar")
 }
@@ -47,5 +54,32 @@ tasks.processResources {
     filteringCharset = "UTF-8"
     filesMatching("paper-plugin.yml") {
         expand(props)
+    }
+}
+
+hangarPublish {
+    publications.register("plugin") {
+        version.set(project.version as String)
+        channel.set("Release")
+        id.set("PunisherX")
+        apiKey.set(System.getenv("HANGAR_API_TOKEN"))
+
+        platforms {
+            register(Platforms.PAPER) {
+                jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+
+                val versions: List<String> = (property("paperVersion") as String)
+                    .split(",")
+                    .map { it.trim() }
+                platformVersions.set(versions)
+
+                dependencies {
+                    hangar("Paper") {
+                        required.set(true)
+                    }
+                }
+            }
+        }
+        changelog.set(file("CHANGELOG.md").readText())
     }
 }
