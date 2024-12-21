@@ -150,7 +150,7 @@ kick:
 
 # Nachrichten für den /check-Befehl
 check:
-  usage: "Korrekte Verwendung: <gold>/check <player_name> <all|ban|mute|warn>"
+  usage: "Korrekte Verwendung: <gold>/check <player_name> <all|ban|jail|mute|warn>"
   invalid_type: "<red>Ungültiger Strafentyp. Verwenden Sie: all, ban, mute, warn.</red>"
   no_punishments: "<dark_green>Spieler <gold>{player}</gold> hat keine Strafen.</dark_green>"
   title: "<dark_gray>Aktive Strafen für</dark_gray>"

@@ -149,7 +149,7 @@ kick:
 
 # /check command messages
 check:
-  usage: "Correct usage is: <gold>/check <player_name> <all|ban|mute|warn>"
+  usage: "Correct usage is: <gold>/check <player_name> <all|ban|jail|mute|warn>"
   invalid_type: "<red>Invalid punishment type. Use: all, ban, mute, warn.</red>"
   no_punishments: "<dark_green>Player <gold>{player}</gold> has no punishments.</dark_green>"
   title: "<dark_gray>Active punishments for</dark_gray>"

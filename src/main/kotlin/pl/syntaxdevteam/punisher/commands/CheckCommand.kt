@@ -38,6 +38,7 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, priva
                     val filteredPunishments = when (type.lowercase()) {
                         "all" -> punishments
                         "ban" -> punishments.filter { it.type == "BAN" || it.type == "BANIP" }
+                        "jail" -> punishments.filter { it.type == "JAIL" }
                         "mute" -> punishments.filter { it.type == "MUTE" }
                         "warn" -> punishments.filter { it.type == "WARN" }
                         else -> {
@@ -105,7 +106,7 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, priva
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
-            2 -> listOf("all", "warn", "mute", "ban")
+            2 -> listOf("all", "warn", "mute", "jail", "ban")
             else -> emptyList()
         }
     }

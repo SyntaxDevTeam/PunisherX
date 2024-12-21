@@ -150,7 +150,7 @@ kick:
 
 # Wiadomości komendy /check
 check:
-  usage: "Poprawne użycie to: <gold>/check <nazwa_gracza> <all|ban|mute|warn>"
+  usage: "Poprawne użycie to: <gold>/check <nazwa_gracza> <all|ban|jail|mute|warn>"
   invalid_type: "<red>Nieprawidłowy typ kary. Użyj: all, ban, mute, warn.</red>"
   no_punishments: "<dark_green>Gracz <gold>{player}</gold> nie ma żadnych kar.</dark_green>"
   title: "<dark_gray>Aktywne kary dla</dark_gray>"
