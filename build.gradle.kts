@@ -7,8 +7,8 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.2.2"
-description = "Advanced punishment system for Minecraft servers with warnings, mutes, bans, kicks and more."
+version = "1.3.0-DEV"
+description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 repositories {
     mavenCentral()
@@ -28,6 +28,7 @@ dependencies {
     compileOnly("com.google.code.gson:gson:2.11.0")
     compileOnly("com.maxmind.geoip2:geoip2:4.2.1")
     compileOnly("org.apache.ant:ant:1.10.15")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.1")
     compileOnly("org.xerial:sqlite-jdbc:3.47.1.0")
     compileOnly("org.postgresql:postgresql:42.7.4")
@@ -38,10 +39,6 @@ dependencies {
 val targetJavaVersion = 21
 kotlin {
     jvmToolchain(targetJavaVersion)
-}
-
-tasks.shadowJar {
-    archiveClassifier.set("all")
 }
 
 tasks.build {
@@ -72,14 +69,26 @@ hangarPublish {
                     .split(",")
                     .map { it.trim() }
                 platformVersions.set(versions)
-
-                dependencies {
-                    hangar("Paper") {
-                        required.set(true)
-                    }
-                }
             }
         }
         changelog.set(file("CHANGELOG.md").readText())
     }
+}
+
+tasks.register("prepareChangelog") {
+    doLast {
+        val changelogFile = File("CHANGELOG.md")
+        val lines = changelogFile.readLines()
+        val latestChangelog = lines
+            .takeLastWhile { it.startsWith("##") }
+            .joinToString("\n")
+        project.extensions.getByType(io.papermc.hangarpublishplugin.HangarPublishExtension::class.java)
+            .publications
+            .findByName("plugin")
+            ?.changelog?.set(latestChangelog)
+    }
+}
+
+tasks.named("publishPluginPublicationToHangar") {
+    dependsOn("prepareChangelog")
 }
