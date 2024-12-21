@@ -1,4 +1,4 @@
-#Config version 1.0.2
+# Config version 1.0.3
 
 # Settings for connecting to the database
 database:
@@ -54,6 +54,14 @@ WarnActions:
   6: "ban {player} 7d You have received your 6th warning!"
   7: "ban {player} 30d You have received your {warn_no}th warning!"
   10: "ban {player} You have received your 10th warning!"
+
+jail:
+  location:
+    world: "world"
+    x: 100.0
+    y: 64.0
+    z: 200.0
+    radius: 5 # promień strefy więzienia
 
 # You can set your own aliases for the commands below
 aliases:
