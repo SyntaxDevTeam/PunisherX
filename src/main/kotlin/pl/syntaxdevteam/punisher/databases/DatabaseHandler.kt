@@ -59,14 +59,17 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
             hikariConfig.connectionTimeout = 30000
             hikariConfig.idleTimeout = 10000
             hikariConfig.maxLifetime = 60000
+            hikariConfig.keepaliveTime = 30000
         } else {
             hikariConfig.maximumPoolSize = 10
             hikariConfig.minimumIdle = 2
             hikariConfig.connectionTimeout = 30000
             hikariConfig.idleTimeout = 600000
             hikariConfig.maxLifetime = 1800000
+            hikariConfig.keepaliveTime = 900000
             hikariConfig.leakDetectionThreshold = 2000
         }
+
         logger.debug("Setting up data source for database type: $dbType")
         try {
             dataSource = HikariDataSource(hikariConfig)
