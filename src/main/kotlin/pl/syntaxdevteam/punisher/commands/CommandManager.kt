@@ -63,6 +63,11 @@ class CommandManager(private val plugin: PunisherX) {
                 JailCommand(plugin, plugin.pluginMetas)
             )
             commands.register(
+                "unjail",
+                plugin.messageHandler.getMessage("unjail", "usage"),
+                UnjailCommand(plugin, plugin.pluginMetas)
+            )
+            commands.register(
                 "ban",
                 plugin.messageHandler.getMessage("ban", "usage"),
                 BanCommand(plugin, plugin.pluginMetas)
@@ -132,6 +137,12 @@ class CommandManager(private val plugin: PunisherX) {
                         commandName,
                         plugin.messageHandler.getMessage("jail", "usage"),
                         JailCommand(plugin, plugin.pluginMetas)
+                    )
+
+                    "unjail" -> commands.register(
+                        commandName,
+                        plugin.messageHandler.getMessage("unjail", "usage"),
+                        UnjailCommand(plugin, plugin.pluginMetas)
                     )
 
                     "ban" -> commands.register(
