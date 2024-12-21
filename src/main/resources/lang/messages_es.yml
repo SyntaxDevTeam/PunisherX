@@ -151,7 +151,7 @@ kick:
 
 # Mensajes del comando /check
 check:
-  usage: "Uso correcto: <gold>/check <nombre_jugador> <all|ban|mute|warn>"
+  usage: "Uso correcto: <gold>/check <nombre_jugador> <all|ban|jail|mute|warn>"
   invalid_type: "<red>Tipo de castigo no válido. Usa: all, ban, mute, warn.</red>"
   no_punishments: "<dark_green>El jugador <gold>{player}</gold> no tiene castigos.</dark_green>"
   title: "<dark_gray>Castigos activos para</dark_gray>"
