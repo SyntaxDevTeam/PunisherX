@@ -89,7 +89,7 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                         }
                     }
                     if (isForce) {
-                        plugin.logger.warning("Force-banned by ${stack.sender.name} on $player")
+                        plugin.logger.warning("Force-banned by ${stack.sender.name} on $playerOrIpOrUUID")
                     }
                 }
             } else {
