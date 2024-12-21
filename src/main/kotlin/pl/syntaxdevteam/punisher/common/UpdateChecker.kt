@@ -13,6 +13,8 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URI
 import java.io.File
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 @Suppress("UnstableApiUsage")
 class UpdateChecker(private val plugin: PunisherX, private val pluginMetas: PluginMeta, private val config: FileConfiguration) {
@@ -27,32 +29,38 @@ class UpdateChecker(private val plugin: PunisherX, private val pluginMetas: Plug
             return
         }
 
-        try {
-            val uri = URI(hangarApiUrl)
-            val url = uri.toURL()
-            val connection = url.openConnection() as HttpURLConnection
-            connection.requestMethod = "GET"
-            connection.connectTimeout = 5000
+        CompletableFuture.runAsync {
+            try {
+                val uri = URI(hangarApiUrl)
+                val url = uri.toURL()
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "GET"
+                connection.connectTimeout = 5000
+                connection.readTimeout = 5000
 
-            val responseCode = connection.responseCode
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                val responseBody = BufferedReader(InputStreamReader(connection.inputStream)).use { it.readText() }
-                val jsonObject = gson.fromJson(responseBody, JsonObject::class.java)
-                val versions = jsonObject.getAsJsonArray("result")
-                val latestVersion = versions.firstOrNull()?.asJsonObject
-                if (latestVersion != null && isNewerVersion(latestVersion.get("name").asString, pluginMetas.version)) {
-                    notifyUpdate(latestVersion)
-                    if (config.getBoolean("autoDownloadUpdates", false)) {
-                        downloadUpdate(latestVersion)
+                val responseCode = connection.responseCode
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    val responseBody = BufferedReader(InputStreamReader(connection.inputStream)).use { it.readText() }
+                    val jsonObject = gson.fromJson(responseBody, JsonObject::class.java)
+                    val versions = jsonObject.getAsJsonArray("result")
+                    val latestVersion = versions.firstOrNull()?.asJsonObject
+                    if (latestVersion != null && isNewerVersion(latestVersion.get("name").asString, pluginMetas.version)) {
+                        notifyUpdate(latestVersion)
+                        if (config.getBoolean("autoDownloadUpdates", false)) {
+                            downloadUpdate(latestVersion)
+                        }
+                    } else {
+                        plugin.logger.success("Your version is up to date")
                     }
                 } else {
-                    plugin.logger.success("Your version is up to date")
+                    plugin.logger.warning("Failed to check for updates: $responseCode")
                 }
-            } else {
-                plugin.logger.warning("Failed to check for updates: $responseCode")
+            } catch (e: Exception) {
+                plugin.logger.warning("An error occurred while checking for updates: ${e.message}")
             }
-        } catch (e: Exception) {
-            plugin.logger.warning("An error occurred while checking for updates: ${e.message}")
+        }.orTimeout(10, TimeUnit.SECONDS).exceptionally { e ->
+            plugin.logger.warning("Update check timed out or failed: ${e.message}")
+            null
         }
     }
 
