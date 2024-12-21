@@ -34,6 +34,7 @@ class PunisherX : JavaPlugin(), Listener {
     var playerIPManager: PlayerIPManager = PlayerIPManager(this, geoIPHandler)
     val uuidManager = UUIDManager(this)
     private lateinit var commandManager: CommandManager
+    lateinit var cache: PunishmentCache
 
     override fun onEnable() {
         setupConfig()
@@ -70,6 +71,7 @@ class PunisherX : JavaPlugin(), Listener {
         punishmentManager = PunishmentManager()
         geoIPHandler = GeoIPHandler(this)
         pluginsManager = PluginManager(this)
+        cache = PunishmentCache(this)
 
     }
 
