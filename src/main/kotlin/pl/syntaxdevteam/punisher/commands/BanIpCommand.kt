@@ -88,6 +88,9 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                             onlinePlayer.sendMessage(broadcastMessage)
                         }
                     }
+                    if (isForce) {
+                        plugin.logger.warning("Force-banned by ${stack.sender.name} on $player")
+                    }
                 }
             } else {
                 stack.sender.sendRichMessage(messageHandler.getMessage("error", "no_permission"))
