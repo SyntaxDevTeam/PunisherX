@@ -11,6 +11,29 @@ error:
   player_not_found: "<gold>Nie znaleziono gracza o nicku {player}.</gold>"
   reload: "<red>Wystąpił błąd podczas przełądowania konfiguracji:</red> "
   bypass: "<red><b>UWAGA!</b> Gracz <gold>{player}<gold/> <red>nie może otrzymać kary, ze zględu na swoje uprawnienia (OP lub bypass).</red>"
+  location_not_set: "location_not_set"
+
+# Wiadomości komendy /jail
+jail:
+  jail: "<green>Zamknąłeś gracza <gold>{player}</gold> w więzieniu za <gold>{reason}</gold> na czas <gold>{time}</green>"
+  usage: "Poprawne użycie to: <gold>/jail <nazwa_gracza> (czas) <powód>"
+  jail_message: "<red>Zostałeś/aś zesłany/a do więzienia za <b>{reason}</b> na czas <b>{time}</b></red>"
+  jail_info_message: "<red>Próbujesz coś powiedzieć, ale z więzienia nikt Cię nie słyszy</red>"
+  jail_restrict_message: "Opuszczenie obszaru więzienia jest zabronione. Zostałeś teleportowany z powrotem do wyznaczonego miejsca."
+  broadcast: "<dark_gray>Gracz <gray>{player}</gray> został zamknięty w więzieniu za <gray>{reason}</gray> na czas <gray>{time}</gray></dark_gray>"
+  log: "<dark_gray>Uwięziony gracz <gray>{player}</gray> <dark_gray>coś krzyczy ze swojej celi: <gray>{message}</gray>"
+  no_reasons: "bez powodu"
+  reasons:
+    - "Reklama"
+    - "Spam"
+    - "Obraza gracza"
+    - "Wulgarny język"
+
+# Wiadomości komendy /unjail
+unjail:
+  unjail: "<green>Wypuściłeś gracza <gold>{player}</gold></green>"
+  usage: "Poprawne użycie to: <gold>/unjail <nazwa_gracza>"
+  unjail_message: "<green>Zostałeś/aś wypuszczony/a z więzienia!</green>"
 
 # Wiadomości komendy /ban
 ban:
