@@ -4,16 +4,17 @@ import io.papermc.paper.event.player.AsyncChatEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import pl.syntaxdevteam.punisher.PunisherX
 import java.util.*
 
 class PunishmentChecker(private val plugin: PunisherX) : Listener {
-
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerPreLogin(event: AsyncPlayerPreLoginEvent) {
@@ -63,28 +64,37 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerChat(event: AsyncChatEvent) {
+        val player = event.player
+        val playerName = player.name
         try {
-            val player = event.player
-            val playerName = player.name
             val uuid = plugin.uuidManager.getUUID(playerName).toString()
             val messageComponent = event.message()
             val plainMessage = PlainTextComponentSerializer.plainText().serialize(messageComponent)
+
             val punishments = plugin.databaseHandler.getPunishments(uuid)
             if (punishments.isEmpty()) {
-                plugin.logger.debug("No punishments found for player: ${player.name}")
+                plugin.logger.debug("No punishments found for player: $playerName")
                 return
             }
 
-            punishments.forEach { punishment ->
-                if (punishment.type == "MUTE" && plugin.punishmentManager.isPunishmentActive(punishment)) {
-                    val endTime = punishment.end
-                    val remainingTime = (endTime - System.currentTimeMillis()) / 1000
-                    val duration = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(remainingTime.toString())
-                    val reason = punishment.reason
+            for (punishment in punishments) {
+                if ((punishment.type == "MUTE" || punishment.type == "JAIL") && plugin.punishmentManager.isPunishmentActive(punishment)) {
                     event.isCancelled = true
-                    val muteMessage = plugin.messageHandler.getMessage("mute", "mute_info_message", mapOf("reason" to reason, "time" to duration))
-                    val formattedMessage = MiniMessage.miniMessage().deserialize(muteMessage)
-                    val logMessage = plugin.messageHandler.getLogMessage("mute", "log", mapOf("player" to playerName, "message" to plainMessage))
+                    val endTime = punishment.end
+                    val remainingTime = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(((endTime - System.currentTimeMillis()) / 1000).toString())
+                    val reason = punishment.reason
+                    val messageKey = if (punishment.type == "JAIL") "jail" else "mute"
+                    val infoMessage = plugin.messageHandler.getMessage(
+                        messageKey,
+                        "mute_info_message",
+                        mapOf("reason" to reason, "time" to remainingTime)
+                    )
+                    val formattedMessage = MiniMessage.miniMessage().deserialize(infoMessage)
+                    val logMessage = plugin.messageHandler.getLogMessage(
+                        messageKey,
+                        "log",
+                        mapOf("player" to playerName, "message" to plainMessage)
+                    )
                     val logFormattedMessage = MiniMessage.miniMessage().deserialize(logMessage)
                     plugin.logger.clearLog(logFormattedMessage)
                     player.sendMessage(formattedMessage)
@@ -95,17 +105,16 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                 }
             }
         } catch (e: Exception) {
-            plugin.logger.severe("Error in onPlayerChat, report it urgently to the plugin author with the message: ${e.message}")
+            plugin.logger.severe("Error in onPlayerChat, report it urgently to the plugin author: ${e.message}")
             e.printStackTrace()
         }
     }
-
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerCommand(event: PlayerCommandPreprocessEvent) {
         try {
             val player = event.player
-            val uuid = player.uniqueId.toString()
+            val uuid = plugin.uuidManager.getUUID(player.name).toString()
             val command = event.message.split(" ")[0].lowercase(Locale.getDefault()).removePrefix("/")
 
             if (plugin.config.getBoolean("mute_pm")) {
@@ -132,6 +141,35 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         } catch (e: Exception) {
             plugin.logger.severe("Error in onPlayerCommand, report it urgently to the plugin author with the message: ${event.player.name}: ${e.message}")
             e.printStackTrace()
+        }
+    }
+
+    private fun isPlayerInJail(playerLocation: Location, jailCenter: Location, radius: Double): Boolean {
+        return playerLocation.world == jailCenter.world &&
+                playerLocation.distance(jailCenter) <= radius
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun onPlayerMove(event: PlayerMoveEvent) {
+        val player = event.player
+        val uuid = plugin.uuidManager.getUUID(player.name)
+        val jailLocation = JailUtils.getJailLocation(plugin.config) ?: return
+        val punishmentEnd = plugin.cache.getPunishmentEnd(uuid) ?: return
+
+        if (!plugin.cache.isPlayerInCache(uuid)) {
+            return
+        }
+
+        if (punishmentEnd != -1L && punishmentEnd < System.currentTimeMillis()) {
+            plugin.cache.removePunishment(uuid)
+            return
+        }
+
+        val radius = plugin.config.getDouble("jail.radius", 10.0)
+        if (!isPlayerInJail(player.location, jailLocation, radius)) {
+            player.teleport(jailLocation)
+            val message = plugin.messageHandler.getMessage("jail", "jail_restrict_message", mapOf())
+            player.sendRichMessage(message)
         }
     }
 }
