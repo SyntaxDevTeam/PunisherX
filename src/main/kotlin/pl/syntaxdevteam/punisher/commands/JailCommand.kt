@@ -67,7 +67,7 @@ class JailCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
         targetPlayer?.apply {
             gameMode = GameMode.ADVENTURE
             teleport(jailLocation)
-            plugin.logger.info("Changing gamemode (${gameMode}) and teleporting ${name} to $jailLocation")
+            plugin.logger.info("Changing gamemode ($gameMode) and teleporting $name to $jailLocation")
 
             plugin.databaseHandler.addPunishment(name, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
             plugin.databaseHandler.addPunishmentHistory(name, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
