@@ -63,11 +63,26 @@ class PunishmentCache(private val plugin: PunisherX) {
             val type = object : TypeToken<Map<String, Long>>() {}.type
             val map: Map<String, Long> = gson.fromJson(json, type)
             map.forEach { (key, value) ->
-                cache[UUID.fromString(key)] = value
+                if (isValidUUID(key)) {
+                    cache[UUID.fromString(key)] = value
+                } else {
+                    plugin.logger.warning("Nieprawidłowy UUID w cache: $key. Pomijam ten wpis.")
+                }
             }
             plugin.logger.debug("Wczytano ${cache.size} wpisów do cache.")
         } catch (e: IOException) {
             plugin.logger.severe("Błąd podczas wczytywania cache: ${e.message}")
+        } catch (e: Exception) {
+            plugin.logger.severe("Nieoczekiwany błąd podczas wczytywania cache: ${e.message}")
+        }
+    }
+
+    private fun isValidUUID(uuid: String): Boolean {
+        return try {
+            UUID.fromString(uuid)
+            true
+        } catch (e: IllegalArgumentException) {
+            false
         }
     }
 
