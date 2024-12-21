@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.2] - 2024-12-23
+### Added
+- New command `/jail`, `/unjail`
+
+### Fixed
+- Minor bug fixes in the punishment system.
+
+
 ## [1.2.2] - 2024-12-15
 ### Added
 - Ability to publish on Hangar using Gradle for faster plugin update releases.
