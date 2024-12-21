@@ -35,9 +35,18 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                         return
                     }
                     val targetPlayer = Bukkit.getPlayer(playerOrIpOrUUID)
-                    if (targetPlayer != null && targetPlayer.hasPermission("punisherx.bypass.banip")) {
-                        stack.sender.sendRichMessage(messageHandler.getMessage("error", "bypass", mapOf("player" to playerOrIpOrUUID)))
-                        return
+                    val isForce = args.contains("--force")
+                    if (targetPlayer != null) {
+                        if (!isForce && targetPlayer.hasPermission("punisherx.bypass.banip")) {
+                            stack.sender.sendRichMessage(
+                                messageHandler.getMessage(
+                                    "error",
+                                    "bypass",
+                                    mapOf("player" to playerOrIpOrUUID)
+                                )
+                            )
+                            return
+                        }
                     }
 
                     var gtime: String?
@@ -45,10 +54,10 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                     try {
                         gtime = args[1]
                         timeHandler.parseTime(gtime)
-                        reason = args.slice(2 until args.size).joinToString(" ")
+                        reason = args.slice(2 until args.size).filterNot { it == "--force" }.joinToString(" ")
                     } catch (e: NumberFormatException) {
                         gtime = null
-                        reason = args.slice(1 until args.size).joinToString(" ")
+                        reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
                     }
 
                     val punishmentType = "BANIP"

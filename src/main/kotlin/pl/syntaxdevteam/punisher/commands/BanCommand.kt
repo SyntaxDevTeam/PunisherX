@@ -30,9 +30,12 @@ class BanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basic
                 } else {
                     val player = args[0]
                     val targetPlayer = Bukkit.getPlayer(player)
-                    if (targetPlayer != null && targetPlayer.hasPermission("punisherx.bypass.ban")) {
-                        stack.sender.sendRichMessage(messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
-                        return
+                    val isForce = args.contains("--force")
+                    if (targetPlayer != null) {
+                        if (!isForce && targetPlayer.hasPermission("punisherx.bypass.ban")) {
+                            stack.sender.sendRichMessage(messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
+                            return
+                        }
                     }
                     val uuid = uuidManager.getUUID(player).toString()
                     var gtime: String?
@@ -40,10 +43,10 @@ class BanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basic
                     try {
                         gtime = args[1]
                         timeHandler.parseTime(gtime)
-                        reason = args.slice(2 until args.size).joinToString(" ")
+                        reason = args.slice(2 until args.size).filterNot { it == "--force" }.joinToString(" ")
                     } catch (e: NumberFormatException) {
                         gtime = null
-                        reason = args.slice(1 until args.size).joinToString(" ")
+                        reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
                     }
 
                     val punishmentType = "BAN"
@@ -76,6 +79,10 @@ class BanCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basic
                             onlinePlayer.sendMessage(broadcastMessage)
                         }
                     }
+                    if (isForce) {
+                        plugin.logger.warning("Force-banned by ${stack.sender.name} on $player")
+                    }
+
                 }
             } else {
                 stack.sender.sendRichMessage(messageHandler.getMessage("error", "no_permission"))

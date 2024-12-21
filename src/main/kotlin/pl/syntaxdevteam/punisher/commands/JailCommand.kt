@@ -35,12 +35,15 @@ class JailCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
         val playerName = args[0]
         val targetPlayer = Bukkit.getPlayer(playerName)
         val uuid = uuidManager.getUUID(playerName)
+        val isForce = args.contains("--force")
 
-        if (targetPlayer != null && targetPlayer.hasPermission("punisherx.bypass.jail")) {
-            stack.sender.sendRichMessage(
-                messageHandler.getMessage("error", "bypass", mapOf("player" to playerName))
-            )
-            return
+        if (targetPlayer != null) {
+            if (!isForce && targetPlayer.hasPermission("punisherx.bypass.jail")) {
+                stack.sender.sendRichMessage(
+                    messageHandler.getMessage("error", "bypass", mapOf("player" to playerName))
+                )
+                return
+            }
         }
 
         var gtime: String?
@@ -48,10 +51,10 @@ class JailCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
         try {
             gtime = args[1]
             timeHandler.parseTime(gtime)
-            reason = args.slice(2 until args.size).joinToString(" ")
+            reason = args.slice(2 until args.size).filterNot { it == "--force" }.joinToString(" ")
         } catch (e: NumberFormatException) {
             gtime = null
-            reason = args.slice(1 until args.size).joinToString(" ")
+            reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
         }
 
         val punishmentType = "JAIL"
