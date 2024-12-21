@@ -19,4 +19,16 @@ object JailUtils {
         }
         return location
     }
+
+    fun setJailLocation(config: FileConfiguration, location: Location, radius: Double): Boolean {
+        val world = location.world?.name ?: return false
+
+        config.set("jail.location.world", world)
+        config.set("jail.location.x", location.x)
+        config.set("jail.location.y", location.y)
+        config.set("jail.location.z", location.z)
+        config.set("jail.radius", radius)
+
+        return true
+    }
 }

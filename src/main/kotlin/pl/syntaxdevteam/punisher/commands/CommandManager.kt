@@ -58,6 +58,11 @@ class CommandManager(private val plugin: PunisherX) {
                 UnMuteCommand(plugin, plugin.pluginMetas)
             )
             commands.register(
+                "setjail",
+                plugin.messageHandler.getMessage("setjail", "usage"),
+                SetjailCommand(plugin, plugin.pluginMetas)
+            )
+            commands.register(
                 "jail",
                 plugin.messageHandler.getMessage("jail", "usage"),
                 JailCommand(plugin, plugin.pluginMetas)
@@ -131,6 +136,12 @@ class CommandManager(private val plugin: PunisherX) {
                     "unmute" -> commands.register(
                         commandName, plugin.messageHandler.getMessage("mute", "usage"),
                         UnMuteCommand(plugin, plugin.pluginMetas)
+                    )
+
+                    "setjail" -> commands.register(
+                        commandName,
+                        plugin.messageHandler.getMessage("setjail", "usage"),
+                        SetjailCommand(plugin, plugin.pluginMetas)
                     )
 
                     "jail" -> commands.register(
