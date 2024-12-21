@@ -1,4 +1,4 @@
-# Datei übersetzt mit Chat GPT, wenn Sie der Meinung sind, dass sie Korrekturen benötigt, lassen Sie es uns auf Discord wissen (https://discord.gg/Zk6mxv7eMh).
+# Datei übersetzt mit ChatGPT, wenn Sie der Meinung sind, dass sie Korrekturen benötigt, lassen Sie es uns auf Discord wissen (https://discord.gg/Zk6mxv7eMh).
 # Formatierung der Nachrichtentexte:
 # Sie können MiniMessage- und Legacy (Minecraft)-Formatierung verwenden.
 # Beispiele zur Verwendung von MiniMessage: https://docs.advntr.dev/minimessage/format.html
@@ -12,6 +12,28 @@ error:
   player_not_found: "<gold>Spieler mit dem Namen {player} nicht gefunden.</gold>"
   reload: "<red>Beim Neuladen der Konfiguration ist ein Fehler aufgetreten:</red> "
   bypass: "<red><b>ACHTUNG!</b> Spieler <gold>{player}<gold/> <red>kann nicht bestraft werden, da er über spezielle Rechte (OP oder Bypass) verfügt.</red>"
+
+# Nachrichten für den Befehl /jail
+jail:
+  jail: "<green>Du hast den Spieler <gold>{player}</gold> für <gold>{reason}</gold> für <gold>{time}</green> eingesperrt"
+  usage: "Die korrekte Verwendung ist: <gold>/jail <spielername> (zeit) <grund>"
+  jail_message: "<red>Du wurdest für <b>{reason}</b> für <b>{time}</b> eingesperrt</red>"
+  jail_info_message: "<red>Du versuchst etwas zu sagen, aber niemand kann dich aus dem Gefängnis hören</red>"
+  jail_restrict_message: "Das Verlassen des Gefängnisbereichs ist verboten. Du wurdest zurück zu deinem zugewiesenen Ort teleportiert."
+  broadcast: "<dark_gray>Der Spieler <gray>{player}</gray> wurde für <gray>{reason}</gray> für <gray>{time}</gray> eingesperrt</dark_gray>"
+  log: "<dark_gray>Der eingesperrte Spieler <gray>{player}</gray> <dark_gray>schreit aus seiner Zelle: <gray>{message}</gray>"
+  no_reasons: "ohne Grund"
+  reasons:
+    - "Werbung"
+    - "Spam"
+    - "Spielerbeleidigung"
+    - "Vulgäre Sprache"
+
+# Nachrichten für den Befehl /unjail
+unjail:
+  unjail: "<green>Du hast den Spieler <gold>{player}</gold> freigelassen</green>"
+  usage: "Die korrekte Verwendung ist: <gold>/unjail <spielername>"
+  unjail_message: "<green>Du wurdest aus dem Gefängnis entlassen!</green>"
 
 # Nachrichten für den /ban-Befehl
 ban:
