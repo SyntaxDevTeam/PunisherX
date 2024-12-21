@@ -25,12 +25,21 @@ class KickCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
                 } else {
                     val player = args[0]
                     val targetPlayer = Bukkit.getPlayer(player)
-                    if (targetPlayer != null && targetPlayer.hasPermission("punisherx.bypass.kick")) {
-                        stack.sender.sendRichMessage(messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
-                        return
+                    val isForce = args.contains("--force")
+                    if (targetPlayer != null) {
+                        if (!isForce && targetPlayer.hasPermission("punisherx.bypass.kick")) {
+                            stack.sender.sendRichMessage(
+                                messageHandler.getMessage(
+                                    "error",
+                                    "bypass",
+                                    mapOf("player" to player)
+                                )
+                            )
+                            return
+                        }
                     }
                     val uuid = uuidManager.getUUID(player).toString()
-                    val reason = args.slice(1 until args.size).joinToString(" ")
+                    val reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
                     val punishmentType = "KICK"
                     val start = System.currentTimeMillis()
 
