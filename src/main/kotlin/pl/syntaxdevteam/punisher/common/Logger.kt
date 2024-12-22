@@ -10,8 +10,8 @@ import pl.syntaxdevteam.punisher.PunisherX
 
 @Suppress("UnstableApiUsage")
 class Logger(plugin: PunisherX, private val debugMode: Boolean) {
-    private val plName = plugin.pluginMetas.name
-    private val plVer = plugin.pluginMetas.version
+    private val plName = plugin.pluginMeta.name
+    private val plVer = plugin.pluginMeta.version
     private val serverVersion = plugin.server.version
     private val serverName = plugin.server.name
 

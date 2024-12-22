@@ -17,11 +17,9 @@ import java.util.*
 
 @Suppress("UnstableApiUsage", "unused")
 class PunisherX : JavaPlugin(), Listener {
-    val pluginMetas = this.pluginMeta
     private val configHandler by lazy { ConfigHandler(this) }
     private val config: FileConfiguration = configHandler.getConfig()
-    private var debugMode = config.getBoolean("debug")
-    var logger: Logger = Logger(this, debugMode)
+    var logger: Logger = Logger(this, config.getBoolean("debug"))
     private val language = config.getString("language") ?: "EN"
     private lateinit var pluginsManager: PluginManager
     private lateinit var statsCollector: StatsCollector
@@ -52,7 +50,7 @@ class PunisherX : JavaPlugin(), Listener {
     override fun onDisable() {
         databaseHandler.closeConnection()
         AsyncChatEvent.getHandlerList().unregister(this as Plugin)
-        logger.err(pluginMetas.name + " " + pluginMetas.version + " has been disabled ☹️")
+        logger.err(this.pluginMeta.name + " " + this.pluginMeta.version + " has been disabled ☹️")
     }
 
     private fun setupConfig() {

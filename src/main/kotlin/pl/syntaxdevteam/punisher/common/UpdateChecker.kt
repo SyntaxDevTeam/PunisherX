@@ -17,8 +17,8 @@ import java.util.concurrent.TimeUnit
 @Suppress("UnstableApiUsage")
 class UpdateChecker(private val plugin: PunisherX) {
 
-    private val hangarApiUrl = "https://hangar.papermc.io/api/v1/projects/${plugin.pluginMetas.name}/versions"
-    private val pluginUrl = "https://hangar.papermc.io/SyntaxDevTeam/${plugin.pluginMetas.name}"
+    private val hangarApiUrl = "https://hangar.papermc.io/api/v1/projects/${plugin.pluginMeta.name}/versions"
+    private val pluginUrl = "https://hangar.papermc.io/SyntaxDevTeam/${plugin.pluginMeta.name}"
     private val gson = Gson()
 
     fun checkForUpdates() {
@@ -42,7 +42,7 @@ class UpdateChecker(private val plugin: PunisherX) {
                     val jsonObject = gson.fromJson(responseBody, JsonObject::class.java)
                     val versions = jsonObject.getAsJsonArray("result")
                     val latestVersion = versions.firstOrNull()?.asJsonObject
-                    if (latestVersion != null && isNewerVersion(latestVersion.get("name").asString, plugin.pluginMetas.version)) {
+                    if (latestVersion != null && isNewerVersion(latestVersion.get("name").asString, plugin.pluginMeta.version)) {
                         notifyUpdate(latestVersion)
                         if (plugin.config.getBoolean("autoDownloadUpdates", false)) {
                             downloadUpdate(latestVersion)
@@ -136,7 +136,7 @@ class UpdateChecker(private val plugin: PunisherX) {
 
     private fun notifyAdmins(message: Component) {
         for (player in Bukkit.getOnlinePlayers()) {
-            if (player.hasPermission("${plugin.pluginMetas.name}.update.notify")) {
+            if (player.hasPermission("${plugin.pluginMeta.name}.update.notify")) {
                 player.sendMessage(message)
             }
         }
