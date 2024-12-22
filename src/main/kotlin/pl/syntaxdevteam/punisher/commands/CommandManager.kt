@@ -36,7 +36,7 @@ class CommandManager(private val plugin: PunisherX) {
             commands.register(
                 "kick",
                 plugin.messageHandler.getMessage("kick", "usage"),
-                KickCommand(plugin, plugin.pluginMetas)
+                KickCommand(plugin)
             )
             commands.register(
                 "warn",
@@ -112,7 +112,7 @@ class CommandManager(private val plugin: PunisherX) {
                     "kick" -> commands.register(
                         commandName,
                         plugin.messageHandler.getMessage("kick", "usage"),
-                        KickCommand(plugin, plugin.pluginMetas)
+                        KickCommand(plugin)
                     )
 
                     "warn" -> commands.register(
