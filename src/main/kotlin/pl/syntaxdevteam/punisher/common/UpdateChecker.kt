@@ -2,11 +2,9 @@ package pl.syntaxdevteam.punisher.common
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import io.papermc.paper.plugin.configuration.PluginMeta
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
-import org.bukkit.configuration.file.FileConfiguration
 import pl.syntaxdevteam.punisher.PunisherX
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -17,14 +15,14 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 @Suppress("UnstableApiUsage")
-class UpdateChecker(private val plugin: PunisherX, private val pluginMetas: PluginMeta, private val config: FileConfiguration) {
+class UpdateChecker(private val plugin: PunisherX) {
 
-    private val hangarApiUrl = "https://hangar.papermc.io/api/v1/projects/${pluginMetas.name}/versions"
-    private val pluginUrl = "https://hangar.papermc.io/SyntaxDevTeam/${pluginMetas.name}"
+    private val hangarApiUrl = "https://hangar.papermc.io/api/v1/projects/${plugin.pluginMetas.name}/versions"
+    private val pluginUrl = "https://hangar.papermc.io/SyntaxDevTeam/${plugin.pluginMetas.name}"
     private val gson = Gson()
 
     fun checkForUpdates() {
-        if (!config.getBoolean("checkForUpdates", true)) {
+        if (!plugin.config.getBoolean("checkForUpdates", true)) {
             plugin.logger.debug("Update check is disabled in the config.")
             return
         }
@@ -44,9 +42,9 @@ class UpdateChecker(private val plugin: PunisherX, private val pluginMetas: Plug
                     val jsonObject = gson.fromJson(responseBody, JsonObject::class.java)
                     val versions = jsonObject.getAsJsonArray("result")
                     val latestVersion = versions.firstOrNull()?.asJsonObject
-                    if (latestVersion != null && isNewerVersion(latestVersion.get("name").asString, pluginMetas.version)) {
+                    if (latestVersion != null && isNewerVersion(latestVersion.get("name").asString, plugin.pluginMetas.version)) {
                         notifyUpdate(latestVersion)
-                        if (config.getBoolean("autoDownloadUpdates", false)) {
+                        if (plugin.config.getBoolean("autoDownloadUpdates", false)) {
                             downloadUpdate(latestVersion)
                         }
                     } else {
@@ -138,7 +136,7 @@ class UpdateChecker(private val plugin: PunisherX, private val pluginMetas: Plug
 
     private fun notifyAdmins(message: Component) {
         for (player in Bukkit.getOnlinePlayers()) {
-            if (player.hasPermission("${pluginMetas.name}.update.notify")) {
+            if (player.hasPermission("${plugin.pluginMetas.name}.update.notify")) {
                 player.sendMessage(message)
             }
         }

@@ -3,30 +3,26 @@ package pl.syntaxdevteam.punisher.commands
 import org.jetbrains.annotations.NotNull
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import io.papermc.paper.plugin.configuration.PluginMeta
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.common.MessageHandler
 import pl.syntaxdevteam.punisher.basic.JailUtils
 
 @Suppress("UnstableApiUsage")
-class SetjailCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : BasicCommand {
-
-    private val messageHandler = MessageHandler(plugin, pluginMetas)
+class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (stack.sender !is Player) {
-            stack.sender.sendMessage(messageHandler.getLogMessage("error", "console"))
+            stack.sender.sendMessage(plugin.messageHandler.getLogMessage("error", "console"))
             return
         }
 
         if (!stack.sender.hasPermission("punisherx.setjail")) {
-            stack.sender.sendRichMessage(messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
             return
         }
 
         if (args.isEmpty() || !args[0].equals("radius", ignoreCase = true)) {
-            stack.sender.sendRichMessage(messageHandler.getMessage("setjail", "usage"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("setjail", "usage"))
             return
         }
 
@@ -35,7 +31,7 @@ class SetjailCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : B
 
         val radius = if (args.size > 1) args[1].toDoubleOrNull() else null
         if (radius == null || radius <= 0) {
-            stack.sender.sendRichMessage(messageHandler.getMessage("error", "invalid_radius"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "invalid_radius"))
             return
         }
 
@@ -48,7 +44,7 @@ class SetjailCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : B
         if (JailUtils.setJailLocation(plugin.config, location, radius)) {
             plugin.saveConfig()
             stack.sender.sendRichMessage(
-                messageHandler.getMessage(
+                plugin.messageHandler.getMessage(
                     "setjail", "set", mapOf(
                         "world" to world,
                         "locationx" to locationX,
@@ -59,7 +55,7 @@ class SetjailCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : B
                 )
             )
         } else {
-            stack.sender.sendRichMessage(messageHandler.getMessage("setjail", "set_error"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("setjail", "set_error"))
         }
     }
 

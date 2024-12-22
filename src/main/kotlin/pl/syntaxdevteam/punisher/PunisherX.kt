@@ -21,7 +21,7 @@ class PunisherX : JavaPlugin(), Listener {
     private val configHandler by lazy { ConfigHandler(this) }
     private val config: FileConfiguration = configHandler.getConfig()
     private var debugMode = config.getBoolean("debug")
-    var logger: Logger = Logger(pluginMetas, debugMode)
+    var logger: Logger = Logger(this, debugMode)
     private val language = config.getString("language") ?: "EN"
     private lateinit var pluginsManager: PluginManager
     private lateinit var statsCollector: StatsCollector
@@ -60,14 +60,14 @@ class PunisherX : JavaPlugin(), Listener {
     }
 
     private fun setupDatabase() {
-        databaseHandler = DatabaseHandler(this, config)
+        databaseHandler = DatabaseHandler(this)
         databaseHandler.openConnection()
         databaseHandler.createTables()
     }
 
     private fun setupHandlers() {
-        messageHandler = MessageHandler(this, pluginMetas).apply { initial() }
-        timeHandler = TimeHandler(this, pluginMetas)
+        messageHandler = MessageHandler(this).apply { initial() }
+        timeHandler = TimeHandler(this)
         punishmentManager = PunishmentManager()
         geoIPHandler = GeoIPHandler(this)
         pluginsManager = PluginManager(this)
@@ -87,7 +87,7 @@ class PunisherX : JavaPlugin(), Listener {
 
     private fun checkForUpdates() {
         statsCollector = StatsCollector(this)
-        updateChecker = UpdateChecker(this, pluginMetas, config)
+        updateChecker = UpdateChecker(this)
         updateChecker.checkForUpdates()
     }
 
@@ -103,7 +103,7 @@ class PunisherX : JavaPlugin(), Listener {
         } catch (e: Exception) {
             logger.err(messageHandler.getMessage("error", "reload") + e.message)
         }
-        databaseHandler = DatabaseHandler(this, this.config)
+        databaseHandler = DatabaseHandler(this)
         databaseHandler.openConnection()
         databaseHandler.createTables()
 

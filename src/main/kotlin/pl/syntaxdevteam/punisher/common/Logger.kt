@@ -7,11 +7,15 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.kyori.adventure.text.minimessage.MiniMessage
+import org.bukkit.plugin.java.JavaPlugin
+import pl.syntaxdevteam.punisher.PunisherX
 
 @Suppress("UnstableApiUsage")
-class Logger(pluginMetas: PluginMeta, private val debugMode: Boolean) {
-    private val plName = pluginMetas.name
-    private val plVer = pluginMetas.version
+class Logger(private val plugin: PunisherX, private val debugMode: Boolean) {
+    private val plName = plugin.pluginMetas.name
+    private val plVer = plugin.pluginMetas.version
+    private val serverVersion = plugin.server.version
+    private val serverName = plugin.server.name
 
     private fun clear(s: String?) {
         Bukkit.getConsoleSender().sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(s!!))
@@ -66,7 +70,7 @@ class Logger(pluginMetas: PluginMeta, private val debugMode: Boolean) {
         for ((pluginName, pluginVersion) in pluginsByPriority) {
             clear("&9                     &f * $pluginName v$pluginVersion")
         }
-        clear("&9                 utilizing all the optimizations of your server engine!         ")
+        clear("&9                 utilizing all the optimizations of your server $serverName $serverVersion!         ")
         clear("")
         clear("&a    Join our Discord! &9&lhttps://discord.gg/Zk6mxv7eMh")
         clear("")

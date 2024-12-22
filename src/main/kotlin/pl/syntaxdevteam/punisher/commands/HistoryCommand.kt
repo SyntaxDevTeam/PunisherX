@@ -2,23 +2,18 @@ package pl.syntaxdevteam.punisher.commands
 
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import io.papermc.paper.plugin.configuration.PluginMeta
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.common.MessageHandler
-import pl.syntaxdevteam.punisher.common.UUIDManager
 import pl.syntaxdevteam.punisher.players.PlayerIPManager
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Suppress("UnstableApiUsage")
-class HistoryCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, private val playerIPManager: PlayerIPManager) :
+class HistoryCommand(private val plugin: PunisherX, private val playerIPManager: PlayerIPManager) :
     BasicCommand {
 
-    private val uuidManager = UUIDManager(plugin)
-    private val messageHandler = MessageHandler(plugin, pluginMetas)
     private val dateFormat = SimpleDateFormat("yy-MM-dd HH:mm:ss")
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
@@ -30,7 +25,7 @@ class HistoryCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, pri
             val offset = (page - 1) * limit
 
             if (player.equals(senderName, ignoreCase = true) || stack.sender.hasPermission("punisherx.history")) {
-                val uuid = uuidManager.getUUID(player)
+                val uuid = plugin.uuidManager.getUUID(player)
                 val targetPlayer = when (Bukkit.getPlayer(player)?.name) {
                     null -> Bukkit.getOfflinePlayer(uuid).name
                     else -> Bukkit.getPlayer(player)?.name
@@ -38,13 +33,13 @@ class HistoryCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, pri
                 val punishments = plugin.databaseHandler.getPunishmentHistory(uuid.toString(), limit, offset)
 
                 if (punishments.isEmpty()) {
-                    stack.sender.sendRichMessage(messageHandler.getMessage("history", "no_punishments", mapOf("player" to player)))
+                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("history", "no_punishments", mapOf("player" to player)))
                 } else {
-                    val id = messageHandler.getLogMessage("history", "id")
-                    val types = messageHandler.getLogMessage("history", "type")
-                    val reasons = messageHandler.getLogMessage("history", "reason")
-                    val times = messageHandler.getLogMessage("history", "time")
-                    val title = messageHandler.getLogMessage("history", "title")
+                    val id = plugin.messageHandler.getLogMessage("history", "id")
+                    val types = plugin.messageHandler.getLogMessage("history", "type")
+                    val reasons = plugin.messageHandler.getLogMessage("history", "reason")
+                    val times = plugin.messageHandler.getLogMessage("history", "time")
+                    val title = plugin.messageHandler.getLogMessage("history", "title")
                     val playerIP = playerIPManager.getPlayerIPByName(player)
                     plugin.logger.debug("Player IP: $playerIP")
                     val geoLocation = playerIP?.let { ip ->
@@ -88,10 +83,10 @@ class HistoryCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, pri
                     stack.sender.sendMessage(navigation)
                 }
             } else {
-                stack.sender.sendRichMessage(messageHandler.getMessage("history", "no_permission"))
+                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("history", "no_permission"))
             }
         } else {
-            stack.sender.sendRichMessage(messageHandler.getMessage("history", "usage"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("history", "usage"))
         }
     }
 
