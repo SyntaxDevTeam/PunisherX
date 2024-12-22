@@ -7,20 +7,15 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.common.MessageHandler
-import pl.syntaxdevteam.punisher.common.UUIDManager
 
 @Suppress("UnstableApiUsage")
 class KickCommand(private val plugin: PunisherX) : BasicCommand {
-
-    private val uuidManager = UUIDManager(plugin)
-    private val messageHandler = MessageHandler(plugin)
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (args.isNotEmpty()) {
             if (stack.sender.hasPermission("punisherx.kick")) {
                 if (args.size < 2) {
-                    stack.sender.sendRichMessage(messageHandler.getMessage("kick", "usage"))
+                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("kick", "usage"))
                 } else {
                     val player = args[0]
                     val targetPlayer = Bukkit.getPlayer(player)
@@ -28,7 +23,7 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                     if (targetPlayer != null) {
                         if (!isForce && targetPlayer.hasPermission("punisherx.bypass.kick")) {
                             stack.sender.sendRichMessage(
-                                messageHandler.getMessage(
+                                plugin.messageHandler.getMessage(
                                     "error",
                                     "bypass",
                                     mapOf("player" to player)
@@ -37,7 +32,7 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                             return
                         }
                     }
-                    val uuid = uuidManager.getUUID(player).toString()
+                    val uuid = plugin.uuidManager.getUUID(player).toString()
                     val reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
                     val punishmentType = "KICK"
                     val start = System.currentTimeMillis()
@@ -45,7 +40,7 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                     plugin.databaseHandler.addPunishmentHistory(player, uuid, reason, stack.sender.name, punishmentType, start, start)
 
                     if (targetPlayer != null) {
-                        val kickMessages = messageHandler.getComplexMessage("kick", "kick_message", mapOf("reason" to reason))
+                        val kickMessages = plugin.messageHandler.getComplexMessage("kick", "kick_message", mapOf("reason" to reason))
                         val kickMessage = Component.text()
                         kickMessages.forEach { line ->
                             kickMessage.append(line)
@@ -53,9 +48,9 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                         }
                         targetPlayer.kick(kickMessage.build())
                     }
-                    stack.sender.sendRichMessage(messageHandler.getMessage("kick", "kick", mapOf("player" to player, "reason" to reason)))
+                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("kick", "kick", mapOf("player" to player, "reason" to reason)))
                     val permission = "punisherx.see.kick"
-                    val broadcastMessage = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("kick", "broadcast", mapOf("player" to player, "reason" to reason)))
+                    val broadcastMessage = MiniMessage.miniMessage().deserialize(plugin.messageHandler.getMessage("kick", "broadcast", mapOf("player" to player, "reason" to reason)))
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if (onlinePlayer.hasPermission(permission)) {
                             onlinePlayer.sendMessage(broadcastMessage)
@@ -63,17 +58,17 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                     }
                 }
             } else {
-                stack.sender.sendRichMessage(messageHandler.getMessage("error", "no_permission"))
+                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
             }
         } else {
-            stack.sender.sendRichMessage(messageHandler.getMessage("kick", "usage"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("kick", "usage"))
         }
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
-            2 -> messageHandler.getReasons("kick", "reasons")
+            2 -> plugin.messageHandler.getReasons("kick", "reasons")
             else -> emptyList()
         }
     }

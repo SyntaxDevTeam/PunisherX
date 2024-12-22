@@ -14,7 +14,6 @@ import java.util.*
 @Suppress("UnstableApiUsage")
 class BanCommand(private val plugin: PunisherX) : BasicCommand {
 
-
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (args.isNotEmpty()) {
             if (stack.sender.hasPermission("punisherx.ban")) {
