@@ -4,6 +4,8 @@ import io.papermc.paper.event.player.AsyncChatEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+import org.bukkit.Bukkit
+import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -162,14 +164,45 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
         if (punishmentEnd != -1L && punishmentEnd < System.currentTimeMillis()) {
             plugin.cache.removePunishment(uuid)
+            player.gameMode = GameMode.SURVIVAL
             return
         }
 
         val radius = plugin.config.getDouble("jail.radius", 10.0)
-        if (!isPlayerInJail(player.location, jailLocation, radius)) {
-            player.teleport(jailLocation)
-            val message = plugin.messageHandler.getMessage("jail", "jail_restrict_message", mapOf())
-            player.sendRichMessage(message)
+        if (plugin.server.name.contains("Folia")) {
+            // Obsługa Folia
+            Bukkit.getServer().regionScheduler.execute(plugin, jailLocation) {
+                try {
+                    val isInJail = isPlayerInJail(player.location, jailLocation, radius)
+                    if (!isInJail) {
+                        Bukkit.getServer().globalRegionScheduler.execute(plugin) {
+                            player.teleportAsync(jailLocation).thenAccept { success ->
+                                if (success) {
+                                    val message = plugin.messageHandler.getMessage(
+                                        "jail",
+                                        "jail_restrict_message",
+                                        mapOf()
+                                    )
+                                    player.sendRichMessage(message)
+                                } else {
+                                    plugin.logger.debug("<red>Failed to teleport player back to jail in Folia.</red>")
+                                }
+                            }.exceptionally { throwable ->
+                                plugin.logger.debug("<red>Error while teleporting back to jail: ${throwable.message}</red>")
+                                null
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    plugin.logger.debug("<red>Error while checking player in jail: ${e.message}</red>")
+                }
+            }
+        } else {
+            if (!isPlayerInJail(player.location, jailLocation, radius)) {
+                player.teleport(jailLocation)
+                val message = plugin.messageHandler.getMessage("jail", "jail_restrict_message", mapOf())
+                player.sendRichMessage(message)
+            }
         }
     }
 }

@@ -55,13 +55,14 @@ WarnActions:
   7: "ban {player} 30d You have received your {warn_no}th warning!"
   10: "ban {player} You have received your 10th warning!"
 
+# Settings for the location of the prison center along with the radius of that prison.
 jail:
   location:
     world: "world"
     x: 100.0
     y: 64.0
     z: 200.0
-    radius: 5 # promień strefy więzienia
+  radius: 5
 
 # You can set your own aliases for the commands below
 aliases:
