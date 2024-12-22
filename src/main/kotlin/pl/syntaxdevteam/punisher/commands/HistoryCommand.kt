@@ -11,8 +11,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Suppress("UnstableApiUsage")
-class HistoryCommand(private val plugin: PunisherX, private val playerIPManager: PlayerIPManager) :
-    BasicCommand {
+class HistoryCommand(private val plugin: PunisherX, private val playerIPManager: PlayerIPManager) : BasicCommand {
 
     private val dateFormat = SimpleDateFormat("yy-MM-dd HH:mm:ss")
 
