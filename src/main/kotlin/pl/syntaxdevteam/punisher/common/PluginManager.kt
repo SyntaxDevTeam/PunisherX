@@ -17,8 +17,8 @@ class PluginManager(private val plugin: PunisherX) {
         val externalPlugins = fetchPluginsFromExternalSource()
         val loadedPlugins = fetchLoadedPlugins()
         val highestPriorityPlugin = getHighestPriorityPlugin(externalPlugins, loadedPlugins)
-        if (highestPriorityPlugin == plugin.pluginMetas.name) {
-            val syntaxDevTeamPlugins = loadedPlugins.filter { it.first != plugin.pluginMetas.name }
+        if (highestPriorityPlugin == plugin.pluginMeta.name) {
+            val syntaxDevTeamPlugins = loadedPlugins.filter { it.first != plugin.pluginMeta.name }
             plugin.logger.pluginStart(syntaxDevTeamPlugins)
         }
     }
