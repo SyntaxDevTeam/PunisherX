@@ -2,22 +2,14 @@ package pl.syntaxdevteam.punisher.commands
 
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import io.papermc.paper.plugin.configuration.PluginMeta
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.common.MessageHandler
-import pl.syntaxdevteam.punisher.basic.TimeHandler
-import pl.syntaxdevteam.punisher.common.UUIDManager
 import pl.syntaxdevteam.punisher.players.PlayerIPManager
 
 @Suppress("UnstableApiUsage")
-class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, private val playerIPManager: PlayerIPManager) : BasicCommand {
-
-    private val uuidManager = UUIDManager(plugin)
-    private val messageHandler = MessageHandler(plugin, pluginMetas)
-    private val timeHandler = TimeHandler(plugin, pluginMetas)
+class CheckCommand(private val plugin: PunisherX, private val playerIPManager: PlayerIPManager) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (args.isNotEmpty()) {
@@ -26,10 +18,10 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, priva
 
             if (player.equals(senderName, ignoreCase = true) || stack.sender.hasPermission("punisherx.check")) {
                 if (args.size < 2) {
-                    stack.sender.sendRichMessage(messageHandler.getMessage("check", "usage"))
+                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("check", "usage"))
                 } else {
                     val type = args[1]
-                    val uuid = uuidManager.getUUID(player)
+                    val uuid = plugin.uuidManager.getUUID(player)
                     val targetPlayer = when (Bukkit.getPlayer(player)?.name) {
                         null -> Bukkit.getOfflinePlayer(uuid).name
                         else -> Bukkit.getPlayer(player)?.name
@@ -42,19 +34,19 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, priva
                         "mute" -> punishments.filter { it.type == "MUTE" }
                         "warn" -> punishments.filter { it.type == "WARN" }
                         else -> {
-                            stack.sender.sendRichMessage(messageHandler.getMessage("check", "invalid_type"))
+                            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("check", "invalid_type"))
                             return
                         }
                     }
 
                     if (filteredPunishments.isEmpty()) {
-                        stack.sender.sendRichMessage(messageHandler.getMessage("check", "no_punishments", mapOf("player" to player)))
+                        stack.sender.sendRichMessage(plugin.messageHandler.getMessage("check", "no_punishments", mapOf("player" to player)))
                     } else {
-                        val id = messageHandler.getLogMessage("check", "id")
-                        val types = messageHandler.getLogMessage("check", "type")
-                        val reasons = messageHandler.getLogMessage("check", "reason")
-                        val times = messageHandler.getLogMessage("check", "time")
-                        val title = messageHandler.getLogMessage("check", "title")
+                        val id = plugin.messageHandler.getLogMessage("check", "id")
+                        val types = plugin.messageHandler.getLogMessage("check", "type")
+                        val reasons = plugin.messageHandler.getLogMessage("check", "reason")
+                        val times = plugin.messageHandler.getLogMessage("check", "time")
+                        val title = plugin.messageHandler.getLogMessage("check", "title")
                         val playerIP = playerIPManager.getPlayerIPByName(player)
                         plugin.logger.debug("Player IP: $playerIP")
                         val geoLocation = playerIP?.let { ip ->
@@ -88,7 +80,7 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, priva
                         filteredPunishments.forEach { punishment ->
                             val endTime = punishment.end
                             val remainingTime = (endTime - System.currentTimeMillis()) / 1000
-                            val duration = if (endTime == -1L) "permanent" else timeHandler.formatTime(remainingTime.toString())
+                            val duration = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(remainingTime.toString())
                             val reason = punishment.reason
                             val row = miniMessage.deserialize("<blue>|   <white>#${punishment.id}</white> <blue>|</blue> <white>${punishment.type}</white> <blue>|</blue> <white>$reason</white> <blue>|</blue> <white>$duration</white>")
                             stack.sender.sendMessage(row)
@@ -96,10 +88,10 @@ class CheckCommand(private val plugin: PunisherX, pluginMetas: PluginMeta, priva
                     }
                 }
             } else {
-                stack.sender.sendRichMessage(messageHandler.getMessage("error", "no_permission"))
+                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
             }
         } else {
-            stack.sender.sendRichMessage(messageHandler.getMessage("check", "usage"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("check", "usage"))
         }
     }
 

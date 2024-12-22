@@ -2,41 +2,33 @@ package pl.syntaxdevteam.punisher.commands
 
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import io.papermc.paper.plugin.configuration.PluginMeta
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.basic.TimeHandler
-import pl.syntaxdevteam.punisher.common.MessageHandler
-import pl.syntaxdevteam.punisher.common.UUIDManager
 
 @Suppress("UnstableApiUsage")
-class WarnCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : BasicCommand {
-
-    private val uuidManager = UUIDManager(plugin)
-    private val messageHandler = MessageHandler(plugin, pluginMetas)
-    private val timeHandler = TimeHandler(plugin, pluginMetas)
+class WarnCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (args.isNotEmpty()) {
             if (stack.sender.hasPermission("punisherx.warn")) {
                 if (args.size < 2) {
-                    stack.sender.sendRichMessage(messageHandler.getMessage("warn", "usage"))
+                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("warn", "usage"))
                 } else {
                     val player = args[0]
                     val targetPlayer = Bukkit.getPlayer(player)
                     if (targetPlayer != null && targetPlayer.hasPermission("punisherx.bypass.warn")) {
-                        stack.sender.sendRichMessage(messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
+                        stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
                         return
                     }
-                    val uuid = uuidManager.getUUID(player).toString()
+                    val uuid = plugin.uuidManager.getUUID(player).toString()
 
                     var gtime: String?
                     var reason: String
                     try {
                         gtime = args[1]
-                        timeHandler.parseTime(gtime)
+                        plugin.timeHandler.parseTime(gtime)
                         reason = args.slice(2 until args.size).joinToString(" ")
                     } catch (e: NumberFormatException) {
                         gtime = null
@@ -45,18 +37,18 @@ class WarnCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
 
                     val punishmentType = "WARN"
                     val start = System.currentTimeMillis()
-                    val end: Long? = if (gtime != null) (System.currentTimeMillis() + timeHandler.parseTime(gtime) * 1000) else null
+                    val end: Long? = if (gtime != null) (System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
 
                     plugin.databaseHandler.addPunishment(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
                     plugin.databaseHandler.addPunishmentHistory(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
 
                     val warnCount = plugin.databaseHandler.getActiveWarnCount(uuid)
-                    stack.sender.sendRichMessage(messageHandler.getMessage("warn", "warn", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime), "warn_no" to warnCount.toString())))
-                    val warnMessage = messageHandler.getMessage("warn", "warn_message", mapOf("reason" to reason, "time" to timeHandler.formatTime(gtime), "warn_no" to warnCount.toString()))
+                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("warn", "warn", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime), "warn_no" to warnCount.toString())))
+                    val warnMessage = plugin.messageHandler.getMessage("warn", "warn_message", mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime), "warn_no" to warnCount.toString()))
                     val formattedMessage = MiniMessage.miniMessage().deserialize(warnMessage)
                     targetPlayer?.sendMessage(formattedMessage)
                     val permission = "punisherx.see.warn"
-                    val broadcastMessage = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("warn", "broadcast", mapOf("player" to player, "reason" to reason, "time" to timeHandler.formatTime(gtime), "warn_no" to warnCount.toString())))
+                    val broadcastMessage = MiniMessage.miniMessage().deserialize(plugin.messageHandler.getMessage("warn", "broadcast", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime), "warn_no" to warnCount.toString())))
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if (onlinePlayer.hasPermission(permission)) {
                             onlinePlayer.sendMessage(broadcastMessage)
@@ -65,10 +57,10 @@ class WarnCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
                     executeWarnAction(player, warnCount)
                 }
             } else {
-                stack.sender.sendRichMessage(messageHandler.getMessage("error", "no_permission"))
+                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
             }
         } else {
-            stack.sender.sendRichMessage(messageHandler.getMessage("warn", "usage"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("warn", "usage"))
         }
     }
 
@@ -76,7 +68,7 @@ class WarnCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Basi
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
             2 -> generateTimeSuggestions()
-            3 -> messageHandler.getReasons("warn", "reasons")
+            3 -> plugin.messageHandler.getReasons("warn", "reasons")
             else -> emptyList()
         }
     }

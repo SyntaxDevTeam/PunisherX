@@ -8,20 +8,15 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.common.MessageHandler
-import pl.syntaxdevteam.punisher.basic.TimeHandler
 
 @Suppress("UnstableApiUsage")
-class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : BasicCommand {
-
-    private val messageHandler = MessageHandler(plugin, pluginMetas)
-    private val timeHandler = TimeHandler(plugin, pluginMetas)
+class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (args.isNotEmpty()) {
             if (stack.sender.hasPermission("punisherx.banip")) {
                 if (args.size < 2) {
-                    stack.sender.sendRichMessage(messageHandler.getMessage("banip", "usage"))
+                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("banip", "usage"))
                 } else {
                     val playerOrIpOrUUID = args[0]
                     val playerIP = when {
@@ -31,7 +26,7 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                     }
 
                     if (playerIP == null) {
-                        stack.sender.sendRichMessage(messageHandler.getMessage("banip", "not_found"))
+                        stack.sender.sendRichMessage(plugin.messageHandler.getMessage("banip", "not_found"))
                         return
                     }
                     val targetPlayer = Bukkit.getPlayer(playerOrIpOrUUID)
@@ -39,7 +34,7 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                     if (targetPlayer != null) {
                         if (!isForce && targetPlayer.hasPermission("punisherx.bypass.banip")) {
                             stack.sender.sendRichMessage(
-                                messageHandler.getMessage(
+                                plugin.messageHandler.getMessage(
                                     "error",
                                     "bypass",
                                     mapOf("player" to playerOrIpOrUUID)
@@ -53,7 +48,7 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                     var reason: String
                     try {
                         gtime = args[1]
-                        timeHandler.parseTime(gtime)
+                        plugin.timeHandler.parseTime(gtime)
                         reason = args.slice(2 until args.size).filterNot { it == "--force" }.joinToString(" ")
                     } catch (e: NumberFormatException) {
                         gtime = null
@@ -62,7 +57,7 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
 
                     val punishmentType = "BANIP"
                     val start = System.currentTimeMillis()
-                    val end: Long? = if (gtime != null) (System.currentTimeMillis() + timeHandler.parseTime(gtime) * 1000) else null
+                    val end: Long? = if (gtime != null) (System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
 
                     val success = plugin.databaseHandler.addPunishment(playerOrIpOrUUID, playerIP, reason, stack.sender.name, punishmentType, start, end ?: -1)
                     if (!success) {
@@ -71,7 +66,7 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                     plugin.databaseHandler.addPunishmentHistory(playerOrIpOrUUID, playerIP, reason, stack.sender.name, punishmentType, start, end ?: -1)
 
                     if (targetPlayer != null) {
-                        val kickMessages = messageHandler.getComplexMessage("banip", "kick_message", mapOf("reason" to reason, "time" to timeHandler.formatTime(gtime)))
+                        val kickMessages = plugin.messageHandler.getComplexMessage("banip", "kick_message", mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime)))
                         val kickMessage = Component.text()
                         kickMessages.forEach { line ->
                             kickMessage.append(line)
@@ -80,9 +75,9 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                         targetPlayer.kick(kickMessage.build())
                     }
 
-                    stack.sender.sendRichMessage(messageHandler.getMessage("banip", "ban", mapOf("player" to playerOrIpOrUUID, "reason" to reason, "time" to timeHandler.formatTime(gtime))))
+                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("banip", "ban", mapOf("player" to playerOrIpOrUUID, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))))
                     val permission = "punisherx.see.banip"
-                    val broadcastMessage = MiniMessage.miniMessage().deserialize(messageHandler.getMessage("banip", "ban", mapOf("player" to playerOrIpOrUUID, "reason" to reason, "time" to timeHandler.formatTime(gtime))))
+                    val broadcastMessage = MiniMessage.miniMessage().deserialize(plugin.messageHandler.getMessage("banip", "ban", mapOf("player" to playerOrIpOrUUID, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))))
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if (onlinePlayer.hasPermission(permission)) {
                             onlinePlayer.sendMessage(broadcastMessage)
@@ -93,10 +88,10 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
                     }
                 }
             } else {
-                stack.sender.sendRichMessage(messageHandler.getMessage("error", "no_permission"))
+                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
             }
         } else {
-            stack.sender.sendRichMessage(messageHandler.getMessage("banip", "usage"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("banip", "usage"))
         }
     }
 
@@ -104,7 +99,7 @@ class BanIpCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : Bas
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
             2 -> generateTimeSuggestions()
-            3 -> messageHandler.getReasons("banip", "reasons")
+            3 -> plugin.messageHandler.getReasons("banip", "reasons")
             else -> emptyList()
         }
     }

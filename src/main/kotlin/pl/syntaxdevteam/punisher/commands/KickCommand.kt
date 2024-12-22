@@ -15,7 +15,7 @@ import pl.syntaxdevteam.punisher.common.UUIDManager
 class KickCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : BasicCommand {
 
     private val uuidManager = UUIDManager(plugin)
-    private val messageHandler = MessageHandler(plugin, pluginMetas)
+    private val messageHandler = MessageHandler(plugin)
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (args.isNotEmpty()) {

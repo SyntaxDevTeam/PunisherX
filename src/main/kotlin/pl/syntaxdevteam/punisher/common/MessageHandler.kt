@@ -1,6 +1,5 @@
 package pl.syntaxdevteam.punisher.common
 
-import io.papermc.paper.plugin.configuration.PluginMeta
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
@@ -10,13 +9,9 @@ import org.bukkit.configuration.file.YamlConfiguration
 import pl.syntaxdevteam.punisher.PunisherX
 import java.io.File
 
-@Suppress("UnstableApiUsage")
-class MessageHandler(private val plugin: PunisherX, pluginMetas: PluginMeta) {
+class MessageHandler(private val plugin: PunisherX) {
     private val language = plugin.config.getString("language") ?: "EN"
     private var messages: FileConfiguration
-    private var config = plugin.config
-    private var debugMode = config.getBoolean("debug")
-    private val logger = Logger(pluginMetas, debugMode)
 
     init {
         copyDefaultMessages()
@@ -34,7 +29,7 @@ class MessageHandler(private val plugin: PunisherX, pluginMetas: PluginMeta) {
             "de" -> "OpenAI Chat GPT-3.5"
             else -> plugin.getServerName()
         }
-        logger.log("<gray>Loaded \"$language\" language file by: <white><b>$author</b></white>")
+        plugin.logger.log("<gray>Loaded \"$language\" language file by: <white><b>$author</b></white>")
     }
 
     private fun copyDefaultMessages() {
@@ -50,7 +45,7 @@ class MessageHandler(private val plugin: PunisherX, pluginMetas: PluginMeta) {
         val defaultLangStream = plugin.getResource("lang/messages_${language.lowercase()}.yml")
 
         if (defaultLangStream == null) {
-            logger.err("Default language file for $language not found in plugin resources!")
+            plugin.logger.err("Default language file for $language not found in plugin resources!")
             return
         }
 
@@ -76,7 +71,7 @@ class MessageHandler(private val plugin: PunisherX, pluginMetas: PluginMeta) {
         synchronizeSections(defaultConfig, currentConfig)
 
         if (updated) {
-            logger.success("Updating language file: messages_${language.lowercase()}.yml with missing entries.")
+            plugin.logger.success("Updating language file: messages_${language.lowercase()}.yml with missing entries.")
             currentConfig.save(langFile)
         }
     }
@@ -97,7 +92,7 @@ class MessageHandler(private val plugin: PunisherX, pluginMetas: PluginMeta) {
     fun getMessage(category: String, key: String, placeholders: Map<String, String> = emptyMap()): String {
         val prefix = getPrefix()
         val message = messages.getString("$category.$key") ?: run {
-            logger.err("There was an error loading the message $key from category $category")
+            plugin.logger.err("There was an error loading the message $key from category $category")
             "Message not found. Check console..."
         }
         val formattedMessage = placeholders.entries.fold(message) { acc, entry ->
@@ -108,7 +103,7 @@ class MessageHandler(private val plugin: PunisherX, pluginMetas: PluginMeta) {
 
     fun getLogMessage(category: String, key: String, placeholders: Map<String, String> = emptyMap()): String {
         val message = messages.getString("$category.$key") ?: run {
-            logger.err("There was an error loading the message $key from category $category")
+            plugin.logger.err("There was an error loading the message $key from category $category")
             "Message not found. Check console..."
         }
         val formattedMessage = placeholders.entries.fold(message) { acc, entry ->
@@ -120,7 +115,7 @@ class MessageHandler(private val plugin: PunisherX, pluginMetas: PluginMeta) {
     fun getComplexMessage(category: String, key: String, placeholders: Map<String, String> = emptyMap()): List<Component> {
         val messageList = messages.getStringList("$category.$key")
         if (messageList.isEmpty()) {
-            logger.err("There was an error loading the message list $key from category $category")
+            plugin.logger.err("There was an error loading the message list $key from category $category")
             return listOf(Component.text("Message list not found. Check console..."))
         }
         return messageList.map { message ->

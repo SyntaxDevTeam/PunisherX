@@ -1,12 +1,8 @@
 package pl.syntaxdevteam.punisher.basic
 
-import io.papermc.paper.plugin.configuration.PluginMeta
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.common.MessageHandler
 
-@Suppress("UnstableApiUsage")
-class TimeHandler(plugin: PunisherX, pluginMetas: PluginMeta) {
-    private val messageHandler = MessageHandler(plugin, pluginMetas)
+class TimeHandler(private val plugin: PunisherX) {
 
     fun parseTime(time: String): Long {
         val amount = time.substring(0, time.length - 1).toLong()
@@ -22,7 +18,7 @@ class TimeHandler(plugin: PunisherX, pluginMetas: PluginMeta) {
     }
 
     fun formatTime(time: String?): String {
-        if (time == null) return messageHandler.getLogMessage("formatTime", "undefined")
+        if (time == null) return plugin.messageHandler.getLogMessage("formatTime", "undefined")
 
         val isNumeric = time.all { it.isDigit() }
         if (isNumeric) {
@@ -54,16 +50,16 @@ class TimeHandler(plugin: PunisherX, pluginMetas: PluginMeta) {
             'm' -> "$amount ${getLocalizedMessage("minute", amount)}"
             'h' -> "$amount ${getLocalizedMessage("hour", amount)}"
             'd' -> "$amount ${getLocalizedMessage("day", amount)}"
-            else -> messageHandler.getLogMessage("formatTime", "undefined")
+            else -> plugin.messageHandler.getLogMessage("formatTime", "undefined")
         }
     }
 
     private fun getLocalizedMessage(unit: String, amount: Long): String {
         val unitPath = "formatTime.$unit"
         return when (amount) {
-            1L -> messageHandler.getLogMessage(unitPath, "one")
-            in 2..4 -> messageHandler.getLogMessage(unitPath, "few")
-            else -> messageHandler.getLogMessage(unitPath, "many")
+            1L -> plugin.messageHandler.getLogMessage(unitPath, "one")
+            in 2..4 -> plugin.messageHandler.getLogMessage(unitPath, "few")
+            else -> plugin.messageHandler.getLogMessage(unitPath, "many")
         }
     }
 }

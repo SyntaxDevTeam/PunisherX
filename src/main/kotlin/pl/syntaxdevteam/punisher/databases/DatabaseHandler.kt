@@ -2,16 +2,15 @@ package pl.syntaxdevteam.punisher.databases
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import org.bukkit.configuration.file.FileConfiguration
 import pl.syntaxdevteam.punisher.PunisherX
 import java.io.File
 import java.io.IOException
 import java.sql.*
 
-class DatabaseHandler(private val plugin: PunisherX, private val config: FileConfiguration) {
+class DatabaseHandler(private val plugin: PunisherX) {
     private var dataSource: HikariDataSource? = null
     private var logger = plugin.logger
-    private val dbType = config.getString("database.type")?.lowercase() ?: "sqlite"
+    private val dbType = plugin.config.getString("database.type")?.lowercase() ?: "sqlite"
 
     init {
         setupDataSource()
@@ -19,13 +18,13 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
 
     private fun setupDataSource() {
         val hikariConfig = HikariConfig()
-        val dbName = config.getString("database.sql.dbname") ?: plugin.name
-        val user = config.getString("database.sql.username") ?: "ROOT"
-        val password = config.getString("database.sql.password") ?: "V3ryU5eStr0ngP4ssw0rd"
+        val dbName = plugin.config.getString("database.sql.dbname") ?: plugin.name
+        val user = plugin.config.getString("database.sql.username") ?: "ROOT"
+        val password = plugin.config.getString("database.sql.password") ?: "V3ryU5eStr0ngP4ssw0rd"
         when (dbType) {
             "mysql", "mariadb" -> {
                 hikariConfig.jdbcUrl =
-                    "jdbc:mysql://${config.getString("database.sql.host")}:${config.getString("database.sql.port")}/$dbName"
+                    "jdbc:mysql://${plugin.config.getString("database.sql.host")}:${plugin.config.getString("database.sql.port")}/$dbName"
                 hikariConfig.username = user
                 hikariConfig.password = password
                 hikariConfig.driverClassName = "com.mysql.cj.jdbc.Driver"
@@ -33,7 +32,7 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
 
             "postgresql" -> {
                 hikariConfig.jdbcUrl =
-                    "jdbc:postgresql://${config.getString("database.sql.host")}:${config.getString("database.sql.port")}/$dbName"
+                    "jdbc:postgresql://${plugin.config.getString("database.sql.host")}:${plugin.config.getString("database.sql.port")}/$dbName"
                 hikariConfig.username = user
                 hikariConfig.password = password
                 hikariConfig.driverClassName = "org.postgresql.Driver"
@@ -400,7 +399,7 @@ class DatabaseHandler(private val plugin: PunisherX, private val config: FileCon
                 conn.prepareStatement(query).use { preparedStatement ->
                     preparedStatement.setString(1, uuidOrIp)
                     preparedStatement.setString(2, punishmentType)
-                    if (!removeAll && (config.getString("database.type")?.lowercase() == "postgresql" || config.getString("database.type")?.lowercase() == "h2" || config.getString("database.type")?.lowercase() == "sqlite")) {
+                    if (!removeAll && (plugin.config.getString("database.type")?.lowercase() == "postgresql" || plugin.config.getString("database.type")?.lowercase() == "h2" || plugin.config.getString("database.type")?.lowercase() == "sqlite")) {
                         preparedStatement.setString(3, uuidOrIp)
                         preparedStatement.setString(4, punishmentType)
                     }
