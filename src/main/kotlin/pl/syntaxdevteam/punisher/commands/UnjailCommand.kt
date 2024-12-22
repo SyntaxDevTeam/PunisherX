@@ -25,10 +25,34 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
         val playerName = args[0]
         val uuid = plugin.uuidManager.getUUID(playerName)
 
-        Bukkit.getPlayer(playerName)?.apply {
-            gameMode = GameMode.SURVIVAL
-            teleport(plugin.server.worlds[0].spawnLocation)
-            sendRichMessage(plugin.messageHandler.getMessage("unjail", "unjail_message"))
+        val player = Bukkit.getPlayer(playerName)
+        if (player != null) {
+            val spawnLocation = plugin.server.worlds[0].spawnLocation
+
+            if (plugin.server.name.contains("Folia")) {
+                Bukkit.getServer().globalRegionScheduler.execute(plugin) {
+                    try {
+                        player.teleportAsync(spawnLocation).thenAccept { success ->
+                            if (success) {
+                                player.gameMode = GameMode.SURVIVAL
+                                player.sendRichMessage(plugin.messageHandler.getMessage("unjail", "unjail_message"))
+                                plugin.logger.debug("<green>Player $playerName successfully unjailed (Folia).</green>")
+                            } else {
+                                plugin.logger.debug("<red>Failed to teleport player $playerName during unjail (Folia).</red>")
+                            }
+                        }.exceptionally { throwable ->
+                            plugin.logger.debug("<red>Error while teleporting $playerName during unjail: ${throwable.message}</red>")
+                            null
+                        }
+                    } catch (e: Exception) {
+                        plugin.logger.debug("<red>Error during Folia unjail for $playerName: ${e.message}</red>")
+                    }
+                }
+            } else {
+                player.teleport(spawnLocation)
+                player.gameMode = GameMode.SURVIVAL
+                player.sendRichMessage(plugin.messageHandler.getMessage("unjail", "unjail_message"))
+            }
         }
 
         plugin.cache.removePunishment(uuid)

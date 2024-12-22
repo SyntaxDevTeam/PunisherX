@@ -14,9 +14,6 @@ object JailUtils {
         val z = config.getDouble("jail.location.z")
         val location = Location(world, x, y, z)
 
-        if (!location.chunk.isLoaded) {
-            location.chunk.load(true)
-        }
         return location
     }
 

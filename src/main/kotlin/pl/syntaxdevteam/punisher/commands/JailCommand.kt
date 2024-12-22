@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull
 import net.kyori.adventure.text.minimessage.MiniMessage
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import net.kyori.adventure.text.Component
 import org.bukkit.GameMode
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.basic.JailUtils
@@ -55,14 +54,52 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
 
         val jailLocation = JailUtils.getJailLocation(plugin.config)
         if (jailLocation == null) {
-            stack.sender.sendMessage(Component.text("Jail location is not set in the configuration!"))
+            plugin.logger.debug("<red>No jail location found! Teleportation aborted.</red>")
             return
         }
+        plugin.logger.debug("<yellow>Jail location: ${jailLocation}</yellow>")
 
         targetPlayer?.apply {
+            if (plugin.server.name.contains("Folia")) {
+                plugin.logger.debug("<green>TO JEST FOLIA.</green>")
+
+                Bukkit.getServer().regionScheduler.execute(plugin, jailLocation) {
+                    try {
+                        if (!jailLocation.chunk.isLoaded) {
+                            jailLocation.chunk.load()
+                        }
+
+                        Bukkit.getServer().globalRegionScheduler.execute(plugin) {
+                            teleportAsync(jailLocation).thenAccept { success ->
+                                if (success) {
+                                    plugin.logger.debug("<green>Player successfully teleported to jail.</green>")
+                                } else {
+                                    plugin.logger.debug("<red>Failed to teleport player to jail.</red>")
+                                }
+                            }.exceptionally { throwable ->
+                                plugin.logger.debug("<red>Teleportation error: ${throwable.message}</red>")
+                                null
+                            }
+                        }
+                    } catch (e: Exception) {
+                        plugin.logger.debug("<red>Error in regionScheduler execution: ${e.message}</red>")
+                    }
+                }
+            } else {
+                plugin.logger.debug("<red>TO NIE JEST FOLIA.</red>")
+                if (!jailLocation.chunk.isLoaded) {
+                    jailLocation.chunk.load()
+                }
+                try {
+                    teleport(jailLocation)
+                    plugin.logger.debug("<green>Player successfully teleported to jail.</green>")
+                } catch (e: Exception) {
+                    plugin.logger.debug("<red>Error while teleporting player: ${e.message}</red>")
+                }
+            }
             gameMode = GameMode.ADVENTURE
-            teleport(jailLocation)
-            plugin.logger.info("Changing gamemode ($gameMode) and teleporting $name to $jailLocation")
+
+            plugin.logger.debug("Changing gamemode ($gameMode) and teleporting $name to $jailLocation")
 
             plugin.databaseHandler.addPunishment(name, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
             plugin.databaseHandler.addPunishmentHistory(name, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
