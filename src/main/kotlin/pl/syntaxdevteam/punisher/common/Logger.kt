@@ -1,17 +1,15 @@
 package pl.syntaxdevteam.punisher.common
 
-import io.papermc.paper.plugin.configuration.PluginMeta
 import org.bukkit.Bukkit
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.kyori.adventure.text.minimessage.MiniMessage
-import org.bukkit.plugin.java.JavaPlugin
 import pl.syntaxdevteam.punisher.PunisherX
 
 @Suppress("UnstableApiUsage")
-class Logger(private val plugin: PunisherX, private val debugMode: Boolean) {
+class Logger(plugin: PunisherX, private val debugMode: Boolean) {
     private val plName = plugin.pluginMetas.name
     private val plVer = plugin.pluginMetas.version
     private val serverVersion = plugin.server.version

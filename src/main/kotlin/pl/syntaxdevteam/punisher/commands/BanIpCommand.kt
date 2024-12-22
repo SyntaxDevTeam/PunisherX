@@ -2,7 +2,6 @@ package pl.syntaxdevteam.punisher.commands
 
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import io.papermc.paper.plugin.configuration.PluginMeta
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit

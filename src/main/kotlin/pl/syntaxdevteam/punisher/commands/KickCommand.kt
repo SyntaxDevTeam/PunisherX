@@ -2,7 +2,6 @@ package pl.syntaxdevteam.punisher.commands
 
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import io.papermc.paper.plugin.configuration.PluginMeta
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
@@ -12,7 +11,7 @@ import pl.syntaxdevteam.punisher.common.MessageHandler
 import pl.syntaxdevteam.punisher.common.UUIDManager
 
 @Suppress("UnstableApiUsage")
-class KickCommand(private val plugin: PunisherX, pluginMetas: PluginMeta) : BasicCommand {
+class KickCommand(private val plugin: PunisherX) : BasicCommand {
 
     private val uuidManager = UUIDManager(plugin)
     private val messageHandler = MessageHandler(plugin)
