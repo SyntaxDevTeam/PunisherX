@@ -116,10 +116,10 @@ class PunisherX : JavaPlugin(), Listener {
             if (serverName != null) {
                 return serverName
             } else {
-                logger.debug("Właściwość 'server-name' nie została znaleziona w pliku server.properties.")
+                logger.debug("Property 'server-name' not found in server.properties file.")
             }
         } else {
-            logger.debug("Plik server.properties nie istnieje.")
+            logger.debug("The server.properties file does not exist.")
         }
         return "Unknown Server"
     }

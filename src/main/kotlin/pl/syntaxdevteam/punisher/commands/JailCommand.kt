@@ -61,8 +61,6 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
 
         targetPlayer?.apply {
             if (plugin.server.name.contains("Folia")) {
-                plugin.logger.debug("<green>TO JEST FOLIA.</green>")
-
                 Bukkit.getServer().regionScheduler.execute(plugin, jailLocation) {
                     try {
                         if (!jailLocation.chunk.isLoaded) {
@@ -86,7 +84,6 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
                     }
                 }
             } else {
-                plugin.logger.debug("<red>TO NIE JEST FOLIA.</red>")
                 if (!jailLocation.chunk.isLoaded) {
                     jailLocation.chunk.load()
                 }
