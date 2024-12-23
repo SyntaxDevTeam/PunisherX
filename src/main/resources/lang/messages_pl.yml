@@ -1,3 +1,4 @@
+# Ver. 1.0.0
 # Formatowanie tekstów wiadomości:
 # Można używać formatowania MiniMessage oraz Legacy (Minecraft).
 # Przykłady jak stosować MiniMessage: https://docs.advntr.dev/minimessage/format.html
@@ -9,9 +10,16 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 error:
   no_permission: "<red>Nie masz uprawnień do tej komendy.</red>"
   player_not_found: "<gold>Nie znaleziono gracza o nicku {player}.</gold>"
+  console: "<red>Tylko gracz może użyć tej komendy</red>"
   reload: "<red>Wystąpił błąd podczas przełądowania konfiguracji:</red> "
-  bypass: "<red><b>UWAGA!</b> Gracz <gold>{player}<gold/> <red>nie może otrzymać kary, ze zględu na swoje uprawnienia (OP lub bypass).</red>"
-  location_not_set: "location_not_set"
+  bypass: "<red><b>UWAGA!</b> Gracz <gold>{player}<gold/> <red>nie może otrzymać kary, ze zględu na swoje uprawnienia (OP lub bypass).</red><dark_gray>Może dało by się to obejść..."
+
+# Wiadomości komendy /setjail
+setjail:
+  usage: "Poprawne użycie to: <gold>/setjail radius <promień>"
+  set: "<green>Lokalizacja więzienia została ustawiona: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>] z promieniem <gold>{radius}</gold>"
+  set_error: "<red>Nie udało się ustawić lokalizacji więzienia</red>"
+  invalid_radius: "<red>Podaj prawidłowy promień (liczba większa od 0)</red>"
 
 # Wiadomości komendy /jail
 jail:
@@ -31,9 +39,11 @@ jail:
 
 # Wiadomości komendy /unjail
 unjail:
-  unjail: "<green>Wypuściłeś gracza <gold>{player}</gold></green>"
+  unjail: "<green>Uwolniłeś/aś gracza <gold>{player}</gold> z więzienia</green>"
   usage: "Poprawne użycie to: <gold>/unjail <nazwa_gracza>"
-  unjail_message: "<green>Zostałeś/aś wypuszczony/a z więzienia!</green>"
+  unjail_message: "<green>Twoja kara więzienia się zakończyła! Nie zmarnuj tej szansy!</green>"
+  success: "<green>Gracz <gold>{player}</gold> został pomyślnie wypuszczony z więzienia."
+  broadcast: "Gracz <gold>{player}</gold> został wypuszczony z więzienia. Lepiej uważajcie..."
 
 # Wiadomości komendy /ban
 ban:
