@@ -5,7 +5,7 @@
 * New command: `/jail <player> (time) <reason>` - Allows administrators to jail a player in a specified location in the config.yml for a set duration.
   * Utilized cache system for player checks (performance improvement)
   * Minimized database connections (performance improvement)
-* New command: `/unjail <player>` - Counterpart to the `jail` command. Instantly releases a player from jail, teleporting them to spawnworld.
+* New command: `/unjail <player>` - Counterpart to the `jail` command. Instantly releases a player from jail, teleporting them to "World Spawn".
 * New command: `/setjail radius <radius>` - Sets the jail area with a specified radius. Simply stand at the desired location and use the command to designate the jail area. This simplifies the process, avoiding tedious config settings.
 * Added `--force` argument for `ban`, `jail`, `mute` commands to provide additional security. Just add it at the end of the command, e.g., `/ban player reason --force`, to execute the command even on `OP` or with `bypass` permission in case of server abuse.
 
