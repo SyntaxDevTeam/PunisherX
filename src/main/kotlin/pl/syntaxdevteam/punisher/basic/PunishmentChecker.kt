@@ -170,7 +170,6 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
         val radius = plugin.config.getDouble("jail.radius", 10.0)
         if (plugin.server.name.contains("Folia")) {
-            // Obsługa Folia
             Bukkit.getServer().regionScheduler.execute(plugin, jailLocation) {
                 try {
                     val isInJail = isPlayerInJail(player.location, jailLocation, radius)
