@@ -1,3 +1,4 @@
+# Ver. 1.0.0
 # Datei übersetzt mit ChatGPT, wenn Sie der Meinung sind, dass sie Korrekturen benötigt, lassen Sie es uns auf Discord wissen (https://discord.gg/Zk6mxv7eMh).
 # Formatierung der Nachrichtentexte:
 # Sie können MiniMessage- und Legacy (Minecraft)-Formatierung verwenden.
@@ -11,16 +12,23 @@ error:
   no_permission: "<red>Du hast keine Berechtigung für diesen Befehl.</red>"
   player_not_found: "<gold>Spieler mit dem Namen {player} nicht gefunden.</gold>"
   reload: "<red>Beim Neuladen der Konfiguration ist ein Fehler aufgetreten:</red> "
-  bypass: "<red><b>ACHTUNG!</b> Spieler <gold>{player}<gold/> <red>kann nicht bestraft werden, da er über spezielle Rechte (OP oder Bypass) verfügt.</red>"
+  bypass: "<red><b>ACHTUNG!</b> Spieler <gold>{player}<gold/> <red>kann aufgrund seiner Berechtigungen (OP oder Bypass) nicht bestraft werden.</red><dark_gray>Vielleicht könnte dies umgangen werden..."
 
-# Nachrichten für den Befehl /jail
+# Nachrichten des Befehls /setjail
+setjail:
+  usage: "Die korrekte Verwendung ist: <gold>/setjail radius <radius>"
+  set: "<green>Gefängnisstandort wurde festgelegt: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>] mit einem Radius von <gold>{radius}</gold>"
+  set_error: "<red>Fehler beim Festlegen des Gefängnisstandorts</red>"
+  invalid_radius: "<red>Bitte geben Sie einen gültigen Radius an (Zahl größer als 0)</red>"
+
+# Nachrichten des Befehls /jail
 jail:
-  jail: "<green>Du hast den Spieler <gold>{player}</gold> für <gold>{reason}</gold> für <gold>{time}</green> eingesperrt"
+  jail: "<green>Sie haben den Spieler <gold>{player}</gold> für <gold>{reason}</gold> für <gold>{time}</gold> eingesperrt</green>"
   usage: "Die korrekte Verwendung ist: <gold>/jail <spielername> (zeit) <grund>"
-  jail_message: "<red>Du wurdest für <b>{reason}</b> für <b>{time}</b> eingesperrt</red>"
-  jail_info_message: "<red>Du versuchst etwas zu sagen, aber niemand kann dich aus dem Gefängnis hören</red>"
-  jail_restrict_message: "Das Verlassen des Gefängnisbereichs ist verboten. Du wurdest zurück zu deinem zugewiesenen Ort teleportiert."
-  broadcast: "<dark_gray>Der Spieler <gray>{player}</gray> wurde für <gray>{reason}</gray> für <gray>{time}</gray> eingesperrt</dark_gray>"
+  jail_message: "<red>Sie wurden für <b>{reason}</b> für <b>{time}</b> eingesperrt</red>"
+  jail_info_message: "<red>Sie versuchen zu sprechen, aber niemand kann Sie aus dem Gefängnis hören</red>"
+  jail_restrict_message: "Das Verlassen des Gefängnisbereichs ist verboten. Sie wurden zurück zum vorgesehenen Ort teleportiert."
+  broadcast: "<dark_gray>Spieler <gray>{player}</gray> wurde für <gray>{reason}</gray> für <gray>{time}</gray> eingesperrt</dark_gray>"
   log: "<dark_gray>Der eingesperrte Spieler <gray>{player}</gray> <dark_gray>schreit aus seiner Zelle: <gray>{message}</gray>"
   no_reasons: "ohne Grund"
   reasons:
@@ -29,11 +37,13 @@ jail:
     - "Spielerbeleidigung"
     - "Vulgäre Sprache"
 
-# Nachrichten für den Befehl /unjail
+# Nachrichten des Befehls /unjail
 unjail:
-  unjail: "<green>Du hast den Spieler <gold>{player}</gold> freigelassen</green>"
+  unjail: "<green>Sie haben den Spieler <gold>{player}</gold> aus dem Gefängnis entlassen</green>"
   usage: "Die korrekte Verwendung ist: <gold>/unjail <spielername>"
-  unjail_message: "<green>Du wurdest aus dem Gefängnis entlassen!</green>"
+  unjail_message: "<green>Ihre Gefängnisstrafe ist beendet! Verschwenden Sie diese Chance nicht!</green>"
+  success: "<green>Spieler <gold>{player}</gold> wurde erfolgreich aus dem Gefängnis entlassen."
+  broadcast: "Spieler <gold>{player}</gold> wurde aus dem Gefängnis entlassen. Besser aufpassen..."
 
 # Nachrichten für den /ban-Befehl
 ban:

@@ -1,3 +1,4 @@
+# Ver. 1.0.0
 # Message formatting:
 # You can use MiniMessage and Legacy (Minecraft) formatting.
 # Examples of how to use MiniMessage: https://docs.advntr.dev/minimessage/format.html
@@ -10,15 +11,22 @@ error:
   no_permission: "<red>You do not have permission to use this command.</red>"
   player_not_found: "<gold>Player with nickname {player} not found.</gold>"
   reload: "<red>An error occurred while reloading the configuration:</red> "
-  bypass: "<red><b>WARNING!</b> Player <gold>{player}<gold/> <red>cannot be punished due to their permissions (OP or bypass).</red>"
+  bypass: "<red><b>WARNING!</b> Player <gold>{player}<gold/> <red>cannot be punished due to their permissions (OP or bypass).</red><dark_gray>Maybe this could be bypassed..."
 
-# Messages for the /jail command
+# /setjail command messages
+setjail:
+  usage: "Correct usage is: <gold>/setjail radius <radius>"
+  set: "<green>Jail location has been set: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>] with a radius of <gold>{radius}</gold>"
+  set_error: "<red>Failed to set jail location</red>"
+  invalid_radius: "<red>Please provide a valid radius (number greater than 0)</red>"
+
+# /jail command messages
 jail:
-  jail: "<green>You have jailed player <gold>{player}</gold> for <gold>{reason}</gold> for <gold>{time}</green>"
+  jail: "<green>You have jailed player <gold>{player}</gold> for <gold>{reason}</gold> for <gold>{time}</gold></green>"
   usage: "Correct usage is: <gold>/jail <player_name> (time) <reason>"
   jail_message: "<red>You have been jailed for <b>{reason}</b> for <b>{time}</b></red>"
-  jail_info_message: "<red>You are trying to say something, but no one can hear you from jail</red>"
-  jail_restrict_message: "Leaving the jail area is forbidden. You have been teleported back to your designated location."
+  jail_info_message: "<red>You try to speak, but no one can hear you from jail</red>"
+  jail_restrict_message: "Leaving the jail area is prohibited. You have been teleported back to the designated location."
   broadcast: "<dark_gray>Player <gray>{player}</gray> has been jailed for <gray>{reason}</gray> for <gray>{time}</gray></dark_gray>"
   log: "<dark_gray>Jailed player <gray>{player}</gray> <dark_gray>is shouting from their cell: <gray>{message}</gray>"
   no_reasons: "no reason"
@@ -28,11 +36,13 @@ jail:
     - "Player insult"
     - "Foul language"
 
-# Messages for the /unjail command
+# /unjail command messages
 unjail:
-  unjail: "<green>You have released player <gold>{player}</gold></green>"
+  unjail: "<green>You have released player <gold>{player}</gold> from jail</green>"
   usage: "Correct usage is: <gold>/unjail <player_name>"
-  unjail_message: "<green>You have been released from jail!</green>"
+  unjail_message: "<green>Your jail sentence has ended! Don't waste this chance!</green>"
+  success: "<green>Player <gold>{player}</gold> has been successfully released from jail."
+  broadcast: "Player <gold>{player}</gold> has been released from jail. Better watch out..."
 
 # /ban command messages
 ban:
