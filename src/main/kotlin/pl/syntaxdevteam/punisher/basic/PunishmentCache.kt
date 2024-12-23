@@ -2,12 +2,13 @@ package pl.syntaxdevteam.punisher.basic
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import net.kyori.adventure.text.minimessage.MiniMessage
+import org.bukkit.Bukkit
 import pl.syntaxdevteam.punisher.PunisherX
 import java.io.File
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-
 
 class PunishmentCache(private val plugin: PunisherX) {
 
@@ -22,9 +23,9 @@ class PunishmentCache(private val plugin: PunisherX) {
     fun addOrUpdatePunishment(uuid: UUID, endTime: Long) {
         val currentEndTime = cache[uuid]
         if (currentEndTime == null || currentEndTime < System.currentTimeMillis()) {
-            plugin.logger.debug("Dodaję nową karę dla gracza $uuid with end time $endTime")
+            plugin.logger.debug("Adding new punishment for player $uuid with end time $endTime")
         } else {
-            plugin.logger.debug("Aktualizuję karę dla gracza $uuid z $currentEndTime na $endTime")
+            plugin.logger.debug("Updating punishment for player $uuid from $currentEndTime to $endTime")
         }
 
         cache[uuid] = endTime
@@ -33,8 +34,24 @@ class PunishmentCache(private val plugin: PunisherX) {
 
     fun removePunishment(uuid: UUID) {
         if (cache.remove(uuid) != null) {
-            plugin.logger.debug("Usunięto karę dla gracza $uuid")
+            plugin.logger.debug("Removed punishment for player $uuid")
             removeSingleEntry(uuid)
+            plugin.databaseHandler.removePunishment(uuid.toString(), "JAIL")
+            val player = Bukkit.getPlayer(uuid)
+            if (player != null) {
+                val broadcastMessage = MiniMessage.miniMessage().deserialize(
+                    plugin.messageHandler.getMessage("unjail", "broadcast", mapOf("player" to player.name))
+                )
+                plugin.server.onlinePlayers.forEach { onlinePlayer ->
+                    if (onlinePlayer.hasPermission("punisherx.see.unjail")) {
+                        onlinePlayer.sendMessage(broadcastMessage)
+                    }
+                }
+
+                player.sendRichMessage(
+                    plugin.messageHandler.getMessage("unjail", "success", mapOf("player" to player.name))
+                )
+            }
         }
     }
 
@@ -54,7 +71,7 @@ class PunishmentCache(private val plugin: PunisherX) {
 
     private fun loadCache() {
         if (!cacheFile.exists()) {
-            plugin.logger.debug("Plik cache nie istnieje, tworzę pusty cache.")
+            plugin.logger.debug("Cache file does not exist, creating an empty cache.")
             return
         }
 
@@ -66,14 +83,14 @@ class PunishmentCache(private val plugin: PunisherX) {
                 if (isValidUUID(key)) {
                     cache[UUID.fromString(key)] = value
                 } else {
-                    plugin.logger.warning("Nieprawidłowy UUID w cache: $key. Pomijam ten wpis.")
+                    plugin.logger.warning("Invalid UUID in cache: $key. Skipping this entry.")
                 }
             }
-            plugin.logger.debug("Wczytano ${cache.size} wpisów do cache.")
+            plugin.logger.debug("Loaded ${cache.size} entries into cache.")
         } catch (e: IOException) {
-            plugin.logger.severe("Błąd podczas wczytywania cache: ${e.message}")
+            plugin.logger.severe("Error loading cache: ${e.message}")
         } catch (e: Exception) {
-            plugin.logger.severe("Nieoczekiwany błąd podczas wczytywania cache: ${e.message}")
+            plugin.logger.severe("Unexpected error loading cache: ${e.message}")
         }
     }
 
@@ -93,9 +110,9 @@ class PunishmentCache(private val plugin: PunisherX) {
             val existingData: MutableMap<String, Long> = gson.fromJson(fileContent, type) ?: mutableMapOf()
             existingData[uuid.toString()] = endTime
             cacheFile.writeText(gson.toJson(existingData))
-            plugin.logger.debug("Zapisano karę dla gracza $uuid.")
+            plugin.logger.debug("Saved punishment for player $uuid.")
         } catch (e: IOException) {
-            plugin.logger.severe("Błąd podczas zapisywania kary do pliku: ${e.message}")
+            plugin.logger.severe("Error saving punishment to file: ${e.message}")
         }
     }
 
@@ -107,9 +124,9 @@ class PunishmentCache(private val plugin: PunisherX) {
             val existingData: MutableMap<String, Long> = gson.fromJson(fileContent, type) ?: mutableMapOf()
             existingData.remove(uuid.toString())
             cacheFile.writeText(gson.toJson(existingData))
-            plugin.logger.debug("Usunięto karę dla gracza $uuid z pliku.")
+            plugin.logger.debug("Removed punishment for player $uuid from file.")
         } catch (e: IOException) {
-            plugin.logger.severe("Błąd podczas usuwania kary z pliku: ${e.message}")
+            plugin.logger.severe("Error removing punishment from file: ${e.message}")
         }
     }
 }
