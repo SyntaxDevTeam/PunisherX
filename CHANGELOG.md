@@ -1,11 +1,32 @@
 # Changelog
 
-## [1.2.2] - 2024-12-23
-### Added
-- New command `/jail`, `/unjail`
+## [1.3.0] - 2024-12-23
+### Functional Changes:
+* New command: `/jail <player> (time) <reason>` - Allows administrators to jail a player in a specified location in the config.yml for a set duration.
+  * Utilized cache system for player checks (performance improvement)
+  * Minimized database connections (performance improvement)
+* New command: `/unjail <player>` - Counterpart to the `jail` command. Instantly releases a player from jail, teleporting them to spawnworld.
+* New command: `/setjail radius <radius>` - Sets the jail area with a specified radius. Simply stand at the desired location and use the command to designate the jail area. This simplifies the process, avoiding tedious config settings.
+* Added `--force` argument for `ban`, `jail`, `mute` commands to provide additional security. Just add it at the end of the command, e.g., `/ban player reason --force`, to execute the command even on `OP` or with `bypass` permission in case of server abuse.
+
+### Folia server support
+* Chunk loading before teleportation as per Folia documentation
+* Asynchronous teleportation as per Folia documentation for all cases related to `jail` and `unjail` commands.
+
+### Purpur server support
+* Resolved occasional class conflicts between the plugin and Purpur engine in the plugin update system.
 
 ### Fixed
-- Minor bug fixes in the punishment system.
+* Resolved minor issues related to the punishment system to enhance stability.
+* Simulated and fixed all potential issues where players were not correctly teleported to the jail location under various circumstances.
+* Simulated and resolved issues with detecting if a jailed player left the designated area to ensure the system's functionality.
+
+### Technical Changes:
+* Significantly reduced cache memory usage required for the plugin while improving performance.
+  * Improved code structure for better performance and maintenance.
+  * Implemented DRY principle for all classes.
+  * Reduced the number of single-use variables to almost zero.
+* Updated dependency gradle to v8.12.
 
 
 ## [1.2.2] - 2024-12-15
