@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.3.0-DEV"
+version = "1.3.1-DEV"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 repositories {
@@ -21,8 +21,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
-    compileOnly("dev.folia:folia-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("dev.folia:folia-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.3")
     compileOnly("com.google.code.gson:gson:2.11.0")
