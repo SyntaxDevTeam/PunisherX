@@ -18,7 +18,6 @@ localization:
 loader: pl.syntaxdevteam.punisher.loader.SyntaxLoader
 has-open-classloader: false
 load before: [RewarderX]
-load after: [NBTAPI]
 
 softdepend: [Folia]
 
@@ -38,6 +37,18 @@ commands:
     description: Unbans a player or IP.
     usage: /unban <ip|player>
     permission: punisherx.unban
+  jail:
+    description: Allows administrators to jail a player in a specified location in the config.yml for a set duration.
+    usage: /jail <player> (time) <reason>
+    permission: punisherx.jail
+  unjail:
+    description: Counterpart to the jail command. Instantly releases a player from jail, teleporting them to "World Spawn".
+    usage: /unban <player>
+    permission: punisherx.unjail
+  setjail:
+    description: Sets the jail area with a specified radius. Simply stand at the desired location and use the command to designate the jail area. This simplifies the process, avoiding tedious config settings.
+    usage: /unban radius <radius>
+    permission: punisherx.setjail
   mute:
     description: Mutes a player for a specified time with a reason.
     usage: /mute <player> (time) <reason>
@@ -101,6 +112,15 @@ permissions:
     default: op
   punisherx.unban:
     description: Allows unbanning a player or IP.
+    default: op
+  punisherx.jail:
+    description: Allows sending to jail a player.
+    default: op
+  punisherx.unjail:
+    description: Allows unjailing a player
+    default: op
+  punisherx.setjail:
+    description: Allows setting up a jail.
     default: op
   punisherx.clearall:
     description: Allows clearing all active penalties for a player.
