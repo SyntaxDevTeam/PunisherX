@@ -88,6 +88,11 @@ class CommandManager(private val plugin: PunisherX) {
                 UnBanCommand(plugin)
             )
             commands.register(
+                "cache",
+                plugin.messageHandler.getMessage("ban", "usage"),
+                CacheCommand(plugin)
+            )
+            commands.register(
                 "change-reason",
                 plugin.messageHandler.getMessage("change-reason", "usage"),
                 ChangeReasonCommand(plugin)
