@@ -6,6 +6,8 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import java.io.File
 import java.security.Key
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 import kotlin.text.Charsets.UTF_8
@@ -14,6 +16,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
 
     private val cacheFile = File(plugin.dataFolder, "cache")
     private val secretKey: Key = generateKey()
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
     init {
         if (!cacheFile.exists()) {
@@ -33,11 +36,13 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
             val country = geoIPHandler.getCountry(playerIP)
             val city = geoIPHandler.getCity(playerIP)
             val geoLocation = "$city, $country"
+            val lastUpdated = dateFormat.format(Date())
+
             if (!isPlayerInfoExists(playerName, playerUUID, playerIP)) {
-                savePlayerInfo(playerName, playerUUID, playerIP, geoLocation)
-                plugin.logger.debug("Saved player info -> playerName: $playerName, playerUUID: $playerUUID, playerIP: $playerIP, geoLocation: $geoLocation")
+                savePlayerInfo(playerName, playerUUID, playerIP, geoLocation, lastUpdated)
+                plugin.logger.debug("Saved player info -> playerName: $playerName, playerUUID: $playerUUID, playerIP: $playerIP, geoLocation: $geoLocation, lastUpdated: $lastUpdated")
             } else {
-                plugin.logger.debug("Player info already exists -> playerName: $playerName, playerUUID: $playerUUID, playerIP: $playerIP, geoLocation: $geoLocation")
+                plugin.logger.debug("Player info already exists -> playerName: $playerName, playerUUID: $playerUUID, playerIP: $playerIP, geoLocation: $geoLocation, lastUpdated: $lastUpdated")
             }
         }
     }
@@ -46,10 +51,10 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         return searchCache(playerName, playerUUID, playerIP) != null
     }
 
-    private fun savePlayerInfo(playerName: String, playerUUID: String, playerIP: String, geoLocation: String?) {
-        val encryptedData = encrypt("$playerName,$playerUUID,$playerIP,$geoLocation")
+    private fun savePlayerInfo(playerName: String, playerUUID: String, playerIP: String, geoLocation: String?, lastUpdated: String) {
+        val encryptedData = encrypt("$playerName,$playerUUID,$playerIP,$geoLocation,$lastUpdated")
         cacheFile.appendText("$encryptedData\n")
-        plugin.logger.debug("Encrypted data saved -> playerName: $playerName, playerUUID: $playerUUID, playerIP: $playerIP, geoLocation: $geoLocation")
+        plugin.logger.debug("Encrypted data saved -> playerName: $playerName, playerUUID: $playerUUID, playerIP: $playerIP, geoLocation: $geoLocation, lastUpdated: $lastUpdated")
     }
 
     private fun generateKey(): Key {
@@ -69,7 +74,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
             val cipher = Cipher.getInstance("AES")
             cipher.init(Cipher.DECRYPT_MODE, secretKey)
             String(cipher.doFinal(bytes), UTF_8)
-        } catch (e: NumberFormatException) {
+        } catch (e: Exception) {
             plugin.logger.err("Failed to decrypt data: $data -> $e")
             ""
         }
@@ -89,6 +94,17 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         return ip
     }
 
+    fun getAllDecryptedRecords(): List<String> {
+        return cacheFile.readLines().mapNotNull { line ->
+            try {
+                decrypt(line)
+            } catch (e: Exception) {
+                plugin.logger.err("Error decrypting line: $line -> $e")
+                null
+            }
+        }
+    }
+
     private fun searchCache(playerName: String, playerUUID: String, playerIP: String): String? {
         plugin.logger.debug("Searching cache")
         val lines = cacheFile.readLines()
@@ -96,13 +112,13 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         for (line in lines) {
             val decryptedLine = decrypt(line)
             plugin.logger.debug("Decrypted line: $decryptedLine")
-            val parts = decryptedLine.split(",").map { it.trim().lowercase() }
-            plugin.logger.debug("Split parts: $parts")
-            if ((playerName.isEmpty() || parts[0] == playerName.lowercase()) &&
-                (playerUUID.isEmpty() || parts[1] == playerUUID.lowercase()) &&
-                (playerIP.isEmpty() || parts[2] == playerIP.lowercase())) {
-                plugin.logger.debug("Match found: ${parts[2]}")
-                return parts[2]
+            val parts = decryptedLine.split(",").map { it.trim() }
+            if ((playerName.isEmpty() || parts[0].equals(playerName, ignoreCase = true)) &&
+                (playerUUID.isEmpty() || parts[1].equals(playerUUID, ignoreCase = true)) &&
+                (playerIP.isEmpty() || parts[2].equals(playerIP, ignoreCase = true))
+            ) {
+                plugin.logger.debug("Match found: $decryptedLine")
+                return decryptedLine
             }
         }
         plugin.logger.debug("No match found in cache")
