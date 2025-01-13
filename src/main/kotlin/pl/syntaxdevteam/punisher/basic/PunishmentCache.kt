@@ -129,4 +129,8 @@ class PunishmentCache(private val plugin: PunisherX) {
             plugin.logger.severe("Error removing punishment from file: ${e.message}")
         }
     }
+/*
+    fun getAllDecryptedPunishments(): Map<UUID, Long> {
+        return cache.toMap()
+    }*/
 }

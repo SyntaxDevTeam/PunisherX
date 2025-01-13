@@ -16,7 +16,7 @@ class CacheCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         if (sender !is org.bukkit.command.ConsoleCommandSender) {
-            sender.sendRichMessage("console only!")
+            sender.sendRichMessage("Console only!")
             return
         }
 
