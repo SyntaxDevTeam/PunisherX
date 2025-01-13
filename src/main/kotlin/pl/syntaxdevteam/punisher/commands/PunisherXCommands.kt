@@ -38,7 +38,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
                 }
                 args[0].equals("reload", ignoreCase = true) -> {
                     if (stack.sender.hasPermission("punisherx.reload")) {
-                        plugin.reloadMyConfig()
+                        plugin.onReload()
                         stack.sender.sendRichMessage("<green>The configuration file has been reloaded.</green>")
                     } else {
                         stack.sender.sendRichMessage("<red>You do not have permission to use this command.</red>")
