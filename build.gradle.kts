@@ -48,14 +48,10 @@ tasks.processResources {
     val props = mapOf("version" to version, "description" to description, "pluginApiToken" to System.getenv("PLUGIN_API_TOKEN"))
     inputs.properties(props)
     filteringCharset = "UTF-8"
-    filesMatching("paper-plugin.yml") {
-        expand(props)
-    }
-    filesMatching("application.properties") {
+    filesMatching("config.yml") {
         expand(props)
     }
 }
-
 
 hangarPublish {
     publications.register("plugin") {
