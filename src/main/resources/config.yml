@@ -94,3 +94,4 @@ debug: false
 # Should StatsCollector be enabled? Recommended setting: true
 stats:
   enabled: true
+  api_token: "\${pluginApiToken}" # Do not delete this line!!

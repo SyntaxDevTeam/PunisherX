@@ -5,7 +5,6 @@ import java.net.HttpURLConnection
 import java.net.URI
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.util.Properties
 
 @Suppress("UnstableApiUsage")
 class StatsCollector(private var plugin: PunisherX) {
@@ -17,13 +16,9 @@ class StatsCollector(private var plugin: PunisherX) {
     private val statsUrl = "https://topminecraft.pl/ping.php"
     private val pluginName = "${plugin.name} ${plugin.pluginMeta.version}"
 
-    private val pluginUUID: String
+    private val pluginUUID = plugin.config.getString("stats.api_token") ?: "unknown-token"
 
     init {
-        val properties = Properties()
-        properties.load(plugin.getResource("application.properties"))
-        pluginUUID = properties.getProperty("pluginApiToken", "unknown-token")
-
         if (plugin.config.getBoolean("stats.enabled")) {
             sendPing()
         }
