@@ -47,10 +47,8 @@ jobs:
       - name: Download a Build Artifact
         uses: actions/download-artifact@v4.1.8
         with:
-          name: $GITHUB_WORKSPACE
-          repository: ${{ github.repository }}
-          run-id: ${{ github.run_id }}
-          
+          name: build-jar
+          path: ${{ steps.jarname.outputs.jarfile }}          
 
   dependency-submission:
     runs-on: ubuntu-latest
