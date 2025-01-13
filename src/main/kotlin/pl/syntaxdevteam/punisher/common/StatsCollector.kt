@@ -19,8 +19,7 @@ class StatsCollector(private var plugin: PunisherX) {
     private val pluginUUID = System.getenv("PLUGIN_API_TOKEN") ?: "unknown-token"
 
     init {
-        val token = System.getenv("PLUGIN_API_TOKEN")
-        plugin.logger.debug("PLUGIN_API_TOKEN: $token")
+        plugin.logger.debug("PLUGIN_API_TOKEN: $pluginUUID")
         if (plugin.config.getBoolean("stats.enabled")) {
             sendPing()
         }
