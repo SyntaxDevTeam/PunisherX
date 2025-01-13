@@ -38,6 +38,8 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Build with Gradle Wrapper
+        env:
+          PLUGIN_API_TOKEN: ${{ secrets.PLUGIN_API_TOKEN }}
         run: ./gradlew build --scan
 
       - name: Get JAR filename
