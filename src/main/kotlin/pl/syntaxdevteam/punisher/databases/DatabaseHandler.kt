@@ -7,6 +7,14 @@ import java.io.File
 import java.io.IOException
 import java.sql.*
 
+/**
+ * Handles database operations for the PunisherX plugin.
+ *
+ * This class manages the connection to the database, including setting up the data source,
+ * opening and closing connections, and creating necessary tables.
+ *
+ * @param plugin The instance of the PunisherX plugin.
+ */
 class DatabaseHandler(private val plugin: PunisherX) {
     private var dataSource: HikariDataSource? = null
     private var logger = plugin.logger
@@ -15,6 +23,23 @@ class DatabaseHandler(private val plugin: PunisherX) {
     init {
         setupDataSource()
     }
+
+    /**
+     * Configures the HikariCP data source for database connections.
+     *
+     * This method sets up the data source based on the database type defined in the plugin configuration.
+     * It supports the following database types:
+     * - MySQL/MariaDB
+     * - PostgreSQL
+     * - SQLite
+     * - H2
+     *
+     * For SQLite databases, specific pool settings are applied to minimize resource usage.
+     * For other database types, the pool is configured with more robust settings suitable for production.
+     *
+     * @throws IllegalArgumentException If the database type is unsupported.
+     * @throws Exception If an error occurs during data source initialization.
+     */
 
     private fun setupDataSource() {
         val hikariConfig = HikariConfig()
@@ -77,15 +102,28 @@ class DatabaseHandler(private val plugin: PunisherX) {
             logger.err("Failed to initialize HikariCP data source: ${e.message}")
             throw e
         }
-
     }
 
+    /**
+     * Ensures that the database connection is open.
+     *
+     * If the data source is not initialized, this method will invoke `setupDataSource`
+     * to configure and start the connection pool.
+     */
     fun openConnection() {
         if (dataSource == null) {
             setupDataSource()
         }
     }
 
+    /**
+     * Closes the HikariCP connection pool.
+     *
+     * This method gracefully shuts down the data source, releasing all resources associated with
+     * the connection pool. It also logs the pool's statistics, such as total, active, and idle connections.
+     *
+     * Any errors encountered during shutdown are logged but do not interrupt the process.
+     */
     fun closeConnection() {
         try {
             dataSource?.close()
@@ -95,6 +133,16 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
+    /**
+     * Obtains a connection from the HikariCP data source.
+     *
+     * This method retrieves a connection from the pool and, if the database type is SQLite,
+     * enables Write-Ahead Logging (WAL) mode to improve performance.
+     *
+     * Connections must be properly closed after use to avoid resource leaks.
+     *
+     * @return A valid `Connection` object, or `null` if the connection could not be established.
+     */
     private fun getConnection(): Connection? {
         return try {
             val connection = dataSource?.connection
@@ -109,6 +157,14 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
+    /**
+     * Enables Write-Ahead Logging (WAL) mode for SQLite.
+     *
+     * WAL mode improves SQLite's performance by allowing concurrent reads and writes.
+     * This method executes the `PRAGMA journal_mode=WAL;` statement on the provided connection.
+     *
+     * @param connection The active SQLite connection.
+     */
     private fun enableSQLiteWAL(connection: Connection) {
         logger.debug("SQLite connection detected! I'm enabling WAL mode")
         try {
@@ -121,7 +177,20 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-
+    /**
+     * Creates necessary tables in the database.
+     *
+     * This method executes SQL statements to create the following tables if they do not already exist:
+     * - `punishments`: Stores information about active punishments.
+     * - `punishmenthistory`: Stores information about historical punishments.
+     *
+     * The table structures and types are adapted to the configured database type
+     * (e.g., `SQLite`, `PostgreSQL`, `H2`, `MySQL`/`MariaDB`).
+     *
+     * SQL statements are constructed dynamically to match the syntax and capabilities of each database type.
+     *
+     * @throws SQLException If an error occurs while creating the tables.
+     */
     fun createTables() {
         getConnection()?.use { conn ->
             logger.debug("Database connection established from createTables")
@@ -474,6 +543,17 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return punishments
     }
 
+    /**
+     * Retrieves the last ten punishments for a given player UUID from the punishment history database.
+     *
+     * This method establishes a connection to the database, executes a query to fetch the last ten
+     * punishments for the specified UUID, and returns a list of PunishmentData objects representing
+     * the retrieved punishments. If no connection is available or an SQL exception occurs, an error
+     * message is logged and an empty list is returned.
+     *
+     * @param uuid The UUID of the player whose punishment history is to be retrieved.
+     * @return A list of PunishmentData objects representing the last ten punishments for the specified UUID.
+     */
     fun getLastTenPunishments(uuid: String): List<PunishmentData> {
         val punishments = mutableListOf<PunishmentData>()
         try {
