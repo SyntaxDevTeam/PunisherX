@@ -1,10 +1,11 @@
 package pl.syntaxdevteam.punisher.common
 
 import pl.syntaxdevteam.punisher.PunisherX
-import java.net.HttpURLConnection
-import java.net.URI
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URI
+import java.util.Properties
 
 @Suppress("UnstableApiUsage")
 class StatsCollector(private var plugin: PunisherX) {
@@ -16,11 +17,29 @@ class StatsCollector(private var plugin: PunisherX) {
     private val statsUrl = "https://topminecraft.pl/ping.php"
     private val pluginName = "${plugin.name} ${plugin.pluginMeta.version}"
 
-    private val pluginUUID = plugin.config.getString("stats.api_token") ?: "unknown-token"
+    private val pluginUUID: String
 
     init {
+        pluginUUID = loadPluginToken() ?: "unknown-token"
+        plugin.logger.debug("PLUGIN_API_TOKEN: $pluginUUID")
+
         if (plugin.config.getBoolean("stats.enabled")) {
             sendPing()
+        }
+    }
+
+    private fun loadPluginToken(): String? {
+        return try {
+            val properties = Properties()
+            val resource = javaClass.classLoader.getResourceAsStream("META-INF/plugin-api.properties")
+                ?: throw IllegalStateException("META-INF/plugin-api.properties not found!")
+            resource.use { inputStream ->
+                properties.load(inputStream)
+            }
+            properties.getProperty("plugin.api.token")
+        } catch (e: Exception) {
+            plugin.logger.warning("Failed to load plugin token: ${e.message}")
+            null
         }
     }
 
