@@ -45,10 +45,10 @@ tasks.build {
 }
 
 tasks.processResources {
-    val props = mapOf("version" to version, "description" to description, "pluginApiToken" to System.getenv("PLUGIN_API_TOKEN"))
+    val props = mapOf("version" to version, "description" to description)
     inputs.properties(props)
     filteringCharset = "UTF-8"
-    filesMatching("config.yml") {
+    filesMatching("paper-plugin.yml") {
         expand(props)
     }
 }
@@ -91,3 +91,21 @@ tasks.register("prepareChangelog") {
 tasks.named("publishPluginPublicationToHangar") {
     dependsOn("prepareChangelog")
 }
+
+val apiKey: String? = System.getenv("PLUGIN_API_TOKEN")
+tasks.register<Copy>("generateConfig") {
+    val configFile = file("src/main/resources/config.yml")
+    val outputDir = layout.buildDirectory.dir("generated-resources/main")
+
+    from(configFile) {
+        expand("apiKey" to (apiKey ?: "default_key")) // Jeśli brak klucza, wstaw "default_key"
+    }
+    into(outputDir)
+}
+
+tasks.named("processResources") {
+    dependsOn("generateConfig")
+}
+
+
+
