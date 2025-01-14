@@ -17,6 +17,9 @@ class StatsCollector(private var plugin: PunisherX) {
     private val pluginUUID: String = plugin.config.getString("stats.apiKey") ?: "unknown-token"
 
     init {
+        plugin.logger.debug("PLUGIN_API_TOKEN from config: $pluginUUID")
+        plugin.logger.debug("System.getenv PLUGIN_API_TOKEN: ${System.getenv("PLUGIN_API_TOKEN")}")
+
         if (pluginUUID == "unknown-token") {
             plugin.logger.warning("Stats API key is not configured. Please set 'stats.apiKey' in the config.yml.")
         } else {

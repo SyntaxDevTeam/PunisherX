@@ -47,15 +47,20 @@ tasks.build {
 tasks.processResources {
     val props = mapOf(
         "version" to version,
-        "description" to description,
-        "apiKey" to (System.getenv("PLUGIN_API_TOKEN") ?: "default_key")
+        "description" to description
     )
     inputs.properties(props)
     filteringCharset = "UTF-8"
-    filesMatching(listOf("paper-plugin.yml", "config.yml")) {
+    filesMatching(listOf("paper-plugin.yml")) {
         expand(props)
     }
+    val apiKey = System.getenv("PLUGIN_API_TOKEN") ?: "default_key"
+    filesMatching("config.yml") {
+        expand("apiKey" to apiKey)
+    }
 }
+
+
 
 hangarPublish {
     publications.register("plugin") {
