@@ -14,10 +14,14 @@ class StatsCollector(private var plugin: PunisherX) {
     private val statsUrl = "https://topminecraft.pl/ping.php"
     private val pluginName = "${plugin.name} ${plugin.pluginMeta.version}"
 
-    private val pluginUUID: String = plugin.config.getString("stats.apiKey") ?: "unknown-token"
+    private val pluginUUID: String = javaClass.getPackage().implementationTitle ?: "default_key"
+
+
+    //private val pluginUUID: String = plugin.config.getString("stats.apiKey") ?: "unknown-token"
 
     init {
-        plugin.logger.debug("PLUGIN_API_TOKEN from config: $pluginUUID")
+        //plugin.logger.debug("PLUGIN_API_TOKEN from config: $pluginUUID")
+        plugin.logger.debug("PLUGIN_API_TOKEN from manifest: $pluginUUID")
         plugin.logger.debug("System.getenv PLUGIN_API_TOKEN: ${System.getenv("PLUGIN_API_TOKEN")}")
 
         if (pluginUUID == "unknown-token") {
