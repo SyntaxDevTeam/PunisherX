@@ -100,3 +100,11 @@ tasks.register("prepareChangelog") {
 tasks.named("publishPluginPublicationToHangar") {
     dependsOn("prepareChangelog")
 }
+
+tasks.jar {
+    manifest {
+        attributes(
+            "PLUGIN_API_TOKEN" to (System.getenv("PLUGIN_API_TOKEN") ?: "default_key")
+        )
+    }
+}
