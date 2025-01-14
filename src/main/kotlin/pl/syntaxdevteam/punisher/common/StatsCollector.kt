@@ -5,7 +5,6 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URI
-import java.util.Properties
 
 @Suppress("UnstableApiUsage")
 class StatsCollector(private var plugin: PunisherX) {
@@ -17,31 +16,22 @@ class StatsCollector(private var plugin: PunisherX) {
     private val statsUrl = "https://topminecraft.pl/ping.php"
     private val pluginName = "${plugin.name} ${plugin.pluginMeta.version}"
 
-    private val pluginUUID: String
+    private val pluginUUID: String = plugin.config.getString("stats.apiKey") ?: "unknown-token"
 
     init {
-        pluginUUID = loadPluginToken() ?: "unknown-token"
-        plugin.logger.debug("PLUGIN_API_TOKEN: $pluginUUID")
+        if (pluginUUID == "unknown-token") {
+            plugin.logger.warning("Stats API key is not configured. Please set 'stats.apiKey' in the config.yml.")
+        } else {
+            plugin.logger.debug("PLUGIN_API_TOKEN: $pluginUUID")
+        }
 
         if (plugin.config.getBoolean("stats.enabled")) {
             sendPing()
+        } else {
+            plugin.logger.info("StatsCollector is disabled in the configuration.")
         }
     }
 
-    private fun loadPluginToken(): String? {
-        return try {
-            val properties = Properties()
-            val resource = javaClass.classLoader.getResourceAsStream("META-INF/plugin-api.properties")
-                ?: throw IllegalStateException("META-INF/plugin-api.properties not found!")
-            resource.use { inputStream ->
-                properties.load(inputStream)
-            }
-            properties.getProperty("plugin.api.token")
-        } catch (e: Exception) {
-            plugin.logger.warning("Failed to load plugin token: ${e.message}")
-            null
-        }
-    }
 
     private fun sendPing() {
         val uri = URI(statsUrl)
