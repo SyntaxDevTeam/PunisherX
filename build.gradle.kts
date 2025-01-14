@@ -107,5 +107,13 @@ tasks.named("processResources") {
     dependsOn("generateConfig")
 }
 
+tasks.processResources {
+    filesMatching("config.yml") {
+        expand("apiKey" to System.getenv("PLUGIN_API_TOKEN"))
+    }
+}
+
+
+
 
 
