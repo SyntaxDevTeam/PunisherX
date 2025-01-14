@@ -36,7 +36,10 @@ jobs:
 
       # 3. Zbuduj plugin za pomocą Gradle
       - name: Build with Gradle
+        env:
+          PLUGIN_API_TOKEN: ${{ secrets.PLUGIN_API_TOKEN }}
         run: ./gradlew build
+
 
       # 4. Prześlij wynikowy plik JAR jako artefakt
       - name: Upload JAR
