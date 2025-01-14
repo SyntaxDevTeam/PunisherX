@@ -1,8 +1,6 @@
 package pl.syntaxdevteam.punisher.common
 
 import pl.syntaxdevteam.punisher.PunisherX
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URI
 
@@ -22,7 +20,7 @@ class StatsCollector(private var plugin: PunisherX) {
         if (pluginUUID == "unknown-token") {
             plugin.logger.warning("Stats API key is not configured. Please set 'stats.apiKey' in the config.yml.")
         } else {
-            plugin.logger.debug("PLUGIN_API_TOKEN: $pluginUUID")
+            plugin.logger.debug("PLUGIN_API_TOKEN: ${pluginUUID.take(5)}*****")
         }
 
         if (plugin.config.getBoolean("stats.enabled")) {
@@ -32,38 +30,56 @@ class StatsCollector(private var plugin: PunisherX) {
         }
     }
 
-
     private fun sendPing() {
-        val uri = URI(statsUrl)
-        with(uri.toURL().openConnection() as HttpURLConnection) {
-            requestMethod = "POST"
-            doOutput = true
+        try {
+            val uri = URI(statsUrl)
+            with(uri.toURL().openConnection() as HttpURLConnection) {
+                requestMethod = "POST"
+                doOutput = true
+                connectTimeout = 5000
+                readTimeout = 5000
 
-            val data = "pluginName=$pluginName&serverIP=$serverIP&serverPort=$serverPort&serverVersion=$serverVersion&serverName=$serverName&pluginUUID=$pluginUUID"
-            outputStream.write(data.toByteArray())
-            outputStream.flush()
-            outputStream.close()
+                val data = mapOf(
+                    "pluginName" to pluginName,
+                    "serverIP" to serverIP,
+                    "serverPort" to serverPort.toString(),
+                    "serverVersion" to serverVersion,
+                    "serverName" to serverName,
+                    "pluginUUID" to pluginUUID
+                ).entries.joinToString("&") { "${it.key}=${it.value}" }
 
-            val responseCode = responseCode
-            plugin.logger.debug("Response Code: $responseCode")
+                outputStream.use {
+                    it.write(data.toByteArray())
+                    it.flush()
+                }
 
-            val inputStream = inputStream
-            val reader = BufferedReader(InputStreamReader(inputStream))
-            val response = StringBuilder()
-            var line: String?
-            while (reader.readLine().also { line = it } != null) {
-                response.append(line).append("\n")
+                val responseCode = responseCode
+                if (responseCode in 200..299) {
+                    inputStream.bufferedReader().use {
+                        val response = it.readText()
+                        plugin.logger.info("Stats sent successfully: $response")
+                    }
+                } else {
+                    errorStream?.bufferedReader()?.use {
+                        val errorResponse = it.readText()
+                        plugin.logger.warning("Failed to send stats. Response code: $responseCode. Error: $errorResponse")
+                    } ?: plugin.logger.warning("Failed to send stats. Response code: $responseCode. No error message.")
+                }
             }
-
-            plugin.logger.debug("Response Body: $response")
+        } catch (e: Exception) {
+            plugin.logger.severe("An error occurred while sending stats: ${e.message}")
         }
     }
 
     private fun getExternalIP(): String {
-        return try {
-            URI("https://api.ipify.org").toURL().readText()
-        } catch (e: Exception) {
-            "unknown"
+        val apis = listOf("https://api.ipify.org", "https://ifconfig.me/ip")
+        for (api in apis) {
+            try {
+                return URI(api).toURL().readText()
+            } catch (e: Exception) {
+                plugin.logger.warning("Failed to fetch IP from $api: ${e.message}")
+            }
         }
+        return "unknown"
     }
 }
