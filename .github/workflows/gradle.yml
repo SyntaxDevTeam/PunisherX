@@ -1,4 +1,4 @@
-name: Build and Test Plugin
+name: Build Plugin
 
 on:
   push:
@@ -42,35 +42,8 @@ jobs:
           PLUGIN_API_TOKEN: ${{ secrets.PLUGIN_API_TOKEN }}
         run: ./gradlew build
 
-      # 4. Pobierz serwer Minecraft (Paper)
-- name: Download Minecraft server
-  run: |
-    mkdir server
-    curl -o server/server.jar https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/114/downloads/paper-1.21.4-114.jar
 
-      # 5. Skopiuj plugin do folderu plugins serwera
-      - name: Copy plugin to server
-        run: |
-          mkdir -p server/plugins
-          cp build/libs/*.jar server/plugins/
-
-      # 6. Uruchom serwer Minecraft i sprawdź logi
-      - name: Start Minecraft server
-        run: |
-          cd server
-          echo "eula=true" > eula.txt
-          java -Xmx1024M -Xms1024M -jar server.jar nogui &
-          sleep 20
-          pkill -f 'server.jar'
-
-      # 7. Prześlij logi serwera jako artefakt
-      - name: Upload server logs
-        uses: actions/upload-artifact@v4
-        with:
-          name: server-logs
-          path: server/logs/latest.log
-
-      # 8. Prześlij wynikowy plik JAR jako artefakt
+      # 4. Prześlij wynikowy plik JAR jako artefakt
       - name: Upload JAR
         uses: actions/upload-artifact@v3
         with:
