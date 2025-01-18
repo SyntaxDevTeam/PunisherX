@@ -8,15 +8,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    env:
+      PLUGIN_API_TOKEN: ${{ secrets.PLUGIN_API_TOKEN }}
 
     steps:
       # 1. Checkout repozytorium
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Debug environment variables
-        run: echo "PLUGIN_API_TOKEN=${{ secrets.PLUGIN_API_TOKEN }}"
-
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew

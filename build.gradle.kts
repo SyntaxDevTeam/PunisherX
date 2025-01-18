@@ -1,4 +1,5 @@
 import io.papermc.hangarpublishplugin.model.Platforms
+import org.gradle.api.tasks.Copy
 
 plugins {
     kotlin("jvm") version "2.1.0"
@@ -60,6 +61,24 @@ tasks.processResources {
     }
 }
 
+val apiKey: String? = System.getenv("PLUGIN_API_TOKEN")
+
+tasks.register<Copy>("embedApiKey") {
+    val configFile = file("src/main/resources/config.yml")
+    val outputDir = layout.buildDirectory.dir("generated-resources/main")
+
+    from(configFile) {
+        expand("apiKey" to (apiKey ?: "default_key"))
+    }
+    into(outputDir)
+}
+
+tasks.processResources {
+    dependsOn("embedApiKey")
+    from("build/generated-resources/main") {
+        into("config")
+    }
+}
 
 
 hangarPublish {
