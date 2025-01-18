@@ -23,7 +23,7 @@ class PunisherX : JavaPlugin(), Listener {
     private val configHandler by lazy { ConfigHandler(this) }
     private val config: FileConfiguration = configHandler.getConfig()
     var logger: Logger = Logger(this, config.getBoolean("debug"))
-    private lateinit var pluginsManager: PluginManager
+    lateinit var pluginsManager: PluginManager
     private lateinit var statsCollector: StatsCollector
     lateinit var databaseHandler: DatabaseHandler
     lateinit var messageHandler: MessageHandler
