@@ -9,7 +9,6 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
-      # 1. Checkout repozytorium
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -23,7 +22,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v4
@@ -33,20 +32,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # 3. Zbuduj plugin za pomocą Gradle
       - name: Build with Gradle
-        run: ./gradlew build --scan
+        run: ./gradlew build --scan --stacktrace
 
-
-      # 4. Prześlij wynikowy plik JAR jako artefakt
       - name: Upload JAR
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: plugin.jar
           path: build/libs/*.jar
 
   dependency-submission:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
 
@@ -64,4 +60,4 @@ jobs:
           distribution: 'temurin'
 
       - name: Generate and submit dependency graph
-        uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+        uses: gradle/actions/dependency-submission@v4
