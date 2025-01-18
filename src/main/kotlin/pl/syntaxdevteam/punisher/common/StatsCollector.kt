@@ -51,17 +51,17 @@ class StatsCollector(private var plugin: PunisherX) {
                 if (responseCode in 200..299) {
                     inputStream.bufferedReader().use {
                         val response = it.readText()
-                        plugin.logger.info("Stats sent successfully: $response")
+                        plugin.logger.debug("Stats sent successfully: $response")
                     }
                 } else {
                     errorStream?.bufferedReader()?.use {
                         val errorResponse = it.readText()
-                        plugin.logger.warning("Failed to send stats. Response code: $responseCode. Error: $errorResponse")
-                    } ?: plugin.logger.warning("Failed to send stats. Response code: $responseCode. No error message.")
+                        plugin.logger.debug("Failed to send stats. Response code: $responseCode. Error: $errorResponse")
+                    } ?: plugin.logger.debug("Failed to send stats. Response code: $responseCode. No error message.")
                 }
             }
         } catch (e: Exception) {
-            plugin.logger.severe("An error occurred while sending stats: ${e.message}")
+            plugin.logger.debug("An error occurred while sending stats: ${e.message}")
         }
     }
 
@@ -71,7 +71,7 @@ class StatsCollector(private var plugin: PunisherX) {
             try {
                 return URI(api).toURL().readText()
             } catch (e: Exception) {
-                plugin.logger.warning("Failed to fetch IP from $api: ${e.message}")
+                plugin.logger.debug("Failed to fetch IP from $api: ${e.message}")
             }
         }
         return "unknown"
