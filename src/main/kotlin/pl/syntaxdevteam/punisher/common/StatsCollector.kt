@@ -11,7 +11,7 @@ class StatsCollector(private var plugin: PunisherX) {
     private val serverPort = plugin.server.port
     private val serverVersion = plugin.server.version
     private val serverName = plugin.server.name
-    private val statsUrl = "https://topminecraft.pl/ping.php"
+    private val statsUrl = "https://syntaxdevteam.pl/ping.php"
     private val pluginName = "${plugin.name} ${plugin.pluginMeta.version}"
 
     private val pluginUUID: String = plugin.pluginsManager.getPluginUUID(plugin.name) ?: "unknown"
