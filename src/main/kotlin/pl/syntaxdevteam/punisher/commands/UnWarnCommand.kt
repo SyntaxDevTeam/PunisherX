@@ -26,7 +26,7 @@ class UnWarnCommand(private val plugin: PunisherX) : BasicCommand {
                 stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unwarn", "usage_unwarn"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unwarn", "usage"))
         }
     }
 

@@ -72,7 +72,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
                 stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("ban", "usage_unban"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unban", "usage"))
         }
     }
 
