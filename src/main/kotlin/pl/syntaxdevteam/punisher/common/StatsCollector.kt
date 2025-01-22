@@ -1,6 +1,7 @@
 package pl.syntaxdevteam.punisher.common
 
 import pl.syntaxdevteam.punisher.PunisherX
+import java.util.concurrent.CompletableFuture
 import java.net.HttpURLConnection
 import java.net.URI
 
@@ -25,43 +26,39 @@ class StatsCollector(private var plugin: PunisherX) {
     }
 
     private fun sendPing() {
-        try {
-            val uri = URI(statsUrl)
-            with(uri.toURL().openConnection() as HttpURLConnection) {
-                requestMethod = "POST"
-                doOutput = true
-                connectTimeout = 5000
-                readTimeout = 5000
+        CompletableFuture.runAsync {
+            try {
+                val uri = URI(statsUrl)
+                with(uri.toURL().openConnection() as HttpURLConnection) {
+                    requestMethod = "POST"
+                    doOutput = true
+                    connectTimeout = 5000
+                    readTimeout = 5000
 
-                val data = mapOf(
-                    "pluginName" to pluginName,
-                    "serverIP" to serverIP,
-                    "serverPort" to serverPort.toString(),
-                    "serverVersion" to serverVersion,
-                    "serverName" to serverName,
-                    "pluginUUID" to pluginUUID
-                ).entries.joinToString("&") { "${it.key}=${it.value}" }
+                    val data = mapOf(
+                        "pluginName" to pluginName,
+                        "serverIP" to serverIP,
+                        "serverPort" to serverPort.toString(),
+                        "serverVersion" to serverVersion,
+                        "serverName" to serverName,
+                        "pluginUUID" to pluginUUID
+                    ).entries.joinToString("&") { "${it.key}=${it.value}" }
 
-                outputStream.use {
-                    it.write(data.toByteArray())
-                    it.flush()
-                }
-
-                val responseCode = responseCode
-                if (responseCode in 200..299) {
-                    inputStream.bufferedReader().use {
-                        val response = it.readText()
-                        plugin.logger.debug("Stats sent successfully: $response")
+                    outputStream.use {
+                        it.write(data.toByteArray())
+                        it.flush()
                     }
-                } else {
-                    errorStream?.bufferedReader()?.use {
-                        val errorResponse = it.readText()
-                        plugin.logger.debug("Failed to send stats. Response code: $responseCode. Error: $errorResponse")
-                    } ?: plugin.logger.debug("Failed to send stats. Response code: $responseCode. No error message.")
+
+                    val responseCode = responseCode
+                    if (responseCode in 200..299) {
+                        plugin.logger.debug("Stats sent successfully.")
+                    } else {
+                        plugin.logger.debug("Failed to send stats. Response code: $responseCode.")
+                    }
                 }
+            } catch (e: Exception) {
+                plugin.logger.warning("An error occurred while sending stats: ${e.message}")
             }
-        } catch (e: Exception) {
-            plugin.logger.debug("An error occurred while sending stats: ${e.message}")
         }
     }
 
