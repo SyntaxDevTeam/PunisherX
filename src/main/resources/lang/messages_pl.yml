@@ -115,7 +115,7 @@ mute:
 # Wiadomości komendy /unmute
 unmute:
   unmute: "<green>Odwyciszyłeś gracza <gold>{player}</gold></green>"
-  usage: "Poprawne użycie to: <gold>/mute <nazwa_gracza>"
+  usage: "Poprawne użycie to: <gold>/unmute <nazwa_gracza>"
   unmute_message: "<green>Zostałeś/aś odwyciszony/a!</green>"
 
 # Wiadomości komendy /warn
@@ -134,7 +134,7 @@ warn:
 # Wiadomości komendy /unwarn
 unwarn:
   unwarn: "<green>Usunąłeś ostrzeżenie dla gracza <gold>{player}</gold></green>"
-  usage: "Poprawne użycie to: <gold>/warn <nazwa_gracza>"
+  usage: "Poprawne użycie to: <gold>/unwarn <nazwa_gracza>"
 
 # Wiadomości komendy /kick
 kick:

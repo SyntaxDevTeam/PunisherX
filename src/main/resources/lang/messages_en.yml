@@ -114,7 +114,7 @@ mute:
 # /unmute command messages
 unmute:
   unmute: "<green>You unmuted player <gold>{player}</gold></green>"
-  usage: "Correct usage is: <gold>/mute <player>"
+  usage: "Correct usage is: <gold>/unmute <player>"
   unmute_message: "<green>You have been unmuted!</green>"
 
 # /warn command messages
@@ -133,7 +133,7 @@ warn:
 # /unwarn command messages
 unwarn:
   unwarn: "<green>You removed the warning for player <gold>{player}</gold></green>"
-  usage: "Correct usage is: <gold>/warn <player>"
+  usage: "Correct usage is: <gold>/unwarn <player>"
 
 # /kick command messages
 kick:

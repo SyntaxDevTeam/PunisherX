@@ -115,7 +115,7 @@ mute:
 # Nachrichten für den /unmute-Befehl
 unmute:
   unmute: "<green>Du hast Spieler <gold>{player}</gold> entstummt</green>"
-  usage: "Korrekte Verwendung: <gold>/mute <player>"
+  usage: "Korrekte Verwendung: <gold>/unmute <player>"
   unmute_message: "<green>Du wurdest entstummt!</green>"
 
 # Nachrichten für den /warn-Befehl
@@ -134,7 +134,7 @@ warn:
 # Nachrichten für den /unwarn-Befehl
 unwarn:
   unwarn: "<green>Du hast die Verwarnung für Spieler <gold>{player}</gold> entfernt</green>"
-  usage: "Korrekte Verwendung: <gold>/warn <player>"
+  usage: "Korrekte Verwendung: <gold>/unwarn <player>"
 
 # Nachrichten für den /kick-Befehl
 kick:

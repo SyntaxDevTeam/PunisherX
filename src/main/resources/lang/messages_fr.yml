@@ -116,7 +116,7 @@ mute:
 # Messages de la commande /unmute
 unmute:
   unmute: "<green>Vous avez rétabli la voix de <gold>{player}</gold></green>"
-  usage: "Utilisation correcte : <gold>/mute <player>"
+  usage: "Utilisation correcte : <gold>/unmute <player>"
   unmute_message: "<green>Vous avez retrouvé votre voix !</green>"
 
 # Messages de la commande /warn
@@ -135,7 +135,7 @@ warn:
 # Messages de la commande /unwarn
 unwarn:
   unwarn: "<green>Vous avez retiré l'avertissement de <gold>{player}</gold></green>"
-  usage: "Utilisation correcte : <gold>/warn <player>"
+  usage: "Utilisation correcte : <gold>/unwarn <player>"
 
 # Messages de la commande /kick
 kick:
