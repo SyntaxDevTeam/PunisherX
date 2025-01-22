@@ -17,7 +17,7 @@ localization:
 
 loader: pl.syntaxdevteam.punisher.loader.SyntaxLoader
 has-open-classloader: false
-load before: [RewarderX]
+load before: [RewarderX, LPC]
 
 softdepend: [Folia]
 
