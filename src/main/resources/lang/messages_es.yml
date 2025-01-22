@@ -116,7 +116,7 @@ mute:
 # Mensajes del comando /unmute
 unmute:
   unmute: "<green>Has desilenciado a <gold>{player}</gold></green>"
-  usage: "Uso correcto: <gold>/mute <player>"
+  usage: "Uso correcto: <gold>/unmute <player>"
   unmute_message: "<green>¡Has sido desilenciado/a!</green>"
 
 # Mensajes del comando /warn
@@ -135,7 +135,7 @@ warn:
 # Mensajes del comando /unwarn
 unwarn:
   unwarn: "<green>Has eliminado la advertencia del jugador <gold>{player}</gold></green>"
-  usage: "Uso correcto: <gold>/warn <player>"
+  usage: "Uso correcto: <gold>/unwarn <player>"
 
 # Mensajes del comando /kick
 kick:
