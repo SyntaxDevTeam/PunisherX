@@ -54,7 +54,7 @@ class CommandManager(private val plugin: PunisherX) {
                 MuteCommand(plugin)
             )
             commands.register(
-                "unmute", plugin.messageHandler.getMessage("mute", "usage"),
+                "unmute", plugin.messageHandler.getMessage("unmute", "usage"),
                 UnMuteCommand(plugin)
             )
             commands.register(
@@ -84,12 +84,12 @@ class CommandManager(private val plugin: PunisherX) {
             )
             commands.register(
                 "unban",
-                plugin.messageHandler.getMessage("ban", "usage"),
+                plugin.messageHandler.getMessage("unban", "usage"),
                 UnBanCommand(plugin)
             )
             commands.register(
                 "cache",
-                plugin.messageHandler.getMessage("ban", "usage"),
+                plugin.messageHandler.getMessage("cache", "usage"),
                 CacheCommand(plugin)
             )
             commands.register(
@@ -139,7 +139,7 @@ class CommandManager(private val plugin: PunisherX) {
                     )
 
                     "unmute" -> commands.register(
-                        commandName, plugin.messageHandler.getMessage("mute", "usage"),
+                        commandName, plugin.messageHandler.getMessage("unmute", "usage"),
                         UnMuteCommand(plugin)
                     )
 
@@ -175,7 +175,7 @@ class CommandManager(private val plugin: PunisherX) {
 
                     "unban" -> commands.register(
                         commandName,
-                        plugin.messageHandler.getMessage("ban", "usage"),
+                        plugin.messageHandler.getMessage("unban", "usage"),
                         UnBanCommand(plugin)
                     )
 

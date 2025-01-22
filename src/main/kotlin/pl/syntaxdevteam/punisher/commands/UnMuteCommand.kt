@@ -35,7 +35,7 @@ class UnMuteCommand(private val plugin: PunisherX) : BasicCommand {
                 stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unmute", "usage_unmute"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unmute", "usage"))
         }
     }
 
