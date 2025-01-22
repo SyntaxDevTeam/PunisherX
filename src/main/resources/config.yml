@@ -94,5 +94,3 @@ debug: false
 # Should StatsCollector be enabled? Recommended setting: true
 stats:
   enabled: true
-
-apiKey: ${apiKey} # Do not delete this line!!
