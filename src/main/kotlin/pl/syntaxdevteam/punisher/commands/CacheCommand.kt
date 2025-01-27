@@ -10,10 +10,6 @@ class CacheCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         val sender = stack.sender
-        if (args.isNotEmpty()) {
-            sender.sendRichMessage(plugin.messageHandler.getMessage("cache", "usage"))
-            return
-        }
 
         if (sender !is org.bukkit.command.ConsoleCommandSender) {
             sender.sendRichMessage("Console only!")

@@ -10,8 +10,8 @@ import pl.syntaxdevteam.punisher.PunisherX
 class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (args.isNotEmpty()) {
-            if (stack.sender.hasPermission("punisherx.unban")) {
+        if (stack.sender.hasPermission("punisherx.unban")) {
+            if (args.isNotEmpty()) {
                 val playerOrIpOrUUID = args[0]
                 val broadcastMessage = MiniMessage.miniMessage().deserialize(plugin.messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
                 if (playerOrIpOrUUID.matches(Regex("\\d+\\.\\d+\\.\\d+\\.\\d+"))) {
@@ -69,14 +69,17 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
                     }
                 }
             } else {
-                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unban", "usage"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unban", "usage"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
         }
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        if (!stack.sender.hasPermission("punisherx.unban")) {
+            return emptyList()
+        }
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
             else -> emptyList()

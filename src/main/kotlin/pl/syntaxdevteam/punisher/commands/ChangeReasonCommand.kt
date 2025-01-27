@@ -9,8 +9,8 @@ import pl.syntaxdevteam.punisher.PunisherX
 class ChangeReasonCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (args.isNotEmpty()) {
-            if (stack.sender.hasPermission("punisherx.change_reason")) {
+        if (stack.sender.hasPermission("punisherx.change_reason")) {
+            if (args.isNotEmpty()) {
                 if (args.size < 2) {
                     stack.sender.sendRichMessage(plugin.messageHandler.getMessage("change-reason", "usage"))
                     return
@@ -40,14 +40,18 @@ class ChangeReasonCommand(private val plugin: PunisherX) : BasicCommand {
                     )
                 }
             } else {
-                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("ban", "usage"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("ban", "usage"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
         }
+
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        if (!stack.sender.hasPermission("punisherx.banip")) {
+            return emptyList()
+        }
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
             2 -> generateTimeSuggestions()

@@ -9,8 +9,8 @@ import pl.syntaxdevteam.punisher.PunisherX
 class UnWarnCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (args.isNotEmpty()) {
-            if (stack.sender.hasPermission("punisherx.unwarn")) {
+        if (stack.sender.hasPermission("punisherx.unwarn")) {
+            if (args.isNotEmpty()) {
                 val player = args[0]
                 val uuid = plugin.uuidManager.getUUID(player).toString()
                 val punishments = plugin.databaseHandler.getPunishments(uuid)
@@ -23,14 +23,17 @@ class UnWarnCommand(private val plugin: PunisherX) : BasicCommand {
                     stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to player)))
                 }
             } else {
-                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unwarn", "usage"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unwarn", "usage"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
         }
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        if (!stack.sender.hasPermission("punisherx.unwarn")) {
+            return emptyList()
+        }
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
             else -> emptyList()

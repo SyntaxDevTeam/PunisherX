@@ -60,6 +60,9 @@ class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        if (!stack.sender.hasPermission("punisherx.setjail")) {
+            return emptyList()
+        }
         return when (args.size) {
             1 -> listOf("radius")
             2 -> (1..100).map { it.toString() }
