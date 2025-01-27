@@ -1,5 +1,5 @@
 import io.papermc.hangarpublishplugin.model.Platforms
-import org.gradle.api.tasks.Copy
+
 
 plugins {
     kotlin("jvm") version "2.1.0"
@@ -54,10 +54,6 @@ tasks.processResources {
     filteringCharset = "UTF-8"
     filesMatching(listOf("paper-plugin.yml")) {
         expand(props)
-    }
-    val apiKey = System.getenv("PLUGIN_API_TOKEN") ?: "default_key"
-    filesMatching("config.yml") {
-        expand("apiKey" to apiKey)
     }
 }
 
@@ -118,12 +114,4 @@ tasks.register("prepareChangelog") {
 
 tasks.named("publishPluginPublicationToHangar") {
     dependsOn("prepareChangelog")
-}
-
-tasks.jar {
-    manifest {
-        attributes(
-            "PLUGIN_API_TOKEN" to (System.getenv("PLUGIN_API_TOKEN") ?: "default_key")
-        )
-    }
 }
