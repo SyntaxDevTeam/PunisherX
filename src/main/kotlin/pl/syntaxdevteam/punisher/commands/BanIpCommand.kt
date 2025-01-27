@@ -12,8 +12,8 @@ import pl.syntaxdevteam.punisher.PunisherX
 class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (args.isNotEmpty()) {
-            if (stack.sender.hasPermission("punisherx.banip")) {
+        if (stack.sender.hasPermission("punisherx.banip")) {
+            if (args.isNotEmpty()) {
                 if (args.size < 2) {
                     stack.sender.sendRichMessage(plugin.messageHandler.getMessage("banip", "usage"))
                 } else {
@@ -87,14 +87,17 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
                     }
                 }
             } else {
-                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("banip", "usage"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("banip", "usage"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
         }
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        if (!stack.sender.hasPermission("punisherx.banip")) {
+            return emptyList()
+        }
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
             2 -> generateTimeSuggestions()

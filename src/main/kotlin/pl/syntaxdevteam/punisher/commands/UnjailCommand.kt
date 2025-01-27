@@ -12,13 +12,13 @@ import pl.syntaxdevteam.punisher.PunisherX
 class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (args.isEmpty()) {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unjail", "usage"))
-            return
-        }
 
         if (!stack.sender.hasPermission("punisherx.unjail")) {
             stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            return
+        }
+        if (args.isEmpty()) {
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unjail", "usage"))
             return
         }
 
@@ -73,6 +73,9 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        if (!stack.sender.hasPermission("punisherx.unjail")) {
+            return emptyList()
+        }
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
             else -> emptyList()

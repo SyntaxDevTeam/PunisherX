@@ -13,13 +13,13 @@ import pl.syntaxdevteam.punisher.basic.JailUtils
 class JailCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (args.isEmpty() || args.size < 2) {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("jail", "usage"))
-            return
-        }
 
         if (!stack.sender.hasPermission("punisherx.jail")) {
             stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            return
+        }
+        if (args.isEmpty() || args.size < 2) {
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("jail", "usage"))
             return
         }
 
@@ -132,6 +132,9 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        if (!stack.sender.hasPermission("punisherx.jail")) {
+            return emptyList()
+        }
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
             2 -> generateTimeSuggestions()

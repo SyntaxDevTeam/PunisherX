@@ -89,7 +89,7 @@ class CommandManager(private val plugin: PunisherX) {
             )
             commands.register(
                 "cache",
-                plugin.messageHandler.getMessage("cache", "usage"),
+                "debugging command",
                 CacheCommand(plugin)
             )
             commands.register(

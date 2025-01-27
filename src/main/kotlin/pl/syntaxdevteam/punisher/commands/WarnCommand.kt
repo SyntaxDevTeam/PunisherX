@@ -11,8 +11,8 @@ import pl.syntaxdevteam.punisher.PunisherX
 class WarnCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (args.isNotEmpty()) {
-            if (stack.sender.hasPermission("punisherx.warn")) {
+        if (stack.sender.hasPermission("punisherx.warn")) {
+            if (args.isNotEmpty()) {
                 if (args.size < 2) {
                     stack.sender.sendRichMessage(plugin.messageHandler.getMessage("warn", "usage"))
                 } else {
@@ -57,14 +57,17 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                     executeWarnAction(player, warnCount)
                 }
             } else {
-                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("warn", "usage"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("warn", "usage"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
         }
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        if (!stack.sender.hasPermission("punisherx.warn")) {
+            return emptyList()
+        }
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
             2 -> generateTimeSuggestions()

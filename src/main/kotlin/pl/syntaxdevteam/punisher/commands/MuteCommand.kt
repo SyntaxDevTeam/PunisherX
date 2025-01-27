@@ -11,8 +11,8 @@ import pl.syntaxdevteam.punisher.PunisherX
 class MuteCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (args.isNotEmpty()) {
-            if (stack.sender.hasPermission("punisherx.mute")) {
+        if (stack.sender.hasPermission("punisherx.mute")) {
+            if (args.isNotEmpty()) {
                 if (args.size < 2) {
                     stack.sender.sendRichMessage(plugin.messageHandler.getMessage("mute", "usage"))
                 } else {
@@ -64,14 +64,17 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                     }
                 }
             } else {
-                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("mute", "usage"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("mute", "usage"))
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
         }
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        if (!stack.sender.hasPermission("punisherx.mute")) {
+            return emptyList()
+        }
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
             2 -> generateTimeSuggestions()
