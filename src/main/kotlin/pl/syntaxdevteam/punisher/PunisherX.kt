@@ -1,7 +1,7 @@
 package pl.syntaxdevteam.punisher
 
 import io.papermc.paper.event.player.AsyncChatEvent
-//import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
@@ -20,9 +20,8 @@ import java.util.*
  */
 @Suppress("UnstableApiUsage")
 class PunisherX : JavaPlugin(), Listener {
-    /*private val configHandler by lazy { ConfigHandler(this) }
-    private val config: FileConfiguration = configHandler.getConfig()*/
-    private var config = getConfig()
+    private val configHandler by lazy { ConfigHandler(this, "config.yml") }
+    private val config: FileConfiguration = getConfig()
     var logger: Logger = Logger(this, config.getBoolean("debug"))
     lateinit var pluginsManager: PluginManager
     private lateinit var statsCollector: StatsCollector
@@ -72,8 +71,8 @@ class PunisherX : JavaPlugin(), Listener {
      * Sets up the plugin configuration.
      */
     private fun setupConfig() {
-        //configHandler.updateConfig()
         saveDefaultConfig()
+        configHandler.verifyAndUpdateConfig()
     }
 
     /**
@@ -137,7 +136,6 @@ class PunisherX : JavaPlugin(), Listener {
     private fun reloadMyConfig() {
         databaseHandler.closeConnection()
         try {
-            //configHandler.reloadConfig()
             messageHandler.reloadMessages()
         } catch (e: Exception) {
             logger.err(messageHandler.getMessage("error", "reload") + e.message)
