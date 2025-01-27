@@ -10,6 +10,14 @@ import pl.syntaxdevteam.punisher.PunisherX
 class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+        if (!stack.sender.hasPermission("punisherx.help") ||
+            !stack.sender.hasPermission("punisherx.version") ||
+            !stack.sender.hasPermission("punisherx.reload") ||
+            !stack.sender.hasPermission("punisherx.export") ||
+            !stack.sender.hasPermission("punisherx.import")) {
+            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            return
+        }
         val pluginMeta = (plugin as LifecycleEventOwner).pluginMeta
         val pdf = plugin.description
         if (args.isNotEmpty()) {
@@ -119,6 +127,13 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        if (!stack.sender.hasPermission("punisherx.help") ||
+            !stack.sender.hasPermission("punisherx.version") ||
+            !stack.sender.hasPermission("punisherx.reload") ||
+            !stack.sender.hasPermission("punisherx.export") ||
+            !stack.sender.hasPermission("punisherx.import")) {
+            return emptyList()
+        }
         return when (args.size) {
             1 -> listOf("help", "version", "reload", "export", "import")
             else -> emptyList()
