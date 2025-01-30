@@ -25,7 +25,7 @@ dependencies {
     compileOnly("dev.folia:folia-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.3")
-    compileOnly("com.google.code.gson:gson:2.11.0")
+    compileOnly("com.google.code.gson:gson:2.12.0")
     compileOnly("com.maxmind.geoip2:geoip2:4.2.1")
     compileOnly("org.apache.ant:ant:1.10.15")
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
