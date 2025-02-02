@@ -20,7 +20,6 @@ import java.util.*
  */
 @Suppress("UnstableApiUsage")
 class PunisherX : JavaPlugin(), Listener {
-    private val configHandler by lazy { ConfigHandler(this, "config.yml") }
     private val config: FileConfiguration = getConfig()
     var logger: Logger = Logger(this, config.getBoolean("debug"))
     lateinit var pluginsManager: PluginManager
@@ -72,7 +71,6 @@ class PunisherX : JavaPlugin(), Listener {
      */
     private fun setupConfig() {
         saveDefaultConfig()
-        configHandler.verifyAndUpdateConfig()
     }
 
     /**
