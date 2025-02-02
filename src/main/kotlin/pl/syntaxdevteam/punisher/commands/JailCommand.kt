@@ -2,7 +2,6 @@ package pl.syntaxdevteam.punisher.commands
 
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
-import net.kyori.adventure.text.minimessage.MiniMessage
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.GameMode
@@ -15,11 +14,11 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
 
         if (!stack.sender.hasPermission("punisherx.jail")) {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
             return
         }
         if (args.isEmpty() || args.size < 2) {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("jail", "usage"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("jail", "usage"))
             return
         }
 
@@ -30,7 +29,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
 
         if (targetPlayer != null) {
             if (!isForce && targetPlayer.hasPermission("punisherx.bypass.jail")) {
-                stack.sender.sendRichMessage(
+                stack.sender.sendMessage(
                     plugin.messageHandler.getMessage("error", "bypass", mapOf("player" to playerName))
                 )
                 return
@@ -103,7 +102,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
 
             plugin.cache.addOrUpdatePunishment(uuid, end ?: -1)
 
-            sendRichMessage(
+            sendMessage(
                 plugin.messageHandler.getMessage(
                     "jail", "jail_message",
                     mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
@@ -111,19 +110,18 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             )
         }
 
-        val broadcastMessage = MiniMessage.miniMessage().deserialize(
+        val broadcastMessage =
             plugin.messageHandler.getMessage(
                 "jail", "broadcast",
                 mapOf("player" to playerName, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
             )
-        )
         plugin.server.onlinePlayers.forEach { onlinePlayer ->
             if (onlinePlayer.hasPermission("punisherx.see.jail")) {
                 onlinePlayer.sendMessage(broadcastMessage)
             }
         }
 
-        stack.sender.sendRichMessage(
+        stack.sender.sendMessage(
             plugin.messageHandler.getMessage(
                 "jail", "jail",
                 mapOf("player" to playerName, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))

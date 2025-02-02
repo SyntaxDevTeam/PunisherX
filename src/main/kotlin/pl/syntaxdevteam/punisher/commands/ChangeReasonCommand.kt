@@ -12,18 +12,18 @@ class ChangeReasonCommand(private val plugin: PunisherX) : BasicCommand {
         if (stack.sender.hasPermission("punisherx.change_reason")) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
-                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("change-reason", "usage"))
+                    stack.sender.sendMessage(plugin.messageHandler.getMessage("change-reason", "usage"))
                     return
                 }
                 val id = args[0].toIntOrNull()
                 val newReason = args.drop(1).joinToString(" ")
                 if (id == null) {
-                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("change-reason", "invalid_id"))
+                    stack.sender.sendMessage(plugin.messageHandler.getMessage("change-reason", "invalid_id"))
                     return
                 }
                 val success = plugin.databaseHandler.updatePunishmentReason(id, newReason)
                 if (success) {
-                    stack.sender.sendRichMessage(
+                    stack.sender.sendMessage(
                         plugin.messageHandler.getMessage(
                             "change-reason",
                             "success",
@@ -31,7 +31,7 @@ class ChangeReasonCommand(private val plugin: PunisherX) : BasicCommand {
                         )
                     )
                 } else {
-                    stack.sender.sendRichMessage(
+                    stack.sender.sendMessage(
                         plugin.messageHandler.getMessage(
                             "change-reason",
                             "failure",
@@ -40,10 +40,10 @@ class ChangeReasonCommand(private val plugin: PunisherX) : BasicCommand {
                     )
                 }
             } else {
-                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("ban", "usage"))
+                stack.sender.sendMessage(plugin.messageHandler.getMessage("ban", "usage"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
         }
 
     }

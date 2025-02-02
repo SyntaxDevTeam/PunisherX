@@ -24,7 +24,7 @@ class CacheCommand(private val plugin: PunisherX) : BasicCommand {
         } else {
             plugin.logger.info("Cache Contents:")
             allRecords.forEach { record ->
-                plugin.logger.info(record)
+                plugin.logger.info(record.toString())
             }
         }
     }

@@ -3,7 +3,6 @@ package pl.syntaxdevteam.punisher.commands
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
@@ -15,7 +14,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
         if (stack.sender.hasPermission("punisherx.banip")) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
-                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("banip", "usage"))
+                    stack.sender.sendMessage(plugin.messageHandler.getMessage("banip", "usage"))
                 } else {
                     val playerOrIpOrUUID = args[0]
                     val playerIP = when {
@@ -25,14 +24,14 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
                     }
 
                     if (playerIP == null) {
-                        stack.sender.sendRichMessage(plugin.messageHandler.getMessage("banip", "not_found"))
+                        stack.sender.sendMessage(plugin.messageHandler.getMessage("banip", "not_found"))
                         return
                     }
                     val targetPlayer = Bukkit.getPlayer(playerOrIpOrUUID)
                     val isForce = args.contains("--force")
                     if (targetPlayer != null) {
                         if (!isForce && targetPlayer.hasPermission("punisherx.bypass.banip")) {
-                            stack.sender.sendRichMessage(
+                            stack.sender.sendMessage(
                                 plugin.messageHandler.getMessage(
                                     "error",
                                     "bypass",
@@ -74,9 +73,9 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
                         targetPlayer.kick(kickMessage.build())
                     }
 
-                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("banip", "ban", mapOf("player" to playerOrIpOrUUID, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))))
+                    stack.sender.sendMessage(plugin.messageHandler.getMessage("banip", "ban", mapOf("player" to playerOrIpOrUUID, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))))
                     val permission = "punisherx.see.banip"
-                    val broadcastMessage = MiniMessage.miniMessage().deserialize(plugin.messageHandler.getMessage("banip", "ban", mapOf("player" to playerOrIpOrUUID, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))))
+                    val broadcastMessage = plugin.messageHandler.getMessage("banip", "ban", mapOf("player" to playerOrIpOrUUID, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime)))
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if (onlinePlayer.hasPermission(permission)) {
                             onlinePlayer.sendMessage(broadcastMessage)
@@ -87,10 +86,10 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
                     }
                 }
             } else {
-                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("banip", "usage"))
+                stack.sender.sendMessage(plugin.messageHandler.getMessage("banip", "usage"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
         }
     }
 

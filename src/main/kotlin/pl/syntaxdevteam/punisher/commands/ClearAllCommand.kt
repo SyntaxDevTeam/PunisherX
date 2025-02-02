@@ -21,19 +21,19 @@ class ClearAllCommand(private val plugin: PunisherX) : BasicCommand {
                             plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
                         }
                     }
-                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("clear", "clearall", mapOf("player" to player)))
+                    stack.sender.sendMessage(plugin.messageHandler.getMessage("clear", "clearall", mapOf("player" to player)))
                     val targetPlayer = Bukkit.getPlayer(player)
                     val getMessage = plugin.messageHandler.getMessage("clear", "clear_message")
-                    targetPlayer?.sendRichMessage(getMessage)
+                    targetPlayer?.sendMessage(getMessage)
                     plugin.logger.success("Player $player ($uuid) has been cleared of all punishments")
                 } else {
-                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to player)))
+                    stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to player)))
                 }
             } else {
-                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("clear", "usage"))
+                stack.sender.sendMessage(plugin.messageHandler.getMessage("clear", "usage"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
         }
     }
 

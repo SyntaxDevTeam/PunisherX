@@ -2,7 +2,6 @@ package pl.syntaxdevteam.punisher.basic
 
 import io.papermc.paper.event.player.AsyncChatEvent
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
@@ -91,15 +90,14 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                         "mute_info_message",
                         mapOf("reason" to reason, "time" to remainingTime)
                     )
-                    val formattedMessage = MiniMessage.miniMessage().deserialize(infoMessage)
                     val logMessage = plugin.messageHandler.getLogMessage(
                         messageKey,
                         "log",
                         mapOf("player" to playerName, "message" to plainMessage)
                     )
-                    val logFormattedMessage = MiniMessage.miniMessage().deserialize(logMessage)
-                    plugin.logger.clearLog(logFormattedMessage)
-                    player.sendMessage(formattedMessage)
+
+                    plugin.logger.clearLog(logMessage)
+                    player.sendMessage(infoMessage)
                     return
                 } else {
                     plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
@@ -131,8 +129,8 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                             val reason = punishment.reason
                             event.isCancelled = true
                             val muteMessage = plugin.messageHandler.getMessage("mute", "mute_message", mapOf("reason" to reason, "time" to duration))
-                            val formattedMessage = MiniMessage.miniMessage().deserialize(muteMessage)
-                            player.sendMessage(formattedMessage)
+
+                            player.sendMessage(muteMessage)
                         } else {
                             plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
                             plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
@@ -182,7 +180,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                                         "jail_restrict_message",
                                         mapOf()
                                     )
-                                    player.sendRichMessage(message)
+                                    player.sendMessage(message)
                                 } else {
                                     plugin.logger.debug("<red>Failed to teleport player back to jail in Folia.</red>")
                                 }
@@ -200,7 +198,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             if (!isPlayerInJail(player.location, jailLocation, radius)) {
                 player.teleport(jailLocation)
                 val message = plugin.messageHandler.getMessage("jail", "jail_restrict_message", mapOf())
-                player.sendRichMessage(message)
+                player.sendMessage(message)
             }
         }
     }

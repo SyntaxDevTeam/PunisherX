@@ -17,12 +17,12 @@ class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         if (!stack.sender.hasPermission("punisherx.setjail")) {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
             return
         }
 
         if (args.isEmpty() || !args[0].equals("radius", ignoreCase = true)) {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("setjail", "usage"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("setjail", "usage"))
             return
         }
 
@@ -31,7 +31,7 @@ class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
 
         val radius = if (args.size > 1) args[1].toDoubleOrNull() else null
         if (radius == null || radius <= 0) {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "invalid_radius"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "invalid_radius"))
             return
         }
 
@@ -43,7 +43,7 @@ class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
 
         if (JailUtils.setJailLocation(plugin.config, location, radius)) {
             plugin.saveConfig()
-            stack.sender.sendRichMessage(
+            stack.sender.sendMessage(
                 plugin.messageHandler.getMessage(
                     "setjail", "set", mapOf(
                         "world" to world,
@@ -55,7 +55,7 @@ class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
                 )
             )
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("setjail", "set_error"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("setjail", "set_error"))
         }
     }
 

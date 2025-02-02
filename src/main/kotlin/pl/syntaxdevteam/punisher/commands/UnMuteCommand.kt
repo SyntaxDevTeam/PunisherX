@@ -2,7 +2,6 @@ package pl.syntaxdevteam.punisher.commands
 
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
@@ -22,20 +21,19 @@ class UnMuteCommand(private val plugin: PunisherX) : BasicCommand {
                             plugin.databaseHandler.removePunishment(uuid, punishment.type)
                         }
                     }
-                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unmute", "unmute", mapOf("player" to player)))
+                    stack.sender.sendMessage(plugin.messageHandler.getMessage("unmute", "unmute", mapOf("player" to player)))
                     val targetPlayer = Bukkit.getPlayer(player)
                     val muteMessage = plugin.messageHandler.getMessage("unmute", "unmute_message")
-                    val formattedMessage = MiniMessage.miniMessage().deserialize(muteMessage)
-                    targetPlayer?.sendMessage(formattedMessage)
+                    targetPlayer?.sendMessage(muteMessage)
                     plugin.logger.info("Player $player ($uuid) has been unmuted")
                 } else {
-                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to player)))
+                    stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to player)))
                 }
             } else {
-                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unmute", "usage"))
+                stack.sender.sendMessage(plugin.messageHandler.getMessage("unmute", "usage"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
         }
     }
 
