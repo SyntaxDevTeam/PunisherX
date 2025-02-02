@@ -95,7 +95,20 @@ class MessageHandler(private val plugin: PunisherX) {
         return messages.getString("prefix") ?: "[${plugin.pluginMeta.name}]"
     }
 
-    fun getMessage(category: String, key: String, placeholders: Map<String, String> = emptyMap()): String {
+    fun getMessage(category: String, key: String, placeholders: Map<String, String> = emptyMap()): Component {
+        val prefix = getPrefix()
+        val message = messages.getString("$category.$key") ?: run {
+            plugin.logger.err("There was an error loading the message $key from category $category")
+            "Message not found. Check console..."
+        }
+        val formattedMessage = placeholders.entries.fold(message) { acc, entry ->
+            acc.replace("{${entry.key}}", entry.value)
+        }
+        val mixMessage =  "$prefix $formattedMessage"
+        return formatMixedTextToMiniMessage(mixMessage)
+    }
+
+    fun getSimpleMessage(category: String, key: String, placeholders: Map<String, String> = emptyMap()): String {
         val prefix = getPrefix()
         val message = messages.getString("$category.$key") ?: run {
             plugin.logger.err("There was an error loading the message $key from category $category")
@@ -107,7 +120,7 @@ class MessageHandler(private val plugin: PunisherX) {
         return "$prefix $formattedMessage"
     }
 
-    fun getLogMessage(category: String, key: String, placeholders: Map<String, String> = emptyMap()): String {
+    fun getCleanMessage(category: String, key: String, placeholders: Map<String, String> = emptyMap()): String {
         val message = messages.getString("$category.$key") ?: run {
             plugin.logger.err("There was an error loading the message $key from category $category")
             "Message not found. Check console..."
@@ -116,6 +129,17 @@ class MessageHandler(private val plugin: PunisherX) {
             acc.replace("{${entry.key}}", entry.value)
         }
         return formattedMessage
+    }
+
+    fun getLogMessage(category: String, key: String, placeholders: Map<String, String> = emptyMap()): Component {
+        val message = messages.getString("$category.$key") ?: run {
+            plugin.logger.err("There was an error loading the message $key from category $category")
+            "Message not found. Check console..."
+        }
+        val formattedMessage = placeholders.entries.fold(message) { acc, entry ->
+            acc.replace("{${entry.key}}", entry.value)
+        }
+        return formatMixedTextToMiniMessage(formattedMessage)
     }
 
     fun getComplexMessage(category: String, key: String, placeholders: Map<String, String> = emptyMap()): List<Component> {
@@ -195,7 +219,7 @@ class MessageHandler(private val plugin: PunisherX) {
     private fun convertHexToMiniMessage(message: String): String {
         return message.replace("&#([a-fA-F0-9]{6})".toRegex()) {
             val hex = it.groupValues[1]
-            "<#$hex>" // Zmieniamy &#FF0000 na <#FF0000>
+            "<#$hex>"
         }
     }
 
