@@ -38,7 +38,7 @@ class StatsCollector(private var plugin: PunisherX) {
                     val data = mapOf(
                         "pluginName" to pluginName,
                         "serverIP" to serverIP,
-                        "serverPort" to serverPort.toString(),
+                        "serverPort" to serverPort,
                         "serverVersion" to serverVersion,
                         "serverName" to serverName,
                         "pluginUUID" to pluginUUID
@@ -51,7 +51,13 @@ class StatsCollector(private var plugin: PunisherX) {
 
                     val responseCode = responseCode
                     if (responseCode in 200..299) {
-                        plugin.logger.debug("Stats sent successfully.")
+                        plugin.logger.debug("Stats sent successfully:")
+                        plugin.logger.debug("Server IP: $serverIP")
+                        plugin.logger.debug("Server Port: $serverPort")
+                        plugin.logger.debug("Server Version: $serverVersion")
+                        plugin.logger.debug("Server Name: $serverName")
+                        plugin.logger.debug("Plugin Name: $pluginName")
+                        plugin.logger.debug("Plugin UUID: $pluginUUID")
                     } else {
                         plugin.logger.debug("Failed to send stats. Response code: $responseCode.")
                     }
