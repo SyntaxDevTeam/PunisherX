@@ -25,66 +25,66 @@ class CommandManager(private val plugin: PunisherX) {
             )
             commands.register(
                 "check",
-                "Checking player penalties" + plugin.messageHandler.getMessage("check", "usage"),
+                "Checking player penalties" + plugin.messageHandler.getSimpleMessage("check", "usage"),
                 CheckCommand(plugin, plugin.playerIPManager)
             )
             commands.register(
                 "history",
-                "Checking player all penalties history" + plugin.messageHandler.getMessage("history", "usage"),
+                "Checking player all penalties history" + plugin.messageHandler.getSimpleMessage("history", "usage"),
                 HistoryCommand(plugin, plugin.playerIPManager)
             )
             commands.register(
                 "kick",
-                plugin.messageHandler.getMessage("kick", "usage"),
+                plugin.messageHandler.getSimpleMessage("kick", "usage"),
                 KickCommand(plugin)
             )
             commands.register(
                 "warn",
-                plugin.messageHandler.getMessage("warn", "usage"),
+                plugin.messageHandler.getSimpleMessage("warn", "usage"),
                 WarnCommand(plugin)
             )
             commands.register(
                 "unwarn",
-                plugin.messageHandler.getMessage("unwarn", "usage"),
+                plugin.messageHandler.getSimpleMessage("unwarn", "usage"),
                 UnWarnCommand(plugin)
             )
             commands.register(
                 "mute",
-                plugin.messageHandler.getMessage("mute", "usage"),
+                plugin.messageHandler.getSimpleMessage("mute", "usage"),
                 MuteCommand(plugin)
             )
             commands.register(
-                "unmute", plugin.messageHandler.getMessage("unmute", "usage"),
+                "unmute", plugin.messageHandler.getSimpleMessage("unmute", "usage"),
                 UnMuteCommand(plugin)
             )
             commands.register(
                 "setjail",
-                plugin.messageHandler.getMessage("setjail", "usage"),
+                plugin.messageHandler.getSimpleMessage("setjail", "usage"),
                 SetjailCommand(plugin)
             )
             commands.register(
                 "jail",
-                plugin.messageHandler.getMessage("jail", "usage"),
+                plugin.messageHandler.getSimpleMessage("jail", "usage"),
                 JailCommand(plugin)
             )
             commands.register(
                 "unjail",
-                plugin.messageHandler.getMessage("unjail", "usage"),
+                plugin.messageHandler.getSimpleMessage("unjail", "usage"),
                 UnjailCommand(plugin)
             )
             commands.register(
                 "ban",
-                plugin.messageHandler.getMessage("ban", "usage"),
+                plugin.messageHandler.getSimpleMessage("ban", "usage"),
                 BanCommand(plugin)
             )
             commands.register(
                 "banip",
-                plugin.messageHandler.getMessage("banip", "usage"),
+                plugin.messageHandler.getSimpleMessage("banip", "usage"),
                 BanIpCommand(plugin)
             )
             commands.register(
                 "unban",
-                plugin.messageHandler.getMessage("unban", "usage"),
+                plugin.messageHandler.getSimpleMessage("unban", "usage"),
                 UnBanCommand(plugin)
             )
             commands.register(
@@ -94,100 +94,100 @@ class CommandManager(private val plugin: PunisherX) {
             )
             commands.register(
                 "change-reason",
-                plugin.messageHandler.getMessage("change-reason", "usage"),
+                plugin.messageHandler.getSimpleMessage("change-reason", "usage"),
                 ChangeReasonCommand(plugin)
             )
-            commands.register("clearall", plugin.messageHandler.getMessage("clear", "usage"), ClearAllCommand(plugin))
+            commands.register("clearall", plugin.messageHandler.getSimpleMessage("clear", "usage"), ClearAllCommand(plugin))
             val aliases = plugin.config.getConfigurationSection("aliases")
             aliases?.getKeys(false)?.forEach { key ->
                 val commandName = aliases.getString(key) ?: key
                 when (key) {
                     "check" -> commands.register(
                         commandName,
-                        "Checking player penalties" + plugin.messageHandler.getMessage("check", "usage"),
+                        "Checking player penalties" + plugin.messageHandler.getSimpleMessage("check", "usage"),
                         CheckCommand(plugin, plugin.playerIPManager)
                     )
 
                     "history" -> commands.register(
                         commandName,
-                        "Checking player all penalties history" + plugin.messageHandler.getMessage("history", "usage"),
+                        "Checking player all penalties history" + plugin.messageHandler.getSimpleMessage("history", "usage"),
                         HistoryCommand(plugin, plugin.playerIPManager)
                     )
 
                     "kick" -> commands.register(
                         commandName,
-                        plugin.messageHandler.getMessage("kick", "usage"),
+                        plugin.messageHandler.getSimpleMessage("kick", "usage"),
                         KickCommand(plugin)
                     )
 
                     "warn" -> commands.register(
                         commandName,
-                        plugin.messageHandler.getMessage("warn", "usage"),
+                        plugin.messageHandler.getSimpleMessage("warn", "usage"),
                         WarnCommand(plugin)
                     )
 
                     "unwarn" -> commands.register(
                         commandName,
-                        plugin.messageHandler.getMessage("unwarn", "usage"),
+                        plugin.messageHandler.getSimpleMessage("unwarn", "usage"),
                         UnWarnCommand(plugin)
                     )
 
                     "mute" -> commands.register(
                         commandName,
-                        plugin.messageHandler.getMessage("mute", "usage"),
+                        plugin.messageHandler.getSimpleMessage("mute", "usage"),
                         MuteCommand(plugin)
                     )
 
                     "unmute" -> commands.register(
-                        commandName, plugin.messageHandler.getMessage("unmute", "usage"),
+                        commandName, plugin.messageHandler.getSimpleMessage("unmute", "usage"),
                         UnMuteCommand(plugin)
                     )
 
                     "setjail" -> commands.register(
                         commandName,
-                        plugin.messageHandler.getMessage("setjail", "usage"),
+                        plugin.messageHandler.getSimpleMessage("setjail", "usage"),
                         SetjailCommand(plugin)
                     )
 
                     "jail" -> commands.register(
                         commandName,
-                        plugin.messageHandler.getMessage("jail", "usage"),
+                        plugin.messageHandler.getSimpleMessage("jail", "usage"),
                         JailCommand(plugin)
                     )
 
                     "unjail" -> commands.register(
                         commandName,
-                        plugin.messageHandler.getMessage("unjail", "usage"),
+                        plugin.messageHandler.getSimpleMessage("unjail", "usage"),
                         UnjailCommand(plugin)
                     )
 
                     "ban" -> commands.register(
                         commandName,
-                        plugin.messageHandler.getMessage("ban", "usage"),
+                        plugin.messageHandler.getSimpleMessage("ban", "usage"),
                         BanCommand(plugin)
                     )
 
                     "banip" -> commands.register(
                         commandName,
-                        plugin.messageHandler.getMessage("banip", "usage"),
+                        plugin.messageHandler.getSimpleMessage("banip", "usage"),
                         BanIpCommand(plugin)
                     )
 
                     "unban" -> commands.register(
                         commandName,
-                        plugin.messageHandler.getMessage("unban", "usage"),
+                        plugin.messageHandler.getSimpleMessage("unban", "usage"),
                         UnBanCommand(plugin)
                     )
 
                     "change-reason" -> commands.register(
                         commandName,
-                        plugin.messageHandler.getMessage("change-reason", "usage"),
+                        plugin.messageHandler.getSimpleMessage("change-reason", "usage"),
                         ChangeReasonCommand(plugin)
                     )
 
                     "clearall" -> commands.register(
                         commandName,
-                        plugin.messageHandler.getMessage("clear", "usage"),
+                        plugin.messageHandler.getSimpleMessage("clear", "usage"),
                         ClearAllCommand(plugin)
                     )
                 }

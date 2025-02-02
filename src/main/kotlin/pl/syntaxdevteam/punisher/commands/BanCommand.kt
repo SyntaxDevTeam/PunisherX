@@ -4,7 +4,6 @@ import io.papermc.paper.ban.BanListType
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.ban.ProfileBanList
 import org.jetbrains.annotations.NotNull
@@ -18,14 +17,14 @@ class BanCommand(private val plugin: PunisherX) : BasicCommand {
         if (stack.sender.hasPermission("punisherx.ban")) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
-                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("ban", "usage"))
+                    stack.sender.sendMessage(plugin.messageHandler.getMessage("ban", "usage"))
                 } else {
                     val player = args[0]
                     val targetPlayer = Bukkit.getPlayer(player)
                     val isForce = args.contains("--force")
                     if (targetPlayer != null) {
                         if (!isForce && targetPlayer.hasPermission("punisherx.bypass.ban")) {
-                            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
+                            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
                             return
                         }
                     }
@@ -63,9 +62,9 @@ class BanCommand(private val plugin: PunisherX) : BasicCommand {
                         }
                         targetPlayer.kick(kickMessage.build())
                     }
-                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("ban", "ban", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))))
+                    stack.sender.sendMessage(plugin.messageHandler.getMessage("ban", "ban", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))))
                     val permission = "punisherx.see.ban"
-                    val broadcastMessage = MiniMessage.miniMessage().deserialize(plugin.messageHandler.getMessage("ban", "broadcast", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))))
+                    val broadcastMessage = plugin.messageHandler.getMessage("ban", "broadcast", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime)))
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if (onlinePlayer.hasPermission(permission)) {
                             onlinePlayer.sendMessage(broadcastMessage)
@@ -77,10 +76,10 @@ class BanCommand(private val plugin: PunisherX) : BasicCommand {
 
                 }
             } else {
-                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("ban", "usage"))
+                stack.sender.sendMessage(plugin.messageHandler.getMessage("ban", "usage"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
         }
     }
 

@@ -136,7 +136,7 @@ class PunisherX : JavaPlugin(), Listener {
         try {
             messageHandler.reloadMessages()
         } catch (e: Exception) {
-            logger.err(messageHandler.getMessage("error", "reload") + e.message)
+            logger.err("${messageHandler.getMessage("error", "reload")} ${e.message}")
         }
         databaseHandler = DatabaseHandler(this)
         databaseHandler.openConnection()

@@ -3,7 +3,6 @@ package pl.syntaxdevteam.punisher.commands
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
@@ -15,14 +14,14 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
         if (stack.sender.hasPermission("punisherx.kick")) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
-                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("kick", "usage"))
+                    stack.sender.sendMessage(plugin.messageHandler.getMessage("kick", "usage"))
                 } else {
                     val player = args[0]
                     val targetPlayer = Bukkit.getPlayer(player)
                     val isForce = args.contains("--force")
                     if (targetPlayer != null) {
                         if (!isForce && targetPlayer.hasPermission("punisherx.bypass.kick")) {
-                            stack.sender.sendRichMessage(
+                            stack.sender.sendMessage(
                                 plugin.messageHandler.getMessage(
                                     "error",
                                     "bypass",
@@ -48,9 +47,9 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                         }
                         targetPlayer.kick(kickMessage.build())
                     }
-                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("kick", "kick", mapOf("player" to player, "reason" to reason)))
+                    stack.sender.sendMessage(plugin.messageHandler.getMessage("kick", "kick", mapOf("player" to player, "reason" to reason)))
                     val permission = "punisherx.see.kick"
-                    val broadcastMessage = MiniMessage.miniMessage().deserialize(plugin.messageHandler.getMessage("kick", "broadcast", mapOf("player" to player, "reason" to reason)))
+                    val broadcastMessage = plugin.messageHandler.getMessage("kick", "broadcast", mapOf("player" to player, "reason" to reason))
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if (onlinePlayer.hasPermission(permission)) {
                             onlinePlayer.sendMessage(broadcastMessage)
@@ -58,10 +57,10 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                     }
                 }
             } else {
-                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("kick", "usage"))
+                stack.sender.sendMessage(plugin.messageHandler.getMessage("kick", "usage"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
         }
     }
 

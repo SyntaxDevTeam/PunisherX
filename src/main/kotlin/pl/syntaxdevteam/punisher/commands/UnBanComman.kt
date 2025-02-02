@@ -2,7 +2,6 @@ package pl.syntaxdevteam.punisher.commands
 
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 
@@ -13,7 +12,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
         if (stack.sender.hasPermission("punisherx.unban")) {
             if (args.isNotEmpty()) {
                 val playerOrIpOrUUID = args[0]
-                val broadcastMessage = MiniMessage.miniMessage().deserialize(plugin.messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
+                val broadcastMessage = plugin.messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID))
                 if (playerOrIpOrUUID.matches(Regex("\\d+\\.\\d+\\.\\d+\\.\\d+"))) {
                     val punishments = plugin.databaseHandler.getPunishmentsByIP(playerOrIpOrUUID)
                     if (punishments.isNotEmpty()) {
@@ -22,10 +21,10 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
                                 plugin.databaseHandler.removePunishment(playerOrIpOrUUID, punishment.type)
                             }
                         }
-                        stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
+                        stack.sender.sendMessage(plugin.messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
                         plugin.logger.info("IP $playerOrIpOrUUID has been unbanned")
                     } else {
-                        stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
+                        stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
                     }
                 } else {
                     val uuid = plugin.uuidManager.getUUID(playerOrIpOrUUID).toString()
@@ -39,7 +38,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
                                 plugin.logger.info("Player $playerOrIpOrUUID ($uuid) has been unbanned")
                             }
                         }
-                        stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
+                        stack.sender.sendMessage(plugin.messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
                     } else {
                         val ip = plugin.playerIPManager.getPlayerIPByName(playerOrIpOrUUID)
                         plugin.logger.debug("Assigned IP for player $playerOrIpOrUUID: [$ip]")
@@ -53,12 +52,12 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
                                         plugin.logger.info("Player $playerOrIpOrUUID ($uuid) has been unbanned")
                                     }
                                 }
-                                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
+                                stack.sender.sendMessage(plugin.messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
                             } else {
-                                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
+                                stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
                             }
                         } else {
-                            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
+                            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
                         }
                     }
                     val permission = "punisherx.see.unban"
@@ -69,10 +68,10 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
                     }
                 }
             } else {
-                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unban", "usage"))
+                stack.sender.sendMessage(plugin.messageHandler.getMessage("unban", "usage"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
         }
     }
 

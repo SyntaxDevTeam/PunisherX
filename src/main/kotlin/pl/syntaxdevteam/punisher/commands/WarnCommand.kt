@@ -2,7 +2,6 @@ package pl.syntaxdevteam.punisher.commands
 
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
@@ -14,12 +13,12 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
         if (stack.sender.hasPermission("punisherx.warn")) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
-                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("warn", "usage"))
+                    stack.sender.sendMessage(plugin.messageHandler.getMessage("warn", "usage"))
                 } else {
                     val player = args[0]
                     val targetPlayer = Bukkit.getPlayer(player)
                     if (targetPlayer != null && targetPlayer.hasPermission("punisherx.bypass.warn")) {
-                        stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
+                        stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
                         return
                     }
                     val uuid = plugin.uuidManager.getUUID(player).toString()
@@ -43,12 +42,11 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                     plugin.databaseHandler.addPunishmentHistory(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
 
                     val warnCount = plugin.databaseHandler.getActiveWarnCount(uuid)
-                    stack.sender.sendRichMessage(plugin.messageHandler.getMessage("warn", "warn", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime), "warn_no" to warnCount.toString())))
+                    stack.sender.sendMessage(plugin.messageHandler.getMessage("warn", "warn", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime), "warn_no" to warnCount.toString())))
                     val warnMessage = plugin.messageHandler.getMessage("warn", "warn_message", mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime), "warn_no" to warnCount.toString()))
-                    val formattedMessage = MiniMessage.miniMessage().deserialize(warnMessage)
-                    targetPlayer?.sendMessage(formattedMessage)
+                    targetPlayer?.sendMessage(warnMessage)
                     val permission = "punisherx.see.warn"
-                    val broadcastMessage = MiniMessage.miniMessage().deserialize(plugin.messageHandler.getMessage("warn", "broadcast", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime), "warn_no" to warnCount.toString())))
+                    val broadcastMessage = plugin.messageHandler.getMessage("warn", "broadcast", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime), "warn_no" to warnCount.toString()))
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if (onlinePlayer.hasPermission(permission)) {
                             onlinePlayer.sendMessage(broadcastMessage)
@@ -57,10 +55,10 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                     executeWarnAction(player, warnCount)
                 }
             } else {
-                stack.sender.sendRichMessage(plugin.messageHandler.getMessage("warn", "usage"))
+                stack.sender.sendMessage(plugin.messageHandler.getMessage("warn", "usage"))
             }
         } else {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
         }
     }
 

@@ -2,7 +2,6 @@ package pl.syntaxdevteam.punisher.commands
 
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
-import net.kyori.adventure.text.minimessage.MiniMessage
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.GameMode
@@ -14,11 +13,11 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
 
         if (!stack.sender.hasPermission("punisherx.unjail")) {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
             return
         }
         if (args.isEmpty()) {
-            stack.sender.sendRichMessage(plugin.messageHandler.getMessage("unjail", "usage"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("unjail", "usage"))
             return
         }
 
@@ -35,7 +34,7 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
                         player.teleportAsync(spawnLocation).thenAccept { success ->
                             if (success) {
                                 player.gameMode = GameMode.SURVIVAL
-                                player.sendRichMessage(plugin.messageHandler.getMessage("unjail", "unjail_message"))
+                                player.sendMessage(plugin.messageHandler.getMessage("unjail", "unjail_message"))
                                 plugin.logger.debug("<green>Player $playerName successfully unjailed (Folia).</green>")
                             } else {
                                 plugin.logger.debug("<red>Failed to teleport player $playerName during unjail (Folia).</red>")
@@ -51,23 +50,23 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
             } else {
                 player.teleport(spawnLocation)
                 player.gameMode = GameMode.SURVIVAL
-                player.sendRichMessage(plugin.messageHandler.getMessage("unjail", "unjail_message"))
+                player.sendMessage(plugin.messageHandler.getMessage("unjail", "unjail_message"))
             }
         }
 
         plugin.cache.removePunishment(uuid)
         plugin.databaseHandler.removePunishment(uuid.toString(), "JAIL")
 
-        val broadcastMessage = MiniMessage.miniMessage().deserialize(
+        val broadcastMessage =
             plugin.messageHandler.getMessage("unjail", "broadcast", mapOf("player" to playerName))
-        )
+
         plugin.server.onlinePlayers.forEach { onlinePlayer ->
             if (onlinePlayer.hasPermission("punisherx.see.unjail")) {
                 onlinePlayer.sendMessage(broadcastMessage)
             }
         }
 
-        stack.sender.sendRichMessage(
+        stack.sender.sendMessage(
             plugin.messageHandler.getMessage("unjail", "success", mapOf("player" to playerName))
         )
     }

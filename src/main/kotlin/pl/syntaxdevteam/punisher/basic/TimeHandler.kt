@@ -18,7 +18,7 @@ class TimeHandler(private val plugin: PunisherX) {
     }
 
     fun formatTime(time: String?): String {
-        if (time == null) return plugin.messageHandler.getLogMessage("formatTime", "undefined")
+        if (time == null) return plugin.messageHandler.getCleanMessage("formatTime", "undefined")
 
         val isNumeric = time.all { it.isDigit() }
         if (isNumeric) {
@@ -50,16 +50,16 @@ class TimeHandler(private val plugin: PunisherX) {
             'm' -> "$amount ${getLocalizedMessage("minute", amount)}"
             'h' -> "$amount ${getLocalizedMessage("hour", amount)}"
             'd' -> "$amount ${getLocalizedMessage("day", amount)}"
-            else -> plugin.messageHandler.getLogMessage("formatTime", "undefined")
+            else -> plugin.messageHandler.getCleanMessage("formatTime", "undefined")
         }
     }
 
     private fun getLocalizedMessage(unit: String, amount: Long): String {
         val unitPath = "formatTime.$unit"
         return when (amount) {
-            1L -> plugin.messageHandler.getLogMessage(unitPath, "one")
-            in 2..4 -> plugin.messageHandler.getLogMessage(unitPath, "few")
-            else -> plugin.messageHandler.getLogMessage(unitPath, "many")
+            1L -> plugin.messageHandler.getCleanMessage(unitPath, "one")
+            in 2..4 -> plugin.messageHandler.getCleanMessage(unitPath, "few")
+            else -> plugin.messageHandler.getCleanMessage(unitPath, "many")
         }
     }
 }
