@@ -1,14 +1,20 @@
+@file:Suppress("DEPRECATION")
+
 package pl.syntaxdevteam.punisher.common
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.serializer.ansi.ANSIComponentSerializer
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+import org.bukkit.ChatColor
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import pl.syntaxdevteam.punisher.PunisherX
 import java.io.File
 
+@Suppress("UnstableApiUsage", "unused")
 class MessageHandler(private val plugin: PunisherX) {
     private val language = plugin.config.getString("language") ?: "EN"
     private var messages: FileConfiguration
@@ -86,7 +92,7 @@ class MessageHandler(private val plugin: PunisherX) {
     }
 
     private fun getPrefix(): String {
-        return messages.getString("prefix") ?: "[PunisherX] "
+        return messages.getString("prefix") ?: "[${plugin.pluginMeta.name}]"
     }
 
     fun getMessage(category: String, key: String, placeholders: Map<String, String> = emptyMap()): String {
@@ -122,15 +128,41 @@ class MessageHandler(private val plugin: PunisherX) {
             val formattedMessage = placeholders.entries.fold(message) { acc, entry ->
                 acc.replace("{${entry.key}}", entry.value)
             }
-            if (formattedMessage.contains("<")) {
-                MiniMessage.miniMessage().deserialize(formattedMessage)
-            } else {
-                LegacyComponentSerializer.legacyAmpersand().deserialize(formattedMessage)
-            }
+            formatMixedTextToMiniMessage(formattedMessage)
         }
     }
 
     fun getReasons(category: String, key: String): List<String> {
         return messages.getStringList("$category.$key")
+    }
+
+    fun formatLegacyText(message: String): Component {
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(message)
+    }
+
+    fun formatLegacyTextBukkit(message: String): String {
+        return ChatColor.translateAlternateColorCodes('&', message)
+    }
+
+    fun formatHexAndLegacyText(message: String): Component {
+
+        val hexFormatted = message.replace("&#([a-fA-F0-9]{6})".toRegex()) {
+            val hex = it.groupValues[1]
+            "§x§${hex[0]}§${hex[1]}§${hex[2]}§${hex[3]}§${hex[4]}§${hex[5]}"
+        }
+
+        return LegacyComponentSerializer.legacySection().deserialize(hexFormatted)
+    }
+
+    fun miniMessageFormat(message: String): Component {
+        return MiniMessage.miniMessage().deserialize(message)
+    }
+
+    fun getANSIText(component: Component): String {
+        return ANSIComponentSerializer.ansi().serialize(component)
+    }
+
+    fun getPlainText(component: Component): String {
+        return PlainTextComponentSerializer.plainText().serialize(component)
     }
 }
