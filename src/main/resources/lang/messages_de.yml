@@ -161,7 +161,7 @@ kick:
 # Nachrichten für den /check-Befehl
 check:
   usage: "Korrekte Verwendung: <gold>/check <player_name> <all|ban|jail|mute|warn>"
-  invalid_type: "<red>Ungültiger Strafentyp. Verwenden Sie: all, ban, mute, warn.</red>"
+  invalid_type: "<red>Ungültiger Strafentyp. Verwenden Sie: all, ban, jail, mute, warn.</red>"
   no_punishments: "<dark_green>Spieler <gold>{player}</gold> hat keine Strafen.</dark_green>"
   title: "<dark_gray>Aktive Strafen für</dark_gray>"
   id: "<dark_gray>ID</dark_gray>"
@@ -171,7 +171,7 @@ check:
 
 # Nachrichten für den /history-Befehl
 history:
-  usage: "Korrekte Verwendung: <gold>/check <player_name>"
+  usage: "Korrekte Verwendung: <gold>/history <player_name>"
   no_punishments: "<dark_green>Spieler <gold>{player}</gold> hat keine Strafen.</dark_green>"
   title: "<dark_gray>Aktive Strafen für</dark_gray>"
   id: "<dark_gray>ID</dark_gray>"
