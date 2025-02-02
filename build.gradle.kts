@@ -26,7 +26,7 @@ dependencies {
     compileOnly("dev.folia:folia-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.3")
-    compileOnly("com.google.code.gson:gson:2.12.0")
+    compileOnly("com.google.code.gson:gson:2.12.1")
     compileOnly("net.kyori:adventure-text-serializer-legacy:4.18.0")
     compileOnly("net.kyori:adventure-text-minimessage:4.18.0")
     compileOnly("net.kyori:adventure-text-serializer-gson:4.18.0")
