@@ -11,6 +11,7 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.InetAddress
 import java.net.URI
+import java.net.UnknownHostException
 import java.util.zip.GZIPInputStream
 
 class GeoIPHandler(private val plugin: PunisherX) {
@@ -95,6 +96,12 @@ class GeoIPHandler(private val plugin: PunisherX) {
             }
         } catch (e: AddressNotFoundException) {
             "Unknown country"
+        } catch (e: Exception) {
+            plugin.logger.severe("Failed to get country for IP $ip: ${e.message} [Exception]")
+            "Unknown country"
+        } catch (e: UnknownHostException) {
+            plugin.logger.severe("Failed to get country for IP $ip: ${e.message} [UnknownHostException]")
+            "Unknown country"
         }
     }
 
@@ -106,6 +113,12 @@ class GeoIPHandler(private val plugin: PunisherX) {
                 response.city.name
             }
         } catch (e: AddressNotFoundException) {
+            "Unknown city"
+        } catch (e: Exception) {
+        plugin.logger.severe("Failed to get city for IP $ip: ${e.message} [Exception]")
+        "Unknown city"
+        } catch (e: UnknownHostException) {
+            plugin.logger.severe("Failed to get city for IP $ip: ${e.message} [UnknownHostException]")
             "Unknown city"
         }
     }
