@@ -161,7 +161,7 @@ kick:
 # Wiadomości komendy /check
 check:
   usage: "Poprawne użycie to: <gold>/check <nazwa_gracza> <all|ban|jail|mute|warn>"
-  invalid_type: "<red>Nieprawidłowy typ kary. Użyj: all, ban, mute, warn.</red>"
+  invalid_type: "<red>Nieprawidłowy typ kary. Użyj: all, ban, jail, mute, warn.</red>"
   no_punishments: "<dark_green>Gracz <gold>{player}</gold> nie ma żadnych kar.</dark_green>"
   title: "<dark_gray>Aktywne kary dla</dark_gray>"
   id: "<dark_gray>ID</dark_gray>"
@@ -171,7 +171,7 @@ check:
 
 # Wiadomości komendy /history
 history:
-  usage: "Poprawne użycie to: <gold>/check <nazwa_gracza>"
+  usage: "Poprawne użycie to: <gold>/history <nazwa_gracza>"
   no_punishments: "<dark_green>Gracz <gold>{player}</gold> nie ma żadnych kar.</dark_green>"
   title: "<dark_gray>Aktywne kary dla</dark_gray>"
   id: "<dark_gray>ID</dark_gray>"
