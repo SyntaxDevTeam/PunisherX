@@ -2,7 +2,6 @@ package pl.syntaxdevteam.punisher.basic
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import pl.syntaxdevteam.punisher.PunisherX
 import java.io.File
