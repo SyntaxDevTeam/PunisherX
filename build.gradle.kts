@@ -3,12 +3,12 @@ import io.papermc.hangarpublishplugin.model.Platforms
 
 plugins {
     kotlin("jvm") version "2.1.10"
-    id("com.gradleup.shadow") version "9.0.0-beta6"
+    id("com.gradleup.shadow") version "9.0.0-beta7"
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.3.1-SNAPSHOT"
+version = "1.3.3-DEV"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 repositories {
@@ -36,7 +36,7 @@ dependencies {
     compileOnly("org.apache.ant:ant:1.10.15")
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.1")
-    compileOnly("org.xerial:sqlite-jdbc:3.48.0.0")
+    compileOnly("org.xerial:sqlite-jdbc:3.49.0.0")
     compileOnly("org.postgresql:postgresql:42.7.5")
     compileOnly("com.h2database:h2:2.3.232")
     compileOnly("com.zaxxer:HikariCP:6.2.1")
