@@ -3,7 +3,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 
 plugins {
     kotlin("jvm") version "2.1.10"
-    id("com.gradleup.shadow") version "9.0.0-beta7"
+    id("com.gradleup.shadow") version "9.0.0-beta8"
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
 }
 
