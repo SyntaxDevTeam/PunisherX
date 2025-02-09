@@ -34,6 +34,7 @@ class PunisherX : JavaPlugin(), Listener {
     val uuidManager = UUIDManager(this)
     private lateinit var commandManager: CommandManager
     lateinit var cache: PunishmentCache
+    private var configHandler = ConfigHandler(this)
 
     /**
      * Called when the plugin is enabled.
@@ -71,6 +72,7 @@ class PunisherX : JavaPlugin(), Listener {
      */
     private fun setupConfig() {
         saveDefaultConfig()
+        configHandler.verifyAndUpdateConfig()
     }
 
     /**
