@@ -35,7 +35,7 @@ dependencies {
     compileOnly("com.maxmind.geoip2:geoip2:4.2.1")
     compileOnly("org.apache.ant:ant:1.10.15")
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
-    compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.1")
+    compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.2")
     compileOnly("org.xerial:sqlite-jdbc:3.49.0.0")
     compileOnly("org.postgresql:postgresql:42.7.5")
     compileOnly("com.h2database:h2:2.3.232")
