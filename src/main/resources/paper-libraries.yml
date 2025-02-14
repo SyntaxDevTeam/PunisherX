@@ -9,7 +9,7 @@ libraries:
   - net.kyori:adventure-text-serializer-ansi:4.18.0
   - com.maxmind.geoip2:geoip2:4.2.1
   - org.apache.ant:ant:1.10.15
-  - org.mariadb.jdbc:mariadb-java-client:3.5.1
+  - org.mariadb.jdbc:mariadb-java-client:3.5.2
   - org.xerial:sqlite-jdbc:3.49.0.0
   - org.postgresql:postgresql:42.7.5
   - com.h2database:h2:2.3.232
