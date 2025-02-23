@@ -11,66 +11,59 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
     private val mH = plugin.messageHandler
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (!stack.sender.hasPermission("punisherx.help") ||
-            !stack.sender.hasPermission("punisherx.version") ||
-            !stack.sender.hasPermission("punisherx.reload") ||
-            !stack.sender.hasPermission("punisherx.export") ||
-            !stack.sender.hasPermission("punisherx.import")) {
+        if (!stack.sender.hasPermission("punisherx.cmd.prx")) {
             stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
-            return
         }
-        val pluginMeta = (plugin as LifecycleEventOwner).pluginMeta
-        val pdf = plugin.description
-        if (args.isNotEmpty()) {
-            when {
-                args[0].equals("help", ignoreCase = true) -> {
-                    if (stack.sender.hasPermission("punisherx.help")) {
-                        val page = args.getOrNull(1)?.toIntOrNull() ?: 1
-                        sendHelp(stack, page)
-                    } else {
-                        stack.sender.sendMessage(mH.getMessage("error", "no_permission"))
+            val pluginMeta = (plugin as LifecycleEventOwner).pluginMeta
+            val pdf = plugin.description
+            if (args.isNotEmpty()) {
+                when {
+                    args[0].equals("help", ignoreCase = true) -> {
+
+                            val page = args.getOrNull(1)?.toIntOrNull() ?: 1
+                            sendHelp(stack, page)
+
+                    }
+
+                    args[0].equals("version", ignoreCase = true) -> {
+
+                            stack.sender.sendMessage(
+                                mH.miniMessageFormat(
+                                    "\n<gray>-------------------------------------------------\n" +
+                                            " <gray>|\n" +
+                                            " <gray>|   <gold>→ <bold>" + pluginMeta.name + "</bold> ←\n" +
+                                            " <gray>|   <white>Author: <bold><gold>" + pdf.authors + "</gold></bold>\n" +
+                                            " <gray>|   <white>Website: <bold><gold><click:open_url:'" + pdf.website + "'>" + pdf.website + "</click></gold></bold>\n" +
+                                            " <gray>|   <white>Version: <bold><gold>" + pluginMeta.version + "</gold></bold>\n" +
+                                            " <gray>|" +
+                                            "\n-------------------------------------------------"
+                                )
+                            )
+
+                    }
+
+                    args[0].equals("reload", ignoreCase = true) -> {
+
+                            plugin.onReload()
+                            stack.sender.sendMessage(mH.miniMessageFormat("<green>The configuration file has been reloaded.</green>"))
+
+                    }
+
+                    args[0].equals("export", ignoreCase = true) -> {
+
+                            plugin.databaseHandler.exportDatabase()
+
+                    }
+
+                    args[0].equals("import", ignoreCase = true) -> {
+
+                            plugin.databaseHandler.importDatabase()
+
                     }
                 }
-                args[0].equals("version", ignoreCase = true) -> {
-                    if (stack.sender.hasPermission("punisherx.version")) {
-                        stack.sender.sendMessage(mH.miniMessageFormat("\n<gray>-------------------------------------------------\n" +
-                                " <gray>|\n" +
-                                " <gray>|   <gold>→ <bold>" + pluginMeta.name + "</bold> ←\n" +
-                                " <gray>|   <white>Author: <bold><gold>" + pdf.authors + "</gold></bold>\n" +
-                                " <gray>|   <white>Website: <bold><gold><click:open_url:'" + pdf.website + "'>"  + pdf.website + "</click></gold></bold>\n" +
-                                " <gray>|   <white>Version: <bold><gold>" + pluginMeta.version + "</gold></bold>\n" +
-                                " <gray>|" +
-                                "\n-------------------------------------------------"))
-                    } else {
-                        stack.sender.sendMessage(mH.getMessage("error", "no_permission"))
-                    }
-                }
-                args[0].equals("reload", ignoreCase = true) -> {
-                    if (stack.sender.hasPermission("punisherx.reload")) {
-                        plugin.onReload()
-                        stack.sender.sendMessage(mH.miniMessageFormat("<green>The configuration file has been reloaded.</green>"))
-                    } else {
-                        stack.sender.sendMessage(mH.getMessage("error", "no_permission"))
-                    }
-                }
-                args[0].equals("export", ignoreCase = true) -> {
-                    if (stack.sender.hasPermission("punisherx.export")) {
-                        plugin.databaseHandler.exportDatabase()
-                    } else {
-                        stack.sender.sendMessage(mH.getMessage("error", "no_permission"))
-                    }
-                }
-                args[0].equals("import", ignoreCase = true) -> {
-                    if (stack.sender.hasPermission("punisherx.import")) {
-                        plugin.databaseHandler.importDatabase()
-                    } else {
-                        stack.sender.sendMessage(mH.getMessage("error", "no_permission"))
-                    }
-                }
+            } else {
+                stack.sender.sendMessage(mH.miniMessageFormat("<green>Type </green><gold>/punisherx help</gold> <green>to see available commands</green>"))
             }
-        } else {
-            stack.sender.sendMessage(mH.miniMessageFormat("<green>Type </green><gold>/punisherx help</gold> <green>to see available commands</green>"))
-        }
     }
 
     private fun sendHelp(stack: CommandSourceStack, page: Int) {
@@ -128,11 +121,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
-        if (!stack.sender.hasPermission("punisherx.help") ||
-            !stack.sender.hasPermission("punisherx.version") ||
-            !stack.sender.hasPermission("punisherx.reload") ||
-            !stack.sender.hasPermission("punisherx.export") ||
-            !stack.sender.hasPermission("punisherx.import")) {
+        if (!stack.sender.hasPermission("punisherx.cmd.prx")) {
             return emptyList()
         }
         return when (args.size) {
