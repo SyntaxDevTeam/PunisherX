@@ -33,11 +33,12 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
                     if (punishments.isNotEmpty()) {
                         punishments.forEach { punishment ->
                             if (punishment.type == "BAN") {
-                                plugin.databaseHandler.removePunishment(uuid, punishment.type)
+                                plugin.databaseHandler.removePunishment(uuid, punishment.type, removeAll = false)
                                 //Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "pardon $playerOrIpOrUUID")
                                 plugin.logger.info("Player $playerOrIpOrUUID ($uuid) has been unbanned")
                             }
                         }
+
                         stack.sender.sendMessage(plugin.messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
                     } else {
                         val ip = plugin.playerIPManager.getPlayerIPByName(playerOrIpOrUUID)
@@ -47,7 +48,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
                             if (punishmentsByIP.isNotEmpty()) {
                                 punishmentsByIP.forEach { punishment ->
                                     if (punishment.type == "BANIP") {
-                                        plugin.databaseHandler.removePunishment(ip, punishment.type)
+                                        plugin.databaseHandler.removePunishment(ip, punishment.type, removeAll = false)
                                         //Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "pardon-ip $ip")
                                         plugin.logger.info("Player $playerOrIpOrUUID ($uuid) has been unbanned")
                                     }
