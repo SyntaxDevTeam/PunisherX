@@ -178,6 +178,15 @@ history:
   reason: "<dark_gray>Reason</dark_gray>"
   time: "<dark_gray>Time</dark_gray>"
 
+# Messages for the /banlist command
+banlist:
+  usage: "Correct usage: <gold>/banlist"
+  no_punishments: "<dark_green>The ban list is empty.</dark_green>"
+  title: "<blue>|   <gray>Banned players list:</gray>"
+  top_header: "<blue>--------------------------------------------------</blue>"
+  table_header: "<blue>|    Name          |          Type          |          When</blue>"
+  ban_list: "<blue>|   <hover:show_text:'<white>UUID:</white> <gold>{uuid}</gold>'><white>{player}</white></hover>   |   <hover:show_text:'<white>ID:</white> <gold>#{id}<newline><white>Operator:</white> <gold>{operator}</gold><newline><white>Reason:</white> <gold>{reason}</gold>'><white>{type}</white></hover>   |   <white>{time}</white></blue>"
+
 # /change-reason command messages
 change-reason:
   usage: "Correct usage is: <gold>/change-reason <punishment_ID> <new_reason>"
