@@ -179,6 +179,15 @@ history:
   reason: "<dark_gray>Grund</dark_gray>"
   time: "<dark_gray>Zeit</dark_gray>"
 
+# Nachrichten für den /banlist-Befehl
+banlist:
+  usage: "Korrekte Verwendung: <gold>/banlist"
+  no_punishments: "<dark_green>Die Bannliste ist leer.</dark_green>"
+  title: "<blue>|   <gray>Liste der gebannten Spieler:</gray>"
+  top_header: "<blue>--------------------------------------------------</blue>"
+  table_header: "<blue>|    Name          |          Typ           |          Wann</blue>"
+  ban_list: "<blue>|   <hover:show_text:'<white>UUID:</white> <gold>{uuid}</gold>'><white>{player}</white></hover>   |   <hover:show_text:'<white>ID:</white> <gold>#{id}<newline><white>Operator:</white> <gold>{operator}</gold><newline><white>Grund:</white> <gold>{reason}</gold>'><white>{type}</white></hover>   |   <white>{time}</white></blue>"
+
 # Nachrichten für den /change-reason-Befehl
 change-reason:
   usage: "Korrekte Verwendung: <gold>/change-reason <Strafe-ID> <neuer Grund>"
