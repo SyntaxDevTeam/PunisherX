@@ -25,13 +25,13 @@ repositories {
 dependencies {
     compileOnly("dev.folia:folia-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
-    compileOnly("org.yaml:snakeyaml:2.3")
+    compileOnly("org.yaml:snakeyaml:2.4")
     compileOnly("com.google.code.gson:gson:2.12.1")
-    compileOnly("net.kyori:adventure-text-serializer-legacy:4.18.0")
-    compileOnly("net.kyori:adventure-text-minimessage:4.18.0")
-    compileOnly("net.kyori:adventure-text-serializer-gson:4.18.0")
-    compileOnly("net.kyori:adventure-text-serializer-plain:4.18.0")
-    compileOnly("net.kyori:adventure-text-serializer-ansi:4.18.0")
+    compileOnly("net.kyori:adventure-text-serializer-legacy:4.19.0")
+    compileOnly("net.kyori:adventure-text-minimessage:4.19.0")
+    compileOnly("net.kyori:adventure-text-serializer-gson:4.19.0")
+    compileOnly("net.kyori:adventure-text-serializer-plain:4.19.0")
+    compileOnly("net.kyori:adventure-text-serializer-ansi:4.19.0")
     compileOnly("com.maxmind.geoip2:geoip2:4.2.1")
     compileOnly("org.apache.ant:ant:1.10.15")
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
@@ -62,26 +62,6 @@ tasks.processResources {
         expand(props)
     }
 }
-
-val apiKey: String? = System.getenv("PLUGIN_API_TOKEN")
-
-tasks.register<Copy>("embedApiKey") {
-    val configFile = file("src/main/resources/config.yml")
-    val outputDir = layout.buildDirectory.dir("generated-resources/main")
-
-    from(configFile) {
-        expand("apiKey" to (apiKey ?: "default_key"))
-    }
-    into(outputDir)
-}
-
-tasks.processResources {
-    dependsOn("embedApiKey")
-    from("build/generated-resources/main") {
-        into("config")
-    }
-}
-
 
 hangarPublish {
     publications.register("plugin") {
