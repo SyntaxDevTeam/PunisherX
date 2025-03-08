@@ -34,6 +34,11 @@ class CommandManager(private val plugin: PunisherX) {
                 HistoryCommand(plugin, plugin.playerIPManager)
             )
             commands.register(
+                "banlist",
+                "Checking player all penalties history" + plugin.messageHandler.getSimpleMessage("banlist", "usage"),
+                BanListCommand(plugin)
+            )
+            commands.register(
                 "kick",
                 plugin.messageHandler.getSimpleMessage("kick", "usage"),
                 KickCommand(plugin)
