@@ -49,6 +49,7 @@ WarnActions:
 * `/change-reason <penalty_id> <new_reason>` - Changes the reason for the penalty with the given ID
 * `/check <player> <warn|mute|ban|all>` - Checks the active penalties of a given player. Available options to check only for warn|mute|ban or all types through “all”
 * `/history <player> (X)` - Checks the entire penalty history of a given player from the beginning sorted from newest to oldest with page division. You can navigate in the game chat window by clicking the appropriate field [NEXT]|[Previous] or adding the page number as an argument to the command.
+* `/banlist [--h]` - Displays a list of all banned players, paginated 10 per page. The --h argument allows you to display the full history of banned players (including those with inactive punishments).
 * `/punisherx|prx <help|version|reload|export|import>` - Default command displaying depending on the argument shows the help screen with available commands, the current version of the plugin with information about it, and reloading the config file. Additionally, the export|import arguments allow you to make a database backup or import it in the plugin directory.
 > Arguments specified in <> are required, while those in parentheses () are optional for standard command usage. Arguments in square brackets [] are additional and are only used in extraordinary situations. When using time (punishment for a specified duration), you must specify it in the available formats, i.e., Xs|Xm|Xh|Xd, where X represents the time in seconds|minutes|hours|days. Leaving the time field empty will automatically assign an indefinite punishment that will never expire unless a command to cancel the punishment is used.
 
@@ -61,14 +62,15 @@ WarnActions:
 * `punisherx.ban`
 * `punisherx.banip`
 * `punisherx.unban`
-* `punisherx.clearall` (NEW)
-* `punisherx.jail` (**NEW**)
-* `punisherx.unjail` (**NEW**)
-* `punisherx.setjail` (**NEW**)
+* `punisherx.clearall`
+* `punisherx.jail` (NEW)
+* `punisherx.unjail` (NEW)
+* `punisherx.setjail` (NEW)
 * `punisherx.kick`
 * `punisherx.check` - Not required if the player checks themselves.
   * `punisherx.view_ip` - Additional permission allowing to view the player’s IP in the /check command
 * `punisherx.history` - Not required if the player checks themselves.
+* `punisherx.banlist` (**NEW**)
 * `punisherx.help`
 * `punisherx.version`
 * `punisherx.reload`
@@ -78,8 +80,8 @@ WarnActions:
 * `punisherx.see.ban`
 * `punisherx.see.banip`
 * `punisherx.see.unban`
-* `punisherx.see.jail` (**NEW**)
-* `punisherx.see.unjail` (**NEW**)
+* `punisherx.see.jail` (NEW)
+* `punisherx.see.unjail` (NEW)
 * `punisherx.see.mute`
 * `punisherx.see.warns`
 * `punisherx.see.kick`
@@ -87,7 +89,7 @@ WarnActions:
 ### Bypass permissions (do not allow the command to be executed on authorized users):
 * `punisherx.bypass.warn`
 * `punisherx.bypass.mute`
-* `punisherx.bypass.jail` (**NEW**)
+* `punisherx.bypass.jail` (NEW)
 * `punisherx.bypass.ban`
 * `punisherx.bypass.banip` - does not work when using the IP number directly
 
