@@ -9,5 +9,16 @@ package pl.syntaxdevteam.punisher.databases
  * @param reason The reason of the punishment
  * @param start The start of the punishment
  * @param end The end of the punishment
+ * @param name The name of the punished player
+ * @param operator The operator of the punishment
  */
-data class PunishmentData(val id: Int, val uuid: String, val type: String, val reason: String, val start: Long, val end: Long)
+data class PunishmentData(
+    val id: Int,
+    val uuid: String,
+    val type: String,
+    val reason: String,
+    val start: Long,
+    val end: Long,
+    val name: String,
+    val operator: String
+)

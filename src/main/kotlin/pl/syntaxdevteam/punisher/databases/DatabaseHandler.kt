@@ -434,7 +434,9 @@ class DatabaseHandler(private val plugin: PunisherX) {
                         val reason = resultSet.getString("reason")
                         val start = resultSet.getLong("start")
                         val end = resultSet.getLong("endTime")
-                        val punishment = PunishmentData(id, uuid, type, reason, start, end)
+                        val name = resultSet.getString("name")
+                        val operator = resultSet.getString("operator")
+                        val punishment = PunishmentData(id, uuid, type, reason, start, end, name, operator)
 
 
                         if (plugin.punishmentManager.isPunishmentActive(punishment)) {
@@ -480,7 +482,9 @@ class DatabaseHandler(private val plugin: PunisherX) {
                         val reason = resultSet.getString("reason")
                         val start = resultSet.getLong("start")
                         val end = resultSet.getLong("endTime")
-                        val punishment = PunishmentData(id, ip, type, reason, start, end)
+                        val name = resultSet.getString("name")
+                        val operator = resultSet.getString("operator")
+                        val punishment = PunishmentData(id, ip, type, reason, start, end, name, operator)
                         if (plugin.punishmentManager.isPunishmentActive(punishment)) {
                             punishments.add(punishment)
                         } else {
@@ -587,7 +591,9 @@ class DatabaseHandler(private val plugin: PunisherX) {
                         val reason = resultSet.getString("reason")
                         val start = resultSet.getLong("start")
                         val end = resultSet.getLong("endTime")
-                        val punishment = PunishmentData(id, uuid, type, reason, start, end)
+                        val name = resultSet.getString("name")
+                        val operator = resultSet.getString("operator")
+                        val punishment = PunishmentData(id, uuid, type, reason, start, end, name, operator)
                         if (plugin.punishmentManager.isPunishmentActive(punishment)) {
                             punishments.add(punishment)
                         }
@@ -630,7 +636,9 @@ class DatabaseHandler(private val plugin: PunisherX) {
                         val reason = resultSet.getString("reason")
                         val start = resultSet.getLong("start")
                         val end = resultSet.getLong("endTime")
-                        val punishment = PunishmentData(id, uuid, type, reason, start, end)
+                        val name = resultSet.getString("name")
+                        val operator = resultSet.getString("operator")
+                        val punishment = PunishmentData(id, uuid, type, reason, start, end, name, operator)
                         punishments.add(punishment)
                     }
                     resultSet.close()
@@ -669,7 +677,9 @@ class DatabaseHandler(private val plugin: PunisherX) {
                         val reason = resultSet.getString("reason")
                         val start = resultSet.getLong("start")
                         val end = resultSet.getLong("endTime")
-                        val punishment = PunishmentData(id, uuid, type, reason, start, end)
+                        val name = resultSet.getString("name")
+                        val operator = resultSet.getString("operator")
+                        val punishment = PunishmentData(id, uuid, type, reason, start, end, name, operator)
                         punishments.add(punishment)
                     }
                     resultSet.close()
@@ -710,6 +720,132 @@ class DatabaseHandler(private val plugin: PunisherX) {
             plugin.logger.err("Failed to update punishment reason for ID: $id. ${e.message}")
             false
         }
+    }
+
+    fun getBannedPlayers(limit: Int, offset: Int): MutableList<PunishmentData> {
+        val bannedPlayers = mutableListOf<PunishmentData>()
+
+        try {
+            getConnection()?.use { conn ->
+                logger.debug("Database connection established from getBannedPlayers")
+
+                val supportsOrderAndLimit = when (dbType.lowercase()) {
+                    "mysql", "mariadb", "postgresql", "sqlite" -> true
+                    "h2" -> false
+                    else -> false
+                }
+
+                val query = when {
+                    supportsOrderAndLimit -> """
+                    SELECT * FROM punishments 
+                    WHERE punishmentType IN ('BAN', 'BANIP') 
+                    ORDER BY start DESC 
+                    LIMIT ? OFFSET ?
+                """.trimIndent()
+
+                    else -> """
+                    SELECT * FROM punishments 
+                    WHERE punishmentType IN ('BAN', 'BANIP')
+                """.trimIndent()
+                }
+
+                conn.prepareStatement(query).use { preparedStatement ->
+                    if (supportsOrderAndLimit) {
+                        preparedStatement.setInt(1, limit)
+                        preparedStatement.setInt(2, offset)
+                    }
+
+                    val resultSet: ResultSet = preparedStatement.executeQuery()
+                    var skipped = 0
+                    while (resultSet.next()) {
+                        if (!supportsOrderAndLimit && skipped < offset) {
+                            skipped++
+                            continue
+                        }
+                        if (!supportsOrderAndLimit && bannedPlayers.size >= limit) break
+                        val id = resultSet.getInt("id")
+                        val name = resultSet.getString("name")
+                        val uuid = resultSet.getString("uuid")
+                        val reason = resultSet.getString("reason")
+                        val operator = resultSet.getString("operator")
+                        val punishmentType = resultSet.getString("punishmentType")
+                        val start = resultSet.getLong("start")
+                        val end = resultSet.getLong("endTime")
+                        val punishment = PunishmentData(id, uuid, punishmentType, reason, start, end, name, operator)
+                        bannedPlayers.add(punishment)
+                    }
+                }
+            } ?: throw SQLException("No connection available")
+        } catch (e: SQLException) {
+            plugin.logger.err("Failed to get banned players: ${e.message}")
+        } catch (e: IllegalArgumentException) {
+            plugin.logger.err("Unsupported database type: $dbType")
+        }
+
+        return bannedPlayers
+    }
+
+    fun getHistoryBannedPlayers(limit: Int, offset: Int): MutableList<PunishmentData> {
+        val bannedPlayers = mutableListOf<PunishmentData>()
+
+        try {
+            getConnection()?.use { conn ->
+                logger.debug("Database connection established from getHistoryBannedPlayers")
+
+                val supportsOrderAndLimit = when (dbType.lowercase()) {
+                    "mysql", "mariadb", "postgresql", "sqlite" -> true
+                    "h2" -> false
+                    else -> false
+                }
+
+                val query = when {
+                    supportsOrderAndLimit -> """
+                    SELECT * FROM punishments 
+                    WHERE punishmentType IN ('BAN', 'BANIP') 
+                    ORDER BY start DESC 
+                    LIMIT ? OFFSET ?
+                """.trimIndent()
+
+                    else -> """
+                    SELECT * FROM punishments 
+                    WHERE punishmentType IN ('BAN', 'BANIP')
+                """.trimIndent()
+                }
+
+                conn.prepareStatement(query).use { preparedStatement ->
+                    if (supportsOrderAndLimit) {
+                        preparedStatement.setInt(1, limit)
+                        preparedStatement.setInt(2, offset)
+                    }
+
+                    val resultSet: ResultSet = preparedStatement.executeQuery()
+                    var skipped = 0
+                    while (resultSet.next()) {
+                        if (!supportsOrderAndLimit && skipped < offset) {
+                            skipped++
+                            continue
+                        }
+                        if (!supportsOrderAndLimit && bannedPlayers.size >= limit) break
+                        val id = resultSet.getInt("id")
+                        val name = resultSet.getString("name")
+                        val uuid = resultSet.getString("uuid")
+                        val reason = resultSet.getString("reason")
+                        val operator = resultSet.getString("operator")
+                        val punishmentType = resultSet.getString("punishmentType")
+                        val start = resultSet.getLong("start")
+                        val end = resultSet.getLong("endTime")
+                        val punishment = PunishmentData(id, uuid, punishmentType, reason, start, end, name, operator)
+                        bannedPlayers.add(punishment)
+                    }
+                }
+            } ?: throw SQLException("No connection available")
+        } catch (e: SQLException) {
+            plugin.logger.err("Failed to get banned players: ${e.message}")
+        } catch (e: IllegalArgumentException) {
+            plugin.logger.err("Unsupported database type: $dbType")
+        }
+
+        return bannedPlayers
     }
 
     /**
