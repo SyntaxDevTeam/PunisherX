@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class CommandLoggerPlugin(private val plugin: PunisherX) {
+
     private val gson: Gson = GsonBuilder().setPrettyPrinting().create()
     private val logFile: File = File(plugin.dataFolder, "commands.json")
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
@@ -21,36 +22,42 @@ class CommandLoggerPlugin(private val plugin: PunisherX) {
         }
         if (!logFile.exists()) {
             logFile.createNewFile()
-            saveLogs(mutableMapOf())
+            saveLogs(mutableListOf())
         }
     }
 
     fun logCommand(executor: String, command: String, target: String, reason: String) {
-        val logs = loadLogs().toMutableMap()
-        logs[executor] = CommandEntry(command, target, reason, dateFormat.format(Date()))
+        val logs = loadLogs().toMutableList()
+        logs.add(CommandEntry(executor, command, target, reason, dateFormat.format(Date())))
         saveLogs(logs)
     }
 
-    private fun loadLogs(): Map<String, CommandEntry> {
+    private fun loadLogs(): List<CommandEntry> {
         return try {
             FileReader(logFile).use { reader ->
-                gson.fromJson(reader, object : TypeToken<Map<String, CommandEntry>>() {}.type) ?: emptyMap()
+                gson.fromJson(reader, object : TypeToken<List<CommandEntry>>() {}.type) ?: emptyList()
             }
         } catch (e: Exception) {
-            plugin.logger.warning("Nie można odczytać logs.json: ${e.message}")
-            emptyMap()
+            plugin.logger.warning("Nie można odczytać commands.json: ${e.message}")
+            emptyList()
         }
     }
 
-    private fun saveLogs(logs: Map<String, CommandEntry>) {
+    private fun saveLogs(logs: List<CommandEntry>) {
         try {
             FileWriter(logFile).use { writer ->
                 gson.toJson(logs, writer)
             }
         } catch (e: Exception) {
-            plugin.logger.warning("Błąd zapisu logs.json: ${e.message}")
+            plugin.logger.warning("Błąd zapisu commands.json: ${e.message}")
         }
     }
 
-    data class CommandEntry(val command: String, val target: String, val reason: String, val time: String)
+    data class CommandEntry(
+        val executor: String,
+        val command: String,
+        val target: String,
+        val reason: String,
+        val time: String
+    )
 }
