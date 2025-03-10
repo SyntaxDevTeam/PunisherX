@@ -9,6 +9,7 @@ import pl.syntaxdevteam.punisher.PunisherX
 
 @Suppress("UnstableApiUsage")
 class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
+    private val clp = plugin.commandLoggerPlugin
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (stack.sender.hasPermission("punisherx.banip")) {
@@ -61,6 +62,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
                     if (!success) {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban-ip $playerOrIpOrUUID")
                     }
+                    clp.logCommand(stack.sender.name, punishmentType, playerOrIpOrUUID, reason)
                     plugin.databaseHandler.addPunishmentHistory(playerOrIpOrUUID, playerIP, reason, stack.sender.name, punishmentType, start, end ?: -1)
 
                     if (targetPlayer != null) {

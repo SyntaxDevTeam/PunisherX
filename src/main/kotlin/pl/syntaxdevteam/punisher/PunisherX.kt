@@ -35,6 +35,7 @@ class PunisherX : JavaPlugin(), Listener {
     private lateinit var commandManager: CommandManager
     lateinit var cache: PunishmentCache
     private var configHandler = ConfigHandler(this)
+    lateinit var commandLoggerPlugin: CommandLoggerPlugin
 
     /**
      * Called when the plugin is enabled.
@@ -100,6 +101,7 @@ class PunisherX : JavaPlugin(), Listener {
      * Registers the plugin commands.
      */
     private fun registerCommands(){
+        commandLoggerPlugin = CommandLoggerPlugin(this)
         commandManager = CommandManager(this)
         commandManager.registerCommands()
     }

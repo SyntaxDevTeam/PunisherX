@@ -11,7 +11,8 @@ import pl.syntaxdevteam.punisher.PunisherX
 import java.util.*
 
 @Suppress("UnstableApiUsage")
-class BanCommand(private val plugin: PunisherX) : BasicCommand {
+class BanCommand(private var plugin: PunisherX) : BasicCommand {
+    private val clp = plugin.commandLoggerPlugin
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (stack.sender.hasPermission("punisherx.ban")) {
@@ -51,6 +52,7 @@ class BanCommand(private val plugin: PunisherX) : BasicCommand {
                         val banEndDate = if (gtime != null) Date(System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
                         banList.addBan(playerProfile, reason, banEndDate, stack.sender.name)
                     }
+                    clp.logCommand(stack.sender.name, punishmentType, player, reason)
                     plugin.databaseHandler.addPunishmentHistory(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
 
                     if (targetPlayer != null) {
