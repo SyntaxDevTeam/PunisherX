@@ -33,9 +33,12 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
                     if (punishments.isNotEmpty()) {
                         punishments.forEach { punishment ->
                             if (punishment.type == "BAN") {
+                                plugin.commandLoggerPlugin.logCommand(stack.sender.name, "UNBAN", playerOrIpOrUUID, punishment.reason)
                                 plugin.databaseHandler.removePunishment(uuid, punishment.type, removeAll = false)
                                 //Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "pardon $playerOrIpOrUUID")
                                 plugin.logger.info("Player $playerOrIpOrUUID ($uuid) has been unbanned")
+                            }else{
+                                plugin.logger.debug("Player $playerOrIpOrUUID ($uuid) has no ban")
                             }
                         }
 
@@ -48,17 +51,24 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
                             if (punishmentsByIP.isNotEmpty()) {
                                 punishmentsByIP.forEach { punishment ->
                                     if (punishment.type == "BANIP") {
+                                        plugin.commandLoggerPlugin.logCommand(stack.sender.name, "UNBAN (IP)", playerOrIpOrUUID, punishment.reason)
                                         plugin.databaseHandler.removePunishment(ip, punishment.type, removeAll = false)
                                         //Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "pardon-ip $ip")
                                         plugin.logger.info("Player $playerOrIpOrUUID ($uuid) has been unbanned")
+                                    }else{
+                                        plugin.logger.debug("Player $playerOrIpOrUUID ($uuid) has no banip")
                                     }
                                 }
                                 stack.sender.sendMessage(plugin.messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIpOrUUID)))
                             } else {
-                                stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
+                                plugin.logger.debug("No punishments found for player $playerOrIpOrUUID (punishmentsByIP isEmpty!)")
+                                stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID))) //TODO: zmienić wiadomość na "Gracznie ma bana"
+                                return
                             }
                         } else {
-                            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
+                            plugin.logger.debug("No IP found for player $playerOrIpOrUUID (ip is null!)")
+                            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID))) //TODO: zmienić wiadomość na "Gracznie ma bana"
+                            return
                         }
                     }
                     val permission = "punisherx.see.unban"
