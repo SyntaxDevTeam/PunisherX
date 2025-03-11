@@ -12,6 +12,7 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 error:
   no_permission: "<red>Vous n'avez pas la permission d'utiliser cette commande.</red>"
   player_not_found: "<gold>Joueur avec le pseudo {player} introuvable.</gold>"
+  ip_not_found: "<gold>Joueur avec l'IP {ip} introuvable.</gold>"
   reload: "<red>Une erreur est survenue lors du rechargement de la configuration :</red>"
   bypass: "<red><b>ATTENTION !</b> Le joueur <gold>{player}<gold/> <red>ne peut pas être puni en raison de ses permissions (OP ou bypass).</red><dark_gray>Peut-être que cela pourrait être contourné..."
 
