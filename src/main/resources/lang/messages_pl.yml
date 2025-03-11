@@ -10,6 +10,8 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 error:
   no_permission: "<red>Nie masz uprawnień do tej komendy.</red>"
   player_not_found: "<gold>Nie znaleziono gracza o nicku {player}.</gold>"
+  player_not_punished: "<gold>Gracz {player} nie ma takiej kary.</gold>"
+  ip_not_found: "<gold>Nie znaleziono gracza o IP {ip}.</gold>"
   console: "<red>Tylko gracz może użyć tej komendy</red>"
   reload: "<red>Wystąpił błąd podczas przełądowania konfiguracji:</red> "
   bypass: "<red><b>UWAGA!</b> Gracz <gold>{player}<gold/> <red>nie może otrzymać kary, ze zględu na swoje uprawnienia (OP lub bypass).</red><dark_gray>Może dało by się to obejść..."
