@@ -40,7 +40,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
         // Próba odbanowania po IP (jeśli istnieje)
         val ip = plugin.playerIPManager.getPlayerIPByName(playerOrIpOrUUID)
         if (ip == null) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "ip_not_found", mapOf("player" to playerOrIpOrUUID)))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
             return
         }
 
@@ -89,7 +89,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
 
         if (punishments.isEmpty()) {
             plugin.logger.debug("No punishments found for IP $ip")
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "ip_not_found", mapOf("player" to ip)))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "ip_not_found", mapOf("ip" to ip)))
             return false
         }
 
