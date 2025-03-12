@@ -68,26 +68,29 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
 
     private fun sendHelp(stack: CommandSourceStack, page: Int) {
         val commands = listOf(
-            "  <gold>/punisherx help <gray>- <white>Displays this prompt.",
-            "  <gold>/punisherx version <gray>- <white>Shows plugin info.",
-            "  <gold>/punisherx reload <gray>- <white>Reloads the configuration file.",
-            "  <gold>/warn <player> (time) <reason> <gray>- <white>Warns a player.",
-            "  <gold>/unwarn <player> <gray>- <white>Removes a player's warning.",
-            "  <gold>/mute <player> (time) <reason> <gray>- <white>Mutes a player.",
-            "  <gold>/unmute <player> <gray>- <white>Unmutes a player.",
-            "  <gold>/ban <player> (time) <reason> [--force]",
+            "  <gold>/punisherx help <gray>- <white>Displays this prompt.", // ok
+            "  <gold>/punisherx version <gray>- <white>Shows plugin info.", // ok
+            "  <gold>/punisherx reload <gray>- <white>Reloads the configuration file.", // ok
+            "  <gold>/kick <player> <reason> <gray>- <white>Kicks a player from the server", // ok
+            "  <gold>/warn <player> (time) <reason> <gray>- <white>Warns a player.", // ok
+            "  <gold>/unwarn <player> <gray>- <white>Removes a player's warning.", // ok
+            "  <gold>/mute <player> (time) <reason> <gray>- <white>Mutes a player.", // ok
+            "  <gold>/unmute <player> <gray>- <white>Unmutes a player.", // ok
+            "  <gold>/ban <player> (time) <reason> [--force]", // ok
             "         <gray>- <white>Bans a player, optionally ignoring bypass.",
-            "  <gold>/banip <player/ip> (time) <reason> [--force] ",
+            "  <gold>/banip <player/ip> (time) <reason> [--force] ",// ok
             "         <gray>- <white>Bans a player's IP, optionally ignoring bypass.",
-            "  <gold>/unban <player/ip> <gray>- <white>Unbans a player.",
-            "  <gold>/check <player> <all/warn/mute/ban> ",
-            "    <gray>- <white>Checks and displays the punishments of a given player",
+            "  <gold>/unban <player/ip> <gray>- <white>Unbans a player.", // ok
+            "  <gold>/check <player> <all/warn/mute/ban> ", // ok
+            "    <gray>- <white>Checks and displays the punishments of a given player", // ok
             "  <gold>/clearall <player> <gray>- <white>Clears all active penalties.",
-            "  <gold>/jail <player> (time) <reason> <gray>- <white>Sends a player to jail.",
-            "  <gold>/unjail <player> <gray>- <white>Releases a player from jail.",
-            "  <gold>/setjail radius <number> <gray>- <white>Setting up the jail location.",
-            " ",
-            " ",
+            "  <gold>/jail <player> (time) <reason> <gray>- <white>Sends a player to jail.", // ok
+            "  <gold>/unjail <player> <gray>- <white>Releases a player from jail.", // ok
+            "  <gold>/setjail radius <number> <gray>- <white>Setting up the jail location.", // ok
+            "  <gold>/change-reason <penalty_id> <new_reason> <gray>", // ok
+            "                - <white>Changes the reason for the penalty.", // ok
+            "  <gold>/history <player> <page> <gray>- <white>Displays the player's punishment history.", // ok
+            "  <gold>/banlist <page> --h <gray>- <white>Displays the list of banned players.", // ok
             " ",
             " ",
             " ",
