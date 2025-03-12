@@ -13,6 +13,7 @@ error:
   no_permission: "<red>No tienes permiso para usar este comando.</red>"
   player_not_found: "<gold>No se ha encontrado al jugador con el nombre {player}.</gold>"
   ip_not_found: "<gold>No se ha encontrado al jugador con la IP {ip}.</gold>"
+  player_not_punished: "<gold>El jugador {player} no tiene ese castigo.</gold>"
   reload: "<red>Ocurrió un error al recargar la configuración:</red>"
   bypass: "<red><b>¡ADVERTENCIA!</b> El jugador <gold>{player}<gold/> <red>no puede ser castigado debido a sus permisos (OP o bypass).</red><dark_gray>Quizás esto podría ser evitado..."
 
