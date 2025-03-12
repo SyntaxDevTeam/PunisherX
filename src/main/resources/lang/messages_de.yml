@@ -12,6 +12,7 @@ error:
   no_permission: "<red>Du hast keine Berechtigung für diesen Befehl.</red>"
   player_not_found: "<gold>Spieler mit dem Namen {player} nicht gefunden.</gold>"
   ip_not_found: "<gold>Spieler mit der IP {ip} nicht gefunden.</gold>"
+  player_not_punished: "<gold>Der Spieler {player} hat keine solche Strafe.</gold>"
   reload: "<red>Beim Neuladen der Konfiguration ist ein Fehler aufgetreten:</red> "
   bypass: "<red><b>ACHTUNG!</b> Spieler <gold>{player}<gold/> <red>kann aufgrund seiner Berechtigungen (OP oder Bypass) nicht bestraft werden.</red><dark_gray>Vielleicht könnte dies umgangen werden..."
 
