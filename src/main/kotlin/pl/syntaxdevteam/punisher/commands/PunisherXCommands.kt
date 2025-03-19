@@ -13,6 +13,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (!stack.sender.hasPermission("punisherx.cmd.prx")) {
             stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            return
         }
             val pluginMeta = (plugin as LifecycleEventOwner).pluginMeta
             val pdf = plugin.description
