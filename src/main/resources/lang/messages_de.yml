@@ -203,6 +203,15 @@ clear:
   clearall: "<green>Alle aktiven Strafen für Spieler </green><gold>{player}</gold><green> wurden gelöscht</green>"
   clear_message: "<green>Alle deine aktiven Strafen wurden aufgehoben! </green><dark_gray>Pssst! Hast du irgendwelche Kontakte zur Administration oder so?"
 
+webhook:
+  title: "Neue Strafe auf dem Server"
+  player: "Spieler"
+  operator: "Administrator"
+  reason: "Grund"
+  type: "Strafentyp"
+  time: "Endzeit"
+  app_name: "PunisherX • "
+
 # Zeitformatierung
 formatTime:
   undefined: "unbestimmt"

@@ -7,16 +7,6 @@ import java.io.File
 import java.io.IOException
 import java.sql.*
 
-/**
- * Represents a handler for database operations.
- *
- * This class provides methods to interact with the database, such as creating tables, adding punishments,
- * removing punishments, and retrieving punishment data. It uses the HikariCP connection pool to manage
- * database connections efficiently and safely.
- *
- * @param plugin The PunisherX plugin instance.
- */
-@Suppress("KDocUnresolvedReference")
 class DatabaseHandler(private val plugin: PunisherX) {
     private var dataSource: HikariDataSource? = null
     private var logger = plugin.logger
@@ -25,23 +15,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
     init {
         setupDataSource()
     }
-
-    /**
-     * Configures the HikariCP data source for database connections.
-     *
-     * This method sets up the data source based on the database type defined in the plugin configuration.
-     * It supports the following database types:
-     * - MySQL/MariaDB
-     * - PostgreSQL
-     * - SQLite
-     * - H2
-     *
-     * For SQLite databases, specific pool settings are applied to minimize resource usage.
-     * For other database types, the pool is configured with more robust settings suitable for production.
-     *
-     * @throws IllegalArgumentException If the database type is unsupported.
-     * @throws Exception If an error occurs during data source initialization.
-     */
 
     private fun setupDataSource() {
         val hikariConfig = HikariConfig()
@@ -106,26 +79,12 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    /**
-     * Ensures that the database connection is open.
-     *
-     * If the data source is not initialized, this method will invoke `setupDataSource`
-     * to configure and start the connection pool.
-     */
     fun openConnection() {
         if (dataSource == null) {
             setupDataSource()
         }
     }
 
-    /**
-     * Closes the HikariCP connection pool.
-     *
-     * This method gracefully shuts down the data source, releasing all resources associated with
-     * the connection pool. It also logs the pool's statistics, such as total, active, and idle connections.
-     *
-     * Any errors encountered during shutdown are logged but do not interrupt the process.
-     */
     fun closeConnection() {
         try {
             dataSource?.close()
@@ -135,16 +94,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    /**
-     * Obtains a connection from the HikariCP data source.
-     *
-     * This method retrieves a connection from the pool and, if the database type is SQLite,
-     * enables Write-Ahead Logging (WAL) mode to improve performance.
-     *
-     * Connections must be properly closed after use to avoid resource leaks.
-     *
-     * @return A valid `Connection` object, or `null` if the connection could not be established.
-     */
     private fun getConnection(): Connection? {
         return try {
             val connection = dataSource?.connection
@@ -159,14 +108,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    /**
-     * Enables Write-Ahead Logging (WAL) mode for SQLite.
-     *
-     * WAL mode improves SQLite's performance by allowing concurrent reads and writes.
-     * This method executes the `PRAGMA journal_mode=WAL;` statement on the provided connection.
-     *
-     * @param connection The active SQLite connection.
-     */
     private fun enableSQLiteWAL(connection: Connection) {
         logger.debug("SQLite connection detected! I'm enabling WAL mode")
         try {
@@ -179,20 +120,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    /**
-     * Creates necessary tables in the database.
-     *
-     * This method executes SQL statements to create the following tables if they do not already exist:
-     * - `punishments`: Stores information about active punishments.
-     * - `punishmenthistory`: Stores information about historical punishments.
-     *
-     * The table structures and types are adapted to the configured database type
-     * (e.g., `SQLite`, `PostgreSQL`, `H2`, `MySQL`/`MariaDB`).
-     *
-     * SQL statements are constructed dynamically to match the syntax and capabilities of each database type.
-     *
-     * @throws SQLException If an error occurs while creating the tables.
-     */
     fun createTables() {
         getConnection()?.use { conn ->
             logger.debug("Database connection established from createTables")
@@ -317,26 +244,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
         logger.debug("Operacje tworzenia tabel zakończone.")
     }
 
-    /**
-     * Adds a punishment to the punishments' database.
-     *
-     * This method establishes a connection to the database and executes an SQL insert statement
-     * to add a punishment record to the `punishments` table. The record includes the player's
-     * name, UUID, reason, operator, punishment type, start time, and end time.
-     *
-     * If the operation is successful, the method logs a debug message indicating the punishment was added
-     * and returns `true`. If no connection is available or an SQL exception occurs, an error message is logged,
-     * and the method returns `false`.
-     *
-     * @param name The name of the player to add the punishment for.
-     * @param uuid The UUID of the player to add the punishment for.
-     * @param reason The reason for the punishment.
-     * @param operator The name of the operator who issued the punishment.
-     * @param punishmentType The type of punishment (e.g., "BAN", "MUTE", "WARN").
-     * @param start The start time of the punishment.
-     * @param end The end time of the punishment.
-     * @return `true` if the punishment was added successfully; `false` otherwise.
-     */
     fun addPunishment(name: String, uuid: String, reason: String, operator: String, punishmentType: String, start: Long, end: Long): Boolean {
         return try {
             getConnection()?.use { conn ->
@@ -364,24 +271,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    /**
-     * Adds a punishment to the punishment history database.
-     *
-     * This method establishes a connection to the database and executes an SQL insert statement
-     * to add a punishment record to the `punishmenthistory` table. The record includes the player's
-     * name, UUID, reason, operator, punishment type, start time, and end time.
-     *
-     * If the operation is successful, the method logs a debug message indicating the punishment was added.
-     * If no connection is available or an SQL exception occurs, an error message is logged.
-     *
-     * @param name The name of the player to add the punishment for.
-     * @param uuid The UUID of the player to add the punishment for.
-     * @param reason The reason for the punishment.
-     * @param operator The name of the operator who issued the punishment.
-     * @param punishmentType The type of punishment (e.g., "BAN", "MUTE", "WARN").
-     * @param start The start time of the punishment.
-     * @param end The end time of the punishment.
-     */
     fun addPunishmentHistory(name: String, uuid: String, reason: String, operator: String, punishmentType: String, start: Long, end: Long) {
         try {
             getConnection()?.use { conn ->
@@ -400,6 +289,13 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     preparedStatement.setLong(7, end)
                     preparedStatement.executeUpdate()
                     plugin.logger.debug("Punishment history for player $name added to the database.")
+                    plugin.discordWebhook.sendPunishmentWebhook(
+                        playerName = name,
+                        adminName = operator,
+                        reason = reason,
+                        type = punishmentType,
+                        duration = end
+                    )
                 }
             } ?: throw SQLException("No connection available")
         } catch (e: SQLException) {
@@ -407,17 +303,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    /**
-     * Retrieves all active punishments for a given player UUID from the punishments' database.
-     *
-     * This method establishes a connection to the database, executes a query to fetch all active
-     * punishments for the specified UUID, and returns a list of PunishmentData objects representing
-     * the retrieved punishments. If no connection is available or an SQL exception occurs, an error
-     * message is logged, and an empty list is returned.
-     *
-     * @param uuid The UUID of the player whose active punishments are to be retrieved.
-     * @return A list of PunishmentData objects representing the active punishments for the specified UUID.
-     */
     fun getPunishments(uuid: String): List<PunishmentData> {
         val punishments = mutableListOf<PunishmentData>()
         logger.debug("Database connection established from getPunishments")
@@ -456,17 +341,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return punishments
     }
 
-    /**
-     * Retrieves all active punishments for a given player UUID from the punishments' database.
-     *
-     * This method establishes a connection to the database, executes a query to fetch all active
-     * punishments for the specified UUID, and returns a list of PunishmentData objects representing
-     * the retrieved punishments. If no connection is available or an SQL exception occurs, an error
-     * message is logged, and an empty list is returned.
-     *
-     * @param uuid The UUID of the player whose active punishments are to be retrieved.
-     * @return A list of PunishmentData objects representing the active punishments for the specified UUID.
-     */
     fun getPunishmentsByIP(ip: String): List<PunishmentData> {
         val punishments = mutableListOf<PunishmentData>()
         try {
@@ -499,21 +373,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return punishments
     }
 
-    /**
-     * Removes a punishment from the database.
-     *
-     * This method establishes a connection to the database and executes an SQL delete statement
-     * to remove the punishment with the specified UUID/IP and punishment type. If `removeAll` is `true`,
-     * all punishments of the specified type for the given UUID/IP are removed. Otherwise, only the most
-     * recent punishment of the specified type is deleted.
-     *
-     * If the operation is successful, the method logs a debug message indicating the punishment was removed.
-     * If no connection is available or an SQL exception occurs, an error message is logged.
-     *
-     * @param uuidOrIp The UUID or IP address of the player to remove the punishment for.
-     * @param punishmentType The type of punishment to remove (e.g., "BAN", "MUTE", "WARN").
-     * @param removeAll `true` to remove all punishments of the specified type; `false` to remove only the most recent one.
-     */
     fun removePunishment(uuidOrIp: String, punishmentType: String, removeAll: Boolean = false) {
         try {
             getConnection()?.use { conn ->
@@ -565,17 +424,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    /**
-     * Retrieves the active warn count for a given player UUID from the punishments' database.
-     *
-     * This method establishes a connection to the database, executes a query to fetch the active
-     * warn count for the specified UUID, and returns the number of active warn punishments.
-     * If no connection is available or an SQL exception occurs, an error message is logged,
-     * and the method returns 0.
-     *
-     * @param uuid The UUID of the player whose active warn count is to be retrieved.
-     * @return The number of active warn punishments for the specified UUID.
-     */
     fun getActiveWarnCount(uuid: String): Int {
         val punishments = mutableListOf<PunishmentData>()
         try {
@@ -606,19 +454,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return punishments.size
     }
 
-    /**
-     * Retrieves the punishment history for a given player UUID from the punishment history database.
-     *
-     * This method establishes a connection to the database, executes a query to fetch the punishment
-     * history for the specified UUID, and returns a list of PunishmentData objects representing the
-     * retrieved punishments. If no connection is available or an SQL exception occurs, an error message
-     * is logged and an empty list is returned.
-     *
-     * @param uuid The UUID of the player whose punishment history is to be retrieved.
-     * @param limit The maximum number of punishments to retrieve.
-     * @param offset The number of punishments to skip before retrieving the results.
-     * @return A list of PunishmentData objects representing the punishment history for the specified UUID.
-     */
     fun getPunishmentHistory(uuid: String, limit: Int, offset: Int): List<PunishmentData> {
         val punishments = mutableListOf<PunishmentData>()
         try {
@@ -651,17 +486,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return punishments
     }
 
-    /**
-     * Retrieves the last ten punishments for a given player UUID from the punishment history database.
-     *
-     * This method establishes a connection to the database, executes a query to fetch the last ten
-     * punishments for the specified UUID, and returns a list of PunishmentData objects representing
-     * the retrieved punishments. If no connection is available or an SQL exception occurs, an error
-     * message is logged and an empty list is returned.
-     *
-     * @param uuid The UUID of the player whose punishment history is to be retrieved.
-     * @return A list of PunishmentData objects representing the last ten punishments for the specified UUID.
-     */
     fun getLastTenPunishments(uuid: String): List<PunishmentData> {
         val punishments = mutableListOf<PunishmentData>()
         try {
@@ -692,17 +516,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return punishments
     }
 
-    /**
-     * Updates the reason for a punishment in the punishment history database.
-     *
-     * This method establishes a connection to the database and executes an SQL update statement
-     * to change the reason for a punishment with the specified ID. If the update is successful,
-     * the method returns `true`; otherwise, it returns `false`.
-     *
-     * @param id The ID of the punishment to update.
-     * @param newReason The new reason for the punishment.
-     * @return `true` if the update was successful; `false` otherwise.
-     */
     fun updatePunishmentReason(id: Int, newReason: String): Boolean {
         return try {
             getConnection()?.use { conn ->

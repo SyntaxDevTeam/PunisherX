@@ -204,6 +204,15 @@ clear:
   clearall: "<green>Toutes les sanctions actives pour le joueur </green><gold>{player}</gold><green> ont été effacées</green>"
   clear_message: "<green>Toutes vos sanctions actives ont été annulées ! </green><dark_gray>Pssst ! Vous avez des relations avec les admins ou quoi ?"
 
+webhook:
+  title: "Nouvelle sanction sur le serveur"
+  player: "Joueur"
+  operator: "Administrateur"
+  reason: "Raison"
+  type: "Type de sanction"
+  time: "Heure de fin"
+  app_name: "PunisherX • "
+
 # Format du temps
 formatTime:
   undefined: "indéfini"
