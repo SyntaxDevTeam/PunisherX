@@ -1,5 +1,52 @@
 # Changelog
 
+## [1.4.0] - 2025-03-20
+### Functional Changes:
+* Added Discord Webhook support
+* Added Experimental version of API
+
+## [1.3.3-HOTFIX] - 2025-03-12
+### Functional Changes:
+HOTFIX Missing entries entries in language files.
+
+## [1.3.3] - 2025-03-11
+### Functional Changes:
+* **Hotfix incorrectly generated UUID**
+* Added new command `/banlist` (perm: `punisherx.banlist`)
+* Rebuilding the unban command logic and improving specific messages
+* Update all necessary libraries
+* Added CommandLogger class
+* Updated kotlin and gradle versions
+* Updated all dependencies and classes to their latest versions for greater stability and performance.
+
+
+## [1.3.2] - 2025-02-02
+### Functional Changes:
+
+* Significantly improved error handling for GeoIP checking
+* Geolocation display logic has been improved
+* Added several helper methods to handle different types of formatting
+* Added full conversion of text formatting to MiniMessage
+* Added missing entries in lang file
+* Improved internal messaging
+* Fixed issue with displaying results in console in check and history command
+* **Moved the responsibility of handling Minimessage formatting to a plugin**
+* Minor fixes + added more debug logs
+
+
+## [1.3.1-SNAPSHOT] - 2025-02-02
+### Functional Changes:
+* Hotfix for all errors related to missing entries in the language file for commands.
+* Significantly improved permission handling for commands and their auto-completion.
+* **Downgrade config file synchronization method while critical bug is resolved**
+* Numerous performance improvements.
+* Added several missing minor entries in the language file.
+* Various bug fixes, both minor and major
+
+### Technical Changes:
+Update all dependency
+
+
 ## [1.3.0] - 2024-12-23
 ### Functional Changes:
 * New command: `/jail <player> (time) <reason>` - Allows administrators to jail a player in a specified location in the config.yml for a set duration.
