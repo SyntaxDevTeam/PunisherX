@@ -5,12 +5,16 @@ import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
+import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.java.JavaPlugin
+import pl.syntaxdevteam.punisher.api.PunisherXApi
+import pl.syntaxdevteam.punisher.api.PunisherXApiImpl
 import pl.syntaxdevteam.punisher.basic.*
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.*
 import pl.syntaxdevteam.punisher.databases.*
 import pl.syntaxdevteam.punisher.players.*
+import pl.syntaxdevteam.punisher.webhook.DiscordWebhook
 import java.io.File
 import java.util.*
 
@@ -36,6 +40,8 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var cache: PunishmentCache
     private var configHandler = ConfigHandler(this)
     lateinit var commandLoggerPlugin: CommandLoggerPlugin
+    lateinit var punisherXApi: PunisherXApi
+    lateinit var discordWebhook: DiscordWebhook
 
     /**
      * Called when the plugin is enabled.
@@ -95,6 +101,8 @@ class PunisherX : JavaPlugin(), Listener {
         geoIPHandler = GeoIPHandler(this)
         pluginsManager = PluginManager(this)
         cache = PunishmentCache(this)
+        punisherXApi = PunisherXApiImpl(databaseHandler)
+        discordWebhook = DiscordWebhook(this)
     }
 
     /**
@@ -112,6 +120,7 @@ class PunisherX : JavaPlugin(), Listener {
     private fun registerEvents() {
         server.pluginManager.registerEvents(playerIPManager, this)
         server.pluginManager.registerEvents(PunishmentChecker(this), this)
+        server.servicesManager.register(PunisherXApi::class.java, punisherXApi, this, ServicePriority.Normal)
     }
 
     /**
@@ -167,21 +176,5 @@ class PunisherX : JavaPlugin(), Listener {
             logger.debug("The server.properties file does not exist.")
         }
         return "Unknown Server"
-    }
-
-    /**
-     * API for RewarderX plugin
-     * Retrieves the punishment history for a given player.
-     *
-     * This method fetches the UUID of the player using the uuidManager and then calls the
-     * getLastTenPunishments method to retrieve the last ten punishments for the player.
-     *
-     * @param player The player whose punishment history is to be retrieved.
-     * @return A list of PunishmentData objects representing the player's punishment history.
-     */
-    @Suppress("unused")
-    fun getPunishmentHistory(player: Player): List<PunishmentData> {
-        val uuid = uuidManager.getUUID(player.name)
-        return databaseHandler.getLastTenPunishments(uuid.toString())
     }
 }
