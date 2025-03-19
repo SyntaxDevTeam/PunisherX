@@ -17,10 +17,6 @@ import pl.syntaxdevteam.punisher.webhook.DiscordWebhook
 import java.io.File
 import java.util.*
 
-/**
- * Main class for the PunisherX plugin.
- * This class handles the initialization and management of the plugin's components.
- */
 @Suppress("UnstableApiUsage")
 class PunisherX : JavaPlugin(), Listener {
     private val config: FileConfiguration = getConfig()
