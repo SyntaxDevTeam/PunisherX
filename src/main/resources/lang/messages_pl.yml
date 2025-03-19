@@ -203,6 +203,17 @@ clear:
   clearall: "<green>Wszystkie aktywne kary gracza </green><gold>{player}</gold><green> zostały wyczyszczone</green>"
   clear_message: "<green>Wszystkie Twoje aktywne kary zostały anulowane!</green> <grey>Pssssyt! Masz jakieś układy z administracją czy coś?"
 
+# Wiadomości webhooka
+webhook:
+  title: "Nowa kara na serwerze"
+  player: "Gracz"
+  operator: "Administrator"
+  reason: "Powód"
+  type: "Typ kary"
+  time: "Czas zakończenia"
+  app_name: "PunisherX • "
+
+
 # Formatowanie czasu
 formatTime:
   undefined: "nieokreślony"
