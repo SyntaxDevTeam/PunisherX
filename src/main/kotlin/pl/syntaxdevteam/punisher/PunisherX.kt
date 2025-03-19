@@ -2,7 +2,6 @@ package pl.syntaxdevteam.punisher
 
 import io.papermc.paper.event.player.AsyncChatEvent
 import org.bukkit.configuration.file.FileConfiguration
-import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.ServicePriority
