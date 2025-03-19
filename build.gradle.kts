@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.3.4-DEV"
+version = "1.4.0-DEV"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 repositories {
@@ -19,7 +19,6 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/") {
         name = "sonatype"
     }
-    maven("https://repo.spongepowered.org/maven")
 }
 
 dependencies {
@@ -34,7 +33,6 @@ dependencies {
     compileOnly("net.kyori:adventure-text-serializer-ansi:4.19.0")
     compileOnly("com.maxmind.geoip2:geoip2:4.2.1")
     compileOnly("org.apache.ant:ant:1.10.15")
-    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.2")
     compileOnly("org.xerial:sqlite-jdbc:3.49.1.0")
     compileOnly("org.postgresql:postgresql:42.7.5")
