@@ -2,6 +2,7 @@ package pl.syntaxdevteam.punisher
 
 import io.papermc.paper.event.player.AsyncChatEvent
 import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.ServicePriority
@@ -171,5 +172,49 @@ class PunisherX : JavaPlugin(), Listener {
             logger.debug("The server.properties file does not exist.")
         }
         return "Unknown Server"
+    }
+
+    /**
+     * Retrieves punishment history for a given player.
+     *
+     * @deprecated This method is deprecated and will be removed in version 2.0.0.
+     * Please migrate to {@link pl.syntaxdevteam.punisher.api.PunisherXApi#getPunishmentHistory}
+     * which provides the following improvements:
+     * - Fully asynchronous execution using CompletableFuture, reducing main-thread lag.
+     * - Improved caching, minimizing redundant database queries.
+     * - Supports filtering by punishment type (e.g., WARN, MUTE, JAIL, BAN).
+     * - Optimized for large datasets, ensuring better scalability.
+     *
+     * Migration example:
+     * ```kotlin
+     * // Old implementation (deprecated)
+     * val history: List<PunishmentData> = plugin.getPunishmentHistory(player)
+     *
+     * // New implementation using PunisherXApi
+     * val future: CompletableFuture<List<PunishmentData>> = plugin.punisherXApi
+     *     .getPunishmentHistory()
+     *     .thenApply { punishments ->
+     *         punishments.filter { it.playerUUID == player.uniqueId.toString() }
+     *     }
+     * ```
+     *
+     * @see pl.syntaxdevteam.punisher.api.PunisherXApi
+     * @see pl.syntaxdevteam.punisher.api.PunisherXApiImpl
+     * @see java.util.concurrent.CompletableFuture
+     *
+     * @param player The player whose punishment history should be retrieved
+     * @return A list of [PunishmentData] objects representing the player's punishment history
+     */
+    @Deprecated(
+        message = "Use PunisherXApi#getPunishmentHistory for improved async operations and filtering",
+        replaceWith = ReplaceWith(
+            expression = "punisherXApi.getPunishmentHistory(uuid.toString())",
+            imports = ["pl.syntaxdevteam.punisher.api.PunisherXApi"]
+        ),
+        level = DeprecationLevel.WARNING
+    )
+    fun getPunishmentHistory(player: Player): List<PunishmentData> {
+        val uuid = uuidManager.getUUID(player.name)
+        return databaseHandler.getLastTenPunishments(uuid.toString())
     }
 }
