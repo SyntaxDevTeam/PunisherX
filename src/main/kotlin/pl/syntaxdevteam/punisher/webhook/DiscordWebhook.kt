@@ -10,6 +10,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.CompletableFuture
 
 /**
  * Class responsible for sending punishment notifications to a Discord channel via webhook
@@ -102,31 +103,33 @@ class DiscordWebhook(plugin: PunisherX) {
     }
 
     private fun sendWebhook(content: String) {
-        try {
-            log.debug("Attempting to send webhook...")
-            val uri = URI(webhookUrl)
-            val connection = uri.toURL().openConnection() as HttpURLConnection
-            connection.requestMethod = "POST"
-            connection.setRequestProperty("Content-Type", "application/json")
-            connection.doOutput = true
+        CompletableFuture.runAsync {
+            try {
+                log.debug("Attempting to send webhook asynchronously...")
+                val uri = URI(webhookUrl)
+                val connection = uri.toURL().openConnection() as HttpURLConnection
+                connection.requestMethod = "POST"
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.doOutput = true
 
-            OutputStreamWriter(connection.outputStream).use { writer ->
-                writer.write(content)
+                OutputStreamWriter(connection.outputStream).use { writer ->
+                    writer.write(content)
+                }
+
+                val responseCode = connection.responseCode
+                log.debug("Response code: $responseCode")
+
+                if (responseCode != 204) {
+                    log.debug("Error sending webhook. Response code: $responseCode")
+                    val errorStream = connection.errorStream?.bufferedReader()?.use { it.readText() }
+                    log.debug("Error content: $errorStream")
+                }
+
+                connection.disconnect()
+            } catch (e: Exception) {
+                log.debug("Error occurred while sending webhook: ${e.message}")
+                e.printStackTrace()
             }
-
-            val responseCode = connection.responseCode
-            log.debug("Response code: $responseCode")
-
-            if (responseCode != 204) {
-                log.debug("Error sending webhook. Response code: $responseCode")
-                val errorStream = connection.errorStream?.bufferedReader()?.use { it.readText() }
-                log.debug("Error content: $errorStream")
-            }
-
-            connection.disconnect()
-        } catch (e: Exception) {
-            log.debug("Error occurred while sending webhook: ${e.message}")
-            e.printStackTrace()
         }
     }
 }
