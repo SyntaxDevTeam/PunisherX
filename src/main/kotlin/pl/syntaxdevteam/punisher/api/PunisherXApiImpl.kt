@@ -8,33 +8,48 @@ class PunisherXApiImpl(private val databaseHandler: DatabaseHandler) : PunisherX
 
     override fun getLastTenPunishmentHistory(uuid: String): CompletableFuture<List<PunishmentData>> {
         return CompletableFuture.supplyAsync {
-            databaseHandler.getPunishmentHistory(uuid, 10, 0)
+            databaseHandler.getPunishmentHistory(uuid, limit = 10)
         }
     }
 
     override fun getLastTenActivePunishments(uuid: String): CompletableFuture<List<PunishmentData>> {
         return CompletableFuture.supplyAsync {
-            databaseHandler.getLastTenPunishments(uuid)
+            databaseHandler.getPunishments(uuid, limit = 10)
         }
     }
 
-    override fun getActivePunishments(type: String?): CompletableFuture<List<PunishmentData>> {
+    override fun getActivePunishments(uuid: String, type: String?): CompletableFuture<List<PunishmentData>> {
         return CompletableFuture.supplyAsync {
-            val filterType = type ?: "ALL"
-            databaseHandler.getPunishments(filterType)
+            val allPunishments = databaseHandler.getPunishments(uuid)
+            if (type == null || type.equals("ALL", ignoreCase = true)) {
+                allPunishments
+            } else {
+                allPunishments.filter { it.type.equals(type, ignoreCase = true) }
+            }
         }
     }
 
-    override fun getPunishmentHistory(type: String?): CompletableFuture<List<PunishmentData>> {
+    override fun getPunishmentHistory(uuid: String, type: String?): CompletableFuture<List<PunishmentData>> {
         return CompletableFuture.supplyAsync {
-            val filterType = type ?: "ALL"
-            databaseHandler.getPunishments(filterType)
+            val allPunishmentHistory = databaseHandler.getPunishmentHistory(uuid)
+            if (type == null || type.equals("ALL", ignoreCase = true)) {
+                allPunishmentHistory
+            } else {
+                allPunishmentHistory.filter { it.type.equals(type, ignoreCase = true) }
+            }
+
         }
     }
 
-    override fun getActivePunishmentsCount(uuid: String, type: String): CompletableFuture<Int> {
+    override fun getBannedPlayers(limit: Int, offset: Int): CompletableFuture<List<PunishmentData>> {
         return CompletableFuture.supplyAsync {
-            databaseHandler.getActiveWarnCount(uuid)
+            databaseHandler.getBannedPlayers(limit, offset)
+        }
+    }
+
+    override fun getHistoryBannedPlayers(limit: Int, offset: Int): CompletableFuture<List<PunishmentData>> {
+        return CompletableFuture.supplyAsync {
+            databaseHandler.getHistoryBannedPlayers(limit, offset)
         }
     }
 }
