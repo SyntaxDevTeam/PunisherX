@@ -303,14 +303,36 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    fun getPunishments(uuid: String): List<PunishmentData> {
+    fun getPunishments(uuid: String, limit: Int? = null, offset: Int? = null): List<PunishmentData> {
         val punishments = mutableListOf<PunishmentData>()
         logger.debug("Database connection established from getPunishments")
         try {
             getConnection()?.use { conn ->
-                val query = "SELECT * FROM punishments WHERE uuid = ?"
+                val supportsOrderAndLimit = when (dbType.lowercase()) {
+                    "mysql", "mariadb", "postgresql", "sqlite" -> true
+                    "h2" -> false
+                    else -> false
+                }
+
+                val query = when {
+                    supportsOrderAndLimit && limit != null && offset != null -> """
+                        SELECT * FROM punishments
+                        WHERE uuid = ?
+                        ORDER BY start DESC
+                        LIMIT ? OFFSET ?
+                    """.trimIndent()
+                    else -> """
+                        SELECT * FROM punishments
+                        WHERE uuid = ?
+                    """.trimIndent()
+                }
+
                 conn.prepareStatement(query).use { preparedStatement ->
                     preparedStatement.setString(1, uuid)
+                    if (supportsOrderAndLimit && limit != null && offset != null) {
+                        preparedStatement.setInt(2, limit)
+                        preparedStatement.setInt(3, offset)
+                    }
                     val resultSet: ResultSet = preparedStatement.executeQuery()
                     val punishmentsToRemove = mutableListOf<Pair<String, String>>()
                     while (resultSet.next()) {
@@ -323,11 +345,10 @@ class DatabaseHandler(private val plugin: PunisherX) {
                         val operator = resultSet.getString("operator")
                         val punishment = PunishmentData(id, uuid, type, reason, start, end, name, operator)
 
-
                         if (plugin.punishmentManager.isPunishmentActive(punishment)) {
                             punishments.add(punishment)
                         } else {
-                            punishmentsToRemove.add(uuid to type) // Zbieramy dane do usunięcia
+                            punishmentsToRemove.add(uuid to type)
                         }
                     }
                     punishmentsToRemove.forEach { (uuid, type) ->
@@ -454,38 +475,65 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return punishments.size
     }
 
-    fun getPunishmentHistory(uuid: String, limit: Int, offset: Int): List<PunishmentData> {
-        val punishments = mutableListOf<PunishmentData>()
-        try {
-            getConnection()?.use { conn ->
-                logger.debug("Database connection established from getPunishmentHistory")
-                val query = "SELECT * FROM punishmentHistory WHERE uuid = ? ORDER BY start DESC LIMIT ? OFFSET ?"
-                conn.prepareStatement(query).use { preparedStatement ->
-                    preparedStatement.setString(1, uuid)
+    fun getPunishmentHistory(uuid: String, limit: Int? = null, offset: Int? = null): List<PunishmentData> {
+    val punishments = mutableListOf<PunishmentData>()
+    logger.debug("Database connection established from getPunishmentHistory")
+    try {
+        getConnection()?.use { conn ->
+            val supportsOrderAndLimit = when (dbType.lowercase()) {
+                "mysql", "mariadb", "postgresql", "sqlite" -> true
+                "h2" -> false
+                else -> false
+            }
+
+            val query = when {
+                supportsOrderAndLimit && limit != null && offset != null -> """
+                    SELECT * FROM punishmentHistory
+                    WHERE uuid = ?
+                    ORDER BY start DESC
+                    LIMIT ? OFFSET ?
+                """.trimIndent()
+                else -> """
+                    SELECT * FROM punishmentHistory
+                    WHERE uuid = ?
+                """.trimIndent()
+            }
+
+            conn.prepareStatement(query).use { preparedStatement ->
+                preparedStatement.setString(1, uuid)
+                if (supportsOrderAndLimit && limit != null && offset != null) {
                     preparedStatement.setInt(2, limit)
                     preparedStatement.setInt(3, offset)
-                    val resultSet: ResultSet = preparedStatement.executeQuery()
-                    while (resultSet.next()) {
-                        val id = resultSet.getInt("id")
-                        val type = resultSet.getString("punishmentType")
-                        val reason = resultSet.getString("reason")
-                        val start = resultSet.getLong("start")
-                        val end = resultSet.getLong("endTime")
-                        val name = resultSet.getString("name")
-                        val operator = resultSet.getString("operator")
-                        val punishment = PunishmentData(id, uuid, type, reason, start, end, name, operator)
-                        punishments.add(punishment)
-                    }
-                    resultSet.close()
-                    preparedStatement.close()
                 }
-            } ?: throw SQLException("No connection available")
-        } catch (e: SQLException) {
-            plugin.logger.err("Failed to get punishment history for UUID: $uuid. ${e.message}")
-        }
+                val resultSet: ResultSet = preparedStatement.executeQuery()
+                while (resultSet.next()) {
+                    val id = resultSet.getInt("id")
+                    val type = resultSet.getString("punishmentType")
+                    val reason = resultSet.getString("reason")
+                    val start = resultSet.getLong("start")
+                    val end = resultSet.getLong("endTime")
+                    val name = resultSet.getString("name")
+                    val operator = resultSet.getString("operator")
+                    val punishment = PunishmentData(id, uuid, type, reason, start, end, name, operator)
+                    punishments.add(punishment)
+                }
+                resultSet.close()
+            }
+        } ?: throw SQLException("No connection available")
+    } catch (e: SQLException) {
+        plugin.logger.err("Failed to get punishment history for UUID: $uuid. ${e.message}")
+    }
         return punishments
     }
 
+    /**
+     * Retrieves the last ten punishment records for a given player.
+     *
+     * @param uuid The UUID of the player.
+     * @return A list of PunishmentData objects representing the player's last ten punishments.
+     */
+    @Deprecated("This method is deprecated and will be removed in future releases. Use getPunishment or getPunishmentHistory instead.")
+    @Suppress("unused")
     fun getLastTenPunishments(uuid: String): List<PunishmentData> {
         val punishments = mutableListOf<PunishmentData>()
         try {
