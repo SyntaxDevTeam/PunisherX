@@ -14,7 +14,9 @@ import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.*
 import pl.syntaxdevteam.punisher.databases.*
 import pl.syntaxdevteam.punisher.players.*
-import pl.syntaxdevteam.punisher.webhook.DiscordWebhook
+import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
+import pl.syntaxdevteam.punisher.hooks.HookHandler
+import pl.syntaxdevteam.punisher.placeholders.PlaceholderHandler
 import java.io.File
 import java.util.*
 
@@ -38,6 +40,7 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var commandLoggerPlugin: CommandLoggerPlugin
     lateinit var punisherXApi: PunisherXApi
     lateinit var discordWebhook: DiscordWebhook
+    lateinit var hookHandler: HookHandler
 
     /**
      * Called when the plugin is enabled.
@@ -98,6 +101,7 @@ class PunisherX : JavaPlugin(), Listener {
         pluginsManager = PluginManager(this)
         cache = PunishmentCache(this)
         punisherXApi = PunisherXApiImpl(databaseHandler)
+        hookHandler = HookHandler(this)
         discordWebhook = DiscordWebhook(this)
     }
 
@@ -117,6 +121,9 @@ class PunisherX : JavaPlugin(), Listener {
         server.pluginManager.registerEvents(playerIPManager, this)
         server.pluginManager.registerEvents(PunishmentChecker(this), this)
         server.servicesManager.register(PunisherXApi::class.java, punisherXApi, this, ServicePriority.Normal)
+        if (hookHandler.checkPlaceholderAPI()) {
+            PlaceholderHandler(this).register()
+        }
     }
 
     /**
