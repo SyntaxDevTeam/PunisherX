@@ -37,7 +37,7 @@ dependencies {
     compileOnly("org.xerial:sqlite-jdbc:3.49.1.0")
     compileOnly("org.postgresql:postgresql:42.7.5")
     compileOnly("com.h2database:h2:2.3.232")
-    compileOnly("com.zaxxer:HikariCP:6.2.1")
+    compileOnly("com.zaxxer:HikariCP:6.3.0")
 }
 
 val targetJavaVersion = 21
