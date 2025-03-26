@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.webhook
+package pl.syntaxdevteam.punisher.hooks
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
