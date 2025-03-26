@@ -134,7 +134,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                         reason TEXT,
                         operator TEXT,
                         punishmentType TEXT,
-                        start INTEGER,
+                        start TEXT,
                         endTime TEXT
                     );
                 """.trimIndent()
@@ -190,7 +190,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                         reason TEXT,
                         operator TEXT,
                         punishmentType TEXT,
-                        start INTEGER,
+                        start TEXT,
                         endTime TEXT
                     );
                 """.trimIndent()
