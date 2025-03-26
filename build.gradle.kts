@@ -19,6 +19,9 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/") {
         name = "sonatype"
     }
+    maven("https://repo.extendedclip.com/releases/") //PlaceholderAPI
+    maven("https://repo.codemc.org/repository/maven-public") //VaultUnliokedAPI
+    maven("https://jitpack.io") //VaultAPI
 }
 
 dependencies {
@@ -38,6 +41,11 @@ dependencies {
     compileOnly("org.postgresql:postgresql:42.7.5")
     compileOnly("com.h2database:h2:2.3.232")
     compileOnly("com.zaxxer:HikariCP:6.3.0")
+    compileOnly("net.luckperms:api:5.4")
+    compileOnly("me.clip:placeholderapi:2.11.6")
+    compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:2.2.3")
+    compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
+    compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.9")
 }
 
 val targetJavaVersion = 21
