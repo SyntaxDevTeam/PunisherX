@@ -43,7 +43,7 @@ dependencies {
     compileOnly("com.zaxxer:HikariCP:6.3.0")
     compileOnly("net.luckperms:api:5.4")
     compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:2.2.3")
+    compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:2.3.0")
     compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
     compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.9")
 }
