@@ -101,7 +101,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                     player.sendMessage(infoMessage)
                     return
                 } else {
-                    plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
+                    plugin.databaseHandler.removePunishment(uuid, "MUTE", true)
                     plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
                 }
             }
@@ -133,7 +133,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
                             player.sendMessage(muteMessage)
                         } else {
-                            plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
+                            plugin.databaseHandler.removePunishment(uuid, "MUTE", true)
                             plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
                         }
                     }

@@ -4,7 +4,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 plugins {
     kotlin("jvm") version "2.1.20"
     id("com.gradleup.shadow") version "9.0.0-beta11"
-    id("io.papermc.hangar-publish-plugin") version "0.1.2"
+    id("io.papermc.hangar-publish-plugin") version "0.1.3"
 }
 
 group = "pl.syntaxdevteam.punisher"
@@ -19,6 +19,9 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/") {
         name = "sonatype"
     }
+    maven("https://repo.extendedclip.com/releases/") //PlaceholderAPI
+    maven("https://repo.codemc.org/repository/maven-public") //VaultUnliokedAPI
+    maven("https://jitpack.io") //VaultAPI
 }
 
 dependencies {
@@ -33,11 +36,16 @@ dependencies {
     compileOnly("net.kyori:adventure-text-serializer-ansi:4.19.0")
     compileOnly("com.maxmind.geoip2:geoip2:4.2.1")
     compileOnly("org.apache.ant:ant:1.10.15")
-    compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.2")
+    compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.3")
     compileOnly("org.xerial:sqlite-jdbc:3.49.1.0")
     compileOnly("org.postgresql:postgresql:42.7.5")
     compileOnly("com.h2database:h2:2.3.232")
     compileOnly("com.zaxxer:HikariCP:6.3.0")
+    compileOnly("net.luckperms:api:5.4")
+    compileOnly("me.clip:placeholderapi:2.11.6")
+    compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:2.3.0")
+    compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
+    compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.9")
 }
 
 val targetJavaVersion = 21
