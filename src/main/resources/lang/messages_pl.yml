@@ -213,6 +213,10 @@ webhook:
   time: "Czas zakończenia"
   app_name: "PunisherX • "
 
+# Wiadomości dla placeholderów
+placeholders:
+  mute_remaining_time: "<gray>Wyciszony do: <gold>"
+  warn_remaining_time: "<gray>Ostrzeżenie ważne do: <gold>"
 
 # Formatowanie czasu
 formatTime:

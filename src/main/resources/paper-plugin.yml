@@ -1,5 +1,4 @@
 name: PunisherX
-main: pl.syntaxdevteam.punisher.PunisherX
 version: ${version}
 description: ${description}
 api-version: '1.20'
@@ -15,14 +14,32 @@ localization:
   available: [en_US, pl_PL, fr_FR, es_ES, de_DE]
   default: en_US
 
+main: pl.syntaxdevteam.punisher.PunisherX
 loader: pl.syntaxdevteam.punisher.loader.SyntaxLoader
 has-open-classloader: false
-load before: [RewarderX]
 
 softdepend: [Folia]
 
 features:
   debug: true
+
+dependencies:
+  server:
+    PlaceholderAPI:
+      load: BEFORE
+      required: false
+    MiniPlaceholders:
+      load: BEFORE
+      required: false
+    LuckPerms:
+      load: BEFORE
+      required: false
+    Vault:
+      load: BEFORE
+      required: false
+    VaultUnlocked:
+      load: BEFORE
+      required: false
 
 commands:
   ban:
