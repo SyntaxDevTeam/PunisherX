@@ -4,7 +4,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 plugins {
     kotlin("jvm") version "2.1.20"
     id("com.gradleup.shadow") version "9.0.0-beta11"
-    id("io.papermc.hangar-publish-plugin") version "0.1.2"
+    id("io.papermc.hangar-publish-plugin") version "0.1.3"
 }
 
 group = "pl.syntaxdevteam.punisher"
