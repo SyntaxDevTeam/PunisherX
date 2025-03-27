@@ -212,6 +212,10 @@ webhook:
   time: "Endzeit"
   app_name: "PunisherX • "
 
+placeholders:
+  mute_remaining_time: "<gray>Stummgeschaltet bis: <gold>"
+  warn_remaining_time: "<gray>Warnung gültig bis: <gold>"
+
 # Zeitformatierung
 formatTime:
   undefined: "unbestimmt"
