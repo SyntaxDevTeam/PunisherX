@@ -202,7 +202,7 @@ clear:
   clearall: "<green>All active punishments for player </green><gold>{player}</gold><green> have been cleared</green>"
   clear_message: "<green>All your active punishments have been canceled! </green><dark_gray>Pssst! Do you have some connections with the admins or something?"
 
-
+# Messages for webhook
 webhook:
   title: "New punishment on the server"
   player: "Player"
@@ -211,6 +211,11 @@ webhook:
   type: "Punishment type"
   time: "End time"
   app_name: "PunisherX • "
+
+# Messages for placeholders
+placeholders:
+  mute_remaining_time: "<gray>Muted until: <gold>"
+  warn_remaining_time: "<gray>Warning valid until: <gold>"
 
 # Time formatting
 formatTime:
