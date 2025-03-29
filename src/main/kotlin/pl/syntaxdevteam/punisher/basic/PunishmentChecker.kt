@@ -9,8 +9,8 @@ import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
+import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import pl.syntaxdevteam.punisher.PunisherX
 import java.util.*
@@ -18,17 +18,17 @@ import java.util.*
 class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun onPlayerPreLogin(event: AsyncPlayerPreLoginEvent) {
+    fun onPlayerLogin(event: PlayerLoginEvent) {
         try {
-            plugin.logger.debug("Checking punishment for player: ${event.name}")
+            plugin.logger.debug("Checking punishment for player: ${event.player.name}")
 
-            val uuid = plugin.uuidManager.getUUID(event.name).toString()
+            val uuid = plugin.uuidManager.getUUID(event.player.name).toString()
             val ip = event.address.hostAddress
             plugin.logger.debug("[TEST] IP: $ip")
 
             val punishments = plugin.databaseHandler.getPunishments(uuid) + plugin.databaseHandler.getPunishmentsByIP(ip)
             if (punishments.isEmpty()) {
-                plugin.logger.debug("No punishments found for player: ${event.name}")
+                plugin.logger.debug("No punishments found for player: ${event.player.name}")
                 return
             }
 
@@ -49,9 +49,8 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                             kickMessage.append(line)
                             kickMessage.append(Component.newline())
                         }
-                        event.loginResult = AsyncPlayerPreLoginEvent.Result.KICK_BANNED
-                        event.kickMessage(kickMessage.build())
-                        plugin.logger.debug("Player ${event.name} was kicked for: $reason")
+                        event.disallow(PlayerLoginEvent.Result.KICK_BANNED, kickMessage.build())
+                        plugin.logger.debug("Player ${event.player.name} was kicked for: $reason")
                     }
                 } else {
                     plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
@@ -59,7 +58,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                 }
             }
         } catch (e: Exception) {
-            plugin.logger.severe("Error in onPlayerPreLogin, report it urgently to the plugin author with the message: ${event.name}: ${e.message}")
+            plugin.logger.severe("Error in onPlayerPreLogin, report it urgently to the plugin author with the message: ${event.player.name}: ${e.message}")
             e.printStackTrace()
         }
     }
