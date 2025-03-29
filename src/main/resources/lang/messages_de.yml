@@ -215,6 +215,8 @@ webhook:
 placeholders:
   mute_remaining_time: "<gray>Stummgeschaltet bis: <gold>"
   warn_remaining_time: "<gray>Warnung gültig bis: <gold>"
+  total_punishments: "<gray>Gesamtstrafen: <gold>"
+  total_active_punishments: "<gray>Gesamtaktive Strafen: <gold>"
 
 # Zeitformatierung
 formatTime:
