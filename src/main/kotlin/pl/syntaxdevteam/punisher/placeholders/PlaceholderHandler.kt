@@ -28,6 +28,8 @@ class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion()
         return when (params) {
             "mute_remaining_time" -> getMuteEndTime(player.name).getNow("")
             "warn_remaining_time" -> getWarnEndTime(player.name).getNow("")
+            "total_punishments" -> getAllPunishmentHistory().getNow("")
+            "total_active_punishments" -> getAllPunishments().getNow("")
             else -> null
         }
     }
@@ -59,6 +61,20 @@ class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion()
             } else {
                 null
             }
+        }
+    }
+
+    private fun getAllPunishments(): CompletableFuture<String?> {
+        return CompletableFuture.supplyAsync {
+            val totalPunishments = plugin.databaseHandler.countAllPunishments()
+            plugin.messageHandler.getCleanMessage("placeholders", "total_active_punishments") + totalPunishments.toString()
+        }
+    }
+
+    private fun getAllPunishmentHistory(): CompletableFuture<String?> {
+        return CompletableFuture.supplyAsync {
+            val totalPunishmentHistory = plugin.databaseHandler.countAllPunishmentHistory()
+            plugin.messageHandler.getCleanMessage("placeholders", "total_punishments") + totalPunishmentHistory.toString()
         }
     }
 }

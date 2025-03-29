@@ -526,6 +526,42 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return punishments
     }
 
+fun countAllPunishments(): Int {
+    var count = 0
+    try {
+        getConnection()?.use { conn ->
+            val query = "SELECT COUNT(*) FROM punishments"
+            conn.prepareStatement(query).use { preparedStatement ->
+                val resultSet = preparedStatement.executeQuery()
+                if (resultSet.next()) {
+                    count = resultSet.getInt(1)
+                }
+            }
+        } ?: throw SQLException("No connection available")
+    } catch (e: SQLException) {
+        plugin.logger.err("Failed to count punishments. ${e.message}")
+    }
+    return count
+}
+
+fun countAllPunishmentHistory(): Int {
+    var count = 0
+    try {
+        getConnection()?.use { conn ->
+            val query = "SELECT COUNT(*) FROM punishmenthistory"
+            conn.prepareStatement(query).use { preparedStatement ->
+                val resultSet = preparedStatement.executeQuery()
+                if (resultSet.next()) {
+                    count = resultSet.getInt(1)
+                }
+            }
+        } ?: throw SQLException("No connection available")
+    } catch (e: SQLException) {
+        plugin.logger.err("Failed to count punishment history. ${e.message}")
+    }
+    return count
+}
+
     /**
      * Retrieves the last ten punishment records for a given player.
      *
