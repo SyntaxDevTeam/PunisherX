@@ -436,7 +436,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     if (rowsAffected > 0) {
                         plugin.logger.debug("Punishment of type $punishmentType for UUID/IP: $uuidOrIp removed from the database.")
                     } else {
-                        plugin.logger.warning("No punishment of type $punishmentType found for UUID/IP: $uuidOrIp.")
+                        plugin.logger.debug("No punishment of type $punishmentType found for UUID/IP: $uuidOrIp.")
                     }
                 }
             } ?: throw SQLException("No connection available")
