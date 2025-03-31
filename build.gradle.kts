@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.4.0"
+version = "2.0.0"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 repositories {
