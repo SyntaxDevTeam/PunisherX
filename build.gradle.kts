@@ -3,12 +3,12 @@ import io.papermc.hangarpublishplugin.model.Platforms
 
 plugins {
     kotlin("jvm") version "2.1.20"
-    id("com.gradleup.shadow") version "9.0.0-beta11"
+    id("com.gradleup.shadow") version "9.0.0-beta12"
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.4.0"
+version = "2.0.0"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 repositories {
