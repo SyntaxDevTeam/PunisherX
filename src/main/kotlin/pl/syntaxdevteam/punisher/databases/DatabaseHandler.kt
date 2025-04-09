@@ -60,7 +60,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
             hikariConfig.maxLifetime = 60000
             hikariConfig.keepaliveTime = 30000
         } else {
-            hikariConfig.maximumPoolSize = 10
+            hikariConfig.maximumPoolSize = 20
             hikariConfig.minimumIdle = 2
             hikariConfig.connectionTimeout = 30000
             hikariConfig.idleTimeout = 600000
