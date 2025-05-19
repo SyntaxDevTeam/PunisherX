@@ -55,6 +55,29 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                 } else {
                     plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
                     plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
+                    if (punishment.type == "JAIL") {
+
+                        val player = Bukkit.getPlayer(event.player.name) ?: return@forEach
+                        val loc = JailUtils.getUnjailLocation(plugin.config) ?: return@forEach
+
+                        if (plugin.server.name.contains("Folia")) {
+                            Bukkit.getServer().globalRegionScheduler.execute(plugin) {
+                                player.teleportAsync(loc).thenAccept { success ->
+                                    if (success) {
+                                        player.gameMode = GameMode.SURVIVAL
+                                        player.sendMessage(plugin.messageHandler.getMessage("unjail", "unjail_message"))
+                                        plugin.logger.debug("Player ${player.name} auto-unjail on login (Folia).")
+                                    }
+                                }
+                            }
+                        } else {
+                            player.teleport(loc)
+                            player.gameMode = GameMode.SURVIVAL
+                            player.sendMessage(plugin.messageHandler.getMessage("unjail", "unjail_message"))
+                            plugin.logger.debug("Player ${player.name} auto-unjail on login.")
+                        }
+                    }
+
                 }
             }
         } catch (e: Exception) {
