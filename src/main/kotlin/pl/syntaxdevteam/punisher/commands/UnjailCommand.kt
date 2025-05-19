@@ -6,6 +6,7 @@ import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.GameMode
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.basic.JailUtils
 
 @Suppress("UnstableApiUsage")
 class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
@@ -26,7 +27,9 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
 
         val player = Bukkit.getPlayer(playerName)
         if (player != null) {
-            val spawnLocation = plugin.server.worlds[0].spawnLocation
+
+            //val spawnLocation = plugin.server.worlds[0].spawnLocation
+            val spawnLocation = JailUtils.getUnjailLocation(plugin.config) ?: return
 
             if (plugin.server.name.contains("Folia")) {
                 Bukkit.getServer().globalRegionScheduler.execute(plugin) {
