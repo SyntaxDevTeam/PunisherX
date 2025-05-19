@@ -32,10 +32,10 @@ object JailUtils {
     fun setUnjailLocation(config: FileConfiguration, location: Location): Boolean {
         val world = location.world?.name ?: return false
 
-        config.set("jail.location.world", world)
-        config.set("jail.location.x", location.x)
-        config.set("jail.location.y", location.y)
-        config.set("jail.location.z", location.z)
+        config.set("spawn.location.world", world)
+        config.set("spawn.location.x", location.x)
+        config.set("spawn.location.y", location.y)
+        config.set("spawn.location.z", location.z)
 
         return true
     }
