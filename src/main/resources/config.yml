@@ -11,7 +11,7 @@ database:
     username: "root"
     password: "password"
 
-# Plugin language selection. Possible values:  EN, PL, ES, FR, DE
+# Plugin language selection. Possible values:  EN, PL, NL, ES, FR, DE
 # If you would like to add your own language file, please contact us on Discord (https://discord.gg/Zk6mxv7eMh).
 language: "EN"
 
