@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import pl.syntaxdevteam.punisher.PunisherX
@@ -19,10 +20,11 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerLogin(event: PlayerLoginEvent) {
+        val player = event.player
         try {
-            plugin.logger.debug("Checking punishment for player: ${event.player.name}")
+            plugin.logger.debug("Checking punishment for player: ${player.name}")
 
-            val uuid = plugin.uuidManager.getUUID(event.player.name).toString()
+            val uuid = plugin.uuidManager.getUUID(player.name).toString()
             val ip = event.address.hostAddress
             plugin.logger.debug("[TEST] IP: $ip")
 
@@ -55,35 +57,38 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                 } else {
                     plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
                     plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
-                    if (punishment.type == "JAIL") {
-
-                        val player = Bukkit.getPlayer(event.player.name) ?: return@forEach
-                        val loc = JailUtils.getUnjailLocation(plugin.config) ?: return@forEach
-
-                        if (plugin.server.name.contains("Folia")) {
-                            Bukkit.getServer().globalRegionScheduler.execute(plugin) {
-                                player.teleportAsync(loc).thenAccept { success ->
-                                    if (success) {
-                                        player.gameMode = GameMode.SURVIVAL
-                                        player.sendMessage(plugin.messageHandler.getMessage("unjail", "unjail_message"))
-                                        plugin.logger.debug("Player ${player.name} auto-unjail on login (Folia).")
-                                    }
-                                }
-                            }
-                        } else {
-                            player.teleport(loc)
-                            player.gameMode = GameMode.SURVIVAL
-                            player.sendMessage(plugin.messageHandler.getMessage("unjail", "unjail_message"))
-                            plugin.logger.debug("Player ${player.name} auto-unjail on login.")
-                        }
-                    }
-
                 }
             }
         } catch (e: Exception) {
             plugin.logger.severe("Error in onPlayerPreLogin, report it urgently to the plugin author with the message: ${event.player.name}: ${e.message}")
             e.printStackTrace()
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    fun onPlayerJoin(event: PlayerJoinEvent) {
+        val player = event.player
+        val radius = plugin.config.getDouble("jail.radius", 10.0)
+
+        Bukkit.getScheduler().runTaskLater(plugin, Runnable {
+            if (!player.isOnline) return@Runnable
+
+            val jailLoc   = JailUtils.getJailLocation(plugin.config)
+            val unjailLoc = JailUtils.getUnjailLocation(plugin.config)
+            if (jailLoc == null || unjailLoc == null) {
+                plugin.logger.warning("Jail lub unjail location niezdefiniowane!")
+                return@Runnable
+            }
+
+            plugin.logger.debug("DBG: Player at ${player.location}, jail at $jailLoc, radius $radius")
+
+            if (isPlayerInJail(player.location, jailLoc, radius)) {
+                plugin.logger.debug("DBG: teleporting ${player.name} → $unjailLoc")
+                player.teleport(unjailLoc)
+                player.gameMode = GameMode.SURVIVAL
+                plugin.logger.debug("Player ${player.name} był w obszarze jail po joinie – przeniesiony na unjail")
+            }
+        }, 1L)
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
