@@ -41,11 +41,11 @@ object JailUtils {
     }
 
     fun getUnjailLocation(config: FileConfiguration): Location? {
-        val worldName = config.getString("unjail.location.world") ?: return null
+        val worldName = config.getString("spawn.location.world") ?: return null
         val world = Bukkit.getWorld(worldName) ?: return null
-        val x = config.getDouble("unjail.location.x")
-        val y = config.getDouble("unjail.location.y")
-        val z = config.getDouble("unjail.location.z")
+        val x = config.getDouble("spawn.location.x")
+        val y = config.getDouble("spawn.location.y")
+        val z = config.getDouble("spawn.location.z")
         val location = Location(world, x, y, z)
 
         return location
