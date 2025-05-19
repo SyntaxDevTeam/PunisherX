@@ -64,6 +64,14 @@ jail:
     z: 200.0
   radius: 5
 
+spawn:
+  # Location of the spawn point after the player is unjailed
+  location:
+    world: "world"
+    x: 0.0
+    y: 64.0
+    z: 0.0
+
 # You can set your own aliases for the commands below
 aliases:
   check: "cx"
