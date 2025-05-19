@@ -38,7 +38,7 @@ jobs:
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
-          name: plugin.jar
+          name: PunisherX-latest-DEV.jar
           path: build/libs/*.jar
 
   dependency-submission:

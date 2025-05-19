@@ -26,7 +26,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
             val uuid = plugin.uuidManager.getUUID(player.name).toString()
             val ip = event.address.hostAddress
-            plugin.logger.debug("[TEST] IP: $ip")
+            //plugin.logger.debug("[TEST] IP: $ip")
 
             val punishments = plugin.databaseHandler.getPunishments(uuid) + plugin.databaseHandler.getPunishmentsByIP(ip)
             if (punishments.isEmpty()) {
