@@ -30,9 +30,10 @@ class MessageHandler(private val plugin: PunisherX) {
         val author = when (language.lowercase()) {
             "pl" -> "WieszczY"
             "en" -> "Syntaxerr"
-            "fr" -> "OpenAI Chat GPT-3.5"
-            "es" -> "OpenAI Chat GPT-3.5"
-            "de" -> "OpenAI Chat GPT-3.5"
+            "nl" -> "LegacyHeaven"
+            "fr" -> "OpenAI ChatGPT-3.5"
+            "es" -> "OpenAI ChatGPT-3.5"
+            "de" -> "OpenAI ChatGPT-3.5"
             else -> plugin.getServerName()
         }
         plugin.logger.log("<gray>Loaded \"$language\" language file by: <white><b>$author</b></white>")
