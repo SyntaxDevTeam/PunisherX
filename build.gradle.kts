@@ -46,6 +46,7 @@ dependencies {
     compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:2.3.0")
     compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
     compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.10")
+    compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.0")
 }
 
 val targetJavaVersion = 21
