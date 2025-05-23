@@ -1,5 +1,7 @@
 package pl.syntaxdevteam.punisher.basic
 
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.Cache
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.bukkit.Bukkit
@@ -7,46 +9,51 @@ import pl.syntaxdevteam.punisher.PunisherX
 import java.io.File
 import java.io.IOException
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-
+import java.util.concurrent.TimeUnit
+// TODO: Zaktualizować komunikaty do nowego systemu
 class PunishmentCache(private val plugin: PunisherX) {
 
-    private val cacheFile: File = File(plugin.dataFolder, "jail_cache.json")
-    private val cache: MutableMap<UUID, Long> = ConcurrentHashMap()
-    private val gson: Gson = Gson()
+    private val cacheFile = File(plugin.dataFolder, "jail_cache.json")
+
+    companion object {
+        private const val DEFAULT_EXPIRE_AFTER_ACCESS = 1L     // czas
+        private val DEFAULT_EXPIRE_UNIT = TimeUnit.HOURS       // jednostka (możesz to zmienić)
+        private const val DEFAULT_MAXIMUM_SIZE = 1_000L        // maksymalna liczba wpisów
+    }
+
+    private val cache: Cache<UUID, Long> = Caffeine.newBuilder()
+        .expireAfterAccess(DEFAULT_EXPIRE_AFTER_ACCESS, DEFAULT_EXPIRE_UNIT)
+        .maximumSize(DEFAULT_MAXIMUM_SIZE)
+        .build()
+
+    private val gson = Gson()
 
     init {
-        loadCache()
+        loadCacheIntoMemory()
     }
 
     fun addOrUpdatePunishment(uuid: UUID, endTime: Long) {
-        val currentEndTime = cache[uuid]
-        if (currentEndTime == null || currentEndTime < System.currentTimeMillis()) {
-            plugin.logger.debug("Adding new punishment for player $uuid with end time $endTime")
+        val previous = cache.getIfPresent(uuid)
+        if (previous == null || previous < System.currentTimeMillis()) {
+            plugin.logger.debug("Dodaję nową karę dla gracza $uuid do $endTime")
         } else {
-            plugin.logger.debug("Updating punishment for player $uuid from $currentEndTime to $endTime")
+            plugin.logger.debug("Aktualizuję karę dla gracza $uuid z $previous na $endTime")
         }
-
-        cache[uuid] = endTime
+        cache.put(uuid, endTime)
         saveSingleEntry(uuid, endTime)
     }
 
     fun removePunishment(uuid: UUID) {
-        if (cache.remove(uuid) != null) {
-            plugin.logger.debug("Removed punishment for player $uuid")
+        if (cache.asMap().remove(uuid) != null) {
+            plugin.logger.debug("Usuwam karę dla $uuid")
             removeSingleEntry(uuid)
             plugin.databaseHandler.removePunishment(uuid.toString(), "JAIL")
-            val player = Bukkit.getPlayer(uuid)
-            if (player != null) {
-                val broadcastMessage =
-                    plugin.messageHandler.getMessage("unjail", "broadcast", mapOf("player" to player.name)
-                )
-                plugin.server.onlinePlayers.forEach { onlinePlayer ->
-                    if (onlinePlayer.hasPermission("punisherx.see.unjail")) {
-                        onlinePlayer.sendMessage(broadcastMessage)
-                    }
-                }
 
+            Bukkit.getPlayer(uuid)?.let { player ->
+                val bc = plugin.messageHandler.getMessage("unjail", "broadcast", mapOf("player" to player.name))
+                plugin.server.onlinePlayers
+                    .filter { it.hasPermission("punisherx.see.unjail") }
+                    .forEach { it.sendMessage(bc) }
                 player.sendMessage(
                     plugin.messageHandler.getMessage("unjail", "success", mapOf("player" to player.name))
                 )
@@ -54,82 +61,75 @@ class PunishmentCache(private val plugin: PunisherX) {
         }
     }
 
-    @Suppress("unused")
     fun isPunishmentActive(uuid: UUID): Boolean {
-        val endTime = cache[uuid] ?: return false
-        return endTime > System.currentTimeMillis()
+        return cache.getIfPresent(uuid)?.let { it > System.currentTimeMillis() } ?: false
     }
 
-    fun isPlayerInCache(uuid: UUID): Boolean {
-        return cache.containsKey(uuid)
-    }
+    fun isPlayerInCache(uuid: UUID): Boolean =
+        cache.asMap().containsKey(uuid)
 
-    fun getPunishmentEnd(uuid: UUID): Long? {
-        return cache[uuid]
-    }
+    fun getPunishmentEnd(uuid: UUID): Long? =
+        cache.getIfPresent(uuid)
 
-    private fun loadCache() {
+    fun getActivePunishments(): Map<UUID, Long> =
+        cache.asMap().filterValues { it > System.currentTimeMillis() }
+
+    private fun loadCacheIntoMemory() {
         if (!cacheFile.exists()) {
             plugin.logger.debug("Cache file does not exist, creating an empty cache.")
             return
         }
-
         try {
             val json = cacheFile.readText()
             val type = object : TypeToken<Map<String, Long>>() {}.type
             val map: Map<String, Long> = gson.fromJson(json, type)
             map.forEach { (key, value) ->
                 if (isValidUUID(key)) {
-                    cache[UUID.fromString(key)] = value
+                    cache.put(UUID.fromString(key), value)
                 } else {
                     plugin.logger.warning("Invalid UUID in cache: $key. Skipping this entry.")
                 }
             }
-            plugin.logger.debug("Loaded ${cache.size} entries into cache.")
-        } catch (e: IOException) {
-            plugin.logger.severe("Error loading cache: ${e.message}")
+            plugin.logger.debug("Loaded ${cache.asMap().size} entries into cache.")
         } catch (e: Exception) {
-            plugin.logger.severe("Unexpected error loading cache: ${e.message}")
+            plugin.logger.severe("nexpected error loading cache: ${e.message}")
         }
     }
 
-    private fun isValidUUID(uuid: String): Boolean {
-        return try {
-            UUID.fromString(uuid)
+    private fun isValidUUID(str: String): Boolean =
+        try {
+            UUID.fromString(str)
             true
-        } catch (e: IllegalArgumentException) {
+        } catch (_: IllegalArgumentException) {
             false
         }
-    }
 
     private fun saveSingleEntry(uuid: UUID, endTime: Long) {
         try {
-            val fileContent = if (cacheFile.exists()) cacheFile.readText() else "{}"
-            val type = object : TypeToken<MutableMap<String, Long>>() {}.type
-            val existingData: MutableMap<String, Long> = gson.fromJson(fileContent, type) ?: mutableMapOf()
-            existingData[uuid.toString()] = endTime
-            cacheFile.writeText(gson.toJson(existingData))
+            val existing = if (cacheFile.exists()) {
+                gson.fromJson<MutableMap<String, Long>>(cacheFile.readText(), object : TypeToken<MutableMap<String, Long>>() {}.type)
+                    ?: mutableMapOf()
+            } else {
+                mutableMapOf()
+            }
+            existing[uuid.toString()] = endTime
+            cacheFile.writeText(gson.toJson(existing))
             plugin.logger.debug("Saved punishment for player $uuid.")
         } catch (e: IOException) {
-            plugin.logger.severe("Error saving punishment to file: ${e.message}")
+            plugin.logger.severe("rror saving punishment to file: ${e.message}")
         }
     }
 
     private fun removeSingleEntry(uuid: UUID) {
         try {
             if (!cacheFile.exists()) return
-            val fileContent = cacheFile.readText()
-            val type = object : TypeToken<MutableMap<String, Long>>() {}.type
-            val existingData: MutableMap<String, Long> = gson.fromJson(fileContent, type) ?: mutableMapOf()
-            existingData.remove(uuid.toString())
-            cacheFile.writeText(gson.toJson(existingData))
+            val existing = gson.fromJson<MutableMap<String, Long>>(cacheFile.readText(), object : TypeToken<MutableMap<String, Long>>() {}.type)
+                ?: mutableMapOf()
+            existing.remove(uuid.toString())
+            cacheFile.writeText(gson.toJson(existing))
             plugin.logger.debug("Removed punishment for player $uuid from file.")
         } catch (e: IOException) {
             plugin.logger.severe("Error removing punishment from file: ${e.message}")
         }
     }
-/*
-    fun getAllDecryptedPunishments(): Map<UUID, Long> {
-        return cache.toMap()
-    }*/
 }
