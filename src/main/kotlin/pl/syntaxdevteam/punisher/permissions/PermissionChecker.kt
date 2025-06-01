@@ -1,9 +1,11 @@
 package pl.syntaxdevteam.punisher.permissions
 
+import net.kyori.adventure.text.minimessage.MiniMessage
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.UUID
 
-//@Suppress("unused")
+@Suppress("unused")
 object PermissionChecker {
     private val AUTHOR_UUID: UUID = UUID.fromString("248e508c-28de-4a8f-a284-2c73cf917d15")
 
@@ -114,7 +116,8 @@ object PermissionChecker {
         PermissionKey.VIEW_IP -> "Allows viewing the player's IP in the /check and /history command."
     }
 
-    fun has(player: Player, key: PermissionKey): Boolean {
+    fun has(player: CommandSender, key: PermissionKey): Boolean {
+        if (player !is Player) return true
         if (player.isOp) return true
         if (player.hasPermission("*")) return true
         if (player.hasPermission("punisherx.*")) return true
@@ -124,10 +127,15 @@ object PermissionChecker {
     }
 
 
-    fun hasWithBypass(player: Player, key: PermissionKey): Boolean {
+    fun hasWithBypass(player: CommandSender, key: PermissionKey): Boolean {
+        if (player !is Player) return true
         if (player.uniqueId == AUTHOR_UUID) return true
         if (player.isOp) return true
         return canBypass(player) || has(player, key)
+    }
+
+    fun isAuthor(uuid: UUID): Boolean {
+        return uuid == AUTHOR_UUID
     }
 
     /**
@@ -200,37 +208,32 @@ object PermissionChecker {
         "punisherx.bypass.banip"    to PermissionKey.BYPASS_BANIP.node
     )
 
-    fun hasWithLegacy(player: Player, key: PermissionKey): Boolean {
-        // 1) najpierw obsłuż stare uprawnienia
+    fun hasWithLegacy(player: CommandSender, key: PermissionKey): Boolean {
+
         val legacyKeys = legacyToNew
             .filterValues { it == key.node }
             .keys
-
+        val url = if (player !is Player) {
+            "Kliknij i sprawdź dokumentację pluginu. https://github.com/SyntaxDevTeam/PunisherX/wiki"
+        }else{
+            "<click:OPEN_URL:https://github.com/SyntaxDevTeam/PunisherX/wiki>Kliknij i sprawdź dokumentację pluginu. </click>"
+        }
         for (oldNode in legacyKeys) {
             if (player.hasPermission(oldNode)) {
 
                 val isSeePermission = key.node.startsWith("punisherx.see")
                 if (!isSeePermission) {
-                    player.sendRichMessage(
+                    player.sendMessage(MiniMessage.miniMessage().deserialize(
                         "<yellow>[PunisherX]</yellow> <red>Wykryto użycie starego uprawnienia: <gray>$oldNode</gray>.\n" +
                                 "Dodaj nowe uprawnienie: <hover:show_text:'${displayName(key)}'><yellow>${key.node}</yellow></hover>!\n" +
                                 "Stare uprawnienia zostaną usunięte w wersji 2.0.\n" +
-                                "<blue><u><click:OPEN_URL:https://github.com/SyntaxDevTeam/PunisherX/wiki>" +
-                                "Kliknij i sprawdź dokumentację pluginu.</click></u></blue></red>"
-                    )
+                                "<blue><u>$url</u></blue></red>"
+                    ))
                 }
-                // i tak zwracamy TRUE — legacy nod obsłużony
                 return true
             }
         }
-
-        // 2) standardowa ścieżka: OP / wildcard / bypass / normalne permission
-        if (hasWithBypass(player, key)) {
-            return true
-        }
-
-        // 3) bez uprawnień
-        return false
+        return hasWithBypass(player, key)
     }
 }
 
