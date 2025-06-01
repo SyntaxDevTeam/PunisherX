@@ -25,35 +25,28 @@ class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion()
         }
 
         return when (params) {
-            "mute_remaining_time" -> getMuteEndTime(player.name) ?: ""
-            "warn_remaining_time" -> getWarnEndTime(player.name) ?: ""
+            "mute_remaining_time" -> getPunishmentEndTime(player.name, "MUTE") ?: ""
+            "warn_remaining_time" -> getPunishmentEndTime(player.name, "WARN") ?: ""
+            "jail_remaining_time" -> getPunishmentEndTime(player.name, "JAIL") ?: ""
             "total_active_punishments" -> getAllPunishments() ?: ""
             "total_punishments" -> getAllPunishmentHistory() ?: ""
             else -> null
         }
     }
 
-    private fun getMuteEndTime(player: String): String? {
+    private fun getPunishmentEndTime(player: String, punishType: String): String? {
         val uuid = plugin.uuidManager.getUUID(player)
         val punishments = plugin.databaseHandler.getPunishments(uuid.toString())
-        val muteData = punishments.find { it.type == "MUTE" && it.end > System.currentTimeMillis() } ?: return null
-
-        val remainingTime = (muteData.end - System.currentTimeMillis())  / 1000
-        return if (remainingTime > 0) {
-            plugin.messageHandler.getCleanMessage("placeholders", "mute_remaining_time") + plugin.timeHandler.formatTime(remainingTime.toString())
-        } else {
-            null
+        val punishData = punishments.find { it.type == punishType && it.end > System.currentTimeMillis() } ?: return null
+        val punishment = when (punishType) {
+            "MUTE" -> "mute_remaining_time"
+            "WARN" -> "warn_remaining_time"
+            "JAIL" -> "jail_remaining_time"
+            else -> return null
         }
-    }
-
-    private fun getWarnEndTime(player: String): String? {
-        val uuid = plugin.uuidManager.getUUID(player)
-        val punishments = plugin.databaseHandler.getPunishments(uuid.toString())
-        val muteData = punishments.find { it.type == "WARN" && it.end > System.currentTimeMillis() } ?: return null
-
-        val remainingTime = (muteData.end - System.currentTimeMillis())  / 1000
+        val remainingTime = (punishData.end - System.currentTimeMillis())  / 1000
         return if (remainingTime > 0) {
-            plugin.messageHandler.getCleanMessage("placeholders", "warn_remaining_time") + plugin.timeHandler.formatTime(remainingTime.toString())
+            plugin.messageHandler.getCleanMessage("placeholders", punishment) + plugin.timeHandler.formatTime(remainingTime.toString())
         } else {
             null
         }
