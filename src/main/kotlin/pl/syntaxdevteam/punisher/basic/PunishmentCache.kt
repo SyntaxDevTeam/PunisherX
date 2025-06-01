@@ -92,7 +92,7 @@ class PunishmentCache(private val plugin: PunisherX) {
             }
             plugin.logger.debug("Loaded ${cache.asMap().size} entries into cache.")
         } catch (e: Exception) {
-            plugin.logger.severe("nexpected error loading cache: ${e.message}")
+            plugin.logger.severe("Unexpected error loading cache: ${e.message}")
         }
     }
 
@@ -116,7 +116,7 @@ class PunishmentCache(private val plugin: PunisherX) {
             cacheFile.writeText(gson.toJson(existing))
             plugin.logger.debug("Saved punishment for player $uuid.")
         } catch (e: IOException) {
-            plugin.logger.severe("rror saving punishment to file: ${e.message}")
+            plugin.logger.severe("Error saving punishment to file: ${e.message}")
         }
     }
 
