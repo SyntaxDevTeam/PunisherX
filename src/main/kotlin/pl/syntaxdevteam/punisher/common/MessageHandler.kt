@@ -92,7 +92,7 @@ class MessageHandler(private val plugin: PunisherX) {
         messages = loadMessages()
     }
 
-    private fun getPrefix(): String {
+    fun getPrefix(): String {
         return messages.getString("prefix") ?: "[${plugin.pluginMeta.name}]"
     }
 
@@ -154,6 +154,26 @@ class MessageHandler(private val plugin: PunisherX) {
                 acc.replace("{${entry.key}}", entry.value)
             }
             formatMixedTextToMiniMessage(formattedMessage)
+        }
+    }
+
+    fun getSmartMessage(category: String, key: String, placeholders: Map<String, String> = emptyMap()): List<Component> {
+        val path = "$category.$key"
+        val value = messages.get(path)
+        val prefix = getPrefix()
+        return when (value) {
+            is String -> listOf(formatMixedTextToMiniMessage(
+                "$prefix " + placeholders.entries.fold(value) { acc, entry -> acc.replace("{${entry.key}}", entry.value) }
+            ))
+            is List<*> -> value.filterIsInstance<String>().map { line ->
+                formatMixedTextToMiniMessage(
+                    placeholders.entries.fold(line) { acc, entry -> acc.replace("{${entry.key}}", entry.value) }
+                )
+            }
+            else -> {
+                plugin.logger.err("There was an error loading the message list $key from category $category")
+                return listOf(Component.text("Message list not found. Check console..."))
+            }
         }
     }
 
@@ -224,7 +244,7 @@ class MessageHandler(private val plugin: PunisherX) {
         }
     }
 
-    private fun formatMixedTextToMiniMessage(message: String): Component {
+    fun formatMixedTextToMiniMessage(message: String): Component {
         var formattedMessage = convertLegacyToMiniMessage(message)
         formattedMessage = convertHexToMiniMessage(formattedMessage)
 
