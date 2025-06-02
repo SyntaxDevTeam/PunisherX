@@ -30,6 +30,15 @@ jail:
   jail_info_message: "<red>You try to speak, but no one can hear you from jail</red>"
   jail_restrict_message: "Leaving the jail area is prohibited. You have been teleported back to the designated location."
   broadcast: "<dark_gray>Player <gray>{player}</gray> has been jailed for <gray>{reason}</gray> for <gray>{time}</gray></dark_gray>"
+  # Alternatively, you can use the message format below if you wish to further emphasize this message
+  # broadcast:
+    #- "<dark_gray>*************** Your Server Name *************** </dark_gray>"
+    #- ""
+    #- "<red>   Player <white>{player}</white> has been locked up</red>"
+    #- "   Reason: <white>{reason}</white>"
+    #- "   Duration: <white>{time}</white>"
+    #- ""
+    #- "<dark_gray>*************************************************** </dark_gray>"
   log: "<dark_gray>Jailed player <gray>{player}</gray> <dark_gray>is shouting from their cell: <gray>{message}</gray>"
   no_reasons: "no reason"
   reasons:
@@ -62,6 +71,15 @@ ban:
     - '&8You can appeal at:'
     - "&eDiscord &8» &c&nhttps://servername.pl/discord"
   broadcast: "<dark_gray>Player <gray>{player}</gray> has been banned for <gray>{reason}</gray> for <gray>{time}</gray></dark_gray>"
+  # Alternatively, you can use the message format below if you wish to further emphasize this message
+    # broadcast:
+        #- "<dark_gray>*************** Your Server Name *************** </dark_gray>"
+        #- ""
+        #- "<red>   Player <white>{player}</white> has been banned</red>"
+        #- "   Reason: <white>{reason}</white>"
+        #- "   Duration: <white>{time}</white>"
+        #- ""
+        #- "<dark_gray>*************************************************** </dark_gray>"
   no_reasons: "no reason"
   reasons: # Add your own reasons that will be suggested when executing the command
     - "Cheating"
@@ -105,6 +123,15 @@ mute:
   mute_message: "<red>You have been muted for <b>{reason}</b> for <b>{time}</b></red>"
   mute_info_message: "<red>You are trying to speak but you have been muted</red>"
   broadcast: "<dark_gray>Player <gray>{player}</gray> has been muted for <gray>{reason}</gray> for <gray>{time}</gray></dark_gray>"
+    # Alternatively, you can use the message format below if you wish to further emphasize this message
+  # broadcast:
+    #   - "<dark_gray>*************** Your Server Name *************** </dark_gray>"
+    #   - ""
+    #   - "<red>   Player <white>{player}</white> has been muted</red>"
+    #   - "   Reason: <white>{reason}</white>"
+    #   - "   Duration: <white>{time}</white>"
+    #   - ""
+    #   - "<dark_gray>*************************************************** </dark_gray>"
   log: "<dark_gray>Muted player <gray>{player}</gray> <dark_gray>sent a message: <gray>{message}</gray>"
   no_reasons: "no reason"
   reasons:
@@ -125,6 +152,15 @@ warn:
   usage: "Correct usage is: <gold>/warn <player> (time) <reason>"
   warn_message: "<red>You received <b>{warn_no}</b> warning!</red>"
   broadcast: "<dark_gray>Player <gray>{player}</gray> received a warning for <gray>{reason}</gray> for <gray>{time}</gray></dark_gray>"
+  # Alternatively, you can use the message format below if you wish to further emphasize this message
+  # broadcast:
+      # - "<dark_gray>*************** Your Server Name *************** </dark_gray>"
+      # - ""
+      # - "<red>   Player <white>{player}</white> has been warned</red>"
+      # - "   Reason: <white>{reason}</white>"
+      # - "   Duration: <white>{time}</white>"
+      # - ""
+      # - "<dark_gray>*************************************************** </dark_gray>"
   no_reasons: "no reason"
   reasons:
     - "Advertising"
@@ -153,6 +189,14 @@ kick:
     - '&8You can appeal at:'
     - "&eDiscord &8» &c&nhttps://servername.pl/discord"
   broadcast: "<dark_gray>Player <gray>{player}</gray> has been kicked for <gray>{reason}</gray></dark_gray>"
+  # Alternatively, you can use the message format below if you wish to further emphasize this message
+    # broadcast:
+        # - "<dark_gray>*************** Your Server Name *************** </dark_gray>"
+        # - ""
+        # - "<red>   Player <white>{player}</white> has been kicked</red>"
+        # - "   Reason: <white>{reason}</white>"
+        # - ""
+        # - "<dark_gray>*************************************************** </dark_gray>"
   no_reasons: "no reason"
   reasons:
     - "Flood"
