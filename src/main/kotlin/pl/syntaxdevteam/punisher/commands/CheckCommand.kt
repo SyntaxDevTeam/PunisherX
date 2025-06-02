@@ -5,6 +5,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.players.PlayerIPManager
 
 @Suppress("UnstableApiUsage")
@@ -18,7 +19,7 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
         }
         val player = args[0]
 
-        if (player.equals(stack.sender.name, ignoreCase = true) || stack.sender.hasPermission("punisherx.check")) {
+        if (player.equals(stack.sender.name, ignoreCase = true) || PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.CHECK)) {
             if (args.size < 2) {
                 stack.sender.sendMessage(plugin.messageHandler.getMessage("check", "usage"))
             } else {
@@ -60,7 +61,7 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
                         "$city, $country"
                     } ?: "Unknown location"
                     plugin.logger.debug("GeoLocation: $geoLocation")
-                    val fullGeoLocation = when (stack.sender.hasPermission("punisherx.view_ip")) {
+                    val fullGeoLocation = when (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.VIEW_IP)) {
                         true -> "$playerIP ($geoLocation)"
                         else -> geoLocation
                     }

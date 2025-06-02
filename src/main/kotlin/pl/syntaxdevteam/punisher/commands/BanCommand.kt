@@ -8,6 +8,7 @@ import org.bukkit.Bukkit
 import org.bukkit.ban.ProfileBanList
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.*
 
 @Suppress("UnstableApiUsage")
@@ -15,28 +16,33 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
     private val clp = plugin.commandLoggerPlugin
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (stack.sender.hasPermission("punisherx.ban")) {
+
+        if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN)) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
                     stack.sender.sendMessage(plugin.messageHandler.getMessage("ban", "usage"))
                 } else {
                     val player = args[0]
-                    val targetPlayer = Bukkit.getPlayer(player)
+                    val uuid = plugin.uuidManager.getUUID(player)
+                    val targetPlayer = Bukkit.getPlayer(uuid)
                     val isForce = args.contains("--force")
                     if (targetPlayer != null) {
-                        if (!isForce && targetPlayer.hasPermission("punisherx.bypass.ban")) {
+                        if (!isForce && PermissionChecker.hasWithLegacy(targetPlayer, PermissionChecker.PermissionKey.BYPASS_BAN)) {
                             stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
                             return
                         }
                     }
-                    val uuid = plugin.uuidManager.getUUID(player).toString()
+                    if(PermissionChecker.isAuthor(uuid)){
+                        stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("<red>You can't punish the plugin author</red>"))
+                        return
+                    }
                     var gtime: String?
                     var reason: String
                     try {
                         gtime = args[1]
                         plugin.timeHandler.parseTime(gtime)
                         reason = args.slice(2 until args.size).filterNot { it == "--force" }.joinToString(" ")
-                    } catch (e: NumberFormatException) {
+                    } catch (_: NumberFormatException) {
                         gtime = null
                         reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
                     }
@@ -45,15 +51,18 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                     val start = System.currentTimeMillis()
                     val end: Long? = if (gtime != null) (System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
 
-                    val success = plugin.databaseHandler.addPunishment(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    val success = plugin.databaseHandler.addPunishment(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
                     if (!success) {
-                        val playerProfile = Bukkit.createProfile(UUID.fromString(uuid), player)
+                        val playerProfile = Bukkit.createProfile(UUID.fromString(uuid.toString()), player)
                         val banList: ProfileBanList = Bukkit.getBanList(BanListType.PROFILE)
                         val banEndDate = if (gtime != null) Date(System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
                         banList.addBan(playerProfile, reason, banEndDate, stack.sender.name)
+                    }else{
+                        plugin.logger.err("Failed to add ban to database for player $player. Using fallback method.")
+                        return
                     }
                     clp.logCommand(stack.sender.name, punishmentType, player, reason)
-                    plugin.databaseHandler.addPunishmentHistory(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
 
                     if (targetPlayer != null) {
                         val kickMessages = plugin.messageHandler.getComplexMessage("ban", "kick_message", mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime)))
@@ -65,10 +74,10 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                         targetPlayer.kick(kickMessage.build())
                     }
                     stack.sender.sendMessage(plugin.messageHandler.getMessage("ban", "ban", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))))
-                    val permission = "punisherx.see.ban"
+
                     val broadcastMessage = plugin.messageHandler.getMessage("ban", "broadcast", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime)))
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
-                        if (onlinePlayer.hasPermission(permission)) {
+                        if(PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_BAN)) {
                             onlinePlayer.sendMessage(broadcastMessage)
                         }
                     }
@@ -86,7 +95,7 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
-        if (!stack.sender.hasPermission("punisherx.ban")) {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN)) {
             return emptyList()
         }
         return when (args.size) {

@@ -5,12 +5,13 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 @Suppress("UnstableApiUsage")
 class MuteCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (stack.sender.hasPermission("punisherx.mute")) {
+        if(PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.MUTE)) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
                     stack.sender.sendMessage(plugin.messageHandler.getMessage("mute", "usage"))
@@ -19,7 +20,7 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                     val targetPlayer = Bukkit.getPlayer(player)
                     val isForce = args.contains("--force")
                     if (targetPlayer != null) {
-                        if (!isForce && targetPlayer.hasPermission("punisherx.bypass.mute")) {
+                        if (!isForce && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_MUTE)) {
                             stack.sender.sendMessage(
                                 plugin.messageHandler.getMessage(
                                     "error",
@@ -36,7 +37,7 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                     var reason: String
                     try {
                         gtime = args[1]
-                        plugin.timeHandler.parseTime(gtime) // Sprawdzenie, czy gtime jest poprawnym czasem
+                        plugin.timeHandler.parseTime(gtime)
                         reason = args.slice(2 until args.size).filterNot { it == "--force" }.joinToString(" ")
                     } catch (e: NumberFormatException) {
                         gtime = null
@@ -53,10 +54,10 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                     stack.sender.sendMessage(plugin.messageHandler.getMessage("mute", "mute", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))))
                     val muteMessage = plugin.messageHandler.getMessage("mute", "mute_message", mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime)))
                     targetPlayer?.sendMessage(muteMessage)
-                    val permission = "punisherx.see.mute"
+
                     val broadcastMessage = plugin.messageHandler.getMessage("mute", "broadcast", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime)))
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
-                        if (onlinePlayer.hasPermission(permission)) {
+                        if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_MUTE)) {
                             onlinePlayer.sendMessage(broadcastMessage)
                         }
                     }
@@ -70,7 +71,7 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
-        if (!stack.sender.hasPermission("punisherx.mute")) {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.MUTE)) {
             return emptyList()
         }
         return when (args.size) {

@@ -87,6 +87,11 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                 player.teleport(unjailLoc)
                 player.gameMode = GameMode.SURVIVAL
                 plugin.logger.debug("Player ${player.name} był w obszarze jail po joinie – przeniesiony na unjail")
+            }else{
+                if (!plugin.cache.isPunishmentActive(player.uniqueId)) return@Runnable
+                if (!jailLoc.chunk.isLoaded) jailLoc.chunk.load()
+                player.teleport(jailLoc)
+                player.gameMode = GameMode.ADVENTURE
             }
         }, 1L)
     }

@@ -5,24 +5,24 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 @Suppress("UnstableApiUsage")
 class WarnCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (stack.sender.hasPermission("punisherx.warn")) {
+        if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.WARN)) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
                     stack.sender.sendMessage(plugin.messageHandler.getMessage("warn", "usage"))
                 } else {
                     val player = args[0]
-                    val targetPlayer = Bukkit.getPlayer(player)
-                    if (targetPlayer != null && targetPlayer.hasPermission("punisherx.bypass.warn")) {
+                    val uuid = plugin.uuidManager.getUUID(player)
+                    val targetPlayer = Bukkit.getPlayer(uuid)
+                    if (targetPlayer != null && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_WARN)) {
                         stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
                         return
                     }
-                    val uuid = plugin.uuidManager.getUUID(player).toString()
-
                     var gtime: String?
                     var reason: String
                     try {
@@ -38,17 +38,17 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                     val start = System.currentTimeMillis()
                     val end: Long? = if (gtime != null) (System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
 
-                    plugin.databaseHandler.addPunishment(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
-                    plugin.databaseHandler.addPunishmentHistory(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    plugin.databaseHandler.addPunishment(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
 
-                    val warnCount = plugin.databaseHandler.getActiveWarnCount(uuid)
+                    val warnCount = plugin.databaseHandler.getActiveWarnCount(uuid.toString())
                     stack.sender.sendMessage(plugin.messageHandler.getMessage("warn", "warn", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime), "warn_no" to warnCount.toString())))
                     val warnMessage = plugin.messageHandler.getMessage("warn", "warn_message", mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime), "warn_no" to warnCount.toString()))
                     targetPlayer?.sendMessage(warnMessage)
-                    val permission = "punisherx.see.warn"
+
                     val broadcastMessage = plugin.messageHandler.getMessage("warn", "broadcast", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime), "warn_no" to warnCount.toString()))
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
-                        if (onlinePlayer.hasPermission(permission)) {
+                        if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_WARN)) {
                             onlinePlayer.sendMessage(broadcastMessage)
                         }
                     }
@@ -63,7 +63,7 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
-        if (!stack.sender.hasPermission("punisherx.warn")) {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.WARN)) {
             return emptyList()
         }
         return when (args.size) {

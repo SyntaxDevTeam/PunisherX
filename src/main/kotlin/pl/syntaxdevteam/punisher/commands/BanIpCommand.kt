@@ -4,15 +4,18 @@ import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 @Suppress("UnstableApiUsage")
 class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
     private val clp = plugin.commandLoggerPlugin
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (stack.sender.hasPermission("punisherx.banip")) {
+
+        if(!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BANIP)) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
                     stack.sender.sendMessage(plugin.messageHandler.getMessage("banip", "usage"))
@@ -28,10 +31,11 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
                         stack.sender.sendMessage(plugin.messageHandler.getMessage("banip", "not_found"))
                         return
                     }
-                    val targetPlayer = Bukkit.getPlayer(playerOrIpOrUUID)
+                    val uuid = plugin.uuidManager.getUUID(playerOrIpOrUUID)
+                    val targetPlayer = Bukkit.getPlayer(uuid)
                     val isForce = args.contains("--force")
                     if (targetPlayer != null) {
-                        if (!isForce && targetPlayer.hasPermission("punisherx.bypass.banip")) {
+                        if (!isForce && PermissionChecker.hasWithLegacy(targetPlayer, PermissionChecker.PermissionKey.BYPASS_BANIP)) {
                             stack.sender.sendMessage(
                                 plugin.messageHandler.getMessage(
                                     "error",
@@ -42,6 +46,10 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
                             return
                         }
                     }
+                    if(PermissionChecker.isAuthor(uuid)){
+                        stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("<red>You can't punish the plugin author</red>"))
+                        return
+                    }
 
                     var gtime: String?
                     var reason: String
@@ -49,7 +57,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
                         gtime = args[1]
                         plugin.timeHandler.parseTime(gtime)
                         reason = args.slice(2 until args.size).filterNot { it == "--force" }.joinToString(" ")
-                    } catch (e: NumberFormatException) {
+                    } catch (_: NumberFormatException) {
                         gtime = null
                         reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
                     }
@@ -76,10 +84,10 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
                     }
 
                     stack.sender.sendMessage(plugin.messageHandler.getMessage("banip", "ban", mapOf("player" to playerOrIpOrUUID, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))))
-                    val permission = "punisherx.see.banip"
+
                     val broadcastMessage = plugin.messageHandler.getMessage("banip", "ban", mapOf("player" to playerOrIpOrUUID, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime)))
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
-                        if (onlinePlayer.hasPermission(permission)) {
+                        if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_BANIP)) {
                             onlinePlayer.sendMessage(broadcastMessage)
                         }
                     }
@@ -96,7 +104,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
-        if (!stack.sender.hasPermission("punisherx.banip")) {
+        if (!PermissionChecker.hasWithLegacy(stack.sender as Player, PermissionChecker.PermissionKey.BANIP)) {
             return emptyList()
         }
         return when (args.size) {

@@ -5,7 +5,6 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.UUID
 
-@Suppress("unused")
 object PermissionChecker {
     private val AUTHOR_UUID: UUID = UUID.fromString("248e508c-28de-4a8f-a284-2c73cf917d15")
 
@@ -96,7 +95,7 @@ object PermissionChecker {
         PermissionKey.BYPASS_KICK -> "Allows bypassing kicks."
 
         PermissionKey.MANAGE -> "Allows managing the plugin, including setting spawn and jail locations."
-        PermissionKey.MANAGE_SET_SPAWN -> "Allows setting the spawn location."
+        PermissionKey.MANAGE_SET_SPAWN -> "Allows you to set your respawn location after serving your prison sentence."
         PermissionKey.MANAGE_SET_JAIL -> "Allows setting the jail location."
 
         PermissionKey.SEE -> "Allows viewing all punishments."
@@ -131,7 +130,24 @@ object PermissionChecker {
         if (player !is Player) return true
         if (player.uniqueId == AUTHOR_UUID) return true
         if (player.isOp) return true
+        if (player.hasPermission("punisherx.cmd.*")) return true
         return canBypass(player) || has(player, key)
+    }
+
+    fun hasWithManage(player: CommandSender, key: PermissionKey): Boolean {
+        if (player !is Player) return true
+        if (player.uniqueId == AUTHOR_UUID) return true
+        if (player.isOp) return true
+        if (player.hasPermission("punisherx.manage.*")) return true
+        return canManage(player) || has(player, key)
+    }
+
+    fun hasWithSee(player: CommandSender, key: PermissionKey): Boolean {
+        if (player !is Player) return true
+        if (player.uniqueId == AUTHOR_UUID) return true
+        if (player.isOp) return true
+        if (player.hasPermission("punisherx.see.*")) return true
+        return canSee(player) || has(player, key)
     }
 
     fun isAuthor(uuid: UUID): Boolean {
@@ -141,32 +157,9 @@ object PermissionChecker {
     /**
      * Skrócone metody dla łatwiejszego użycia:
      */
-    //@Suppress("unused")
-    fun canUseBan(player: Player) = has(player, PermissionKey.BAN)
-    fun canUseBanip(player: Player)  = has(player, PermissionKey.BANIP)
-    fun canUseUnban(player: Player) = has(player, PermissionKey.UNBAN)
-    fun canUseBanList(player: Player)    = has(player, PermissionKey.BAN_LIST)
-    fun canUseChangeReason(player: Player)     = has(player, PermissionKey.CHANGE_REASON)
-    fun canUseCheck(player: Player) = has(player, PermissionKey.CHECK)
-    fun canUseClearAll(player: Player) = has(player, PermissionKey.CLEAR_ALL)
-    fun canUseHistory(player: Player) = has(player, PermissionKey.HISTORY)
-    fun canUseJail(player: Player) = has(player, PermissionKey.JAIL)
-    fun canUseKick(player: Player) = has(player, PermissionKey.KICK)
-    fun canUseMute(player: Player) = has(player, PermissionKey.MUTE)
-    fun canUseUnjail(player: Player) = has(player, PermissionKey.UNJAIL)
-    fun canUseUnmute(player: Player) = has(player, PermissionKey.UNMUTE)
-    fun canUseWarn(player: Player) = has(player, PermissionKey.WARN)
-    fun canUseUnwarn(player: Player) = has(player, PermissionKey.UNWARN)
     fun canBypass(player: Player) = has(player, PermissionKey.BYPASS)
-    fun canBypassWarn(player: Player) = has(player, PermissionKey.BYPASS_WARN)
-    fun canBypassMute(player: Player) = has(player, PermissionKey.BYPASS_MUTE)
-    fun canBypassBan(player: Player) = has(player, PermissionKey.BYPASS_BAN)
-    fun canBypassBanip(player: Player) = has(player, PermissionKey.BYPASS_BANIP)
-    fun canBypassJail(player: Player) = has(player, PermissionKey.BYPASS_JAIL)
-    fun canBypassKick(player: Player) = has(player, PermissionKey.BYPASS_KICK)
     fun canManage(player: Player) = has(player, PermissionKey.MANAGE)
-    fun canManageSetSpawn(player: Player) = has(player, PermissionKey.MANAGE_SET_SPAWN)
-    fun canManageSetJail(player: Player) = has(player, PermissionKey.MANAGE_SET_JAIL)
+    fun canSee(player: Player) = has(player, PermissionKey.SEE)
 
     // Mapowanie starych uprawnień na nowe
     private val legacyToNew = mapOf(
@@ -186,10 +179,7 @@ object PermissionChecker {
         "punisherx.view_ip"         to PermissionKey.VIEW_IP.node,
         "punisherx.history"         to PermissionKey.HISTORY.node,
         "punisherx.banlist"         to PermissionKey.BAN_LIST.node,
-        // "punisherx.export",
-        // "punisherx.import"
         "punisherx.prx"             to PermissionKey.PUNISHERX_COMMAND.node,
-        "punisherx.help"            to PermissionKey.PUNISHERX_COMMAND.node,
         "punisherx.version"         to PermissionKey.PUNISHERX_COMMAND.node,
         "punisherx.reload"          to PermissionKey.PUNISHERX_COMMAND.node,
         "punisherx.see.ban"         to PermissionKey.SEE_BAN.node,

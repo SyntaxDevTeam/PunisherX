@@ -5,12 +5,13 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 @Suppress("UnstableApiUsage")
 class UnMuteCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (stack.sender.hasPermission("punisherx.unmute")) {
+        if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNMUTE)) {
             if (args.isNotEmpty()) {
                 val player = args[0]
                 val uuid = plugin.uuidManager.getUUID(player).toString()
@@ -38,7 +39,7 @@ class UnMuteCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
-        if (!stack.sender.hasPermission("punisherx.unmute")) {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNMUTE)) {
             return emptyList()
         }
         return when (args.size) {

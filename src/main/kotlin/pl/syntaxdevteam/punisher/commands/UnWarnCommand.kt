@@ -4,12 +4,13 @@ import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 @Suppress("UnstableApiUsage")
 class UnWarnCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (stack.sender.hasPermission("punisherx.unwarn")) {
+        if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNWARN)) {
             if (args.isNotEmpty()) {
                 val player = args[0]
                 val uuid = plugin.uuidManager.getUUID(player).toString()
@@ -31,7 +32,7 @@ class UnWarnCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
-        if (!stack.sender.hasPermission("punisherx.unwarn")) {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNWARN)) {
             return emptyList()
         }
         return when (args.size) {
