@@ -68,6 +68,11 @@ class CommandManager(private val plugin: PunisherX) {
                 SetjailCommand(plugin)
             )
             commands.register(
+                "setspawn",
+                plugin.messageHandler.getSimpleMessage("setspawn", "usage"),
+                SetSpawnCommand(plugin)
+            )
+            commands.register(
                 "jail",
                 plugin.messageHandler.getSimpleMessage("jail", "usage"),
                 JailCommand(plugin)

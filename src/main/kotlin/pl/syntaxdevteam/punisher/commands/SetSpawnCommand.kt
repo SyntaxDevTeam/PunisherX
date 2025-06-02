@@ -1,15 +1,15 @@
 package pl.syntaxdevteam.punisher.commands
 
-import org.jetbrains.annotations.NotNull
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.entity.Player
+import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.basic.JailUtils
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 @Suppress("UnstableApiUsage")
-class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
+class SetSpawnCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (stack.sender !is Player) {
@@ -17,13 +17,13 @@ class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        if (!PermissionChecker.hasWithManage(stack.sender, PermissionChecker.PermissionKey.MANAGE_SET_JAIL)) {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.MANAGE_SET_SPAWN)) {
             stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
             return
         }
 
         if (args.isEmpty() || !args[0].equals("radius", ignoreCase = true)) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("setjail", "usage"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("setspawn", "usage"))
             return
         }
 
@@ -42,11 +42,11 @@ class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
         val locationZ = location.blockZ.toString()
         val mRadius = radius.toString()
 
-        if (JailUtils.setJailLocation(plugin.config, location, radius)) {
+        if (JailUtils.setUnjailLocation(plugin.config, location)) {
             plugin.saveConfig()
             stack.sender.sendMessage(
                 plugin.messageHandler.getMessage(
-                    "setjail", "set", mapOf(
+                    "spawn", "set", mapOf(
                         "world" to world,
                         "locationx" to locationX,
                         "locationy" to locationY,
@@ -56,12 +56,12 @@ class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
                 )
             )
         } else {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("setjail", "set_error"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("setspawn", "set_error"))
         }
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
-        if (!PermissionChecker.hasWithManage(stack.sender, PermissionChecker.PermissionKey.MANAGE_SET_JAIL)) {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.MANAGE_SET_SPAWN)) {
             return emptyList()
         }
         return when (args.size) {

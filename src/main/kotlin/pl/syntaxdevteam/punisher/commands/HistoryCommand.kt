@@ -5,6 +5,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.players.PlayerIPManager
 import java.text.SimpleDateFormat
 import java.util.*
@@ -22,7 +23,7 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
         }
 
         val player = args[0]
-        if (player.equals(stack.sender.name, ignoreCase = true) || stack.sender.hasPermission("punisherx.history")) {
+        if (player.equals(stack.sender.name, ignoreCase = true) || PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.HISTORY)) {
 
             val page = if (args.size > 1) args[1].toIntOrNull() ?: 1 else 1
             val limit = 10
@@ -100,7 +101,7 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
-        if (!stack.sender.hasPermission("punisherx.history")) {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.HISTORY)) {
             return emptyList()
         }
         return when (args.size) {

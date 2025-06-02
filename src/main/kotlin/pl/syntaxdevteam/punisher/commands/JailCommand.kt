@@ -7,13 +7,14 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.GameMode
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.basic.JailUtils
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 @Suppress("UnstableApiUsage")
 class JailCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
 
-        if (!stack.sender.hasPermission("punisherx.jail")) {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.JAIL)) {
             stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
             return
         }
@@ -23,17 +24,22 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         val playerName = args[0]
-        val targetPlayer = Bukkit.getPlayer(playerName)
         val uuid = plugin.uuidManager.getUUID(playerName)
+        val targetPlayer = Bukkit.getPlayer(uuid)
         val isForce = args.contains("--force")
 
         if (targetPlayer != null) {
-            if (!isForce && targetPlayer.hasPermission("punisherx.bypass.jail")) {
+            if (!isForce && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_JAIL)) {
                 stack.sender.sendMessage(
                     plugin.messageHandler.getMessage("error", "bypass", mapOf("player" to playerName))
                 )
                 return
             }
+            /*val prefix = plugin.messageHandler.getPrefix()
+            if(PermissionChecker.isAuthor(targetPlayer)){
+                stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("$prefix <red>You can't punish the plugin author</red>"))
+                return
+            }*/
         }
 
         var gtime: String?
@@ -42,7 +48,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             gtime = args[1]
             plugin.timeHandler.parseTime(gtime)
             reason = args.slice(2 until args.size).filterNot { it == "--force" }.joinToString(" ")
-        } catch (e: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             gtime = null
             reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
         }
@@ -97,27 +103,27 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
 
             plugin.logger.debug("Changing gamemode ($gameMode) and teleporting $name to $jailLocation")
 
-            plugin.databaseHandler.addPunishment(name, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
-            plugin.databaseHandler.addPunishmentHistory(name, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
-
-            plugin.cache.addOrUpdatePunishment(uuid, end ?: -1)
-
-            sendMessage(
-                plugin.messageHandler.getMessage(
-                    "jail", "jail_message",
-                    mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
-                )
-            )
         }
 
-        val broadcastMessage =
+        plugin.databaseHandler.addPunishment(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+        plugin.databaseHandler.addPunishmentHistory(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+        plugin.cache.addOrUpdatePunishment(uuid, end ?: -1)
+
+        targetPlayer?.sendMessage(
             plugin.messageHandler.getMessage(
-                "jail", "broadcast",
-                mapOf("player" to playerName, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
+                "jail", "jail_message",
+                mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
             )
+        )
+        val broadcastMessages = plugin.messageHandler.getSmartMessage(
+            "jail", "broadcast",
+            mapOf("player" to playerName, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
+        )
         plugin.server.onlinePlayers.forEach { onlinePlayer ->
-            if (onlinePlayer.hasPermission("punisherx.see.jail")) {
-                onlinePlayer.sendMessage(broadcastMessage)
+            if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_JAIL)) {
+                broadcastMessages.forEach { message ->
+                    onlinePlayer.sendMessage(message)
+                }
             }
         }
 
@@ -130,7 +136,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
-        if (!stack.sender.hasPermission("punisherx.jail")) {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.JAIL)) {
             return emptyList()
         }
         return when (args.size) {

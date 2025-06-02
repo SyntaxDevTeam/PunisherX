@@ -4,6 +4,7 @@ import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -14,7 +15,7 @@ class BanListCommand(private val plugin: PunisherX) : BasicCommand {
     private val mh = plugin.messageHandler
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (!stack.sender.hasPermission("punisherx.banlist")) {
+        if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN_LIST)) {
             stack.sender.sendMessage(mh.getMessage("error", "no_permission"))
             return
         }
@@ -82,7 +83,7 @@ class BanListCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
-        if (!stack.sender.hasPermission("punisherx.banlist")) {
+        if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN_LIST)) {
             return emptyList()
         }
         return when (args.size) {
