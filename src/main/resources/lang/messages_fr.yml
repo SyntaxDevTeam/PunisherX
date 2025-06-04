@@ -24,6 +24,12 @@ setjail:
   set_error: "<red>Échec de la définition de la localisation de la prison</red>"
   invalid_radius: "<red>Veuillez fournir un rayon valide (nombre supérieur à 0)</red>"
 
+# Messages de la commande /setspawn
+setspawn:
+  usage: "L'utilisation correcte est : <gold>/setspawn</gold>"
+  set: "<green>Le point de spawn a été défini : <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>]</green>"
+  set_error: "<red>Échec de la définition du point de spawn</red>"
+
 # Messages de la commande /jail
 jail:
   jail: "<green>Vous avez emprisonné le joueur <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold></green>"

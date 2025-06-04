@@ -23,6 +23,13 @@ setjail:
   set_error: "<red>Fout bij het instellen van de gevangenislocatie</red>"
   invalid_radius: "<red>Geef een geldige straal op (nummer groter dan 0)</red>"
 
+# /setspawn commando berichten
+setspawn:
+  usage: "Correct gebruik is: <gold>/setspawn <wereld> <x> <y> <z>"
+  set: "<green>Spawnlocatie is ingesteld: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>]</green>"
+  set_error: "<red>Fout bij het instellen van de spawnlocatie</red>"
+  invalid_coordinates: "<red>Geef geldige coördinaten op (getallen)</red>"
+
 # /jail commando berichten
 jail:
   jail: "<green>Je hebt speler <gold>{player}</gold> opgesloten voor <gold>{reason}</gold> voor <gold>{time}</gold></green>"
