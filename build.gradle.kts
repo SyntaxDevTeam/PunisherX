@@ -1,8 +1,8 @@
 import io.papermc.hangarpublishplugin.model.Platforms
 
 plugins {
-    kotlin("jvm") version "2.2.0-RC"
-    id("com.gradleup.shadow") version "9.0.0-beta13"
+    kotlin("jvm") version "2.2.0-RC2"
+    id("com.gradleup.shadow") version "9.0.0-beta15"
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
 }
 
@@ -33,18 +33,18 @@ dependencies {
     compileOnly("net.kyori:adventure-text-serializer-gson:4.21.0")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.21.0")
     compileOnly("net.kyori:adventure-text-serializer-ansi:4.21.0")
-    compileOnly("com.maxmind.geoip2:geoip2:4.3.0")
+    compileOnly("com.maxmind.geoip2:geoip2:4.3.1")
     compileOnly("org.apache.ant:ant:1.10.15")
     compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.3")
     compileOnly("org.xerial:sqlite-jdbc:3.49.1.0")
-    compileOnly("org.postgresql:postgresql:42.7.5")
+    compileOnly("org.postgresql:postgresql:42.7.6")
     compileOnly("com.h2database:h2:2.3.232")
     compileOnly("com.zaxxer:HikariCP:6.3.0")
-    compileOnly("net.luckperms:api:5.4")
+    compileOnly("net.luckperms:api:5.5")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:2.3.0")
     compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
-    compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.10")
+    compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.11")
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.0")
 }
 
