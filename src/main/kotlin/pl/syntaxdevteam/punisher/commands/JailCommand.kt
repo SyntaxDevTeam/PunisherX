@@ -28,18 +28,16 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         val targetPlayer = Bukkit.getPlayer(uuid)
         val isForce = args.contains("--force")
 
-        if (targetPlayer != null) {
-            if (!isForce && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_JAIL)) {
-                stack.sender.sendMessage(
-                    plugin.messageHandler.getMessage("error", "bypass", mapOf("player" to playerName))
-                )
-                return
-            }
-            /*val prefix = plugin.messageHandler.getPrefix()
-            if(PermissionChecker.isAuthor(targetPlayer)){
-                stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("$prefix <red>You can't punish the plugin author</red>"))
-                return
-            }*/
+        if (targetPlayer != null && !isForce && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_JAIL)) {
+            stack.sender.sendMessage(
+                plugin.messageHandler.getMessage("error", "bypass", mapOf("player" to playerName))
+            )
+            return
+        }
+        val prefix = plugin.messageHandler.getPrefix()
+        if(PermissionChecker.isAuthor(uuid)){
+            stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("$prefix <red>You can't punish the plugin author</red>"))
+            return
         }
 
         var gtime: String?
