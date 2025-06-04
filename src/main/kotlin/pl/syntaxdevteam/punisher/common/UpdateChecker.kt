@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -58,6 +59,60 @@ class UpdateChecker(private val plugin: PunisherX) {
             }
         }.orTimeout(10, TimeUnit.SECONDS).exceptionally { e ->
             plugin.logger.warning("Update check timed out or failed: ${e.message}")
+            null
+        }
+    }
+
+    fun checkForUpdatesForPlayer(player: Player) {
+        if (!plugin.config.getBoolean("checkForUpdates", true)) {
+            plugin.logger.debug("Update check is disabled in the config.")
+            return
+        }
+
+        CompletableFuture.runAsync {
+            try {
+                val uri = URI(hangarApiUrl)
+                val url = uri.toURL()
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "GET"
+                connection.connectTimeout = 5000
+                connection.readTimeout = 5000
+
+                val responseCode = connection.responseCode
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    val responseBody = BufferedReader(InputStreamReader(connection.inputStream)).use { it.readText() }
+                    val jsonObject = gson.fromJson(responseBody, JsonObject::class.java)
+                    val versions = jsonObject.getAsJsonArray("result")
+                    val latestVersion = versions.firstOrNull()?.asJsonObject
+
+                    if (latestVersion != null
+                        && isNewerVersion(latestVersion.get("name").asString, plugin.pluginMeta.version)
+                    ) {
+
+                        val versionName = latestVersion.get("name").asString
+                        val channel = latestVersion.getAsJsonObject("channel").get("name").asString
+                        val prefix = plugin.messageHandler.getPrefix()
+                        val message = when (channel) {
+                            "Release" -> "$prefix <green>New release version <bold>$versionName</bold> is available on <u><click:open_url:'$pluginUrl'>Hangar</click>!"
+                            "Snapshot" -> "$prefix <yellow>New snapshot version <bold>$versionName</bold> is available on <u><click:open_url:'$pluginUrl'>Hangar</click>!"
+                            else -> "$prefix <blue>New version <bold>$versionName</bold> is available on <u><click:open_url:'$pluginUrl'>Hangar</click>!"
+                        }
+                        val component = MiniMessage.miniMessage().deserialize(message)
+
+                        player.sendMessage(component)
+
+                        if (plugin.config.getBoolean("autoDownloadUpdates", false)) {
+                            downloadUpdate(latestVersion)
+                        }
+                    }
+                } else {
+                    plugin.logger.warning("Failed to check for updates (for player): $responseCode")
+                }
+            } catch (e: Exception) {
+                plugin.logger.warning("Błąd podczas sprawdzania aktualizacji (dla gracza ${player.name}): ${e.message}")
+            }
+        }.orTimeout(10, TimeUnit.SECONDS).exceptionally { e ->
+            plugin.logger.warning("Update check (dla gracza ${player.name}) timeout lub nieudane: ${e.message}")
             null
         }
     }
