@@ -23,6 +23,12 @@ setjail:
   set_error: "<red>Fehler beim Festlegen des Gefängnisstandorts</red>"
   invalid_radius: "<red>Bitte geben Sie einen gültigen Radius an (Zahl größer als 0)</red>"
 
+# Nachrichten des Befehls /setspawn
+setspawn:
+  usage: "Die korrekte Verwendung ist: <gold>/setspawn</gold>"
+  set: "<green>Spawnpunkt wurde festgelegt: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>]</green>"
+  set_error: "<red>Fehler beim Festlegen des Spawnpunkts</red>"
+
 # Nachrichten des Befehls /jail
 jail:
   jail: "<green>Sie haben den Spieler <gold>{player}</gold> für <gold>{reason}</gold> für <gold>{time}</gold> eingesperrt</green>"

@@ -23,6 +23,12 @@ setjail:
   set_error: "<red>Nie udało się ustawić lokalizacji więzienia</red>"
   invalid_radius: "<red>Podaj prawidłowy promień (liczba większa od 0)</red>"
 
+# Wiadomości komendy /setspawn
+setspawn:
+    usage: "Poprawne użycie to: <gold>/setspawn</gold>"
+    set: "<green>Lokalizacja więzienia została ustawiona: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>]</green>"
+    set_error: "<red>Nie udało się ustawić lokalizacji więzienia</red>"
+
 # Wiadomości komendy /jail
 jail:
   jail: "<green>Zamknąłeś gracza <gold>{player}</gold> w więzieniu za <gold>{reason}</gold> na czas <gold>{time}</green>"

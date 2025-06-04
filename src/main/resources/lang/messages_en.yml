@@ -22,6 +22,12 @@ setjail:
   set_error: "<red>Failed to set jail location</red>"
   invalid_radius: "<red>Please provide a valid radius (number greater than 0)</red>"
 
+# /setspawn command messages
+setspawn:
+  usage: "Correct usage is: <gold>/setspawn</gold>"
+  set: "<green>Spawn location has been set: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>]</green>"
+  set_error: "<red>Failed to set spawn location</red>"
+
 # /jail command messages
 jail:
   jail: "<green>You have jailed player <gold>{player}</gold> for <gold>{reason}</gold> for <gold>{time}</gold></green>"
