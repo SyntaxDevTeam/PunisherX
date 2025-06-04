@@ -30,17 +30,10 @@ class SetSpawnCommand(private val plugin: PunisherX) : BasicCommand {
         val player = stack.sender as Player
         val location = player.location
 
-        val radius = if (args.size > 1) args[1].toDoubleOrNull() else null
-        if (radius == null || radius <= 0) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "invalid_radius"))
-            return
-        }
-
         val world = location.world?.name ?: "unknown"
         val locationX = location.blockX.toString()
         val locationY = location.blockY.toString()
         val locationZ = location.blockZ.toString()
-        val mRadius = radius.toString()
 
         if (JailUtils.setUnjailLocation(plugin.config, location)) {
             plugin.saveConfig()
@@ -50,8 +43,7 @@ class SetSpawnCommand(private val plugin: PunisherX) : BasicCommand {
                         "world" to world,
                         "locationx" to locationX,
                         "locationy" to locationY,
-                        "locationz" to locationZ,
-                        "radius" to mRadius
+                        "locationz" to locationZ
                     )
                 )
             )
