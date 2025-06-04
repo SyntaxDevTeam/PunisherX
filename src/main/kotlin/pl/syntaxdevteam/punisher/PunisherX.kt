@@ -30,7 +30,7 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var messageHandler: MessageHandler
     lateinit var timeHandler: TimeHandler
     lateinit var punishmentManager: PunishmentManager
-    private lateinit var updateChecker: UpdateChecker
+    lateinit var updateChecker: UpdateChecker
     private var geoIPHandler: GeoIPHandler = GeoIPHandler(this)
     var playerIPManager: PlayerIPManager = PlayerIPManager(this, geoIPHandler)
     val uuidManager = UUIDManager(this)

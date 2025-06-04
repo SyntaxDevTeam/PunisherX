@@ -14,9 +14,13 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.common.UpdateChecker
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.*
 
 class PunishmentChecker(private val plugin: PunisherX) : Listener {
+
+    private val updateChecker = UpdateChecker(plugin)
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerLogin(event: PlayerLoginEvent) {
@@ -93,7 +97,14 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                 player.teleport(jailLoc)
                 player.gameMode = GameMode.ADVENTURE
             }
+
         }, 1L)
+        if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.SEE_UPDATE)) {
+            updateChecker.checkForUpdatesForPlayer(player)
+            plugin.logger.debug("Checking for updates for player: ${player.name}")
+        }else{
+            plugin.logger.debug("Player ${player.name} does not have permission to see updates.")
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
