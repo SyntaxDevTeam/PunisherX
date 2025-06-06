@@ -8,7 +8,7 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion
 class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion() {
 
     override fun getIdentifier(): String {
-        return "punisherx"
+        return "prx"
     }
 
     override fun getAuthor(): String {
@@ -65,7 +65,6 @@ class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion()
     }
 
     private fun getAllPunishmentHistory(): String? {
-
         val totalPunishmentHistory = plugin.databaseHandler.countAllPunishmentHistory()
         return if (totalPunishmentHistory > 0) {
             plugin.logger.debug("Total punishments: $totalPunishmentHistory")
