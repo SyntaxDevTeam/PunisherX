@@ -18,7 +18,7 @@ error:
 
 # Nachrichten des Befehls /setjail
 setjail:
-  usage: "Die korrekte Verwendung ist: <gold>/setjail radius <radius>"
+  usage: "Die korrekte Verwendung ist: <gold>/setjail <radius>"
   set: "<green>Gefängnisstandort wurde festgelegt: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>] mit einem Radius von <gold>{radius}</gold>"
   set_error: "<red>Fehler beim Festlegen des Gefängnisstandorts</red>"
   invalid_radius: "<red>Bitte geben Sie einen gültigen Radius an (Zahl größer als 0)</red>"

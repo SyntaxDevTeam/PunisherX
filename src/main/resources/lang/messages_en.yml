@@ -17,7 +17,7 @@ error:
 
 # /setjail command messages
 setjail:
-  usage: "Correct usage is: <gold>/setjail radius <radius>"
+  usage: "Correct usage is: <gold>/setjail <radius>"
   set: "<green>Jail location has been set: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>] with a radius of <gold>{radius}</gold>"
   set_error: "<red>Failed to set jail location</red>"
   invalid_radius: "<red>Please provide a valid radius (number greater than 0)</red>"

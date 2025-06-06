@@ -19,7 +19,7 @@ error:
 
 # Mensajes del comando /setjail
 setjail:
-  usage: "El uso correcto es: <gold>/setjail radius <radio>"
+  usage: "El uso correcto es: <gold>/setjail <radio>"
   set: "<green>La ubicación de la cárcel ha sido establecida: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>] con un radio de <gold>{radius}</gold>"
   set_error: "<red>No se pudo establecer la ubicación de la cárcel</red>"
   invalid_radius: "<red>Por favor, proporciona un radio válido (número mayor que 0)</red>"

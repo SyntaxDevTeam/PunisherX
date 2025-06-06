@@ -18,7 +18,7 @@ error:
 
 # Wiadomości komendy /setjail
 setjail:
-  usage: "Poprawne użycie to: <gold>/setjail radius <promień>"
+  usage: "Poprawne użycie to: <gold>/setjail <promień>"
   set: "<green>Lokalizacja więzienia została ustawiona: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>] z promieniem <gold>{radius}</gold>"
   set_error: "<red>Nie udało się ustawić lokalizacji więzienia</red>"
   invalid_radius: "<red>Podaj prawidłowy promień (liczba większa od 0)</red>"
