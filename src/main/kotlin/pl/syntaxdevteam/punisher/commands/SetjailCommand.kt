@@ -12,17 +12,19 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+        // Sprawdzamy, czy to gracz
         if (stack.sender !is Player) {
             stack.sender.sendMessage(plugin.messageHandler.getLogMessage("error", "console"))
             return
         }
 
+        // Sprawdzamy uprawnienia
         if (!PermissionChecker.hasWithManage(stack.sender, PermissionChecker.PermissionKey.MANAGE_SET_JAIL)) {
             stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
             return
         }
 
-        if (args.isEmpty() || !args[0].equals("radius", ignoreCase = true)) {
+        if (args.isEmpty()) {
             stack.sender.sendMessage(plugin.messageHandler.getMessage("setjail", "usage"))
             return
         }
@@ -30,7 +32,7 @@ class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
         val player = stack.sender as Player
         val location = player.location
 
-        val radius = if (args.size > 1) args[1].toDoubleOrNull() else null
+        val radius = args[0].toDoubleOrNull()
         if (radius == null || radius <= 0) {
             stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "invalid_radius"))
             return
@@ -65,8 +67,9 @@ class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
             return emptyList()
         }
         return when (args.size) {
-            1 -> listOf("radius")
-            2 -> (1..100).map { it.toString() }
+            1 -> {
+                (1..100).map { it.toString() }
+            }
             else -> emptyList()
         }
     }
