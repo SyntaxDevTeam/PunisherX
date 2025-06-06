@@ -267,6 +267,7 @@ webhook:
 placeholders:
   mute_remaining_time: "<gray>Wyciszony do: <gold>"
   warn_remaining_time: "<gray>Ostrzeżenie ważne do: <gold>"
+  jail_remaining_time: "<gray>W więzieniu do: <gold>"
   total_punishments: "<gray>Łącznie wszystkich kar: <gold>"
   total_active_punishments: "<gray>Łącznie aktywnych kar: <gold>"
 
