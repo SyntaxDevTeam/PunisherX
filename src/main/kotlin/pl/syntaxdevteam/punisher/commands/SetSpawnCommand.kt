@@ -22,15 +22,10 @@ class SetSpawnCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        if (args.isEmpty() || !args[0].equals("radius", ignoreCase = true)) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("setspawn", "usage"))
-            return
-        }
-
         val player = stack.sender as Player
         val location = player.location
 
-        val world = location.world?.name ?: "unknown"
+        val world = location.world?.name ?: "world"
         val locationX = location.blockX.toString()
         val locationY = location.blockY.toString()
         val locationZ = location.blockZ.toString()
@@ -39,7 +34,7 @@ class SetSpawnCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.saveConfig()
             stack.sender.sendMessage(
                 plugin.messageHandler.getMessage(
-                    "spawn", "set", mapOf(
+                    "setspawn", "set", mapOf(
                         "world" to world,
                         "locationx" to locationX,
                         "locationy" to locationY,
