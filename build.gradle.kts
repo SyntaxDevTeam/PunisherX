@@ -1,14 +1,21 @@
 import io.papermc.hangarpublishplugin.model.Platforms
+import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
     kotlin("jvm") version "2.2.0-RC2"
     id("com.gradleup.shadow") version "9.0.0-beta15"
+    `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
 }
 
 group = "pl.syntaxdevteam.punisher"
 version = "1.4.0"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
+
+val targetJavaVersion = 21
+kotlin {
+    jvmToolchain(targetJavaVersion)
+}
 
 repositories {
     mavenCentral()
@@ -18,9 +25,9 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/") {
         name = "sonatype"
     }
-    maven("https://repo.extendedclip.com/releases/") //PlaceholderAPI
-    maven("https://repo.codemc.org/repository/maven-public") //VaultUnliokedAPI
-    maven("https://jitpack.io") //VaultAPI
+    maven("https://repo.extendedclip.com/releases/") // PlaceholderAPI
+    maven("https://repo.codemc.org/repository/maven-public") // VaultUnlockedAPI
+    maven("https://jitpack.io") // VaultAPI
 }
 
 dependencies {
@@ -48,13 +55,10 @@ dependencies {
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.0")
 }
 
-val targetJavaVersion = 21
-kotlin {
-    jvmToolchain(targetJavaVersion)
-}
-
-tasks.build {
-    dependsOn("shadowJar")
+tasks {
+    build {
+        dependsOn(shadowJar)
+    }
 }
 
 tasks.processResources {
@@ -66,6 +70,52 @@ tasks.processResources {
     filteringCharset = "UTF-8"
     filesMatching(listOf("paper-plugin.yml")) {
         expand(props)
+    }
+}
+
+// ShadowJar configuration
+tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+    archiveBaseName.set("PunisherX")
+    archiveClassifier.set("")      // usuwa domyślne "-all"
+    archiveVersion.set(project.version.toString())
+    mergeServiceFiles()
+}
+
+// Maven Publish configuration
+publishing {
+    publications {
+        create<MavenPublication>("PunisherX") {
+            artifact(tasks.named("shadowJar").get()) {
+                classifier = null
+            }
+            pom {
+                name.set("PunisherX")
+                description.set(project.description)
+                url.set("https://github.com/TwojRepo/PunisherX")
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://opensource.org/licenses/MIT")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("twojGitId")
+                        name.set("Twoje Imię")
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "Nexus"
+            url = uri("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
+            credentials {
+                username = findProperty("nexusUser") as String
+                password = findProperty("nexusPassword") as String
+            }
+        }
     }
 }
 
