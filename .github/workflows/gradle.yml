@@ -7,7 +7,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    env:
+      NEXUS_USER: ${{ secrets.NEXUS_USER }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,7 +45,7 @@ jobs:
           path: build/libs/*.jar
 
   dependency-submission:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     permissions:
       contents: write
 
