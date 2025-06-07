@@ -81,7 +81,6 @@ tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJ
     mergeServiceFiles()
 }
 
-// Maven Publish configuration
 publishing {
     publications {
         create<MavenPublication>("PunisherX") {
@@ -100,8 +99,8 @@ publishing {
                 }
                 developers {
                     developer {
-                        id.set("twojGitId")
-                        name.set("Twoje Imię")
+                        id.set("WieszczY85")
+                        name.set("WieszczY")
                     }
                 }
             }
@@ -112,8 +111,10 @@ publishing {
             name = "Nexus"
             url = uri("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
             credentials {
-                username = findProperty("nexusUser") as String
-                password = findProperty("nexusPassword") as String
+                username = findProperty("nexusUser")?.toString()
+                    ?: throw GradleException("Właściwość 'nexusUser' nie jest ustawiona w gradle.properties")
+                password = findProperty("nexusPassword")?.toString()
+                    ?: throw GradleException("Właściwość 'nexusPassword' nie jest ustawiona w gradle.properties")
             }
         }
     }
