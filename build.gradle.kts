@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.4.0"
+version = "1.4.1-DEV"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val targetJavaVersion = 21

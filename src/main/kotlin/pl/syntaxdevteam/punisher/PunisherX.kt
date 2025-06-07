@@ -16,6 +16,7 @@ import pl.syntaxdevteam.punisher.databases.*
 import pl.syntaxdevteam.punisher.players.*
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
+import pl.syntaxdevteam.punisher.loader.VersionChecker
 import pl.syntaxdevteam.punisher.placeholders.PlaceholderHandler
 import java.io.File
 import java.util.*
@@ -42,6 +43,9 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var discordWebhook: DiscordWebhook
     lateinit var hookHandler: HookHandler
 
+    override fun onLoad() {
+        VersionChecker(this).checkAndLog()
+    }
     /**
      * Called when the plugin is enabled.
      * Initializes the configuration, database, handlers, events, and commands.
