@@ -20,6 +20,10 @@ class SyntaxLoader : PluginLoader {
             .forEach { artifact -> resolver.addDependency(Dependency(artifact, null)) }
 
         resolver.addRepository(RemoteRepository.Builder("paper", "default", "https://repo.papermc.io/repository/maven-public/").build())
+        resolver.addRepository(RemoteRepository.Builder("central", "default", "https://repo.maven.apache.org/maven2/").build())
+        resolver.addRepository(RemoteRepository.Builder("jitpack", "default", "https://jitpack.io/").build())
+        resolver.addRepository(RemoteRepository.Builder("codemc-snapshots", "default", "https://repo.codemc.io/repository/maven-snapshots/").build())
+        resolver.addRepository(RemoteRepository.Builder("syntaxdevteam", "default", "https://nexus.syntaxdevteam.pl/repository/maven-releases/").build())
         pluginClasspath.addLibrary(resolver)
     }
 
