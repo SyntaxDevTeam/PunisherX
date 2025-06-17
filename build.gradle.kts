@@ -2,10 +2,11 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.2.0-RC2"
-    id("com.gradleup.shadow") version "9.0.0-beta15"
+    kotlin("jvm") version "2.2.0-RC3"
+    id("com.gradleup.shadow") version "9.0.0-beta16"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
+    id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
 group = "pl.syntaxdevteam.punisher"
@@ -61,6 +62,12 @@ tasks {
     }
 }
 
+tasks {
+    runServer {
+        minecraftVersion("1.21.6")
+    }
+}
+
 tasks.processResources {
     val props = mapOf(
         "version" to version,
@@ -90,7 +97,7 @@ publishing {
             pom {
                 name.set("PunisherX")
                 description.set(project.description)
-                url.set("https://github.com/TwojRepo/PunisherX")
+                url.set("https://github.com/SyntaxDevTeam/PunisherX")
                 licenses {
                     license {
                         name.set("MIT License")
@@ -111,10 +118,8 @@ publishing {
             name = "Nexus"
             url = uri("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
             credentials {
-                username = findProperty("nexusUser")?.toString()
-                    ?: throw GradleException("Właściwość 'nexusUser' nie jest ustawiona w gradle.properties")
-                password = findProperty("nexusPassword")?.toString()
-                    ?: throw GradleException("Właściwość 'nexusPassword' nie jest ustawiona w gradle.properties")
+                username = System.getenv("NEXUS_USER")
+                password = System.getenv("NEXUS_PASSWORD")
             }
         }
     }
