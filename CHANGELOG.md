@@ -1,9 +1,80 @@
 # Changelog
 
-## [1.4.0] - 2025-03-20
+## [1.4.0] - 2025-06-06
 ### Functional Changes:
-* Added Discord Webhook support
-* Added Experimental version of API
+* Added support for version 1.21.5
+* Updated information about available commands (`/prx help`)
+* Added NL language. Thanks to _**LegacyHeaven**_
+* Added ability to set up a Webhook for Discord
+
+Config e.g.:
+```YAML
+webhook:
+  discord:
+    enabled: false
+    url: "YOUR_WEBHOOK_URL_HERE"
+```
+* Added PunisherXAPI version 1.0-Beta - more info in [Wiki](https://github.com/SyntaxDevTeam/PunisherX/wiki/API)
+* Added placeholders for mute, warn and jail penalty times
+  * From now on, the following placeholders are available:
+    * `%prx_mute_remaining_time%`
+    * `%prx_warn_remaining_time%`
+    * `%prx_jail_remaining_time%`
+    * `%prx_total_active_punishments%`
+    * `%prx_total_punishments%`
+
+  * Additionally, in the language file in the placeholders category, you can set any format in which they will be displayed.
+
+For example:
+```YAML
+placeholders:
+  mute_remaining_time: "<gray>Muted until: <gold>"
+  warn_remaining_time: "<gray>Warning valid until: <gold>"
+  jail_remaining_time: "<gray>Jail time remaining: <gold>"
+  total_punishments: "<gray>Total punishments: <gold>"
+  total_active_punishments: "<gray>Total active punishments: <gold>"
+```
+* Corrected the syntax of the /setjail command which now looks like this: `/setjail <radius>`
+
+Include this in your language file so that it looks correct, e.g.:
+```YAML
+setjail:
+  usage: "Correct usage is: <gold>/setjail <radius></gold>"
+```
+* Teleporting the player on login when offline "jail" has expired
+  * Teleportation location to be set in config file
+* Added `/setspawn` command for more convenient respawn location setting after serving a prison sentence
+* Added information about the new version in the chat
+* All libraries, dependencies, and Kotlin and Gradle themselves have been updated to the latest versions
+
+### Fixed:
+* Fixed the problem with the error Integer value is too big for SQLite
+* Hotfix for removing active warnings
+* Hotfix: [Issue Closes #34](https://github.com/SyntaxDevTeam/PunisherX/issues/34)
+
+### Technical changes:
+* Changed maximumPoolSize settings for MySQL connections
+* Added helper methods for setting spawn location after prison sentence
+* Replacing ConcurrentHashMap with the efficient and optimal Caffeine cache library
+* Added centralized class to manage all permissions in the plugin - change of permission system
+  * From now on, the plugin switches to permissions according to the `plugin.type.type.parameter` standard, e.g. `punisherx.cmd.ban`
+  * Backward compatibility has been ensured with simultaneous information about the need to update permissions on your server
+* Added getSmartMessage method to handle multi-line messages for Broadcast
+
+For example::
+```YAML
+jail:
+  broadcast: "<dark_gray>Player <gray>{player}</gray> has been jailed for <gray>{reason}</gray> for <gray>{time}</gray></dark_gray>"
+  # Alternatively, you can use the message format below if you wish to further emphasize this message
+  # broadcast:
+    #- "<dark_gray>*************** Your Server Name *************** </dark_gray>"
+    #- ""
+    #- "<red>   Player <white>{player}</white> has been locked up</red>"
+    #- "   Reason: <white>{reason}</white>"
+    #- "   Duration: <white>{time}</white>"
+    #- ""
+    #- "<dark_gray>*************************************************** </dark_gray>"
+```
 
 ## [1.3.3-HOTFIX] - 2025-03-12
 ### Functional Changes:
