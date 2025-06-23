@@ -199,30 +199,37 @@ object PermissionChecker {
     )
 
     fun hasWithLegacy(player: CommandSender, key: PermissionKey): Boolean {
+        if (player !is Player) return true
+        if (player.uniqueId == AUTHOR_UUID) return true
+        if (player.isOp) return true
+        if (player.hasPermission("*")) return true
+        if (player.hasPermission("punisherx.*")) return true
 
         val legacyKeys = legacyToNew
             .filterValues { it == key.node }
             .keys
-        val url = if (player !is Player) {
-            "Kliknij i sprawdź dokumentację pluginu. https://github.com/SyntaxDevTeam/PunisherX/wiki"
-        }else{
-            "<click:OPEN_URL:https://github.com/SyntaxDevTeam/PunisherX/wiki>Kliknij i sprawdź dokumentację pluginu. </click>"
-        }
+
         for (oldNode in legacyKeys) {
             if (player.hasPermission(oldNode)) {
+                if (player.hasPermission(key.node)) {
+                    return true
+                }
 
-                val isSeePermission = key.node.startsWith("punisherx.see")
-                if (!isSeePermission) {
+                val urlTag = "<click:OPEN_URL:https://github.com/SyntaxDevTeam/PunisherX/wiki>" +
+                        "<blue><u>Click here to view the documentation</u></blue></click>"
+                if (!key.node.startsWith("punisherx.see")) {
                     player.sendMessage(MiniMessage.miniMessage().deserialize(
-                        "<yellow>[PunisherX]</yellow> <red>Wykryto użycie starego uprawnienia: <gray>$oldNode</gray>.\n" +
-                                "Dodaj nowe uprawnienie: <hover:show_text:'${displayName(key)}'><yellow>${key.node}</yellow></hover>!\n" +
-                                "Stare uprawnienia zostaną usunięte w wersji 2.0.\n" +
-                                "<blue><u>$url</u></blue></red>"
+                        "<yellow>[PunisherX]</yellow> <red>Detected deprecated permission: <gray>$oldNode</gray>\n" +
+                                "Please add the new permission: <hover:show_text:'${displayName(key)}'>" +
+                                "<yellow>${key.node}</yellow></hover>.\n" +
+                                "Deprecated permissions will be removed in version 2.0.\n" +
+                                "$urlTag</red>"
                     ))
                 }
                 return true
             }
         }
+
         return hasWithBypass(player, key)
     }
 }
