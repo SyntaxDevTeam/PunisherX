@@ -2,7 +2,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.2.0-RC3"
+    kotlin("jvm") version "2.2.0"
     id("com.gradleup.shadow") version "9.0.0-beta17"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.4.1-DEV"
+version = "1.4.2-DEV"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val targetJavaVersion = 21
@@ -36,24 +36,24 @@ dependencies {
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.4")
     compileOnly("com.google.code.gson:gson:2.13.1")
-    compileOnly("net.kyori:adventure-text-serializer-legacy:4.22.0")
-    compileOnly("net.kyori:adventure-text-minimessage:4.22.0")
-    compileOnly("net.kyori:adventure-text-serializer-gson:4.22.0")
-    compileOnly("net.kyori:adventure-text-serializer-plain:4.22.0")
-    compileOnly("net.kyori:adventure-text-serializer-ansi:4.22.0")
+    compileOnly("net.kyori:adventure-text-serializer-legacy:4.23.0")
+    compileOnly("net.kyori:adventure-text-minimessage:4.23.0")
+    compileOnly("net.kyori:adventure-text-serializer-gson:4.23.0")
+    compileOnly("net.kyori:adventure-text-serializer-plain:4.23.0")
+    compileOnly("net.kyori:adventure-text-serializer-ansi:4.23.0")
     compileOnly("com.maxmind.geoip2:geoip2:4.3.1")
     compileOnly("org.apache.ant:ant:1.10.15")
     compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.3")
-    compileOnly("org.xerial:sqlite-jdbc:3.49.1.0")
-    compileOnly("org.postgresql:postgresql:42.7.6")
+    compileOnly("org.xerial:sqlite-jdbc:3.50.1.0")
+    compileOnly("org.postgresql:postgresql:42.7.7")
     compileOnly("com.h2database:h2:2.3.232")
     compileOnly("com.zaxxer:HikariCP:6.3.0")
     compileOnly("net.luckperms:api:5.5")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:2.3.0")
     compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
-    compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.11")
-    compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.0")
+    compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.12")
+    compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.1")
 }
 
 tasks {
@@ -84,7 +84,7 @@ tasks.processResources {
 // ShadowJar configuration
 tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
     archiveBaseName.set("PunisherX")
-    archiveClassifier.set("")      // usuwa domyślne "-all"
+    archiveClassifier.set("")
     archiveVersion.set(project.version.toString())
     mergeServiceFiles()
 }
