@@ -34,6 +34,7 @@ class MessageHandler(private val plugin: PunisherX) {
             "fr" -> "OpenAI ChatGPT-3.5"
             "es" -> "OpenAI ChatGPT-3.5"
             "de" -> "OpenAI ChatGPT-3.5"
+            "ru" -> "marat2509"
             else -> plugin.getServerName()
         }
         plugin.logger.log("<gray>Loaded \"$language\" language file by: <white><b>$author</b></white>")
