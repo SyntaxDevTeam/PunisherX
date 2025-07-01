@@ -675,7 +675,7 @@ fun countAllPunishmentHistory(): Int {
             } ?: throw SQLException("No connection available")
         } catch (e: SQLException) {
             plugin.logger.err("Failed to get banned players: ${e.message}")
-        } catch (e: IllegalArgumentException) {
+        } catch (_: IllegalArgumentException) {
             plugin.logger.err("Unsupported database type: $dbType")
         }
 
@@ -738,7 +738,7 @@ fun countAllPunishmentHistory(): Int {
             } ?: throw SQLException("No connection available")
         } catch (e: SQLException) {
             plugin.logger.err("Failed to get banned players: ${e.message}")
-        } catch (e: IllegalArgumentException) {
+        } catch (_: IllegalArgumentException) {
             plugin.logger.err("Unsupported database type: $dbType")
         }
 
