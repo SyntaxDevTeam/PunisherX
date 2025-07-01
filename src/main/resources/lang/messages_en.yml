@@ -14,6 +14,7 @@ error:
   player_not_punished: "<gold>Player {player} does not have such a punishment.</gold>"
   reload: "<red>An error occurred while reloading the configuration:</red> "
   bypass: "<red><b>WARNING!</b> Player <gold>{player}<gold/> <red>cannot be punished due to their permissions (OP or bypass).</red><dark_gray>Maybe this could be bypassed..."
+  db_error: "An error occurred while adding the punishment to the database. Using fallback method. Check the console!"
 
 # /setjail command messages
 setjail:

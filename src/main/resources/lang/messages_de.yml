@@ -15,6 +15,8 @@ error:
   player_not_punished: "<gold>Der Spieler {player} hat keine solche Strafe.</gold>"
   reload: "<red>Beim Neuladen der Konfiguration ist ein Fehler aufgetreten:</red> "
   bypass: "<red><b>ACHTUNG!</b> Spieler <gold>{player}<gold/> <red>kann aufgrund seiner Berechtigungen (OP oder Bypass) nicht bestraft werden.</red><dark_gray>Vielleicht könnte dies umgangen werden..."
+  db_error: "Beim Hinzufügen der Strafe zur Datenbank ist ein Fehler aufgetreten. Fallback-Methode wird verwendet. Überprüfe die Konsole!"
+
 
 # Nachrichten des Befehls /setjail
 setjail:
