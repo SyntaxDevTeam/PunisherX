@@ -15,7 +15,7 @@ error:
   db_error: "Wystąpił błąd przy dodawaniu kary do bazy danych. Korzystanie z metody zapasowej. Sprawdź konsolę!"
   console: "<red>Tylko gracz może użyć tej komendy</red>"
   reload: "<red>Wystąpił błąd podczas przełądowania konfiguracji:</red> "
-  bypass: "<red><b>UWAGA!</b> Gracz <gold>{player}<gold/> <red>nie może otrzymać kary, ze zględu na swoje uprawnienia (OP lub bypass).</red><dark_gray>Może dało by się to obejść..."
+  bypass: "<red><b>UWAGA!</b> Gracz <gold>{player}</gold> <red>nie może otrzymać kary, ze zględu na swoje uprawnienia (OP lub bypass).</red><dark_gray>Może dało by się to obejść..."
 
 # Wiadomości komendy /setjail
 setjail:
@@ -27,7 +27,7 @@ setjail:
 # Wiadomości komendy /setspawn
 setspawn:
     usage: "Poprawne użycie to: <gold>/setspawn</gold>"
-    set: "<green>Lokalizacja więzienia została ustawiona: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>]</green>"
+    set: "<green>Lokalizacja respawnu została ustawiona: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>]</green>"
     set_error: "<red>Nie udało się ustawić lokalizacji więzienia</red>"
 
 # Wiadomości komendy /jail
@@ -90,7 +90,7 @@ ban:
     #- "<dark_gray>*************************************************** </dark_gray>"
   no_reasons: "bez powodu"
   reasons: # Dodaj własne powody jakie będą podpowiadane w trakcie wykonywania komendy
-    - "Oszystwo"
+    - "Oszustwo"
     - "Griefing"
     - "Spamowanie"
     - "Wulgarny język"
