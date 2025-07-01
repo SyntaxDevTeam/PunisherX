@@ -16,6 +16,8 @@ error:
   player_not_punished: "<gold>El jugador {player} no tiene ese castigo.</gold>"
   reload: "<red>Ocurrió un error al recargar la configuración:</red>"
   bypass: "<red><b>¡ADVERTENCIA!</b> El jugador <gold>{player}<gold/> <red>no puede ser castigado debido a sus permisos (OP o bypass).</red><dark_gray>Quizás esto podría ser evitado..."
+  db_error: "Se produjo un error al agregar el castigo a la base de datos. Usando método de respaldo. ¡Consulta la consola!"
+
 
 # Mensajes del comando /setjail
 setjail:
