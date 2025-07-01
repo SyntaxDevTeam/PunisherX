@@ -16,12 +16,13 @@ import pl.syntaxdevteam.punisher.databases.*
 import pl.syntaxdevteam.punisher.players.*
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
+import pl.syntaxdevteam.punisher.listeners.LegacyLoginListener
+import pl.syntaxdevteam.punisher.listeners.ModernLoginListener
 import pl.syntaxdevteam.punisher.loader.VersionChecker
 import pl.syntaxdevteam.punisher.placeholders.PlaceholderHandler
 import java.io.File
 import java.util.*
 
-@Suppress("UnstableApiUsage")
 class PunisherX : JavaPlugin(), Listener {
     private val config: FileConfiguration = getConfig()
     var logger: Logger = Logger(this, config.getBoolean("debug"))
@@ -42,9 +43,11 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var punisherXApi: PunisherXApi
     lateinit var discordWebhook: DiscordWebhook
     lateinit var hookHandler: HookHandler
+    lateinit var versionChecker: VersionChecker
 
     override fun onLoad() {
-        VersionChecker(this).checkAndLog()
+        versionChecker = VersionChecker(this)
+        versionChecker.checkAndLog()
     }
     /**
      * Called when the plugin is enabled.
@@ -124,6 +127,13 @@ class PunisherX : JavaPlugin(), Listener {
     private fun registerEvents() {
         server.pluginManager.registerEvents(playerIPManager, this)
         server.pluginManager.registerEvents(PunishmentChecker(this), this)
+        if (versionChecker.isAtLeast("1.21.7")) {
+            server.pluginManager.registerEvents(ModernLoginListener(this), this)
+            logger.debug("Registered ModernLoginListener for 1.21.7+")
+        } else {
+            server.pluginManager.registerEvents(LegacyLoginListener(this), this)
+            logger.debug("Registered LegacyLoginListener for pre-1.21.7")
+        }
         server.servicesManager.register(PunisherXApi::class.java, punisherXApi, this, ServicePriority.Normal)
         if (hookHandler.checkPlaceholderAPI()) {
             PlaceholderHandler(this).register()
