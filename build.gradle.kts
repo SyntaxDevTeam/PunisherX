@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.4.2-DEV"
+version = "1.4.2"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val targetJavaVersion = 21
@@ -32,7 +32,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.7-R0.1-SNAPSHOT")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.4")
     compileOnly("com.google.code.gson:gson:2.13.1")
@@ -64,7 +64,7 @@ tasks {
 
 tasks {
     runServer {
-        minecraftVersion("1.21.5")
+        minecraftVersion("1.21.7")
         runDirectory(file("run/latest"))
     }
 }
