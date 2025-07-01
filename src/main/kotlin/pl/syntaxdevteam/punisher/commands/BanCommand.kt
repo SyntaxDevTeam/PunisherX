@@ -11,7 +11,6 @@ import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.*
 
-@Suppress("UnstableApiUsage")
 class BanCommand(private var plugin: PunisherX) : BasicCommand {
     private val clp = plugin.commandLoggerPlugin
 
@@ -53,13 +52,12 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
 
                     val success = plugin.databaseHandler.addPunishment(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
                     if (!success) {
+                        plugin.logger.err("Failed to add ban to database for player $player. Using fallback method.")
+                        stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "db_error"))
                         val playerProfile = Bukkit.createProfile(UUID.fromString(uuid.toString()), player)
                         val banList: ProfileBanList = Bukkit.getBanList(BanListType.PROFILE)
                         val banEndDate = if (gtime != null) Date(System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
                         banList.addBan(playerProfile, reason, banEndDate, stack.sender.name)
-                    }else{
-                        plugin.logger.err("Failed to add ban to database for player $player. Using fallback method.")
-                        return
                     }
                     clp.logCommand(stack.sender.name, punishmentType, player, reason)
                     plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
