@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
-@Suppress("UnstableApiUsage")
 class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
     private val clp = plugin.commandLoggerPlugin
 
@@ -68,6 +67,8 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
 
                     val success = plugin.databaseHandler.addPunishment(playerOrIpOrUUID, playerIP, reason, stack.sender.name, punishmentType, start, end ?: -1)
                     if (!success) {
+                        plugin.logger.err("Failed to add ban to database for $playerOrIpOrUUID. Using fallback method.")
+                        stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "db_error"))
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban-ip $playerOrIpOrUUID")
                     }
                     clp.logCommand(stack.sender.name, punishmentType, playerOrIpOrUUID, reason)
