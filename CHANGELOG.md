@@ -1,4 +1,11 @@
 # Changelog
+## [1.4.2] 
+
+## [1.4.1] - 2025-06-24
+### Changes:
+* Fixed a logical error in permissions checking.
+* Updated libraries and dependencies
+* Added support for version 1.21.6
 
 ## [1.4.0] - 2025-06-06
 ### Functional Changes:
