@@ -113,7 +113,7 @@ mute:
   mute: "<green>Vous avez rendu muet <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold></green>"
   usage: "Utilisation correcte : <gold>/mute <player> (durée) <raison>"
   mute_message: "<red>Vous avez été rendu muet pour <b>{reason}</b> pendant <b>{time}</b></red>"
-  mute_info_message: "<red>Vous essayez de parler mais vous avez été rendu muet</red>"
+  mute_info_message: "<red>Vous essayez de parler mais vous êtes encore réduit(e) au silence pendant {time}</red>"
   broadcast: "<dark_gray>Le joueur <gray>{player}</gray> a été rendu muet pour <gray>{reason}</gray> pendant <gray>{time}</gray></dark_gray>"
   log: "<dark_gray>Le joueur <gray>{player}</gray> <dark_gray>muet a envoyé un message : <gray>{message}</gray>"
   no_reasons: "sans raison"

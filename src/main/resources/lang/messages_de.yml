@@ -112,7 +112,7 @@ mute:
   mute: "<green>Du hast Spieler <gold>{player}</gold> für <gold>{reason}</gold> für <gold>{time}</gold> stummgeschaltet</green>"
   usage: "Korrekte Verwendung: <gold>/mute <player> (Dauer) <Grund>"
   mute_message: "<red>Du wurdest für <b>{reason}</b> für <b>{time}</b> stummgeschaltet</red>"
-  mute_info_message: "<red>Du versuchst zu sprechen, aber du bist stummgeschaltet</red>"
+  mute_info_message: "<red>Du versuchst zu sprechen, bist aber noch für {time} stummgeschaltet</red>"
   broadcast: "<dark_gray>Spieler <gray>{player}</gray> wurde für <gray>{reason}</gray> für <gray>{time}</gray> stummgeschaltet</dark_gray>"
   log: "<dark_gray>Stummer Spieler <gray>{player}</gray> <dark_gray>hat eine Nachricht gesendet: <gray>{message}</gray>"
   no_reasons: "ohne Grund"

@@ -111,7 +111,7 @@ mute:
   mute: "<green>Je hebt speler <gold>{player}</gold> gemute voor <gold>{reason}</gold> voor <gold>{time}</green>"
   usage: "Correct gebruik is: <gold>/mute <speler> (tijd) <reden>"
   mute_message: "<red>Je bent gemute voor <b>{reason}</b> voor <b>{time}</b></red>"
-  mute_info_message: "<red>Je probeert te spreken maar je bent gemute</red>"
+  mute_info_message: "<red>Je probeert iets te zeggen, maar je bent nog {time} gedempt</red>"
   broadcast: "<dark_gray>Speler <gray>{player}</gray> is gemute voor <gray>{reason}</gray> voor <gray>{time}</gray></dark_gray>"
   log: "<dark_gray>Gemute speler <gray>{player}</gray> <dark_gray>stuurde een bericht: <gray>{message}</gray>"
   no_reasons: "geen reden"

@@ -113,7 +113,7 @@ mute:
   mute: "<green>Has silenciado a <gold>{player}</gold> por <gold>{reason}</gold> durante <gold>{time}</gold></green>"
   usage: "Uso correcto: <gold>/mute <player> (duración) <razón>"
   mute_message: "<red>Has sido silenciado/a por <b>{reason}</b> durante <b>{time}</b></red>"
-  mute_info_message: "<red>Intentas hablar, pero has sido silenciado/a</red>"
+  mute_info_message: "<red>Estás intentando hablar pero sigues silenciado/a durante {time}</red>"
   broadcast: "<dark_gray>El jugador <gray>{player}</gray> ha sido silenciado por <gray>{reason}</gray> durante <gray>{time}</gray></dark_gray>"
   log: "<dark_gray>El jugador <gray>{player}</gray> <dark_gray>silenciado envió un mensaje: <gray>{message}</gray>"
   no_reasons: "sin razón"

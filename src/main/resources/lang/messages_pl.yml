@@ -129,7 +129,7 @@ mute:
   mute: "<green>Wyciszyłeś gracza <gold>{player}</gold> za <gold>{reason}</gold> na czas <gold>{time}</green>"
   usage: "Poprawne użycie to: <gold>/mute <nazwa_gracza> (time) <reason>"
   mute_message: "<red>Zostałeś/aś wyciszony/a za <b>{reason}</b> na czas <b>{time}</b></red>"
-  mute_info_message: "<red>Próbujesz coś powiedzieć ale zostałeś/aś wyciszony/a</red>"
+  mute_info_message: "<red>Próbujesz coś powiedzieć ale jesteś wyciszony/a jeszcze przez {time}</red>"
   broadcast: "<dark_gray>Gracz <gray>{player}</gray> został wyciszony za <gray>{reason}</gray> na czas <gray>{time}</gray></dark_gray>"
     # Alternatywnie możesz użyć poniższego formatu wiadomości, jeśli chcesz bardziej uwydatnić ten komunikat
   # broadcast:
