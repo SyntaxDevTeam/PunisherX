@@ -15,8 +15,7 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
     private val clp = plugin.commandLoggerPlugin
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-    val sender = stack.source().bukkitSender
-        if (!PermissionChecker.hasWithLegacy(sender, PermissionKey.BAN)) {
+    if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN)) {  
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
                     stack.sender.sendMessage(plugin.messageHandler.getMessage("ban", "usage"))
