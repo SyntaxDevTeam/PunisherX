@@ -116,7 +116,7 @@ object PermissionChecker {
     }
 
     fun has(player: CommandSender, key: PermissionKey): Boolean {
-        if (player !is Player) return true
+        if (player is ConsoleCommandSender) return true
         if (player.isOp) return true
         if (player.hasPermission("*")) return true
         if (player.hasPermission("punisherx.*")) return true
@@ -127,7 +127,7 @@ object PermissionChecker {
 
 
     fun hasWithBypass(player: CommandSender, key: PermissionKey): Boolean {
-        if (player !is Player) return true
+        if (player is ConsoleCommandSender) return true
         if (player.uniqueId == AUTHOR_UUID) return true
         if (player.isOp) return true
         if (player.hasPermission("punisherx.cmd.*")) return true
@@ -135,7 +135,7 @@ object PermissionChecker {
     }
 
     fun hasWithManage(player: CommandSender, key: PermissionKey): Boolean {
-        if (player !is Player) return true
+        if (player is ConsoleCommandSender) return true
         if (player.uniqueId == AUTHOR_UUID) return true
         if (player.isOp) return true
         if (player.hasPermission("punisherx.manage.*")) return true
@@ -143,7 +143,7 @@ object PermissionChecker {
     }
 
     fun hasWithSee(player: CommandSender, key: PermissionKey): Boolean {
-        if (player !is Player) return true
+        if (player is ConsoleCommandSender) return true
         if (player.uniqueId == AUTHOR_UUID) return true
         if (player.isOp) return true
         if (player.hasPermission("punisherx.see.*")) return true
@@ -199,7 +199,7 @@ object PermissionChecker {
     )
 
     fun hasWithLegacy(player: CommandSender, key: PermissionKey): Boolean {
-        if (player !is Player) return true
+        if (player is ConsoleCommandSender) return true
         if (player.uniqueId == AUTHOR_UUID) return true
         if (player.isOp) return true
         if (player.hasPermission("*")) return true
