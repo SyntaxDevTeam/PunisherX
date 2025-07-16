@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
-@Suppress("UnstableApiUsage")
 class KickCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {

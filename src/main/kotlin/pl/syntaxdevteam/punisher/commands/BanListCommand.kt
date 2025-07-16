@@ -8,7 +8,6 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.text.SimpleDateFormat
 import java.util.*
 
-@Suppress("UnstableApiUsage")
 class BanListCommand(private val plugin: PunisherX) : BasicCommand {
 
     private val dateFormat = SimpleDateFormat("yy-MM-dd HH:mm:ss")

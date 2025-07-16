@@ -8,7 +8,6 @@ import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.players.PlayerIPManager
 
-@Suppress("UnstableApiUsage")
 class CheckCommand(private val plugin: PunisherX, private val playerIPManager: PlayerIPManager) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {

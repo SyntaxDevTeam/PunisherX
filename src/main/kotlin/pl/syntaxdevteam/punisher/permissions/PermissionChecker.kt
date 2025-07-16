@@ -29,7 +29,6 @@ object PermissionChecker { private val AUTHOR_UUID: UUID = UUID.fromString("248e
         HISTORY("punisherx.cmd.history"),
         CLEAR_ALL("punisherx.cmd.clear_all"),
 
-        // Administracyjne
         BYPASS("punisherx.bypass"),
         BYPASS_WARN("punisherx.bypass.warn"),
         BYPASS_MUTE("punisherx.bypass.mute"),
@@ -162,7 +161,6 @@ fun hasWithSee(sender: CommandSender, key: PermissionKey): Boolean {
     fun canManage(player: Player) = has(player, PermissionKey.MANAGE)
     fun canSee(player: Player) = has(player, PermissionKey.SEE)
 
-    // Mapowanie starych uprawnień na nowe
     private val legacyToNew = mapOf(
         "punisherx.warn"            to PermissionKey.WARN.node,
         "punisherx.unwarn"          to PermissionKey.UNWARN.node,
@@ -225,7 +223,6 @@ fun hasWithSee(sender: CommandSender, key: PermissionKey): Boolean {
                 return true
             }
         }
-
         return hasWithBypass(sender, key)
     }
 }

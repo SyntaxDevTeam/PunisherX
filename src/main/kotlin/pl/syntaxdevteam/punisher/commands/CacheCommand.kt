@@ -5,7 +5,6 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 
-@Suppress("UnstableApiUsage")
 class CacheCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {

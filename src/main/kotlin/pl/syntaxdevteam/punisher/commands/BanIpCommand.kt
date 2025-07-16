@@ -14,7 +14,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
 
-        if(!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BANIP)) {
+        if(PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BANIP)) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
                     stack.sender.sendMessage(plugin.messageHandler.getMessage("banip", "usage"))
@@ -44,11 +44,11 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
                             )
                             return
                         }
-                    }
+                    }/*
                     if(PermissionChecker.isAuthor(uuid)){
                         stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("<red>You can't punish the plugin author</red>"))
                         return
-                    }
+                    }*/
 
                     var gtime: String?
                     var reason: String
