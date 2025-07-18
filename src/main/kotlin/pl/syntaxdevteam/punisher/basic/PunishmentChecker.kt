@@ -5,6 +5,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -22,39 +23,88 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerJoin(event: PlayerJoinEvent) {
-        val player = event.player
-        val radius = plugin.config.getDouble("jail.radius", 10.0)
+        val player    = event.player
+        val name      = player.name
+        val uuid      = plugin.uuidManager.getUUID(name).toString()
+        val radius    = plugin.config.getDouble("jail.radius", 10.0)
+        val jailLoc   = JailUtils.getJailLocation(plugin.config)
+        val unjailLoc = JailUtils.getUnjailLocation(plugin.config)
 
-        Bukkit.getScheduler().runTaskLater(plugin, Runnable {
-            if (!player.isOnline) return@Runnable
+        // 1. Sprawdź, czy gracz ma aktywną karę JAIL
+        val punishments = plugin.databaseHandler.getPunishments(uuid)
+        val isJailed = punishments.any { it.type == "JAIL" && plugin.punishmentManager.isPunishmentActive(it) }
 
-            val jailLoc   = JailUtils.getJailLocation(plugin.config)
-            val unjailLoc = JailUtils.getUnjailLocation(plugin.config)
-            if (jailLoc == null || unjailLoc == null) {
-                plugin.logger.warning("Jail lub unjail location niezdefiniowane!")
-                return@Runnable
+        if (jailLoc == null || unjailLoc == null) {
+            plugin.logger.warning("Jail lub unjail location niezdefiniowane!")
+        } else {
+
+            val (targetLoc, targetMode) = when {
+                isJailed -> {
+                    jailLoc   to GameMode.ADVENTURE
+                }
+                isPlayerInJail(player.location, jailLoc, radius) -> {
+                    unjailLoc to GameMode.SURVIVAL
+                }
+                else -> {
+                    return
+                }
             }
 
-            plugin.logger.debug("DBG: Player at ${player.location}, jail at $jailLoc, radius $radius")
+            scheduleTeleport(player, targetLoc, targetMode)
+            plugin.logger.debug("Scheduling teleport of $name to $targetLoc with gamemode $targetMode (jailed=$isJailed)")
+        }
 
-            if (isPlayerInJail(player.location, jailLoc, radius)) {
-                plugin.logger.debug("DBG: teleporting ${player.name} → $unjailLoc")
-                player.teleport(unjailLoc)
-                player.gameMode = GameMode.SURVIVAL
-                plugin.logger.debug("Player ${player.name} był w obszarze jail po joinie – przeniesiony na unjail")
-            }else{
-                if (!plugin.cache.isPunishmentActive(player.uniqueId)) return@Runnable
-                if (!jailLoc.chunk.isLoaded) jailLoc.chunk.load()
-                player.teleport(jailLoc)
-                player.gameMode = GameMode.ADVENTURE
-            }
-
-        }, 1L)
         if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.SEE_UPDATE)) {
             updateChecker.checkForUpdatesForPlayer(player)
-            plugin.logger.debug("Checking for updates for player: ${player.name}")
-        }else{
-            plugin.logger.debug("Player ${player.name} does not have permission to see updates.")
+            plugin.logger.debug("Checking for updates for player: $name")
+        } else {
+            plugin.logger.debug("Player $name does not have permission to see updates.")
+        }
+    }
+
+    private fun scheduleTeleport(player: Player, targetLoc: Location, mode: GameMode) {
+        val world = targetLoc.world ?: run {
+            plugin.logger.warning("Brak świata dla $targetLoc")
+            return
+        }
+
+        if (plugin.server.name.contains("Folia")) {
+            Bukkit.getServer().regionScheduler.execute(plugin, targetLoc) {
+                world.getChunkAtAsync(targetLoc.blockX shr 4, targetLoc.blockZ shr 4).thenRun {
+                    Bukkit.getServer().globalRegionScheduler.execute(plugin) {
+                        player.teleportAsync(targetLoc).thenAccept { success ->
+                            if (success) {
+                                player.gameMode = mode
+                                plugin.logger.debug("Player ${player.name} teleported to $targetLoc and set to $mode")
+                            } else {
+                                plugin.logger.debug("<red>Failed to teleport ${player.name} to $targetLoc.</red>")
+                            }
+                        }.exceptionally { thr ->
+                            plugin.logger.debug("<red>Teleportation error: ${thr.message}</red>")
+                            null
+                        }
+                    }
+                }.exceptionally { thr ->
+                    plugin.logger.debug("<red>Chunk load error: ${thr.message}</red>")
+                    null
+                }
+            }
+        } else {
+            val chunk = world.getChunkAt(targetLoc.blockX shr 4, targetLoc.blockZ shr 4)
+            if (!chunk.isLoaded) {
+                try {
+                    chunk.load(true)
+                } catch (e: Exception) {
+                    plugin.logger.debug("<red>Error loading chunk for ${player.name}: ${e.message}</red>")
+                }
+            }
+            try {
+                player.teleport(targetLoc)
+                player.gameMode = mode
+                plugin.logger.debug("<green>Player ${player.name} teleported to $targetLoc and set to $mode.</green>")
+            } catch (e: Exception) {
+                plugin.logger.debug("<red>Error while teleporting ${player.name}: ${e.message}</red>")
+            }
         }
     }
 
