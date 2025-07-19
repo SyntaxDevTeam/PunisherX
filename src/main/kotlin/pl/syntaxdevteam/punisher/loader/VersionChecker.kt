@@ -16,7 +16,8 @@ class VersionChecker(private val plugin: PunisherX) {
             "1.21.4",
             "1.21.5",
             "1.21.6",
-            "1.21.7"
+            "1.21.7",
+            "1.21.8"
         )
     }
 
@@ -40,19 +41,12 @@ class VersionChecker(private val plugin: PunisherX) {
         }
     }
 
-    /**
-     * Sprawdza, czy aktualna wersja serwera jest równa lub wyższa niż podana minimalna wersja.
-     */
     fun isAtLeast(minVersion: String): Boolean {
         val current = getServerVersion().normalizeVersion()
         val required = minVersion.normalizeVersion()
         return compareVersions(current, required) >= 0
     }
 
-    /**
-     * Porównuje dwie listy wersji numerycznie.
-     * Zwraca -1 jeśli a < b, 0 jeśli a == b, 1 jeśli a > b
-     */
     private fun compareVersions(a: List<Int>, b: List<Int>): Int {
         for (i in 0..2) {
             val cmp = a.getOrElse(i) { 0 }.compareTo(b.getOrElse(i) { 0 })
@@ -61,9 +55,6 @@ class VersionChecker(private val plugin: PunisherX) {
         return 0
     }
 
-    /**
-     * Normalizuje wersję do formatu List<Int> o długości 3: [major, minor, patch]
-     */
     private fun String.normalizeVersion(): List<Int> {
         return this.split(".")
             .map { it.toIntOrNull() ?: 0 }
