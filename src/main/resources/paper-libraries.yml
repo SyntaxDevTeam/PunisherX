@@ -10,8 +10,8 @@ libraries:
   - com.maxmind.geoip2:geoip2:4.3.1
   - org.apache.ant:ant:1.10.15
   - org.mariadb.jdbc:mariadb-java-client:3.5.4
-  - org.xerial:sqlite-jdbc:3.50.2.0
+  - org.xerial:sqlite-jdbc:3.50.3.0
   - org.postgresql:postgresql:42.7.7
   - com.h2database:h2:2.3.232
-  - com.zaxxer:HikariCP:6.3.0
+  - com.zaxxer:HikariCP:6.3.2
   - com.github.ben-manes.caffeine:caffeine:3.2.2
