@@ -6,12 +6,10 @@ import com.destroystokyo.paper.profile.PlayerProfile
 import io.papermc.paper.connection.PlayerLoginConnection
 import io.papermc.paper.event.connection.PlayerConnectionValidateLoginEvent
 import net.kyori.adventure.text.Component
-import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 class ModernLoginListener(private val plugin: PunisherX) : Listener {
 
