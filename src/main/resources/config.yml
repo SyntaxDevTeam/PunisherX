@@ -82,6 +82,7 @@ spawn:
     z: 0.0
   # Experimental setting (may not work properly).
   use_external_set:
+    enabled: false
     # Available options: essx (EssentialsX), world (default world spawn point).
     set: world
 
