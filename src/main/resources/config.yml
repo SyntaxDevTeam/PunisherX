@@ -1,4 +1,4 @@
-### Config version 1.1.0
+### Config version 1.1.1
 
 # /********************************************/
 #    Settings for connecting to the database
@@ -33,35 +33,36 @@ warn:
     10: "ban {player} You have received your 10th warning!"
 
 # Should private messages also be blocked when MUTE penalty is applied?
-mute_pm: false
-# If you set mute_pm to TRUE, you can edit which commands for private messages should be blocked here
-mute_cmd:
-  - 'me'
-  - 'say'
-  - 'action'
-  - 'eaction'
-  - 'describe'
-  - 'edescribe'
-  - 'eme'
-  - 'w'
-  - 'm'
-  - 'pm'
-  - 'whisper'
-  - 'ewhisper'
-  - 'emsg'
-  - 'msg'
-  - 'etell'
-  - 'tell'
-  - 'er'
-  - 'r'
-  - 'reply'
-  - 'ereply'
-  - 'ac'
-  - 'eac'
-  - 'amsg'
-  - 'eamsg'
-  - 'ehelpop'
-  - 'p msg'
+mute:
+  pm: false
+  # If you set mute_pm to TRUE, you can edit which commands for private messages should be blocked here
+  cmd:
+    - 'me'
+    - 'say'
+    - 'action'
+    - 'eaction'
+    - 'describe'
+    - 'edescribe'
+    - 'eme'
+    - 'w'
+    - 'm'
+    - 'pm'
+    - 'whisper'
+    - 'ewhisper'
+    - 'emsg'
+    - 'msg'
+    - 'etell'
+    - 'tell'
+    - 'er'
+    - 'r'
+    - 'reply'
+    - 'ereply'
+    - 'ac'
+    - 'eac'
+    - 'amsg'
+    - 'eamsg'
+    - 'ehelpop'
+    - 'p msg'
 
 # Settings for the location of the prison center along with the radius of that prison.
 jail:

@@ -162,8 +162,8 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             val uuid = plugin.uuidManager.getUUID(player.name).toString()
             val command = event.message.split(" ")[0].lowercase(Locale.getDefault()).removePrefix("/")
 
-            if (plugin.config.getBoolean("mute_pm")) {
-                val muteCommands = plugin.config.getStringList("mute_cmd")
+            if (plugin.config.getBoolean("mute.pm")) {
+                val muteCommands = plugin.config.getStringList("mute.cmd")
                 if (muteCommands.contains(command)) {
                     val punishments = plugin.databaseHandler.getPunishments(uuid)
                     punishments.forEach { punishment ->
