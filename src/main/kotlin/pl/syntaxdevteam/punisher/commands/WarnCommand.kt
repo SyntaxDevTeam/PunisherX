@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
-@Suppress("UnstableApiUsage")
 class WarnCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
@@ -86,11 +85,11 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     private fun executeWarnAction(player: String, warnCount: Int) {
-        val warnActions = plugin.config.getConfigurationSection("WarnActions")?.getKeys(false)
+        val warnActions = plugin.config.getConfigurationSection("warn.actions")?.getKeys(false)
         warnActions?.forEach { key ->
             val warnThreshold = key.toIntOrNull()
             if (warnThreshold != null && warnCount == warnThreshold) {
-                val command = plugin.config.getString("WarnActions.$key")
+                val command = plugin.config.getString("warn.actions.$key")
                 if (command != null) {
                     val formattedCommand = command.replace("{player}", player).replace("{warn_no}", warnCount.toString())
                     plugin.server.dispatchCommand(plugin.server.consoleSender, formattedCommand)
