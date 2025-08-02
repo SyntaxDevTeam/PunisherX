@@ -25,13 +25,17 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
     fun onPlayerJoin(event: PlayerJoinEvent) {
         val player    = event.player
         val name      = player.name
-        val uuid      = plugin.uuidManager.getUUID(name).toString()
+        val uuid      = plugin.uuidManager.getUUID(name)
         val radius    = plugin.config.getDouble("jail.radius", 10.0)
         val jailLoc   = JailUtils.getJailLocation(plugin.config)
         val unjailLoc = JailUtils.getUnjailLocation(plugin.config)
-
-        // 1. Sprawdź, czy gracz ma aktywną karę JAIL
-        val punishments = plugin.databaseHandler.getPunishments(uuid)
+        if (PermissionChecker.isAuthor(uuid)) {
+            player.sendMessage(
+                plugin.messageHandler
+                    .formatMixedTextToMiniMessage(plugin.messageHandler.getPrefix() + " <green>Witaj, <b>WieszczY!</b> Ten serwer używa Twojego pluginu! :)")
+            )
+        }
+        val punishments = plugin.databaseHandler.getPunishments(uuid.toString())
         val isJailed = punishments.any { it.type == "JAIL" && plugin.punishmentManager.isPunishmentActive(it) }
 
         if (jailLoc == null || unjailLoc == null) {
