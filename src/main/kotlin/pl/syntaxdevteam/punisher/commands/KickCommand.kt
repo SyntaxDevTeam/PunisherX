@@ -11,6 +11,7 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 class KickCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+        val history: Boolean = plugin.config.getBoolean("kick.history", false)
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.KICK)) {
             stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
             return
@@ -46,16 +47,17 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                     return@forEach
                 }
 
-                // Add history
-                plugin.databaseHandler.addPunishmentHistory(
-                    target.name,
-                    uuid.toString(),
-                    reason,
-                    stack.sender.name,
-                    punishmentType,
-                    start,
-                    start
-                )
+                if(history) {
+                    plugin.databaseHandler.addPunishmentHistory(
+                        target.name,
+                        uuid.toString(),
+                        reason,
+                        stack.sender.name,
+                        punishmentType,
+                        start,
+                        start
+                    )
+                }
 
                 // Kick with message
                 val kickMessages = plugin.messageHandler.getComplexMessage("kick", "kick_message", mapOf("reason" to reason))
@@ -72,7 +74,6 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                 )
             }
 
-            // Broadcast once for all
             val broadcastMessage = plugin.messageHandler.getMessage("kick", "broadcast", mapOf("player" to "all", "reason" to reason))
             plugin.server.onlinePlayers.forEach { onlinePlayer ->
                 if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_KICK)) {
@@ -82,7 +83,6 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        // Single player logic
         val uuid = plugin.uuidManager.getUUID(targetArg)
         val targetPlayer = Bukkit.getPlayer(uuid)
 
@@ -104,18 +104,18 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        // Record history
-        plugin.databaseHandler.addPunishmentHistory(
-            targetArg,
-            uuid.toString(),
-            reason,
-            stack.sender.name,
-            punishmentType,
-            start,
-            start
-        )
+        if(history) {
+            plugin.databaseHandler.addPunishmentHistory(
+                targetArg,
+                uuid.toString(),
+                reason,
+                stack.sender.name,
+                punishmentType,
+                start,
+                start
+            )
+        }
 
-        // Perform kick
         if (targetPlayer != null) {
             val kickMessages = plugin.messageHandler.getComplexMessage("kick", "kick_message", mapOf("reason" to reason))
             val kickMessageBuilder = Component.text()
@@ -125,12 +125,10 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
             targetPlayer.kick(kickMessageBuilder.build())
         }
 
-        // Sender feedback
         stack.sender.sendMessage(
             plugin.messageHandler.getMessage("kick", "kick", mapOf("player" to targetArg, "reason" to reason))
         )
 
-        // Broadcast
         val broadcastMessage = plugin.messageHandler.getMessage("kick", "broadcast", mapOf("player" to targetArg, "reason" to reason))
         plugin.server.onlinePlayers.forEach { onlinePlayer ->
             if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_KICK)) {
