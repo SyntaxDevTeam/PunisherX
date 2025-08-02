@@ -1,4 +1,4 @@
-### Config version 1.1.1
+### Config version 1.2.1
 
 # /********************************************/
 #    Settings for connecting to the database
@@ -8,63 +8,63 @@ database:
   type: "sqlite"
   sql:
     host: "localhost"
-    port: 3306 # 5432 if you use PostgreSQL default for MySQL is 3306
+    port: 3306          # 5432 if you use PostgreSQL; default for MySQL is 3306.
     dbname: "my_database"
     username: "root"
     password: "password"
-
 
 # /********************************************/
 #    Settings for main commands
 # /********************************************/
 
-# Should the "kick" command be recorded in the player's penalty history? Default: false
+# Should the "kick" command be recorded in the player's penalty history? Default: false.
 kick:
   history: false
 
-# Settings for reactions to the number of received warnings
+# Settings for actions triggered by a certain number of warnings.
 warn:
   actions:
-    3: "kick {player} You have received your 3rd warning!"
-    4: "ban {player} 30m You have received your 4th warning!"
-    5: "ban {player} 5h You have received your 5th warning!"
-    6: "ban {player} 7d You have received your 6th warning!"
-    7: "ban {player} 30d You have received your {warn_no}th warning!"
-    10: "ban {player} You have received your 10th warning!"
+    3:  "kick {player} You have received your 3rd warning."
+    4:  "ban {player} 30m You have received your 4th warning."
+    5:  "ban {player} 5h You have received your 5th warning."
+    6:  "ban {player} 7d You have received your 6th warning."
+    7:  "ban {player} 30d You have received your {warn_no}th warning."
+    10: "ban {player} You have received your 10th warning."
 
-# Should private messages also be blocked when MUTE penalty is applied?
+# Settings for "mute" command
 mute:
+  # Should private messages also be blocked when the MUTE penalty is applied?
   pm: false
-  # If you set mute_pm to TRUE, you can edit which commands for private messages should be blocked here
+  # If you set pm to true, you can edit which private-message commands should be blocked here.
   cmd:
-    - 'me'
-    - 'say'
-    - 'action'
-    - 'eaction'
-    - 'describe'
-    - 'edescribe'
-    - 'eme'
-    - 'w'
-    - 'm'
-    - 'pm'
-    - 'whisper'
-    - 'ewhisper'
-    - 'emsg'
-    - 'msg'
-    - 'etell'
-    - 'tell'
-    - 'er'
-    - 'r'
-    - 'reply'
-    - 'ereply'
-    - 'ac'
-    - 'eac'
-    - 'amsg'
-    - 'eamsg'
-    - 'ehelpop'
-    - 'p msg'
+    - "me"
+    - "say"
+    - "action"
+    - "eaction"
+    - "describe"
+    - "edescribe"
+    - "eme"
+    - "w"
+    - "m"
+    - "pm"
+    - "whisper"
+    - "ewhisper"
+    - "emsg"
+    - "msg"
+    - "etell"
+    - "tell"
+    - "er"
+    - "r"
+    - "reply"
+    - "ereply"
+    - "ac"
+    - "eac"
+    - "amsg"
+    - "eamsg"
+    - "ehelpop"
+    - "p msg"
 
-# Settings for the location of the prison center along with the radius of that prison.
+# Settings for the prison location and its radius.
 jail:
   location:
     world: "world"
@@ -74,57 +74,60 @@ jail:
   radius: 5
 
 spawn:
-  # Location of the spawn point after the player is unjailed
+  # Location of the spawn point after the player is unjailed.
   location:
     world: "world"
     x: 0.0
     y: 64.0
     z: 0.0
-
+  # Experimental setting (may not work properly).
+  use_external_set:
+    # Available options: essx (EssentialsX), world (default world spawn point).
+    set: world
 
 # /********************************************/
-#    Internal setting
+#    Internal settings
 # /********************************************/
 
-# Plugin language selection. Possible values:  EN, PL, NL, ES, FR, DE, RU
-# If you would like to add your own language file, please contact us on Discord (https://discord.gg/Zk6mxv7eMh).
+# Plugin language selection. Possible values: EN, PL, NL, ES, FR, DE, RU.
+# To add your own language file, please contact us on Discord: https://discord.gg/Zk6mxv7eMh
 language: "EN"
 
-# You can set your own aliases for the commands below TODO: Dodać pozostałe aliasy
+# Custom aliases for commands.
 aliases:
-  check: "cx"
-  history: "hx"
-  kick: "kx"
-  warn: "wx"
-  unwarn: "uw"
-  mute: "mx"
-  unmute: "um"
-  ban: "bx"
-  banip: "bip" # Don't use "ban-ip" for this alias
-  unban: "ub"
+  check:    "cx"
+  history:  "hx"
+  kick:     "kx"
+  warn:     "wx"
+  unwarn:   "uw"
+  mute:     "mx"
+  unmute:   "um"
+  ban:      "bx"
+  banip:    "bip"   # Don't use "ban-ip" for this alias.
+  unban:    "ub"
   clearall: "ca"
 
 geoDatabase:
   # To use GeoIP functionality, you need a MaxMind license key.
-  # You can obtain a free license key by creating an account at MaxMind:
-  # https://www.maxmind.com/en/geolite2/signup
+  # Obtain a free key at: https://www.maxmind.com/en/geolite2/signup
   licenseKey: "LICENSEKEY"
 
-# Discord webhook settings
+# Discord webhook settings.
 webhook:
   discord:
     enabled: false
     url: "YOUR_WEBHOOK_URL_HERE"
-    # If set to TRUE, the `kick all <reason>` command saves logs for all players in the channel separately. Default is FALSE
+    # Experimental setting (may not work properly).
+    # If true, the `kick all <reason>` command logs each player's kick separately.
     kickall: false
 
-# Update check and auto-update settings
-checkForUpdates: true
-autoDownloadUpdates: false
+# Update check and auto-download settings.
+checkForUpdates:       true
+autoDownloadUpdates:   false
 
-# Debug mode set to true provides more detailed logs in the console
+# Debug mode: when true, provides more detailed console logs.
 debug: false
 
-# Should StatsCollector be enabled? Recommended setting: true
+# Should StatsCollector be enabled? Recommended: true.
 stats:
   enabled: true
