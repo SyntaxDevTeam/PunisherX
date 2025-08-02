@@ -1,6 +1,8 @@
-### Config version 1.0.4
+### Config version 1.1.0
 
-# Settings for connecting to the database
+# /********************************************/
+#    Settings for connecting to the database
+# /********************************************/
 database:
   # Available options: mariadb, mysql, postgresql, sqlite, h2
   type: "sqlite"
@@ -11,9 +13,24 @@ database:
     username: "root"
     password: "password"
 
-# Plugin language selection. Possible values:  EN, PL, NL, ES, FR, DE, RU
-# If you would like to add your own language file, please contact us on Discord (https://discord.gg/Zk6mxv7eMh).
-language: "EN"
+
+# /********************************************/
+#    Settings for main commands
+# /********************************************/
+
+# Should the "kick" command be recorded in the player's penalty history? Default: false
+kick:
+  history: false
+
+# Settings for reactions to the number of received warnings
+warn:
+  actions:
+    3: "kick {player} You have received your 3rd warning!"
+    4: "ban {player} 30m You have received your 4th warning!"
+    5: "ban {player} 5h You have received your 5th warning!"
+    6: "ban {player} 7d You have received your 6th warning!"
+    7: "ban {player} 30d You have received your {warn_no}th warning!"
+    10: "ban {player} You have received your 10th warning!"
 
 # Should private messages also be blocked when MUTE penalty is applied?
 mute_pm: false
@@ -46,15 +63,6 @@ mute_cmd:
   - 'ehelpop'
   - 'p msg'
 
-# Settings for reactions to the number of received warnings
-WarnActions:
-  3: "kick {player} You have received your 3rd warning!"
-  4: "ban {player} 30m You have received your 4th warning!"
-  5: "ban {player} 5h You have received your 5th warning!"
-  6: "ban {player} 7d You have received your 6th warning!"
-  7: "ban {player} 30d You have received your {warn_no}th warning!"
-  10: "ban {player} You have received your 10th warning!"
-
 # Settings for the location of the prison center along with the radius of that prison.
 jail:
   location:
@@ -72,7 +80,16 @@ spawn:
     y: 64.0
     z: 0.0
 
-# You can set your own aliases for the commands below
+
+# /********************************************/
+#    Internal setting
+# /********************************************/
+
+# Plugin language selection. Possible values:  EN, PL, NL, ES, FR, DE, RU
+# If you would like to add your own language file, please contact us on Discord (https://discord.gg/Zk6mxv7eMh).
+language: "EN"
+
+# You can set your own aliases for the commands below TODO: Dodać pozostałe aliasy
 aliases:
   check: "cx"
   history: "hx"
@@ -97,6 +114,8 @@ webhook:
   discord:
     enabled: false
     url: "YOUR_WEBHOOK_URL_HERE"
+    # If set to TRUE, the `kick all <reason>` command saves logs for all players in the channel separately. Default is FALSE
+    kickall: false
 
 # Update check and auto-update settings
 checkForUpdates: true
