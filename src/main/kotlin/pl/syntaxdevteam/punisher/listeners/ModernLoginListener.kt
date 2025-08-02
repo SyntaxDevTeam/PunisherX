@@ -6,20 +6,21 @@ import com.destroystokyo.paper.profile.PlayerProfile
 import io.papermc.paper.connection.PlayerLoginConnection
 import io.papermc.paper.event.connection.PlayerConnectionValidateLoginEvent
 import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 class ModernLoginListener(private val plugin: PunisherX) : Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onValidateLogin(event: PlayerConnectionValidateLoginEvent) {
-        // Rzutujemy, żeby dostać IP i profil:
+
         val loginConn = event.connection as? PlayerLoginConnection
             ?: return event.allow()
 
-        // Pobieramy profil (unsafe lub authenticated):
         val profile: PlayerProfile? = loginConn.unsafeProfile ?: loginConn.authenticatedProfile
         if (profile?.name.isNullOrBlank()) {
             plugin.logger.debug("ModernLogin: brak profilu → allow()")
@@ -30,7 +31,6 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
         val uuid = plugin.uuidManager.getUUID(playerName!!)
         plugin.logger.debug("Checking punishment for player: $playerName")
 
-        // Adres klienta:
         val ip = loginConn.clientAddress.address.hostAddress
 
         try {
