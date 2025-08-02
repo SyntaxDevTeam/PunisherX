@@ -261,6 +261,13 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     preparedStatement.setLong(6, start)
                     preparedStatement.setLong(7, end)
                     preparedStatement.executeUpdate()
+                    plugin.discordWebhook.sendPunishmentWebhook(
+                        playerName = name,
+                        adminName = operator,
+                        reason = reason,
+                        type = punishmentType,
+                        duration = end
+                    )
                     plugin.logger.debug("Punishment for player $name added to the database.")
                     true
                 }
@@ -289,13 +296,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     preparedStatement.setLong(7, end)
                     preparedStatement.executeUpdate()
                     plugin.logger.debug("Punishment history for player $name added to the database.")
-                    plugin.discordWebhook.sendPunishmentWebhook(
-                        playerName = name,
-                        adminName = operator,
-                        reason = reason,
-                        type = punishmentType,
-                        duration = end
-                    )
                 }
             } ?: throw SQLException("No connection available")
         } catch (e: SQLException) {
