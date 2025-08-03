@@ -11,6 +11,7 @@ jobs:
     env:
       NEXUS_USER: ${{ secrets.NEXUS_USER }}
       NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      AES_KEY: ${{ secrets.AES_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -36,7 +37,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Build with Gradle
-        run: ./gradlew build --scan --stacktrace
+        run: ./gradlew clean build
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4
