@@ -8,10 +8,11 @@ database:
   type: "sqlite"
   sql:
     host: "localhost"
-    port: 3306          # 5432 if you use PostgreSQL; default for MySQL is 3306.
+    port: 3306          # 5432 if you use PostgreSQL; Default for MySQL is 3306.
     dbname: "my_database"
     username: "root"
     password: "password"
+
 
 # /********************************************/
 #    Settings for main commands
@@ -103,10 +104,14 @@ aliases:
   unwarn:   "uw"
   mute:     "mx"
   unmute:   "um"
+  jail:     "j"
+  unjail:   "uj"
   ban:      "bx"
-  banip:    "bip"   # Don't use "ban-ip" for this alias.
+  banip:    "bip"   # For security reasons, do not use "ban-ip" for this alias.
   unban:    "ub"
   clearall: "ca"
+  setjail:  "sjail"
+  setspawn: "sspawn"
 
 geoDatabase:
   # To use GeoIP functionality, you need a MaxMind license key.
@@ -120,7 +125,7 @@ webhook:
     url: "YOUR_WEBHOOK_URL_HERE"
     # Experimental setting (may not work properly).
     # If true, the `kick all <reason>` command logs each player's kick separately.
-    kickall: false
+    kickall: true
 
 # Update check and auto-download settings.
 checkForUpdates:       true
