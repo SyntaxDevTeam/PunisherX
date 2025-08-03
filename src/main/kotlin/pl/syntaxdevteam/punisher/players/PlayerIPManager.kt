@@ -72,9 +72,12 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
     }
 
     private fun generateKey(): Key {
-        val keyString = "M424PmX84WlDDXLb" // Fixed encryption key (16 znaków dla AES-128)
+        val keyString = System.getenv("AES_KEY")
+            ?: throw IllegalStateException("Missing AES_KEY environment variable")
+        require(keyString.length == 16) { "AES_KEY must be exactly 16 characters long" }
         return SecretKeySpec(keyString.toByteArray(UTF_8), "AES")
     }
+
 
     private fun encrypt(data: String): String {
         val cipher = Cipher.getInstance("AES")
