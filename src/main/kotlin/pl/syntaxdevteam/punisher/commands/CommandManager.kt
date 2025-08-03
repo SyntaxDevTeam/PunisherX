@@ -6,7 +6,6 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import org.bukkit.plugin.Plugin
 import pl.syntaxdevteam.punisher.PunisherX
 
-@Suppress("UnstableApiUsage")
 class CommandManager(private val plugin: PunisherX) {
 
     fun registerCommands() {
@@ -157,6 +156,12 @@ class CommandManager(private val plugin: PunisherX) {
                         commandName,
                         plugin.messageHandler.getSimpleMessage("setjail", "usage"),
                         SetjailCommand(plugin)
+                    )
+
+                    "setspawn" -> commands.register(
+                        commandName,
+                        plugin.messageHandler.getSimpleMessage("setspawn", "usage"),
+                        SetSpawnCommand(plugin)
                     )
 
                     "jail" -> commands.register(
