@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.4.4-DEV"
+version = "1.5.0-DEV"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val targetJavaVersion = 21
@@ -82,7 +82,6 @@ tasks.processResources {
     }
 }
 
-// ShadowJar configuration
 tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
     archiveBaseName.set("PunisherX")
     archiveClassifier.set("")
