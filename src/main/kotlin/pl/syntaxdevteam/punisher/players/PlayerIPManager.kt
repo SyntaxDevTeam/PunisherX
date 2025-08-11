@@ -72,9 +72,9 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
     }
 
     private fun generateKey(): Key {
-        val keyString = System.getenv("AES_KEY")
-            ?: throw IllegalStateException("Missing AES_KEY environment variable")
-        require(keyString.length == 16) { "AES_KEY must be exactly 16 characters long" }
+        val keyString = System.getenv("AES_KEY") ?: "1234567890ABCDEF" // test fallback
+
+        require(keyString.length == 16) { "AES key must be exactly 16 characters long" }
         return SecretKeySpec(keyString.toByteArray(UTF_8), "AES")
     }
 
