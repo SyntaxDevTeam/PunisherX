@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 package pl.syntaxdevteam.punisher.listeners
 
 import com.destroystokyo.paper.profile.PlayerProfile
@@ -11,6 +9,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import pl.syntaxdevteam.punisher.PunisherX
 
+@Suppress("UnstableApiUsage")
 class ModernLoginListener(private val plugin: PunisherX) : Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

@@ -3,6 +3,7 @@ package pl.syntaxdevteam.punisher.commands
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
@@ -99,7 +100,8 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
 
         if (PermissionChecker.isAuthor(uuid)) {
             stack.sender.sendMessage(
-                plugin.messageHandler.formatMixedTextToMiniMessage("<red>You can't punish the plugin author</red>")
+                plugin.messageHandler.formatMixedTextToMiniMessage("<red>You can't punish the plugin author</red>",
+                    TagResolver.empty())
             )
             return
         }

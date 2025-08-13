@@ -4,6 +4,7 @@ import io.papermc.paper.ban.BanListType
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.ban.ProfileBanList
 import org.jetbrains.annotations.NotNull
@@ -31,7 +32,8 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                         }
                     }
                     if(PermissionChecker.isAuthor(uuid)){
-                        stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("<red>You can't punish the plugin author</red>"))
+                        stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("<red>You can't punish the plugin author</red>",
+                            TagResolver.empty()))
                         return
                     }
                     var gtime: String?

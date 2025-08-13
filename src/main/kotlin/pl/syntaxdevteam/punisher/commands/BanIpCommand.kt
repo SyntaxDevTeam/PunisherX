@@ -106,6 +106,12 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
 
     private fun generateTimeSuggestions(): List<String> {
         val units = listOf("s", "m", "h", "d")
-        return (1..60).flatMap { i -> units.map { u -> $$"$i$u" } }
+        val suggestions = mutableListOf<String>()
+        for (i in 1..999) {
+            for (unit in units) {
+                suggestions.add("$i$unit")
+            }
+        }
+        return suggestions
     }
 }

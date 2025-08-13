@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
-@Suppress("UnstableApiUsage", "DEPRECATION")
 class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
     private val mH = plugin.messageHandler
 
@@ -32,7 +31,6 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
         }
 
         val pluginMeta = (plugin as LifecycleEventOwner).pluginMeta
-        val pdf = plugin.description
 
         when {
             args[0].equals("version", ignoreCase = true) -> {
@@ -41,8 +39,8 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
                         "\n<gray>-------------------------------------------------\n" +
                         " <gray>|\n" +
                         " <gray>|   <gold>→ <bold>${pluginMeta.name}</bold> ←\n" +
-                        " <gray>|   <white>Author: <bold><gold>${pdf.authors}</gold></bold>\n" +
-                        " <gray>|   <white>Website: <bold><gold><click:open_url:'${pdf.website}'>${pdf.website}</click></gold></bold>\n" +
+                        " <gray>|   <white>Author: <bold><gold>${pluginMeta.authors}</gold></bold>\n" +
+                        " <gray>|   <white>Website: <bold><gold><click:open_url:'${pluginMeta.website}'>${pluginMeta.website}</click></gold></bold>\n" +
                         " <gray>|   <white>Version: <bold><gold>${pluginMeta.version}</gold></bold>\n" +
                         " <gray>|" +
                         "\n<gray>-------------------------------------------------"
