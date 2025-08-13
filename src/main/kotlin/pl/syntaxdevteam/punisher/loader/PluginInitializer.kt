@@ -102,6 +102,7 @@ class PluginInitializer(private val plugin: PunisherX) {
     private fun registerEvents() {
         plugin.server.pluginManager.registerEvents(plugin.playerIPManager, plugin)
         plugin.server.pluginManager.registerEvents(PunishmentChecker(plugin), plugin)
+        plugin.versionChecker = VersionChecker(plugin)
         if (plugin.versionChecker.isAtLeast("1.21.7")) {
             plugin.server.pluginManager.registerEvents(ModernLoginListener(plugin), plugin)
             plugin.logger.debug("Registered ModernLoginListener for 1.21.7+")
@@ -121,6 +122,5 @@ class PluginInitializer(private val plugin: PunisherX) {
     private fun checkForUpdates() {
         plugin.statsCollector = SyntaxCore.statsCollector
         SyntaxCore.updateChecker.checkAsync()
-        plugin.versionChecker = VersionChecker(plugin)
     }
 }
