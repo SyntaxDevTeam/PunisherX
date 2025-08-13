@@ -1,6 +1,7 @@
 package pl.syntaxdevteam.punisher.basic
 
 import io.papermc.paper.event.player.AsyncChatEvent
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
@@ -32,7 +33,8 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         if (PermissionChecker.isAuthor(uuid)) {
             player.sendMessage(
                 plugin.messageHandler
-                    .formatMixedTextToMiniMessage(plugin.messageHandler.getPrefix() + " <green>Witaj, <b>WieszczY!</b> Ten serwer używa Twojego pluginu! :)")
+                    .formatMixedTextToMiniMessage(plugin.messageHandler.getPrefix() + " <green>Witaj, <b>WieszczY!</b> Ten serwer używa Twojego pluginu! :)",
+                        TagResolver.empty())
             )
         }
         val punishments = plugin.databaseHandler.getPunishments(uuid.toString())
