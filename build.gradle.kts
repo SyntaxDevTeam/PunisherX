@@ -29,11 +29,14 @@ repositories {
     maven("https://repo.extendedclip.com/releases/") // PlaceholderAPI
     maven("https://repo.codemc.org/repository/maven-public") // VaultUnlockedAPI
     maven("https://jitpack.io") // VaultAPI
+    maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/") //SyntaxDevTeam
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.6-R0.1-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:core:1.0.11")
+    compileOnly("pl.syntaxdevteam:cleanerx:1.5.1-DEV")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.4")
     compileOnly("com.google.code.gson:gson:2.13.1")

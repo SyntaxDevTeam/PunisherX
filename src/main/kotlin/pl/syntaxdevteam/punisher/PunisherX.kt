@@ -2,13 +2,20 @@ package pl.syntaxdevteam.punisher
 
 import io.papermc.paper.event.player.AsyncChatEvent
 import org.bukkit.configuration.file.FileConfiguration
+import pl.syntaxdevteam.core.SyntaxCore
+import pl.syntaxdevteam.core.manager.PluginManagerX
+import pl.syntaxdevteam.core.messaging.MessageHandler
+import pl.syntaxdevteam.core.logging.Logger
+import pl.syntaxdevteam.core.stats.StatsCollector
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import pl.syntaxdevteam.punisher.api.PunisherXApi
 import pl.syntaxdevteam.punisher.basic.*
 import pl.syntaxdevteam.punisher.commands.CommandManager
-import pl.syntaxdevteam.punisher.common.*
+import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
+import pl.syntaxdevteam.punisher.common.ConfigHandler
+import pl.syntaxdevteam.punisher.common.UUIDManager
 import pl.syntaxdevteam.punisher.databases.*
 import pl.syntaxdevteam.punisher.players.*
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
@@ -19,15 +26,22 @@ import java.io.File
 import java.util.*
 
 class PunisherX : JavaPlugin(), Listener {
-    private val config: FileConfiguration = getConfig()
-    var logger: Logger = Logger(this, config.getBoolean("debug"))
-    lateinit var configHandler: ConfigHandler
-    lateinit var databaseHandler: DatabaseHandler
+    private lateinit var pluginInitializer: PluginInitializer
+
+    lateinit var logger: Logger
     lateinit var messageHandler: MessageHandler
+    lateinit var pluginsManager: PluginManagerX
+
+    lateinit var uuidManager: UUIDManager
+    lateinit var configHandler: ConfigHandler
+    lateinit var pluginConfig: FileConfiguration
+    lateinit var statsCollector: StatsCollector
+
+
+    lateinit var databaseHandler: DatabaseHandler
     lateinit var timeHandler: TimeHandler
     lateinit var geoIPHandler: GeoIPHandler
     lateinit var punishmentManager: PunishmentManager
-    lateinit var pluginsManager: PluginManager
     lateinit var cache: PunishmentCache
     lateinit var punisherXApi: PunisherXApi
     lateinit var hookHandler: HookHandler
@@ -35,23 +49,18 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var commandLoggerPlugin: CommandLoggerPlugin
     lateinit var commandManager: CommandManager
     lateinit var playerIPManager: PlayerIPManager
-    lateinit var statsCollector: StatsCollector
-    lateinit var updateChecker: UpdateChecker
-    lateinit var uuidManager: UUIDManager
     lateinit var versionChecker: VersionChecker
-    lateinit var pluginInitializer: PluginInitializer
 
-    override fun onLoad() {
-        versionChecker = VersionChecker(this)
-        versionChecker.checkAndLog()
-    }
+
     /**
      * Called when the plugin is enabled.
      * Initializes the configuration, database, handlers, events, and commands.
      */
     override fun onEnable() {
+        SyntaxCore.init(this)
         pluginInitializer = PluginInitializer(this)
         pluginInitializer.onEnable()
+        versionChecker.checkAndLog()
     }
 
     /**
@@ -69,7 +78,7 @@ class PunisherX : JavaPlugin(), Listener {
     override fun onDisable() {
         databaseHandler.closeConnection()
         AsyncChatEvent.getHandlerList().unregister(this as Plugin)
-        logger.err(this.pluginMeta.name + " " + this.pluginMeta.version + " has been disabled ☹️")
+        pluginInitializer.onDisable()
     }
 
     /**
