@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.gui
 
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -13,7 +14,7 @@ class GUIHandler(private val plugin: PunisherX) : Listener {
 
         when (title) {
             plugin.messageHandler.getLogMessage("GUI", "PunisherMain") -> PunisherMain(plugin).handleClick(event)
-
+            plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Gracze online</gray>", TagResolver.empty()) -> PlayerListGUI(plugin).handleClick(event)
         }
     }
 }

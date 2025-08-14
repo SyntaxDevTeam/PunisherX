@@ -10,9 +10,7 @@ import org.bukkit.inventory.ItemStack
 import pl.syntaxdevteam.punisher.PunisherX
 
 /**
- * Main menu of PunisherX. The GUI is composed of a list of [MenuEntry] items
- * that are loaded from the configuration. This allows easy expansion without
- * keeping separate variables for every button.
+ * Main menu of PunisherX.
  */
 class PunisherMain(private val plugin: PunisherX) : GUI {
 
@@ -27,58 +25,29 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
     )
 
     /**
-     * Helper used to load a [MenuEntry] from the configuration.
-     */
-    private fun loadEntry(
-        path: String,
-        defaultTitle: String,
-        defaultMaterial: Material,
-        defaultIndex: Int,
-        onClick: (Player) -> Unit
-    ): MenuEntry {
-        val title = plugin.config.getString("$path.title", defaultTitle)!!
-        val materialName = plugin.config.getString("$path.material", defaultMaterial.name)!!
-        val material = Material.matchMaterial(materialName) ?: defaultMaterial
-        val index = plugin.config.getInt("$path.index", defaultIndex)
-        return MenuEntry(title, material, index, onClick)
-    }
-
-    /**
-     * Definitions for all buttons displayed in the main menu. New entries can
-     * be appended here without touching the rest of the logic.
+     * Buttons displayed in the main menu.
      */
     private val menuEntries = listOf(
-        loadEntry("GUI.punishments", "Kary graczy", Material.PAPER, 11) { player ->
-            // Future: open GUI with player punishments and sorting options
-            player.sendMessage(plugin.messageHandler.getMessage("GUI", "opening_punishments"))
+        MenuEntry("Informacje o serwerze", Material.PAPER, 13) { _ -> },
+        MenuEntry("Gracze online", Material.PLAYER_HEAD, 22) { player ->
+            PlayerListGUI(plugin).open(player)
         },
-        loadEntry("GUI.serverinfo", "Informacje o serwerze", Material.COMPASS, 13) { player ->
-            // Example information about the server – will be expanded later
-            val serverName = plugin.getServerName()
-            player.sendMessage(Component.text("Serwer: $serverName"))
-        },
-        loadEntry("GUI.online", "Gracze online", Material.PLAYER_HEAD, 15) { player ->
-            // Simple listing of players currently online
-            val online = plugin.server.onlinePlayers.joinToString(", ") { it.name }
-            player.sendMessage(Component.text("Online: $online"))
-        },
-        loadEntry("GUI.stats", "Statystyki kar", Material.BOOK, 22) { player ->
-            // Placeholder stats – proper counting will be implemented later
-            player.sendMessage(Component.text("Łącznie: 0"))
-            player.sendMessage(Component.text("Ten miesiąc: 0"))
-            player.sendMessage(Component.text("Ten tydzień: 0"))
-            player.sendMessage(Component.text("Dzisiaj: 0"))
-        },
-        loadEntry("GUI.settings", "Ustawienia", Material.REDSTONE_TORCH, 26) { player ->
-
-        }
     )
 
     override fun open(player: Player) {
         val inventory = Bukkit.createInventory(null, 27, getTitle())
 
         menuEntries.forEach { entry ->
-            inventory.setItem(entry.slot, createItem(entry.material, entry.title))
+            val lore = when (entry.slot) {
+                13 -> listOf(
+                    "<gray>Nazwa serwera: <green>${plugin.getServerName()}</green>",
+                    "<gray>Ilość graczy online: <yellow>${plugin.server.onlinePlayers.size}</yellow>",
+                    "<gray>Ilość wykonanych kar dzisiaj: <yellow>0</yellow>",
+                    "<gray>Czas działania serwera: <green>1h</green> (<green>20.0</green>)"
+                )
+                else -> emptyList()
+            }
+            inventory.setItem(entry.slot, createItem(entry.material, entry.title, lore))
         }
 
         player.openInventory(inventory)
@@ -102,10 +71,13 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
         return plugin.messageHandler.getLogMessage("GUI", "PunisherMain")
     }
 
-    private fun createItem(material: Material, name: String): ItemStack {
+    private fun createItem(material: Material, name: String, loreLines: List<String> = emptyList()): ItemStack {
         val item = ItemStack(material)
         val meta = item.itemMeta
         meta.displayName(plugin.messageHandler.formatMixedTextToMiniMessage(name, TagResolver.empty()))
+        if (loreLines.isNotEmpty()) {
+            meta.lore(loreLines.map { plugin.messageHandler.formatMixedTextToMiniMessage(it, TagResolver.empty()) })
+        }
         item.itemMeta = meta
         return item
     }
