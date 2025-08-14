@@ -14,6 +14,7 @@ import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigHandler
 import pl.syntaxdevteam.punisher.common.UUIDManager
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
+import pl.syntaxdevteam.punisher.gui.GUIHandler
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
 import pl.syntaxdevteam.punisher.listeners.LegacyLoginListener
@@ -114,6 +115,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         if (plugin.hookHandler.checkPlaceholderAPI()) {
             PlaceholderHandler(plugin).register()
         }
+        plugin.server.pluginManager.registerEvents(GUIHandler(plugin), plugin)
     }
 
     /**
