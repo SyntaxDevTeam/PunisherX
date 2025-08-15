@@ -62,17 +62,17 @@ class PlayerListGUI(private val plugin: PunisherX) : GUI {
             )
             head.itemMeta = meta
             inventory.setItem(index, head)
-            // Separator row
             for (slot in 27 until 36) {
                 inventory.setItem(slot, createFillerItem())
             }
         }
 
-        // Navigation row
         if (currentPage > 0) {
             inventory.setItem(36, createNavItem(Material.PAPER, "<yellow>Poprzednia strona</yellow>"))
         }
+
         inventory.setItem(40, createNavItem(Material.BARRIER, "<yellow>Powrót</yellow>"))
+
         if (currentPage < totalPages - 1) {
             inventory.setItem(44, createNavItem(Material.BOOK, "<yellow>Następna strona</yellow>"))
         }
