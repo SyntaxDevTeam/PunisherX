@@ -3,7 +3,7 @@ import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
     kotlin("jvm") version "2.2.10"
-    id("com.gradleup.shadow") version "9.0.1"
+    id("com.gradleup.shadow") version "9.0.2"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
     id("xyz.jpenilla.run-paper") version "2.3.1"
@@ -64,9 +64,6 @@ tasks {
     build {
         dependsOn(shadowJar)
     }
-}
-
-tasks {
     runServer {
         minecraftVersion("1.21.8")
         runDirectory(file("run/latest"))
