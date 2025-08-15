@@ -3,8 +3,10 @@ package pl.syntaxdevteam.punisher.commands
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventOwner
+import org.bukkit.entity.Player
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.gui.PunisherMain
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
@@ -61,6 +63,10 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
 
             args[0].equals("import", ignoreCase = true) -> {
                 plugin.databaseHandler.importDatabase()
+            }
+
+            args[0].equals("panel", ignoreCase = true) -> {
+                PunisherMain(plugin).open(stack.sender as Player)
             }
 
             else -> {
