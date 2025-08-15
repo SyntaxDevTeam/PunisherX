@@ -106,6 +106,11 @@ class CommandManager(private val plugin: PunisherX) {
                 plugin.messageHandler.getSimpleMessage("change-reason", "usage"),
                 ChangeReasonCommand(plugin)
             )
+            commands.register(
+                "playerlistgui",
+                "Opens player list GUI",
+                PlayerListCommand(plugin)
+            )
             commands.register("clearall", plugin.messageHandler.getSimpleMessage("clear", "usage"), ClearAllCommand(plugin))
             val aliases = plugin.config.getConfigurationSection("aliases")
             aliases?.getKeys(false)?.forEach { key ->
