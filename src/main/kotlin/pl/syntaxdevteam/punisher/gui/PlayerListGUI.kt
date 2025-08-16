@@ -11,6 +11,7 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.stats.PlayerStatsService
 
 /**
  * GUI displaying currently online players.
@@ -52,16 +53,40 @@ class PlayerListGUI(private val plugin: PunisherX) : GUI {
             meta.displayName(
                 plugin.messageHandler.formatMixedTextToMiniMessage("<yellow>${target.name}</yellow>", TagResolver.empty())
             )
+
             meta.lore(
                 listOf(
-                    plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Czas online: <green>5m</green>", TagResolver.empty()),
-                    plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Czas łączny: <green>1h</green>", TagResolver.empty()),
+                    plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Czas online: <yellow>Ładowanie…</yellow>", TagResolver.empty()),
+                    plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Czas łączny: <yellow>Ładowanie…</yellow>", TagResolver.empty()),
                     plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Kara: <red>Brak</red>", TagResolver.empty()),
-                    plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Łącznie kar: <yellow>0</yellow>", TagResolver.empty())
+                    plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Łącznie kar: <yellow>Ładowanie…</yellow>", TagResolver.empty())
                 )
             )
             head.itemMeta = meta
             inventory.setItem(index, head)
+
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
+                val uuid = target.uniqueId
+                val onlineStr  = PlayerStatsService.getCurrentOnlineString(uuid) ?: "Brak danych"
+                val totalStr   = PlayerStatsService.getTotalPlaytimeString(uuid) ?: "Brak danych"
+                val punishStr  = plugin.databaseHandler.countPlayerAllPunishmentHistory(uuid).toString()
+
+                Bukkit.getScheduler().runTask(plugin, Runnable {
+                    if (!holder.inv.viewers.contains(player)) return@Runnable
+                    val item = inventory.getItem(index) ?: return@Runnable
+                    val im = item.itemMeta as SkullMeta
+                    im.lore(
+                        listOf(
+                            plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Czas online: <green>$onlineStr</green>", TagResolver.empty()),
+                            plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Czas łączny: <green>$totalStr</green>", TagResolver.empty()),
+                            plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Kara: <red>Brak</red>", TagResolver.empty()),
+                            plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Łącznie kar: <yellow>$punishStr</yellow>", TagResolver.empty())
+                        )
+                    )
+                    item.itemMeta = im
+                    inventory.setItem(index, item)
+                })
+            })
             for (slot in 27 until 36) {
                 inventory.setItem(slot, createFillerItem())
             }
