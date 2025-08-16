@@ -6,6 +6,7 @@ import pl.syntaxdevteam.punisher.PunisherX
 import java.io.File
 import java.io.IOException
 import java.sql.*
+import java.util.UUID
 
 class DatabaseHandler(private val plugin: PunisherX) {
     private var dataSource: HikariDataSource? = null
@@ -544,23 +545,56 @@ fun countAllPunishments(): Int {
     return count
 }
 
-fun countAllPunishmentHistory(): Int {
-    var count = 0
-    try {
-        getConnection()?.use { conn ->
-            val query = "SELECT COUNT(*) FROM punishmenthistory"
-            conn.prepareStatement(query).use { preparedStatement ->
-                val resultSet = preparedStatement.executeQuery()
-                if (resultSet.next()) {
-                    count = resultSet.getInt(1)
+    fun countAllPunishmentHistory(): Int {
+        var count = 0
+        try {
+            getConnection()?.use { conn ->
+                val query = "SELECT COUNT(*) FROM punishmenthistory"
+                conn.prepareStatement(query).use { preparedStatement ->
+                    val resultSet = preparedStatement.executeQuery()
+                    if (resultSet.next()) {
+                        count = resultSet.getInt(1)
+                    }
                 }
-            }
-        } ?: throw SQLException("No connection available")
-    } catch (e: SQLException) {
-        plugin.logger.err("Failed to count punishment history. ${e.message}")
+            } ?: throw SQLException("No connection available")
+        } catch (e: SQLException) {
+            plugin.logger.err("Failed to count punishment history. ${e.message}")
+        }
+        return count
     }
-    return count
-}
+
+    fun countPlayerAllPunishmentHistory(uuid: UUID): Int {
+        return try {
+            getConnection()?.use { conn ->
+                conn.prepareStatement(
+                    "SELECT COUNT(*) AS cnt FROM punishmenthistory WHERE uuid = ?"
+                ).use { ps ->
+
+                    when (dbType.lowercase()) {
+                        "postgresql" -> {
+                            ps.setObject(1, uuid)
+                        }
+                        "sqlite", "h2" -> {
+                            ps.setString(1, uuid.toString())
+                        }
+                        "mysql", "mariadb" -> {
+                            ps.setString(1, uuid.toString())
+                        }
+                        else -> {
+                            ps.setString(1, uuid.toString())
+                        }
+                    }
+
+                    ps.executeQuery().use { rs ->
+                        if (rs.next()) rs.getInt("cnt") else 0
+                    }
+                }
+            } ?: throw SQLException("No connection available")
+        } catch (e: SQLException) {
+            plugin.logger.err("Failed to count punishment history. ${e.message}")
+            0
+        }
+    }
 
     /**
      * Retrieves the last ten punishment records for a given player.
