@@ -6,7 +6,7 @@ plugins {
     id("com.gradleup.shadow") version "9.0.2"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
-    id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("xyz.jpenilla.run-paper") version "3.0.0-beta.1"
 }
 
 group = "pl.syntaxdevteam.punisher"
@@ -58,7 +58,6 @@ dependencies {
     compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
     //compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.15")
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.2")
-    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 }
 
 tasks {
@@ -67,8 +66,9 @@ tasks {
     }
     runServer {
         minecraftVersion("1.21.8")
-        runDirectory(file("run/latest"))
+        runDirectory(file("run/paper"))
     }
+    runPaper.folia.registerTask()
 }
 
 tasks.processResources {

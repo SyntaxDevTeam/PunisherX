@@ -15,5 +15,4 @@ libraries:
   - com.h2database:h2:2.3.232
   - com.zaxxer:HikariCP:7.0.1
   - com.github.ben-manes.caffeine:caffeine:3.2.2
-  - org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2
   - pl.syntaxdevteam:core:1.0.12
