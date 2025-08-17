@@ -11,36 +11,36 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 # Messages d'erreur
 error:
   no_permission: "<red>Vous n'avez pas la permission d'utiliser cette commande.</red>"
-  player_not_found: "<gold>Joueur avec le pseudo {player} introuvable.</gold>"
-  ip_not_found: "<gold>Joueur avec l'IP {ip} introuvable.</gold>"
-  player_not_punished: "<gold>Le joueur {player} n'a pas une telle sanction.</gold>"
+  player_not_found: "<gold>Joueur avec le pseudo <player> introuvable.</gold>"
+  ip_not_found: "<gold>Joueur avec l'IP <ip> introuvable.</gold>"
+  player_not_punished: "<gold>Le joueur <player> n'a pas une telle sanction.</gold>"
   reload: "<red>Une erreur est survenue lors du rechargement de la configuration :</red>"
-  bypass: "<red><b>ATTENTION !</b> Le joueur <gold>{player}<gold/> <red>ne peut pas être puni en raison de ses permissions (OP ou bypass).</red><dark_gray>Peut-être que cela pourrait être contourné..."
+  bypass: "<red><b>ATTENTION !</b> Le joueur <gold><player><gold/> <red>ne peut pas être puni en raison de ses permissions (OP ou bypass).</red><dark_gray>Peut-être que cela pourrait être contourné..."
   db_error: "Une erreur s'est produite lors de l'ajout de la sanction à la base de données. Utilisation de la méthode de secours. Vérifiez la console!"
 
 
 # Messages de la commande /setjail
 setjail:
   usage: "L'utilisation correcte est : <gold>/setjail <rayon>"
-  set: "<green>La localisation de la prison a été définie : <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>] avec un rayon de <gold>{radius}</gold>"
+  set: "<green>La localisation de la prison a été définie : <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>] avec un rayon de <gold><radius></gold>"
   set_error: "<red>Échec de la définition de la localisation de la prison</red>"
   invalid_radius: "<red>Veuillez fournir un rayon valide (nombre supérieur à 0)</red>"
 
 # Messages de la commande /setspawn
 setspawn:
   usage: "L'utilisation correcte est : <gold>/setspawn</gold>"
-  set: "<green>Le point de spawn a été défini : <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>]</green>"
+  set: "<green>Le point de spawn a été défini : <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
   set_error: "<red>Échec de la définition du point de spawn</red>"
 
 # Messages de la commande /jail
 jail:
-  jail: "<green>Vous avez emprisonné le joueur <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold></green>"
+  jail: "<green>Vous avez emprisonné le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
   usage: "L'utilisation correcte est : <gold>/jail <nom_du_joueur> (temps) <raison>"
-  jail_message: "<red>Vous avez été emprisonné pour <b>{reason}</b> pendant <b>{time}</b></red>"
+  jail_message: "<red>Vous avez été emprisonné pour <b><reason></b> pendant <b><time></b></red>"
   jail_info_message: "<red>Vous essayez de parler, mais personne ne peut vous entendre depuis la prison</red>"
   jail_restrict_message: "Quitter la zone de la prison est interdit. Vous avez été téléporté de retour à l'emplacement désigné."
-  broadcast: "<dark_gray>Le joueur <gray>{player}</gray> a été emprisonné pour <gray>{reason}</gray> pendant <gray>{time}</gray></dark_gray>"
-  log: "<dark_gray>Le joueur emprisonné <gray>{player}</gray> <dark_gray>crie depuis sa cellule : <gray>{message}</gray>"
+  broadcast: "<dark_gray>Le joueur <gray><player></gray> a été emprisonné pour <gray><reason></gray> pendant <gray><time></gray></dark_gray>"
+  log: "<dark_gray>Le joueur emprisonné <gray><player></gray> <dark_gray>crie depuis sa cellule : <gray><message></gray>"
   no_reasons: "sans raison"
   reasons:
     - "Publicité"
@@ -50,15 +50,15 @@ jail:
 
 # Messages de la commande /unjail
 unjail:
-  unjail: "<green>Vous avez libéré le joueur <gold>{player}</gold> de la prison</green>"
+  unjail: "<green>Vous avez libéré le joueur <gold><player></gold> de la prison</green>"
   usage: "L'utilisation correcte est : <gold>/unjail <nom_du_joueur>"
   unjail_message: "<green>Votre peine de prison est terminée ! Ne gâchez pas cette chance !</green>"
-  success: "<green>Le joueur <gold>{player}</gold> a été libéré avec succès de la prison."
-  broadcast: "Le joueur <gold>{player}</gold> a été libéré de la prison. Faites attention..."
+  success: "<green>Le joueur <gold><player></gold> a été libéré avec succès de la prison."
+  broadcast: "Le joueur <gold><player></gold> a été libéré de la prison. Faites attention..."
 
 # Messages de la commande /ban
 ban:
-  ban: "<green>Vous avez banni <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold></green>"
+  ban: "<green>Vous avez banni <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
   usage: "Utilisation correcte : <gold>/ban <player> (durée) <raison>"
   kick_message:
     # Vous pouvez personnaliser le message pour le joueur expulsé
@@ -66,12 +66,12 @@ ban:
     - 'PunisherX &8» &7Vous avez été banni(e)'
     - '&7'
     - '&7'
-    - "&cRaison &8» &7{reason}"
-    - "&cDurée &8» &7{time}"
+    - "&cRaison &8» &7<reason>"
+    - "&cDurée &8» &7<time>"
     - '&7'
     - '&8Vous pouvez contester votre bannissement ici :'
     - "&eDiscord &8» &c&nhttps://nomduserveur.fr/discord"
-  broadcast: "<dark_gray>Le joueur <gray>{player}</gray> a été banni pour <gray>{reason}</gray> pendant <gray>{time}</gray></dark_gray>"
+  broadcast: "<dark_gray>Le joueur <gray><player></gray> a été banni pour <gray><reason></gray> pendant <gray><time></gray></dark_gray>"
   no_reasons: "sans raison"
   reasons: # Ajoutez vos propres raisons qui seront suggérées lors de l'exécution de la commande
     - "Triche"
@@ -81,7 +81,7 @@ ban:
 
 # Messages de la commande /banip
 banip:
-  ban: "<green>Vous avez banni l'IP de <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold></green>"
+  ban: "<green>Vous avez banni l'IP de <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
   usage: "Utilisation correcte : <gold>/banip <player|ip> (durée) <raison>"
   kick_message:
     # Vous pouvez personnaliser le message pour le joueur expulsé
@@ -89,12 +89,12 @@ banip:
     - 'PunisherX &8» &7Votre IP a été bannie !'
     - '&7'
     - '&7'
-    - "&cRaison &8» &7{reason}"
-    - "&cDurée &8» &7{time}"
+    - "&cRaison &8» &7<reason>"
+    - "&cDurée &8» &7<time>"
     - '&7'
     - '&8Vous pouvez contester votre bannissement ici :'
     - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.fr/discord"
-  broadcast: "<dark_gray>Le joueur <gray>{player}</gray> a été banni pour <gray>{reason}</gray> pendant <gray>{time}</gray></dark_gray>"
+  broadcast: "<dark_gray>Le joueur <gray><player></gray> a été banni pour <gray><reason></gray> pendant <gray><time></gray></dark_gray>"
   no_reasons: "sans raison"
   reasons:
     - "Multi-compte"
@@ -104,18 +104,18 @@ banip:
 
 # Messages de la commande /unban
 unban:
-  unban: "<green>Le joueur <gold>{player}</gold> a été débanni</green>"
+  unban: "<green>Le joueur <gold><player></gold> a été débanni</green>"
   usage: "Utilisation correcte : <gold>/unban <player>"
-  broadcast: "<dark_gray>Le joueur <gray>{player}</gray> a été débanni</dark_gray>"
+  broadcast: "<dark_gray>Le joueur <gray><player></gray> a été débanni</dark_gray>"
 
 # Messages de la commande /mute
 mute:
-  mute: "<green>Vous avez rendu muet <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold></green>"
+  mute: "<green>Vous avez rendu muet <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
   usage: "Utilisation correcte : <gold>/mute <player> (durée) <raison>"
-  mute_message: "<red>Vous avez été rendu muet pour <b>{reason}</b> pendant <b>{time}</b></red>"
-  mute_info_message: "<red>Vous essayez de parler mais vous êtes encore réduit(e) au silence pendant {time}</red>"
-  broadcast: "<dark_gray>Le joueur <gray>{player}</gray> a été rendu muet pour <gray>{reason}</gray> pendant <gray>{time}</gray></dark_gray>"
-  log: "<dark_gray>Le joueur <gray>{player}</gray> <dark_gray>muet a envoyé un message : <gray>{message}</gray>"
+  mute_message: "<red>Vous avez été rendu muet pour <b><reason></b> pendant <b><time></b></red>"
+  mute_info_message: "<red>Vous essayez de parler mais vous êtes encore réduit(e) au silence pendant <time></red>"
+  broadcast: "<dark_gray>Le joueur <gray><player></gray> a été rendu muet pour <gray><reason></gray> pendant <gray><time></gray></dark_gray>"
+  log: "<dark_gray>Le joueur <gray><player></gray> <dark_gray>muet a envoyé un message : <gray><message></gray>"
   no_reasons: "sans raison"
   reasons:
     - "Publicité"
@@ -125,16 +125,16 @@ mute:
 
 # Messages de la commande /unmute
 unmute:
-  unmute: "<green>Vous avez rétabli la voix de <gold>{player}</gold></green>"
+  unmute: "<green>Vous avez rétabli la voix de <gold><player></gold></green>"
   usage: "Utilisation correcte : <gold>/unmute <player>"
   unmute_message: "<green>Vous avez retrouvé votre voix !</green>"
 
 # Messages de la commande /warn
 warn:
-  warn: "<green>Vous avez averti ({warn_no}e fois) <gold>{player}</gold> pour <gold>{reason}</gold> pendant <gold>{time}</gold></green>"
+  warn: "<green>Vous avez averti (<warn_no>e fois) <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
   usage: "Utilisation correcte : <gold>/warn <player> (durée) <raison>"
-  warn_message: "<red>Vous avez reçu un <b>{warn_no}</b> avertissement !</red>"
-  broadcast: "<dark_gray>Le joueur <gray>{player}</gray> a reçu un avertissement pour <gray>{reason}</gray> pendant <gray>{time}</gray></dark_gray>"
+  warn_message: "<red>Vous avez reçu un <b><warn_no></b> avertissement !</red>"
+  broadcast: "<dark_gray>Le joueur <gray><player></gray> a reçu un avertissement pour <gray><reason></gray> pendant <gray><time></gray></dark_gray>"
   no_reasons: "sans raison"
   reasons:
     - "Publicité"
@@ -144,12 +144,12 @@ warn:
 
 # Messages de la commande /unwarn
 unwarn:
-  unwarn: "<green>Vous avez retiré l'avertissement de <gold>{player}</gold></green>"
+  unwarn: "<green>Vous avez retiré l'avertissement de <gold><player></gold></green>"
   usage: "Utilisation correcte : <gold>/unwarn <player>"
 
 # Messages de la commande /kick
 kick:
-  kick: "<green>Vous avez expulsé <gold>{player}</gold> pour <gold>{reason}</gold></green>"
+  kick: "<green>Vous avez expulsé <gold><player></gold> pour <gold><reason></gold></green>"
   usage: "Utilisation correcte : <gold>/kick <player> <raison>"
   kick_message:
     # Vous pouvez personnaliser le message pour le joueur expulsé
@@ -157,12 +157,12 @@ kick:
     - 'PunisherX &8» &7Vous avez été expulsé(e)'
     - '&7'
     - '&7'
-    - "&cRaison &8» &7{reason}"
+    - "&cRaison &8» &7<reason>"
     - '&7'
     - '&7'
     - '&8Vous pouvez contester votre expulsion ici :'
     - "&eDiscord &8» &c&nhttps://nomduserveur.fr/discord"
-  broadcast: "<dark_gray>Le joueur <gray>{player}</gray> a été expulsé pour <gray>{reason}</gray></dark_gray>"
+  broadcast: "<dark_gray>Le joueur <gray><player></gray> a été expulsé pour <gray><reason></gray></dark_gray>"
   no_reasons: "sans raison"
   reasons:
     - "Flood"
@@ -173,7 +173,7 @@ kick:
 check:
   usage: "Utilisation correcte : <gold>/check <nom_joueur> <all|ban|jail|mute|warn>"
   invalid_type: "<red>Type de punition invalide. Utilisez : all, ban, jail, mute, warn.</red>"
-  no_punishments: "<dark_green>Le joueur <gold>{player}</gold> n'a aucune punition.</dark_green>"
+  no_punishments: "<dark_green>Le joueur <gold><player></gold> n'a aucune punition.</dark_green>"
   title: "<dark_gray>Punitions actives pour</dark_gray>"
   id: "<dark_gray>ID</dark_gray>"
   type: "<dark_gray>Type</dark_gray>"
@@ -183,7 +183,7 @@ check:
 # Messages de la commande /history
 history:
   usage: "Utilisation correcte : <gold>/history <nom_joueur>"
-  no_punishments: "<dark_green>Le joueur <gold>{player}</gold> n'a aucune punition.</dark_green>"
+  no_punishments: "<dark_green>Le joueur <gold><player></gold> n'a aucune punition.</dark_green>"
   title: "<dark_gray>Punitions actives pour</dark_gray>"
   id: "<dark_gray>ID</dark_gray>"
   type: "<dark_gray>Type</dark_gray>"
@@ -197,19 +197,19 @@ banlist:
   title: "<blue>|   <gray>Liste des joueurs bannis :</gray>"
   top_header: "<blue>--------------------------------------------------</blue>"
   table_header: "<blue>|    Nom           |          Type          |          Quand</blue>"
-  ban_list: "<blue>|   <hover:show_text:'<white>UUID :</white> <gold>{uuid}</gold>'><white>{player}</white></hover>   |   <hover:show_text:'<white>ID :</white> <gold>#{id}<newline><white>Opérateur :</white> <gold>{operator}</gold><newline><white>Raison :</white> <gold>{reason}</gold>'><white>{type}</white></hover>   |   <white>{time}</white></blue>"
+  ban_list: "<blue>|   <hover:show_text:'<white>UUID :</white> <gold><uuid></gold>'><white><player></white></hover>   |   <hover:show_text:'<white>ID :</white> <gold>#<id><newline><white>Opérateur :</white> <gold><operator></gold><newline><white>Raison :</white> <gold><reason></gold>'><white><type></white></hover>   |   <white><time></white></blue>"
 
 # Messages de la commande /change-reason
 change-reason:
   usage: "Utilisation correcte : <gold>/change-reason <ID_punition> <nouvelle_raison>"
   invalid_id: "<red>ID de punition invalide</red>"
-  success: "<green>La raison de la punition avec l'ID : <gold>{id}</gold> a été changée en \"<gold>{reason}</gold>\"</green>"
-  failure: "<red>Échec de la mise à jour de la raison de la punition pour l'ID : <gold>{id}</gold></red>"
+  success: "<green>La raison de la punition avec l'ID : <gold><id></gold> a été changée en \"<gold><reason></gold>\"</green>"
+  failure: "<red>Échec de la mise à jour de la raison de la punition pour l'ID : <gold><id></gold></red>"
 
 # Messages pour la commande /clearall
 clear:
   usage: "L'utilisation correcte est : <gold>/clearall <player>"
-  clearall: "<green>Toutes les sanctions actives pour le joueur </green><gold>{player}</gold><green> ont été effacées</green>"
+  clearall: "<green>Toutes les sanctions actives pour le joueur </green><gold><player></gold><green> ont été effacées</green>"
   clear_message: "<green>Toutes vos sanctions actives ont été annulées ! </green><dark_gray>Pssst ! Vous avez des relations avec les admins ou quoi ?"
 
 # Messages de webhook

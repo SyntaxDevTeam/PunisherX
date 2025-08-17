@@ -9,45 +9,46 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 # Wiadomości obsługi błędów
 error:
   no_permission: "<red>Nie masz uprawnień do tej komendy.</red>"
-  player_not_found: "<gold>Nie znaleziono gracza o nicku {player}.</gold>"
-  player_not_punished: "<gold>Gracz {player} nie ma takiej kary.</gold>"
-  ip_not_found: "<gold>Nie znaleziono gracza o IP {ip}.</gold>"
+  player_not_found: "<gold>Nie znaleziono gracza o nicku <player>.</gold>"
+  player_not_punished: "<gold>Gracz <player> nie ma takiej kary.</gold>"
+  ip_not_found: "<gold>Nie znaleziono gracza o IP <ip>.</gold>"
+  no_data: "<red>Brak danych do wyświetlenia.</red>"
   db_error: "Wystąpił błąd przy dodawaniu kary do bazy danych. Korzystanie z metody zapasowej. Sprawdź konsolę!"
   console: "<red>Tylko gracz może użyć tej komendy</red>"
   reload: "<red>Wystąpił błąd podczas przełądowania konfiguracji:</red> "
-  bypass: "<red><b>UWAGA!</b> Gracz <gold>{player}</gold> <red>nie może otrzymać kary, ze zględu na swoje uprawnienia (OP lub bypass).</red><dark_gray>Może dało by się to obejść..."
+  bypass: "<red><b>UWAGA!</b> Gracz <gold><player></gold> <red>nie może otrzymać kary, ze względu na swoje uprawnienia (OP lub bypass).</red><newline><dark_gray>Może dało by się to obejść..."
 
 # Wiadomości komendy /setjail
 setjail:
   usage: "Poprawne użycie to: <gold>/setjail <promień>"
-  set: "<green>Lokalizacja więzienia została ustawiona: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>] z promieniem <gold>{radius}</gold>"
+  set: "<green>Lokalizacja więzienia została ustawiona: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>] z promieniem <gold><radius></gold>"
   set_error: "<red>Nie udało się ustawić lokalizacji więzienia</red>"
   invalid_radius: "<red>Podaj prawidłowy promień (liczba większa od 0)</red>"
 
 # Wiadomości komendy /setspawn
 setspawn:
     usage: "Poprawne użycie to: <gold>/setspawn</gold>"
-    set: "<green>Lokalizacja respawnu została ustawiona: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>]</green>"
+    set: "<green>Lokalizacja respawnu została ustawiona: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
     set_error: "<red>Nie udało się ustawić lokalizacji więzienia</red>"
 
 # Wiadomości komendy /jail
 jail:
-  jail: "<green>Zamknąłeś gracza <gold>{player}</gold> w więzieniu za <gold>{reason}</gold> na czas <gold>{time}</green>"
+  jail: "<green>Zamknąłeś gracza <gold><player></gold> w więzieniu za <gold><reason></gold> na czas <gold><time></green>"
   usage: "Poprawne użycie to: <gold>/jail <nazwa_gracza> (czas) <powód>"
-  jail_message: "<red>Zostałeś/aś zesłany/a do więzienia za <b>{reason}</b> na czas <b>{time}</b></red>"
+  jail_message: "<red>Zostałeś/aś zesłany/a do więzienia za <b><reason></b> na czas <b><time></b></red>"
   jail_info_message: "<red>Próbujesz coś powiedzieć, ale z więzienia nikt Cię nie słyszy</red>"
   jail_restrict_message: "Opuszczenie obszaru więzienia jest zabronione. Zostałeś teleportowany z powrotem do wyznaczonego miejsca."
-  broadcast: "<dark_gray>Gracz <gray>{player}</gray> został zamknięty w więzieniu za <gray>{reason}</gray> na czas <gray>{time}</gray></dark_gray>"
+  broadcast: "<dark_gray>Gracz <gray><player></gray> został zamknięty w więzieniu za <gray><reason></gray> na czas <gray><time></gray></dark_gray>"
   # Alternatywnie możesz użyć poniższego formatu wiadomości, jeśli chcesz bardziej uwydatnić ten komunikat
   # broadcast:
     #- "<dark_gray>*************** Twoja Nazwa Serwera *************** </dark_gray>"
     #- ""
-    #- "<red>   Gracz <white>{player}</white> został zamknięty w więzieniu</red>"
-    #- "   Powód: <white>{reason}</white>"
-    #- "   Na czas: <white>{time}</white>"
+    #- "<red>   Gracz <white><player></white> został zamknięty w więzieniu</red>"
+    #- "   Powód: <white><reason></white>"
+    #- "   Na czas: <white><time></white>"
     #- ""
     #- "<dark_gray>*************************************************** </dark_gray>"
-  log: "<dark_gray>Uwięziony gracz <gray>{player}</gray> <dark_gray>coś krzyczy ze swojej celi: <gray>{message}</gray>"
+  log: "<dark_gray>Uwięziony gracz <gray><player></gray> <dark_gray>coś krzyczy ze swojej celi: <gray><message></gray>"
   no_reasons: "bez powodu"
   reasons:
     - "Reklama"
@@ -57,15 +58,15 @@ jail:
 
 # Wiadomości komendy /unjail
 unjail:
-  unjail: "<green>Uwolniłeś/aś gracza <gold>{player}</gold> z więzienia</green>"
+  unjail: "<green>Uwolniłeś/aś gracza <gold><player></gold> z więzienia</green>"
   usage: "Poprawne użycie to: <gold>/unjail <nazwa_gracza>"
   unjail_message: "<green>Twoja kara więzienia się zakończyła! Nie zmarnuj tej szansy!</green>"
-  success: "<green>Gracz <gold>{player}</gold> został pomyślnie wypuszczony z więzienia."
-  broadcast: "Gracz <gold>{player}</gold> został wypuszczony z więzienia. Lepiej uważajcie..."
+  success: "<green>Gracz <gold><player></gold> został pomyślnie wypuszczony z więzienia."
+  broadcast: "Gracz <gold><player></gold> został wypuszczony z więzienia. Lepiej uważajcie..."
 
 # Wiadomości komendy /ban
 ban:
-  ban: "<green>Zbanowałeś <gold>{player}</gold> za <gold>{reason}</gold> na czas <gold>{time}</green>"
+  ban: "<green>Zbanowałeś <gold><player></gold> za <gold><reason></gold> na czas <gold><time></green>"
   usage: "Poprawne użycie to: <gold>/ban <nazwa_gracza> (czas) <powód>"
   kick_message:
     # Możesz dowolnie dostosować komunikat dla wyrzuconego gracza
@@ -73,19 +74,19 @@ ban:
     - 'PunisherX &8» &7Zostałeś/aś zbanowany/a'
     - '&7'
     - '&7'
-    - "&cPowód &8» &7{reason}"
-    - "&cNa czas &8» &7{time}"
+    - "&cPowód &8» &7<reason>"
+    - "&cNa czas &8» &7<time>"
     - '&7'
     - '&8Możesz zgłosić swój sprzeciw na:'
     - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
-  broadcast: "<dark_gray>Gracz <gray>{player}</gray> został zbanowany z powodu <gray>{reason}</gray> na czas <gray>{time}</gray></dark_gray>"
+  broadcast: "<dark_gray>Gracz <gray><player></gray> został zbanowany z powodu <gray><reason></gray> na czas <gray><time></gray></dark_gray>"
     # Alternatywnie możesz użyć poniższego formatu wiadomości, jeśli chcesz bardziej uwydatnić ten komunikat
   # broadcast:
     #- "<dark_gray>*************** Twoja Nazwa Serwera *************** </dark_gray>"
     #- ""
-    #- "<red>   Gracz <white>{player}</white> został zbanowany</red>"
-    #- "   Powód: <white>{reason}</white>"
-    #- "   Na czas: <white>{time}</white>"
+    #- "<red>   Gracz <white><player></white> został zbanowany</red>"
+    #- "   Powód: <white><reason></white>"
+    #- "   Na czas: <white><time></white>"
     #- ""
     #- "<dark_gray>*************************************************** </dark_gray>"
   no_reasons: "bez powodu"
@@ -97,7 +98,7 @@ ban:
 
 # Wiadomości komendy /banip
 banip:
-  ban: "<green>Zbanowałeś IP gracza za <gold>{reason}</gold> na czas <gold>{time}</green>"
+  ban: "<green>Zbanowałeś IP gracza za <gold><reason></gold> na czas <gold><time></green>"
   usage: "Poprawne użycie to: <gold>/banip <player|ip> (czas) <powód>"
   kick_message:
     # Możesz dowolnie dostosować komunikat dla wyrzuconego gracza
@@ -105,12 +106,12 @@ banip:
     - 'PunisherX &8» &7Twoje IP zostało zbanowane!'
     - '&7'
     - '&7'
-    - "&cPowód &8» &7{reason}"
-    - "&cNa czas &8» &7{time}"
+    - "&cPowód &8» &7<reason>"
+    - "&cNa czas &8» &7<time>"
     - '&7'
     - '&8Możesz zgłosić swój sprzeciw na:'
     - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.pl/discord"
-  broadcast: "<dark_gray>Gracz <gray>{player}</gray> został zbanowany z powodu <gray>{reason}</gray> na czas <gray>{time}</gray></dark_gray>"
+  broadcast: "<dark_gray>Gracz <gray><player></gray> został zbanowany z powodu <gray><reason></gray> na czas <gray><time></gray></dark_gray>"
   no_reasons: "bez powodu"
   reasons:
     - "Multikonto"
@@ -120,27 +121,27 @@ banip:
 
 # Wiadomości komendy /unban
 unban:
-  unban: "<green>Gracz <gold>{player}</gold> został odbanowany</green>"
+  unban: "<green>Gracz <gold><player></gold> został odbanowany</green>"
   usage: "Poprawne użycie to: <gold>/unban <nazwa_gracza>"
-  broadcast: "<dark_gray>Gracz <gray>{player}</gray> został odbanowany</dark_gray>"
+  broadcast: "<dark_gray>Gracz <gray><player></gray> został odbanowany</dark_gray>"
 
 # Wiadomości komendy /mute
 mute:
-  mute: "<green>Wyciszyłeś gracza <gold>{player}</gold> za <gold>{reason}</gold> na czas <gold>{time}</green>"
+  mute: "<green>Wyciszyłeś gracza <gold><player></gold> za <gold><reason></gold> na czas <gold><time></green>"
   usage: "Poprawne użycie to: <gold>/mute <nazwa_gracza> (time) <reason>"
-  mute_message: "<red>Zostałeś/aś wyciszony/a za <b>{reason}</b> na czas <b>{time}</b></red>"
-  mute_info_message: "<red>Próbujesz coś powiedzieć ale jesteś wyciszony/a jeszcze przez {time}</red>"
-  broadcast: "<dark_gray>Gracz <gray>{player}</gray> został wyciszony za <gray>{reason}</gray> na czas <gray>{time}</gray></dark_gray>"
+  mute_message: "<red>Zostałeś/aś wyciszony/a za <b><reason></b> na czas <b><time></b></red>"
+  mute_info_message: "<red>Próbujesz coś powiedzieć ale jesteś wyciszony/a jeszcze przez <time></red>"
+  broadcast: "<dark_gray>Gracz <gray><player></gray> został wyciszony za <gray><reason></gray> na czas <gray><time></gray></dark_gray>"
     # Alternatywnie możesz użyć poniższego formatu wiadomości, jeśli chcesz bardziej uwydatnić ten komunikat
   # broadcast:
     #- "<dark_gray>*************** Twoja Nazwa Serwera *************** </dark_gray>"
     #- ""
-    #- "<red>   Gracz <white>{player}</white> został wyciszony</red>"
-    #- "   Powód: <white>{reason}</white>"
-    #- "   Na czas: <white>{time}</white>"
+    #- "<red>   Gracz <white><player></white> został wyciszony</red>"
+    #- "   Powód: <white><reason></white>"
+    #- "   Na czas: <white><time></white>"
     #- ""
     #- "<dark_gray>*************************************************** </dark_gray>"
-  log: "<dark_gray>Wyciszony gracz <gray>{player}</gray> <dark_gray>wysłał wiadomość: <gray>{message}</gray>"
+  log: "<dark_gray>Wyciszony gracz <gray><player></gray> <dark_gray>wysłał wiadomość: <gray><message></gray>"
   no_reasons: "bez powodu"
   reasons:
     - "Reklama"
@@ -150,23 +151,23 @@ mute:
 
 # Wiadomości komendy /unmute
 unmute:
-  unmute: "<green>Odwyciszyłeś gracza <gold>{player}</gold></green>"
+  unmute: "<green>Odwyciszyłeś gracza <gold><player></gold></green>"
   usage: "Poprawne użycie to: <gold>/unmute <nazwa_gracza>"
-  unmute_message: "<green>Zostałeś/aś odwyciszony/a!</green>"
+  unmute_message: "<green>Zostałeś/aś od wyciszony/a!</green>"
 
 # Wiadomości komendy /warn
 warn:
-  warn: "<green>Ostrzegłeś ({warn_no} raz) <gold>{player}</gold> za <gold>{reason}</gold> na czas <gold>{time}</green>"
+  warn: "<green>Ostrzegłeś (<warn_no> raz) <gold><player></gold> za <gold><reason></gold> na czas <gold><time></green>"
   usage: "Poprawne użycie to: <gold>/warn <nazwa_gracza> (czas) <powód>"
-  warn_message: "<red>Dostałeś/aś <b>{warn_no}</b> ostrzeżenie!</red>"
-  broadcast: "<dark_gray>Gracz <gray>{player}</gray> otrzymał ostrzeżenie za <gray>{reason}</gray> na czas <gray>{time}</gray></dark_gray>"
+  warn_message: "<red>Dostałeś/aś <b><warn_no></b> ostrzeżenie!</red>"
+  broadcast: "<dark_gray>Gracz <gray><player></gray> otrzymał ostrzeżenie za <gray><reason></gray> na czas <gray><time></gray></dark_gray>"
     # Alternatywnie możesz użyć poniższego formatu wiadomości, jeśli chcesz bardziej uwydatnić ten komunikat
   # broadcast:
     #- "<dark_gray>*************** Twoja Nazwa Serwera *************** </dark_gray>"
     #- ""
-    #- "<red>   Gracz <white>{player}</white> otrzymał {warn_no} ostrzeżenie</red>"
-    #- "   Powód: <white>{reason}</white>"
-    #- "   Na czas; <white>{time}</white>"
+    #- "<red>   Gracz <white><player></white> otrzymał <warn_no> ostrzeżenie</red>"
+    #- "   Powód: <white><reason></white>"
+    #- "   Na czas; <white><time></white>"
     #- ""
     #- "<dark_gray>*************************************************** </dark_gray>"
   no_reasons: "bez powodu"
@@ -178,12 +179,12 @@ warn:
     -
 # Wiadomości komendy /unwarn
 unwarn:
-  unwarn: "<green>Usunąłeś ostrzeżenie dla gracza <gold>{player}</gold></green>"
+  unwarn: "<green>Usunąłeś ostrzeżenie dla gracza <gold><player></gold></green>"
   usage: "Poprawne użycie to: <gold>/unwarn <nazwa_gracza>"
 
 # Wiadomości komendy /kick
 kick:
-  kick: "<green>Wyrzuciłeś <gold>{player}</gold> za <gold>{reason}</gold></green>"
+  kick: "<green>Wyrzuciłeś <gold><player></gold> za <gold><reason></gold></green>"
   usage: "Poprawne użycie to: <gold>/kick <nazwa_gracza> <powód>"
   kick_message:
     # Możesz dowolnie dostosować komunikat dla wyrzuconego gracza
@@ -191,18 +192,18 @@ kick:
     - 'PunisherX &8» &7Zostałeś/aś wyrzucony/a'
     - '&7'
     - '&7'
-    - "&cPowód &8» &7{reason}"
+    - "&cPowód &8» &7<reason>"
     - '&7'
     - '&7'
     - '&8Możesz zgłosić swój sprzeciw na:'
     - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
-  broadcast: "<dark_gray>Gracz <gray>{player}</gray> został wyrzucony z powodu <gray>{reason}</gray></dark_gray>"
+  broadcast: "<dark_gray>Gracz <gray><player></gray> został wyrzucony z powodu <gray><reason></gray></dark_gray>"
   # Alternatywnie możesz użyć poniższego formatu wiadomości, jeśli chcesz bardziej uwydatnić ten komunikat
   # broadcast:
     #- "<dark_gray>*************** Twoja Nazwa Serwera *************** </dark_gray>"
     #- ""
-    #- "<red>   Gracz <white>{player}</white> został wyrzucony</red>
-    #- "   Powód: <white>{reason}</white>"
+    #- "<red>   Gracz <white><player></white> został wyrzucony</red>
+    #- "   Powód: <white><reason></white>"
     #- ""
     #- "<dark_gray>*************************************************** </dark_gray>"
   no_reasons: "bez powodu"
@@ -215,7 +216,7 @@ kick:
 check:
   usage: "Poprawne użycie to: <gold>/check <nazwa_gracza> <all|ban|jail|mute|warn>"
   invalid_type: "<red>Nieprawidłowy typ kary. Użyj: all, ban, jail, mute, warn.</red>"
-  no_punishments: "<dark_green>Gracz <gold>{player}</gold> nie ma żadnych kar.</dark_green>"
+  no_punishments: "<dark_green>Gracz <gold><player></gold> nie ma żadnych kar.</dark_green>"
   title: "<dark_gray>Aktywne kary dla</dark_gray>"
   id: "<dark_gray>ID</dark_gray>"
   type: "<dark_gray>Typ</dark_gray>"
@@ -225,7 +226,7 @@ check:
 # Wiadomości komendy /history
 history:
   usage: "Poprawne użycie to: <gold>/history <nazwa_gracza>"
-  no_punishments: "<dark_green>Gracz <gold>{player}</gold> nie ma żadnych kar.</dark_green>"
+  no_punishments: "<dark_green>Gracz <gold><player></gold> nie ma żadnych kar.</dark_green>"
   title: "<dark_gray>Historia kar dla</dark_gray>"
   id: "<dark_gray>ID</dark_gray>"
   type: "<dark_gray>Typ</dark_gray>"
@@ -239,19 +240,19 @@ banlist:
   title: "<blue>|   <gray>Lista graczy zbanowanych:</gray>"
   top_header: "<blue>--------------------------------------------------</blue>"
   table_header: "<blue>|    Name          |          Type          |          When</blue>"
-  ban_list: "<blue>|   <hover:show_text:'<white>UUID:</white> <gold>{uuid}</gold>'><white>{player}</white></hover>   |   <hover:show_text:'<white>ID:</white> <gold>#{id}<newline><white>Operator:</white> <gold>{operator}</gold><newline><white>Reason:</white> <gold>{reason}</gold>'><white>{type}</white></hover>   |   <white>{time}</white></blue>"
+  ban_list: "<blue>|   <hover:show_text:'<white>UUID:</white> <gold><uuid></gold>'><white><player></white></hover>   |   <hover:show_text:'<white>ID:</white> <gold>#<id><newline><white>Operator:</white> <gold><operator></gold><newline><white>Reason:</white> <gold><reason></gold>'><white><type></white></hover>   |   <white><time></white></blue>"
 
 # Wiadomości komendy /change-reason
 change-reason:
   usage: "Poprawne użycie to: <gold>/change-reason <ID_kary> <nowy_powód>"
   invalid_id: "<red>Nieprawidłowy identyfikator kary</red>"
-  success: "<green>Zmieniono dotychczasowy powód kary o ID: <gold>{id}</gold> na \"<gold>{reason}</gold>\"</green>"
-  failure: "<red>Nie udało się zaktualizować powodu kary dla ID: <gold>{id}</gold></red>"
+  success: "<green>Zmieniono dotychczasowy powód kary o ID: <gold><id></gold> na \"<gold><reason></gold>\"</green>"
+  failure: "<red>Nie udało się zaktualizować powodu kary dla ID: <gold><id></gold></red>"
 
 # Wiadomości komendy /clearall
 clear:
   usage: "Poprawne użycie to: <gold>/clearall <nazwa_gracza>"
-  clearall: "<green>Wszystkie aktywne kary gracza </green><gold>{player}</gold><green> zostały wyczyszczone</green>"
+  clearall: "<green>Wszystkie aktywne kary gracza </green><gold><player></gold><green> zostały wyczyszczone</green>"
   clear_message: "<green>Wszystkie Twoje aktywne kary zostały anulowane!</green> <grey>Pssssyt! Masz jakieś układy z administracją czy coś?"
 
 # Wiadomości webhooka

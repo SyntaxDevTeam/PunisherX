@@ -10,37 +10,37 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 # Foutmeldingen
 error:
   no_permission: "<red>Je hebt geen toestemming om dit commando te gebruiken.</red>"
-  player_not_found: "<gold>Speler met bijnaam {player} niet gevonden.</gold>"
-  ip_not_found: "<gold>Speler met IP {ip} niet gevonden.</gold>"
-  player_not_punished: "<gold>Speler {player} heeft geen dergelijke straf.</gold>"
+  player_not_found: "<gold>Speler met bijnaam <player> niet gevonden.</gold>"
+  ip_not_found: "<gold>Speler met IP <ip> niet gevonden.</gold>"
+  player_not_punished: "<gold>Speler <player> heeft geen dergelijke straf.</gold>"
   reload: "<red>Er is een fout opgetreden tijdens het herladen van de configuratie:</red> "
-  bypass: "<red><b>WAARSCHUWING!</b> Speler <gold>{player}<gold/> <red>kan niet worden gestraft vanwege hun rechten (OP of bypass).</red><dark_gray>Dit kan misschien worden omzeild...</dark_gray>"
+  bypass: "<red><b>WAARSCHUWING!</b> Speler <gold><player><gold/> <red>kan niet worden gestraft vanwege hun rechten (OP of bypass).</red><dark_gray>Dit kan misschien worden omzeild...</dark_gray>"
   db_error: "Er is een fout opgetreden bij het toevoegen van de straf aan de database. Er wordt een back-upmethode gebruikt. Controleer de console!"
 
 
 # /setjail commando berichten
 setjail:
   usage: "Correct gebruik is: <gold>/setjail <radius>"
-  set: "<green>De gevangenislocatie is ingesteld: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>] met een straal van <gold>{radius}</gold>"
+  set: "<green>De gevangenislocatie is ingesteld: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>] met een straal van <gold><radius></gold>"
   set_error: "<red>Fout bij het instellen van de gevangenislocatie</red>"
   invalid_radius: "<red>Geef een geldige straal op (nummer groter dan 0)</red>"
 
 # /setspawn commando berichten
 setspawn:
   usage: "Correct gebruik is: <gold>/setspawn"
-  set: "<green>Spawnlocatie is ingesteld: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>]</green>"
+  set: "<green>Spawnlocatie is ingesteld: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
   set_error: "<red>Fout bij het instellen van de spawnlocatie</red>"
   invalid_coordinates: "<red>Geef geldige coördinaten op (getallen)</red>"
 
 # /jail commando berichten
 jail:
-  jail: "<green>Je hebt speler <gold>{player}</gold> opgesloten voor <gold>{reason}</gold> voor <gold>{time}</gold></green>"
+  jail: "<green>Je hebt speler <gold><player></gold> opgesloten voor <gold><reason></gold> voor <gold><time></gold></green>"
   usage: "Correct gebruik is: <gold>/jail <speler_naam> (tijd) <reden>"
-  jail_message: "<red>Je bent opgesloten voor <b>{reason}</b> voor <b>{time}</b></red>"
+  jail_message: "<red>Je bent opgesloten voor <b><reason></b> voor <b><time></b></red>"
   jail_info_message: "<red>Je probeert te spreken, maar niemand kan je horen vanuit de gevangenis</red>"
   jail_restrict_message: "Het verlaten van het gevangenisgebied is verboden. Je bent teruggeteleporteerd naar de aangewezen locatie."
-  broadcast: "<dark_gray>Speler <gray>{player}</gray> is opgesloten voor <gray>{reason}</gray> voor <gray>{time}</gray></dark_gray>"
-  log: "<dark_gray>Opgesloten speler <gray>{player}</gray> <dark_gray>roept vanuit hun cel: <gray>{message}</gray>"
+  broadcast: "<dark_gray>Speler <gray><player></gray> is opgesloten voor <gray><reason></gray> voor <gray><time></gray></dark_gray>"
+  log: "<dark_gray>Opgesloten speler <gray><player></gray> <dark_gray>roept vanuit hun cel: <gray><message></gray>"
   no_reasons: "geen reden"
   reasons:
     - "Adverteren"
@@ -50,27 +50,27 @@ jail:
 
 # /unjail commando berichten
 unjail:
-  unjail: "<green>Je hebt speler <gold>{player}</gold> uit de gevangenis vrijgelaten</green>"
+  unjail: "<green>Je hebt speler <gold><player></gold> uit de gevangenis vrijgelaten</green>"
   usage: "Correct gebruik is: <gold>/unjail <speler_naam>"
   unjail_message: "<green>Je gevangenisstraf is beëindigd! Verspil deze kans niet!</green>"
-  success: "<green>Speler <gold>{player}</gold> is succesvol uit de gevangenis vrijgelaten.</green>"
-  broadcast: "Speler <gold>{player}</gold> is uit de gevangenis vrijgelaten. Kijk uit..."
+  success: "<green>Speler <gold><player></gold> is succesvol uit de gevangenis vrijgelaten.</green>"
+  broadcast: "Speler <gold><player></gold> is uit de gevangenis vrijgelaten. Kijk uit..."
 
 # /ban commando berichten
 ban:
-  ban: "<green>Je hebt <gold>{player}</gold> verbannen voor <gold>{reason}</gold> voor <gold>{time}</green>"
+  ban: "<green>Je hebt <gold><player></gold> verbannen voor <gold><reason></gold> voor <gold><time></green>"
   usage: "Correct gebruik is: <gold>/ban <speler> (tijd) <reden>"
   kick_message:
     - 'Server Naam'
     - 'PunisherX &8» &7Je bent verbannen'
     - '&7'
     - '&7'
-    - "&cReden &8» &7{reason}"
-    - "&cVoor &8» &7{time}"
+    - "&cReden &8» &7<reason>"
+    - "&cVoor &8» &7<time>"
     - '&7'
     - '&8Je kunt in beroep gaan op:'
     - "&eDiscord &8» &c&nhttps://servername.pl/discord"
-  broadcast: "<dark_gray>Speler <gray>{player}</gray> is verbannen voor <gray>{reason}</gray> voor <gray>{time}</gray></dark_gray>"
+  broadcast: "<dark_gray>Speler <gray><player></gray> is verbannen voor <gray><reason></gray> voor <gray><time></gray></dark_gray>"
   no_reasons: "geen reden"
   reasons:
     - "Cheaten"
@@ -80,19 +80,19 @@ ban:
 
 # /banip commando berichten
 banip:
-  ban: "<green>Je hebt het IP van de speler verbannen voor <gold>{reason}</gold> voor <gold>{time}</green>"
+  ban: "<green>Je hebt het IP van de speler verbannen voor <gold><reason></gold> voor <gold><time></green>"
   usage: "Correct gebruik is: <gold>/banip <speler|ip> (tijd) <reden>"
   kick_message:
     - 'Server Naam'
     - 'PunisherX &8» &7Je IP is verbannen!'
     - '&7'
     - '&7'
-    - "&cReden &8» &7{reason}"
-    - "&cVoor &8» &7{time}"
+    - "&cReden &8» &7<reason>"
+    - "&cVoor &8» &7<time>"
     - '&7'
     - '&8Je kunt in beroep gaan op:'
     - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.pl/discord"
-  broadcast: "<dark_gray>Speler <gray>{player}</gray> is verbannen voor <gray>{reason}</gray> voor <gray>{time}</gray></dark_gray>"
+  broadcast: "<dark_gray>Speler <gray><player></gray> is verbannen voor <gray><reason></gray> voor <gray><time></gray></dark_gray>"
   no_reasons: "geen reden"
   reasons:
     - "Meerdere accounts"
@@ -102,18 +102,18 @@ banip:
 
 # /unban commando berichten
 unban:
-  unban: "<green>Speler <gold>{player}</gold> is uit de ban gehaald</green>"
+  unban: "<green>Speler <gold><player></gold> is uit de ban gehaald</green>"
   usage: "Correct gebruik is: <gold>/unban <speler>"
-  broadcast: "<dark_gray>Speler <gray>{player}</gray> is uit de ban gehaald</dark_gray>"
+  broadcast: "<dark_gray>Speler <gray><player></gray> is uit de ban gehaald</dark_gray>"
 
 # /mute commando berichten
 mute:
-  mute: "<green>Je hebt speler <gold>{player}</gold> gemute voor <gold>{reason}</gold> voor <gold>{time}</green>"
+  mute: "<green>Je hebt speler <gold><player></gold> gemute voor <gold><reason></gold> voor <gold><time></green>"
   usage: "Correct gebruik is: <gold>/mute <speler> (tijd) <reden>"
-  mute_message: "<red>Je bent gemute voor <b>{reason}</b> voor <b>{time}</b></red>"
-  mute_info_message: "<red>Je probeert iets te zeggen, maar je bent nog {time} gedempt</red>"
-  broadcast: "<dark_gray>Speler <gray>{player}</gray> is gemute voor <gray>{reason}</gray> voor <gray>{time}</gray></dark_gray>"
-  log: "<dark_gray>Gemute speler <gray>{player}</gray> <dark_gray>stuurde een bericht: <gray>{message}</gray>"
+  mute_message: "<red>Je bent gemute voor <b><reason></b> voor <b><time></b></red>"
+  mute_info_message: "<red>Je probeert iets te zeggen, maar je bent nog <time> gedempt</red>"
+  broadcast: "<dark_gray>Speler <gray><player></gray> is gemute voor <gray><reason></gray> voor <gray><time></gray></dark_gray>"
+  log: "<dark_gray>Gemute speler <gray><player></gray> <dark_gray>stuurde een bericht: <gray><message></gray>"
   no_reasons: "geen reden"
   reasons:
     - "Adverteren"
@@ -123,16 +123,16 @@ mute:
 
 # /unmute commando berichten
 unmute:
-  unmute: "<green>Je hebt speler <gold>{player}</gold> gedemute</green>"
+  unmute: "<green>Je hebt speler <gold><player></gold> gedemute</green>"
   usage: "Correct gebruik is: <gold>/unmute <speler>"
   unmute_message: "<green>Je bent gedemute!</green>"
 
 # /warn commando berichten
 warn:
-  warn: "<green>Je hebt speler <gold>{player}</gold> gewaarschuwd ({warn_no} keer) voor <gold>{reason}</gold> voor <gold>{time}</green>"
+  warn: "<green>Je hebt speler <gold><player></gold> gewaarschuwd (<warn_no> keer) voor <gold><reason></gold> voor <gold><time></green>"
   usage: "Correct gebruik is: <gold>/warn <speler> (tijd) <reden>"
-  warn_message: "<red>Je hebt <b>{warn_no}</b> waarschuwing(en) ontvangen!</red>"
-  broadcast: "<dark_gray>Speler <gray>{player}</gray> heeft een waarschuwing ontvangen voor <gray>{reason}</gray> voor <gray>{time}</gray></dark_gray>"
+  warn_message: "<red>Je hebt <b><warn_no></b> waarschuwing(en) ontvangen!</red>"
+  broadcast: "<dark_gray>Speler <gray><player></gray> heeft een waarschuwing ontvangen voor <gray><reason></gray> voor <gray><time></gray></dark_gray>"
   no_reasons: "geen reden"
   reasons:
     - "Adverteren"
@@ -142,24 +142,24 @@ warn:
 
 # /unwarn commando berichten
 unwarn:
-  unwarn: "<green>Je hebt de waarschuwing voor speler <gold>{player}</gold> verwijderd</green>"
+  unwarn: "<green>Je hebt de waarschuwing voor speler <gold><player></gold> verwijderd</green>"
   usage: "Correct gebruik is: <gold>/unwarn <speler>"
 
 # /kick commando berichten
 kick:
-  kick: "<green>Je hebt speler <gold>{player}</gold> gekicked voor <gold>{reason}</gold></green>"
+  kick: "<green>Je hebt speler <gold><player></gold> gekicked voor <gold><reason></gold></green>"
   usage: "Correct gebruik is: <gold>/kick <speler> <reden>"
   kick_message:
     - 'Server Naam'
     - 'PunisherX &8» &7Je bent gekicked'
     - '&7'
     - '&7'
-    - "&cReden &8» &7{reason}"
+    - "&cReden &8» &7<reason>"
     - '&7'
     - '&7'
     - '&8Je kunt in beroep gaan op:'
     - "&eDiscord &8» &c&nhttps://servername.pl/discord"
-  broadcast: "<dark_gray>Speler <gray>{player}</gray> is gekicked voor <gray>{reason}</gray></dark_gray>"
+  broadcast: "<dark_gray>Speler <gray><player></gray> is gekicked voor <gray><reason></gray></dark_gray>"
   no_reasons: "geen reden"
   reasons:
     - "Overstroming"
@@ -170,7 +170,7 @@ kick:
 check:
   usage: "Correct gebruik is: <gold>/check <speler_naam> <alles|ban|jail|mute|warn>"
   invalid_type: "<red>Ongeldig strafftype. Gebruik: alles, ban, jail, mute, warn.</red>"
-  no_punishments: "<dark_green>Speler <gold>{player}</gold> heeft geen straffen.</dark_green>"
+  no_punishments: "<dark_green>Speler <gold><player></gold> heeft geen straffen.</dark_green>"
   title: "<dark_gray>Actieve straffen voor</dark_gray>"
   id: "<dark_gray>ID</dark_gray>"
   type: "<dark_gray>Type</dark_gray>"
@@ -180,7 +180,7 @@ check:
 # /history commando berichten
 history:
   usage: "Correct gebruik is: <gold>/history <speler_naam>"
-  no_punishments: "<dark_green>Speler <gold>{player}</gold> heeft geen straffen.</dark_green>"
+  no_punishments: "<dark_green>Speler <gold><player></gold> heeft geen straffen.</dark_green>"
   title: "<dark_gray>Actieve straffen voor</dark_gray>"
   id: "<dark_gray>ID</dark_gray>"
   type: "<dark_gray>Type</dark_gray>"
@@ -194,19 +194,19 @@ banlist:
   title: "<blue>|   <gray>Verbannen spelerslijst:</gray>"
   top_header: "<blue>--------------------------------------------------</blue>"
   table_header: "<blue>|    Naam          |          Type          |          Wanneer</blue>"
-  ban_list: "<blue>|   <hover:show_text:'<white>UUID:</white> <gold>{uuid}</gold>'><white>{player}</white></hover>   |   <hover:show_text:'<white>ID:</white> <gold>#{id}<newline><white>Operator:</white> <gold>{operator}</gold><newline><white>Reden:</white> <gold>{reason}</gold>'><white>{type}</white></hover>   |   <white>{time}</white></blue>"
+  ban_list: "<blue>|   <hover:show_text:'<white>UUID:</white> <gold><uuid></gold>'><white><player></white></hover>   |   <hover:show_text:'<white>ID:</white> <gold>#<id><newline><white>Operator:</white> <gold><operator></gold><newline><white>Reden:</white> <gold><reason></gold>'><white><type></white></hover>   |   <white><time></white></blue>"
 
 # /change-reason commando berichten
 change-reason:
   usage: "Correct gebruik is: <gold>/change-reason <straff_ID> <nieuwe_reden>"
   invalid_id: "<red>Ongeldig straff-ID</red>"
-  success: "<green>De huidige reden voor straff-ID: <gold>{id}</gold> is veranderd naar \"<gold>{reason}</gold>\"</green>"
-  failure: "<red>Fout bij het bijwerken van de reden voor straff-ID: <gold>{id}</gold></red>"
+  success: "<green>De huidige reden voor straff-ID: <gold><id></gold> is veranderd naar \"<gold><reason></gold>\"</green>"
+  failure: "<red>Fout bij het bijwerken van de reden voor straff-ID: <gold><id></gold></red>"
 
 # Berichten voor het /clearall commando
 clear:
   usage: "Correct gebruik is: <gold>/clearall <speler>"
-  clearall: "<green>Alle actieve straffen voor speler </green><gold>{player}</gold><green> zijn gewist</green>"
+  clearall: "<green>Alle actieve straffen voor speler </green><gold><player></gold><green> zijn gewist</green>"
   clear_message: "<green>Alle actieve straffen zijn geannuleerd! </green><dark_gray>Pssst! Heb je misschien wat connecties met de beheerders of zo?</dark_gray>"
 
 # Berichten voor de webhook

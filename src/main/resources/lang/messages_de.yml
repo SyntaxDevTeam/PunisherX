@@ -10,36 +10,36 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 # Fehlermeldungen
 error:
   no_permission: "<red>Du hast keine Berechtigung für diesen Befehl.</red>"
-  player_not_found: "<gold>Spieler mit dem Namen {player} nicht gefunden.</gold>"
-  ip_not_found: "<gold>Spieler mit der IP {ip} nicht gefunden.</gold>"
-  player_not_punished: "<gold>Der Spieler {player} hat keine solche Strafe.</gold>"
+  player_not_found: "<gold>Spieler mit dem Namen <player> nicht gefunden.</gold>"
+  ip_not_found: "<gold>Spieler mit der IP <ip> nicht gefunden.</gold>"
+  player_not_punished: "<gold>Der Spieler <player> hat keine solche Strafe.</gold>"
   reload: "<red>Beim Neuladen der Konfiguration ist ein Fehler aufgetreten:</red> "
-  bypass: "<red><b>ACHTUNG!</b> Spieler <gold>{player}<gold/> <red>kann aufgrund seiner Berechtigungen (OP oder Bypass) nicht bestraft werden.</red><dark_gray>Vielleicht könnte dies umgangen werden..."
+  bypass: "<red><b>ACHTUNG!</b> Spieler <gold><player><gold/> <red>kann aufgrund seiner Berechtigungen (OP oder Bypass) nicht bestraft werden.</red><dark_gray>Vielleicht könnte dies umgangen werden..."
   db_error: "Beim Hinzufügen der Strafe zur Datenbank ist ein Fehler aufgetreten. Fallback-Methode wird verwendet. Überprüfe die Konsole!"
 
 
 # Nachrichten des Befehls /setjail
 setjail:
   usage: "Die korrekte Verwendung ist: <gold>/setjail <radius>"
-  set: "<green>Gefängnisstandort wurde festgelegt: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>] mit einem Radius von <gold>{radius}</gold>"
+  set: "<green>Gefängnisstandort wurde festgelegt: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>] mit einem Radius von <gold><radius></gold>"
   set_error: "<red>Fehler beim Festlegen des Gefängnisstandorts</red>"
   invalid_radius: "<red>Bitte geben Sie einen gültigen Radius an (Zahl größer als 0)</red>"
 
 # Nachrichten des Befehls /setspawn
 setspawn:
   usage: "Die korrekte Verwendung ist: <gold>/setspawn</gold>"
-  set: "<green>Spawnpunkt wurde festgelegt: <gold>{world}</gold> [<gold>{locationx}</gold>, <gold>{locationy}</gold>, <gold>{locationz}</gold>]</green>"
+  set: "<green>Spawnpunkt wurde festgelegt: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
   set_error: "<red>Fehler beim Festlegen des Spawnpunkts</red>"
 
 # Nachrichten des Befehls /jail
 jail:
-  jail: "<green>Sie haben den Spieler <gold>{player}</gold> für <gold>{reason}</gold> für <gold>{time}</gold> eingesperrt</green>"
+  jail: "<green>Sie haben den Spieler <gold><player></gold> für <gold><reason></gold> für <gold><time></gold> eingesperrt</green>"
   usage: "Die korrekte Verwendung ist: <gold>/jail <spielername> (zeit) <grund>"
-  jail_message: "<red>Sie wurden für <b>{reason}</b> für <b>{time}</b> eingesperrt</red>"
+  jail_message: "<red>Sie wurden für <b><reason></b> für <b><time></b> eingesperrt</red>"
   jail_info_message: "<red>Sie versuchen zu sprechen, aber niemand kann Sie aus dem Gefängnis hören</red>"
   jail_restrict_message: "Das Verlassen des Gefängnisbereichs ist verboten. Sie wurden zurück zum vorgesehenen Ort teleportiert."
-  broadcast: "<dark_gray>Spieler <gray>{player}</gray> wurde für <gray>{reason}</gray> für <gray>{time}</gray> eingesperrt</dark_gray>"
-  log: "<dark_gray>Der eingesperrte Spieler <gray>{player}</gray> <dark_gray>schreit aus seiner Zelle: <gray>{message}</gray>"
+  broadcast: "<dark_gray>Spieler <gray><player></gray> wurde für <gray><reason></gray> für <gray><time></gray> eingesperrt</dark_gray>"
+  log: "<dark_gray>Der eingesperrte Spieler <gray><player></gray> <dark_gray>schreit aus seiner Zelle: <gray><message></gray>"
   no_reasons: "ohne Grund"
   reasons:
     - "Werbung"
@@ -49,15 +49,15 @@ jail:
 
 # Nachrichten des Befehls /unjail
 unjail:
-  unjail: "<green>Sie haben den Spieler <gold>{player}</gold> aus dem Gefängnis entlassen</green>"
+  unjail: "<green>Sie haben den Spieler <gold><player></gold> aus dem Gefängnis entlassen</green>"
   usage: "Die korrekte Verwendung ist: <gold>/unjail <spielername>"
   unjail_message: "<green>Ihre Gefängnisstrafe ist beendet! Verschwenden Sie diese Chance nicht!</green>"
-  success: "<green>Spieler <gold>{player}</gold> wurde erfolgreich aus dem Gefängnis entlassen."
-  broadcast: "Spieler <gold>{player}</gold> wurde aus dem Gefängnis entlassen. Besser aufpassen..."
+  success: "<green>Spieler <gold><player></gold> wurde erfolgreich aus dem Gefängnis entlassen."
+  broadcast: "Spieler <gold><player></gold> wurde aus dem Gefängnis entlassen. Besser aufpassen..."
 
 # Nachrichten für den /ban-Befehl
 ban:
-  ban: "<green>Du hast <gold>{player}</gold> für <gold>{reason}</gold> für <gold>{time}</gold> gebannt</green>"
+  ban: "<green>Du hast <gold><player></gold> für <gold><reason></gold> für <gold><time></gold> gebannt</green>"
   usage: "Korrekte Verwendung: <gold>/ban <player> (Dauer) <Grund>"
   kick_message:
     # Sie können die Nachricht für den gekickten Spieler frei anpassen
@@ -65,12 +65,12 @@ ban:
     - 'PunisherX &8» &7Du wurdest gebannt'
     - '&7'
     - '&7'
-    - "&cGrund &8» &7{reason}"
-    - "&cDauer &8» &7{time}"
+    - "&cGrund &8» &7<reason>"
+    - "&cDauer &8» &7<time>"
     - '&7'
     - '&8Du kannst Einspruch einlegen unter:'
     - "&eDiscord &8» &c&nhttps://servername.de/discord"
-  broadcast: "<dark_gray>Spieler <gray>{player}</gray> wurde für <gray>{reason}</gray> für <gray>{time}</gray> gebannt</dark_gray>"
+  broadcast: "<dark_gray>Spieler <gray><player></gray> wurde für <gray><reason></gray> für <gray><time></gray> gebannt</dark_gray>"
   no_reasons: "ohne Grund"
   reasons: # Fügen Sie benutzerdefinierte Gründe hinzu, die während der Befehlsausführung vorgeschlagen werden
     - "Betrug"
@@ -80,7 +80,7 @@ ban:
 
 # Nachrichten für den /banip-Befehl
 banip:
-  ban: "<green>Du hast die IP von {player} für <gold>{reason}</gold> für <gold>{time}</gold> gebannt</green>"
+  ban: "<green>Du hast die IP von <player> für <gold><reason></gold> für <gold><time></gold> gebannt</green>"
   usage: "Korrekte Verwendung: <gold>/banip <player|ip> (Dauer) <Grund>"
   kick_message:
     # Sie können die Nachricht für den gekickten Spieler frei anpassen
@@ -88,12 +88,12 @@ banip:
     - 'PunisherX &8» &7Deine IP wurde gebannt!'
     - '&7'
     - '&7'
-    - "&cGrund &8» &7{reason}"
-    - "&cDauer &8» &7{time}"
+    - "&cGrund &8» &7<reason>"
+    - "&cDauer &8» &7<time>"
     - '&7'
     - '&8Du kannst Einspruch einlegen unter:'
     - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.de/discord"
-  broadcast: "<dark_gray>Spieler <gray>{player}</gray> wurde wegen <gray>{reason}</gray> für <gray>{time}</gray> gebannt</dark_gray>"
+  broadcast: "<dark_gray>Spieler <gray><player></gray> wurde wegen <gray><reason></gray> für <gray><time></gray> gebannt</dark_gray>"
   no_reasons: "ohne Grund"
   reasons:
     - "Multi-Account"
@@ -103,18 +103,18 @@ banip:
 
 # Nachrichten für den /unban-Befehl
 unban:
-  unban: "<green>Spieler <gold>{player}</gold> wurde entbannt</green>"
+  unban: "<green>Spieler <gold><player></gold> wurde entbannt</green>"
   usage: "Korrekte Verwendung: <gold>/unban <player>"
-  broadcast: "<dark_gray>Spieler <gray>{player}</gray> wurde entbannt</dark_gray>"
+  broadcast: "<dark_gray>Spieler <gray><player></gray> wurde entbannt</dark_gray>"
 
 # Nachrichten für den /mute-Befehl
 mute:
-  mute: "<green>Du hast Spieler <gold>{player}</gold> für <gold>{reason}</gold> für <gold>{time}</gold> stummgeschaltet</green>"
+  mute: "<green>Du hast Spieler <gold><player></gold> für <gold><reason></gold> für <gold><time></gold> stummgeschaltet</green>"
   usage: "Korrekte Verwendung: <gold>/mute <player> (Dauer) <Grund>"
-  mute_message: "<red>Du wurdest für <b>{reason}</b> für <b>{time}</b> stummgeschaltet</red>"
-  mute_info_message: "<red>Du versuchst zu sprechen, bist aber noch für {time} stummgeschaltet</red>"
-  broadcast: "<dark_gray>Spieler <gray>{player}</gray> wurde für <gray>{reason}</gray> für <gray>{time}</gray> stummgeschaltet</dark_gray>"
-  log: "<dark_gray>Stummer Spieler <gray>{player}</gray> <dark_gray>hat eine Nachricht gesendet: <gray>{message}</gray>"
+  mute_message: "<red>Du wurdest für <b><reason></b> für <b><time></b> stummgeschaltet</red>"
+  mute_info_message: "<red>Du versuchst zu sprechen, bist aber noch für <time> stummgeschaltet</red>"
+  broadcast: "<dark_gray>Spieler <gray><player></gray> wurde für <gray><reason></gray> für <gray><time></gray> stummgeschaltet</dark_gray>"
+  log: "<dark_gray>Stummer Spieler <gray><player></gray> <dark_gray>hat eine Nachricht gesendet: <gray><message></gray>"
   no_reasons: "ohne Grund"
   reasons:
     - "Werbung"
@@ -124,16 +124,16 @@ mute:
 
 # Nachrichten für den /unmute-Befehl
 unmute:
-  unmute: "<green>Du hast Spieler <gold>{player}</gold> entstummt</green>"
+  unmute: "<green>Du hast Spieler <gold><player></gold> entstummt</green>"
   usage: "Korrekte Verwendung: <gold>/unmute <player>"
   unmute_message: "<green>Du wurdest entstummt!</green>"
 
 # Nachrichten für den /warn-Befehl
 warn:
-  warn: "<green>Du hast ({warn_no} Mal) Spieler <gold>{player}</gold> für <gold>{reason}</gold> für <gold>{time}</gold> gewarnt</green>"
+  warn: "<green>Du hast (<warn_no> Mal) Spieler <gold><player></gold> für <gold><reason></gold> für <gold><time></gold> gewarnt</green>"
   usage: "Korrekte Verwendung: <gold>/warn <player> (Dauer) <Grund>"
-  warn_message: "<red>Du hast <b>{warn_no}</b> Verwarnung erhalten!</red>"
-  broadcast: "<dark_gray>Spieler <gray>{player}</gray> wurde für <gray>{reason}</gray> für <gray>{time}</gray> verwarnt</dark_gray>"
+  warn_message: "<red>Du hast <b><warn_no></b> Verwarnung erhalten!</red>"
+  broadcast: "<dark_gray>Spieler <gray><player></gray> wurde für <gray><reason></gray> für <gray><time></gray> verwarnt</dark_gray>"
   no_reasons: "ohne Grund"
   reasons:
     - "Werbung"
@@ -143,12 +143,12 @@ warn:
 
 # Nachrichten für den /unwarn-Befehl
 unwarn:
-  unwarn: "<green>Du hast die Verwarnung für Spieler <gold>{player}</gold> entfernt</green>"
+  unwarn: "<green>Du hast die Verwarnung für Spieler <gold><player></gold> entfernt</green>"
   usage: "Korrekte Verwendung: <gold>/unwarn <player>"
 
 # Nachrichten für den /kick-Befehl
 kick:
-  kick: "<green>Du hast <gold>{player}</gold> für <gold>{reason}</gold> gekickt</green>"
+  kick: "<green>Du hast <gold><player></gold> für <gold><reason></gold> gekickt</green>"
   usage: "Korrekte Verwendung: <gold>/kick <player> <Grund>"
   kick_message:
     # Sie können die Nachricht für den gekickten Spieler frei anpassen
@@ -156,12 +156,12 @@ kick:
     - 'PunisherX &8» &7Du wurdest gekickt'
     - '&7'
     - '&7'
-    - "&cGrund &8» &7{reason}"
+    - "&cGrund &8» &7<reason>"
     - '&7'
     - '&7'
     - '&8Du kannst Einspruch einlegen unter:'
     - "&eDiscord &8» &c&nhttps://servername.de/discord"
-  broadcast: "<dark_gray>Spieler <gray>{player}</gray> wurde für <gray>{reason}</gray> gekickt</dark_gray>"
+  broadcast: "<dark_gray>Spieler <gray><player></gray> wurde für <gray><reason></gray> gekickt</dark_gray>"
   no_reasons: "ohne Grund"
   reasons:
     - "Flood"
@@ -172,7 +172,7 @@ kick:
 check:
   usage: "Korrekte Verwendung: <gold>/check <player_name> <all|ban|jail|mute|warn>"
   invalid_type: "<red>Ungültiger Strafentyp. Verwenden Sie: all, ban, jail, mute, warn.</red>"
-  no_punishments: "<dark_green>Spieler <gold>{player}</gold> hat keine Strafen.</dark_green>"
+  no_punishments: "<dark_green>Spieler <gold><player></gold> hat keine Strafen.</dark_green>"
   title: "<dark_gray>Aktive Strafen für</dark_gray>"
   id: "<dark_gray>ID</dark_gray>"
   type: "<dark_gray>Typ</dark_gray>"
@@ -182,7 +182,7 @@ check:
 # Nachrichten für den /history-Befehl
 history:
   usage: "Korrekte Verwendung: <gold>/history <player_name>"
-  no_punishments: "<dark_green>Spieler <gold>{player}</gold> hat keine Strafen.</dark_green>"
+  no_punishments: "<dark_green>Spieler <gold><player></gold> hat keine Strafen.</dark_green>"
   title: "<dark_gray>Aktive Strafen für</dark_gray>"
   id: "<dark_gray>ID</dark_gray>"
   type: "<dark_gray>Typ</dark_gray>"
@@ -196,19 +196,19 @@ banlist:
   title: "<blue>|   <gray>Liste der gebannten Spieler:</gray>"
   top_header: "<blue>--------------------------------------------------</blue>"
   table_header: "<blue>|    Name          |          Typ           |          Wann</blue>"
-  ban_list: "<blue>|   <hover:show_text:'<white>UUID:</white> <gold>{uuid}</gold>'><white>{player}</white></hover>   |   <hover:show_text:'<white>ID:</white> <gold>#{id}<newline><white>Operator:</white> <gold>{operator}</gold><newline><white>Grund:</white> <gold>{reason}</gold>'><white>{type}</white></hover>   |   <white>{time}</white></blue>"
+  ban_list: "<blue>|   <hover:show_text:'<white>UUID:</white> <gold><uuid></gold>'><white><player></white></hover>   |   <hover:show_text:'<white>ID:</white> <gold>#<id><newline><white>Operator:</white> <gold><operator></gold><newline><white>Grund:</white> <gold><reason></gold>'><white><type></white></hover>   |   <white><time></white></blue>"
 
 # Nachrichten für den /change-reason-Befehl
 change-reason:
   usage: "Korrekte Verwendung: <gold>/change-reason <Strafe-ID> <neuer Grund>"
   invalid_id: "<red>Ungültige Strafe-ID</red>"
-  success: "<green>Der Grund für die Strafe mit ID: <gold>{id}</gold> wurde in \"<gold>{reason}</gold>\" geändert</green>"
-  failure: "<red>Der Grund für die Strafe mit ID: <gold>{id}</gold> konnte nicht aktualisiert werden</red>"
+  success: "<green>Der Grund für die Strafe mit ID: <gold><id></gold> wurde in \"<gold><reason></gold>\" geändert</green>"
+  failure: "<red>Der Grund für die Strafe mit ID: <gold><id></gold> konnte nicht aktualisiert werden</red>"
 
 # Nachrichten für den Befehl /clearall
 clear:
   usage: "Die korrekte Nutzung lautet: <gold>/clearall <player>"
-  clearall: "<green>Alle aktiven Strafen für Spieler </green><gold>{player}</gold><green> wurden gelöscht</green>"
+  clearall: "<green>Alle aktiven Strafen für Spieler </green><gold><player></gold><green> wurden gelöscht</green>"
   clear_message: "<green>Alle deine aktiven Strafen wurden aufgehoben! </green><dark_gray>Pssst! Hast du irgendwelche Kontakte zur Administration oder so?"
 
 webhook:

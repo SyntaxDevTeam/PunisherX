@@ -35,7 +35,7 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:core:1.0.12")
+    compileOnly("pl.syntaxdevteam:core:1.0.14")
     compileOnly("pl.syntaxdevteam:cleanerx:1.5.2")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.4")
