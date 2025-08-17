@@ -5,7 +5,7 @@ api-version: '1.20'
 folia-supported: true
 
 authors: [SyntaxDevTeam]
-website: https://github.com/SyntaxDevTeam/PunisherX
+website: github.com/SyntaxDevTeam/PunisherX
 support:
   issues: https://github.com/SyntaxDevTeam/PunisherX/issues
   updates: https://github.com/SyntaxDevTeam/PunisherX/releases
