@@ -68,7 +68,7 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
     }
 
     override fun getTitle(): Component {
-        return plugin.messageHandler.getLogMessage("GUI", "PunisherMain")
+        return plugin.messageHandler.getLogMessage("GUI", "PunisherMain.title")
     }
 
     private fun createItem(material: Material, name: String, loreLines: List<String> = emptyList()): ItemStack {

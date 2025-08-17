@@ -53,13 +53,16 @@ class PlayerListGUI(private val plugin: PunisherX) : GUI {
             meta.displayName(
                 plugin.messageHandler.formatMixedTextToMiniMessage("<yellow>${target.name}</yellow>", TagResolver.empty())
             )
-
+            val loadMsg = plugin.messageHandler.getCleanMessage("GUI", "PlayerList.loading")
             meta.lore(
                 listOf(
-                    plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Czas online: <yellow>Ładowanie…</yellow>", TagResolver.empty()),
-                    plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Czas łączny: <yellow>Ładowanie…</yellow>", TagResolver.empty()),
-                    plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Kara: <red>Brak</red>", TagResolver.empty()),
-                    plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Łącznie kar: <yellow>Ładowanie…</yellow>", TagResolver.empty())
+                    plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.uuid", mapOf("uuid" to target.uniqueId.toString())),
+                    plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loadMsg)),
+                    plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to loadMsg)),
+                    plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to loadMsg)),
+                    plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to loadMsg)),
+                    plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.punishments", mapOf("punishments" to loadMsg)),
+                    plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to loadMsg)),
                 )
             )
             head.itemMeta = meta
@@ -70,6 +73,9 @@ class PlayerListGUI(private val plugin: PunisherX) : GUI {
                 val onlineStr  = PlayerStatsService.getCurrentOnlineString(uuid) ?: "Brak danych"
                 val totalStr   = PlayerStatsService.getTotalPlaytimeString(uuid) ?: "Brak danych"
                 val punishStr  = plugin.databaseHandler.countPlayerAllPunishmentHistory(uuid).toString()
+                val playerIP   = plugin.playerIPManager.getPlayerIPByName(target.name) ?: "Brak danych"
+                val punishments = "brak"
+                val lastActive = "????-?? ??-?? ?? ??-??:??:??" // Placeholder for last active time
 
                 Bukkit.getScheduler().runTask(plugin, Runnable {
                     if (!holder.inv.viewers.contains(player)) return@Runnable
@@ -77,10 +83,13 @@ class PlayerListGUI(private val plugin: PunisherX) : GUI {
                     val im = item.itemMeta as SkullMeta
                     im.lore(
                         listOf(
-                            plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Czas online: <green>$onlineStr</green>", TagResolver.empty()),
-                            plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Czas łączny: <green>$totalStr</green>", TagResolver.empty()),
-                            plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Kara: <red>Brak</red>", TagResolver.empty()),
-                            plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Łącznie kar: <yellow>$punishStr</yellow>", TagResolver.empty())
+                            plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.uuid", mapOf("uuid" to target.uniqueId.toString())),
+                            plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to playerIP)),
+                            plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to onlineStr)),
+                            plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to totalStr)),
+                            plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to lastActive)),
+                            plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.punishments", mapOf("punishments" to punishments)),
+                            plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to punishStr)),
                         )
                     )
                     item.itemMeta = im
@@ -123,7 +132,7 @@ class PlayerListGUI(private val plugin: PunisherX) : GUI {
     }
 
     override fun getTitle(): Component {
-        return plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Gracze online</gray>", TagResolver.empty())
+        return plugin.messageHandler.getLogMessage("GUI", "PlayerList.title")
     }
     private fun createNavItem(material: Material, name: String): ItemStack {
         val item = ItemStack(material)

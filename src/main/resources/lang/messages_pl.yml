@@ -255,6 +255,42 @@ clear:
   clearall: "<green>Wszystkie aktywne kary gracza </green><gold><player></gold><green> zostały wyczyszczone</green>"
   clear_message: "<green>Wszystkie Twoje aktywne kary zostały anulowane!</green> <grey>Pssssyt! Masz jakieś układy z administracją czy coś?"
 
+# Obsługa wiadomości z GUI
+GUI:
+  PunisherMain:
+    title: "<dark_gray>Główne menu PunisherX</dark_gray>"
+    item:
+      serwerInfo:
+        - "<gray>Nazwa serwera: <green>${plugin.getServerName()}</green>",
+        - "<gray>Ilość graczy online: <yellow>${plugin.server.onlinePlayers.size}</yellow>",
+        - "<gray>Ilość wykonanych kar dzisiaj: <yellow>0</yellow>",
+        - "<gray>Czas działania serwera: <green>1h</green> (<green>20.0</green>)"
+      jail: "<gold>Zarządzaj więzieniem</gold>"
+      mute: "<gold>Zarządzaj wyciszeniami</gold>"
+      warn: "<gold>Zarządzaj ostrzeżeniami</gold>"
+      history: "<gold>Historia kar gracza</gold>"
+      banlist: "<gold>Lista zbanowanych graczy</gold>"
+      playerlist: "<gold>Lista graczy online</gold>"
+      reload: "<red>Przeładuj konfigurację</red>"
+  PlayerList:
+    title: "<green>Lista graczy online</green>"
+    loading: "<gray>Trwa ładowanie danych...</gray>"
+    hover:
+      uuid:         "<gray>UUID: <yellow><uuid></yellow>"
+      playerIP:     "<gray>Obecne IP: <yellow><playerip></yellow>"
+      onlineStr:    "<gray>Czas online: <green><onlinestr></green>"
+      totalStr:     "<gray>Czas łączny: <green><totalstr></green>"
+      lastActive:   "<gray>Poprzednio widziany: <yellow><lastactive></yellow>"
+      punishments:  "<gray>Aktualna kara: <yellow><punishments></yellow>"
+      punishStr:    "<gray>Łącznie kar: <yellow><punishstr></yellow>"
+  Test:
+    - "Test 1"
+    - "Test 2"
+    - "Test 3"
+    - "Test 4"
+    - "Test 5"
+
+
 # Wiadomości webhooka
 webhook:
   title: "Nowa kara na serwerze"

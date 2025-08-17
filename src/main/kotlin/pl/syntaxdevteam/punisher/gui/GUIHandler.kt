@@ -13,8 +13,8 @@ class GUIHandler(private val plugin: PunisherX) : Listener {
         val title = event.view.title()
 
         when (title) {
-            plugin.messageHandler.getLogMessage("GUI", "PunisherMain") -> PunisherMain(plugin).handleClick(event)
-            plugin.messageHandler.formatMixedTextToMiniMessage("<gray>Gracze online</gray>", TagResolver.empty()) -> PlayerListGUI(plugin).handleClick(event)
+            plugin.messageHandler.getLogMessage("GUI", "PunisherMain.title") -> PunisherMain(plugin).handleClick(event)
+            plugin.messageHandler.getLogMessage("GUI", "PlayerList.title") -> PlayerListGUI(plugin).handleClick(event)
         }
     }
 }
