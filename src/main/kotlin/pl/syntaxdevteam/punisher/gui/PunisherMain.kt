@@ -8,6 +8,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.stats.PlayerStatsService
 
 /**
  * Main menu of PunisherX.
@@ -28,22 +29,34 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
      * Buttons displayed in the main menu.
      */
     private val menuEntries = listOf(
-        MenuEntry("Informacje o serwerze", Material.PAPER, 13) { _ -> },
-        MenuEntry("Gracze online", Material.PLAYER_HEAD, 22) { player ->
+        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.serwerInfo.title"), Material.PAPER, 4) { _ -> },
+        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOnline.title"), Material.PLAYER_HEAD, 19) { player ->
             PlayerListGUI(plugin).open(player)
+        },
+        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.adminOnline.title"), Material.COMMAND_BLOCK, 22) { _ ->
+        },
+        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.compare.title"), Material.GOLDEN_CARROT, 25) { _ ->
         },
     )
 
     override fun open(player: Player) {
-        val inventory = Bukkit.createInventory(null, 27, getTitle())
+        val inventory = Bukkit.createInventory(null, 36, getTitle())
+        val serverName = plugin.getServerName()
+        val onlinePlayers = Bukkit.getOnlinePlayers().size.toString()
+        val daily = "0"
+        val time = "1h"
+        val tps = "20.0"
 
         menuEntries.forEach { entry ->
             val lore = when (entry.slot) {
-                13 -> listOf(
-                    "<gray>Nazwa serwera: <green>${plugin.getServerName()}</green>",
-                    "<gray>Ilość graczy online: <yellow>${plugin.server.onlinePlayers.size}</yellow>",
-                    "<gray>Ilość wykonanych kar dzisiaj: <yellow>0</yellow>",
-                    "<gray>Czas działania serwera: <green>1h</green> (<green>20.0</green>)"
+                4 -> listOf(
+                    plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.serwerInfo.serverName", mapOf("servername" to serverName)),
+                    plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.serwerInfo.daily", mapOf("daily" to daily)),
+                    plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.serwerInfo.tps", mapOf("time" to time, "tps" to tps)),
+                )
+                19 -> listOf(
+                    plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOnline.online", mapOf("onlineplayers" to onlinePlayers)),
+                    plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOnline.clickToView")
                 )
                 else -> emptyList()
             }
@@ -68,7 +81,7 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
     }
 
     override fun getTitle(): Component {
-        return plugin.messageHandler.getLogMessage("GUI", "PunisherMain.title")
+        return plugin.messageHandler.getLogMessage("GUI", "PunisherMain.playerOnline.title")
     }
 
     private fun createItem(material: Material, name: String, loreLines: List<String> = emptyList()): ItemStack {

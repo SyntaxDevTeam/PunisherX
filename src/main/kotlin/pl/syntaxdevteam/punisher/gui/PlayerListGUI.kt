@@ -56,7 +56,7 @@ class PlayerListGUI(private val plugin: PunisherX) : GUI {
             val loadMsg = plugin.messageHandler.getCleanMessage("GUI", "PlayerList.loading")
             meta.lore(
                 listOf(
-                    plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.uuid", mapOf("uuid" to target.uniqueId.toString())),
+                    plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.uuid", mapOf("uuid" to loadMsg)),
                     plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loadMsg)),
                     plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to loadMsg)),
                     plugin.messageHandler.getLogMessage("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to loadMsg)),
