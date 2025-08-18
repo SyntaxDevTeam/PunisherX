@@ -64,7 +64,11 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                     plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
 
                     if (targetPlayer != null) {
-                        val kickMessages = plugin.messageHandler.getComplexMessage("ban", "kick_message", mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime)))
+                        val kickMessages = plugin.messageHandler.getSmartMessage(
+                            "ban",
+                            "kick_message",
+                            mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
+                        )
                         val kickMessage = Component.text()
                         kickMessages.forEach { line ->
                             kickMessage.append(line)
@@ -72,12 +76,22 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                         }
                         targetPlayer.kick(kickMessage.build())
                     }
-                    stack.sender.sendMessage(plugin.messageHandler.getMessage("ban", "ban", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))))
 
-                    val broadcastMessage = plugin.messageHandler.getMessage("ban", "broadcast", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime)))
+                    plugin.messageHandler.getSmartMessage(
+                        "ban",
+                        "ban",
+                        mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
+                    ).forEach { stack.sender.sendMessage(it) }
+
+                    val broadcastMessages = plugin.messageHandler.getSmartMessage(
+                        "ban",
+                        "broadcast",
+                        mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
+                    )
+
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if(PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_BAN)) {
-                            onlinePlayer.sendMessage(broadcastMessage)
+                            broadcastMessages.forEach { onlinePlayer.sendMessage(it) }
                         }
                     }
                     if (isForce) {

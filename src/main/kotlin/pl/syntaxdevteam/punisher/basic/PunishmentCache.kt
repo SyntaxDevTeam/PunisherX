@@ -50,13 +50,15 @@ class PunishmentCache(private val plugin: PunisherX) {
             plugin.databaseHandler.removePunishment(uuid.toString(), "JAIL")
 
             Bukkit.getPlayer(uuid)?.let { player ->
-                val bc = plugin.messageHandler.getMessage("unjail", "broadcast", mapOf("player" to player.name))
+                val bc = plugin.messageHandler.getSmartMessage("unjail", "broadcast", mapOf("player" to player.name))
                 plugin.server.onlinePlayers
                     .filter { it.hasPermission("punisherx.see.unjail") }
-                    .forEach { it.sendMessage(bc) }
-                player.sendMessage(
-                    plugin.messageHandler.getMessage("unjail", "success", mapOf("player" to player.name))
-                )
+                    .forEach { p -> bc.forEach { p.sendMessage(it) } }
+                plugin.messageHandler.getSmartMessage(
+                    "unjail",
+                    "success",
+                    mapOf("player" to player.name)
+                ).forEach { msg -> player.sendMessage(msg) }
             }
         }
     }

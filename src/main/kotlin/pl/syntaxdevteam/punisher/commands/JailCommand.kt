@@ -126,12 +126,11 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             }
         }
 
-        stack.sender.sendMessage(
-            plugin.messageHandler.getMessage(
-                "jail", "jail",
-                mapOf("player" to playerName, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
-            )
-        )
+        plugin.messageHandler.getSmartMessage(
+            "jail",
+            "jail",
+            mapOf("player" to playerName, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
+        ).forEach { stack.sender.sendMessage(it) }
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {

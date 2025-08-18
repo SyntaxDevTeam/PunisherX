@@ -50,14 +50,27 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                     plugin.databaseHandler.addPunishment(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
                     plugin.databaseHandler.addPunishmentHistory(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
 
-                    stack.sender.sendMessage(plugin.messageHandler.getMessage("mute", "mute", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))))
-                    val muteMessage = plugin.messageHandler.getMessage("mute", "mute_message", mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime)))
-                    targetPlayer?.sendMessage(muteMessage)
+                    plugin.messageHandler.getSmartMessage(
+                        "mute",
+                        "mute",
+                        mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
+                    ).forEach { stack.sender.sendMessage(it) }
 
-                    val broadcastMessage = plugin.messageHandler.getMessage("mute", "broadcast", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime)))
+                    val muteMessages = plugin.messageHandler.getSmartMessage(
+                        "mute",
+                        "mute_message",
+                        mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
+                    )
+                    targetPlayer?.let { p -> muteMessages.forEach { p.sendMessage(it) } }
+
+                    val broadcastMessages = plugin.messageHandler.getSmartMessage(
+                        "mute",
+                        "broadcast",
+                        mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
+                    )
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_MUTE)) {
-                            onlinePlayer.sendMessage(broadcastMessage)
+                            broadcastMessages.forEach { onlinePlayer.sendMessage(it) }
                         }
                     }
                 }

@@ -36,7 +36,10 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
                         player.teleportAsync(spawnLocation).thenAccept { success ->
                             if (success) {
                                 player.gameMode = GameMode.SURVIVAL
-                                player.sendMessage(plugin.messageHandler.getMessage("unjail", "unjail_message"))
+                                plugin.messageHandler.getSmartMessage(
+                                    "unjail",
+                                    "unjail_message"
+                                ).forEach { msg -> player.sendMessage(msg) }
                                 plugin.logger.debug("<green>Player $playerName successfully unjailed (Folia).</green>")
                             } else {
                                 plugin.logger.debug("<red>Failed to teleport player $playerName during unjail (Folia).</red>")
@@ -52,25 +55,30 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
             } else {
                 player.teleport(spawnLocation)
                 player.gameMode = GameMode.SURVIVAL
-                player.sendMessage(plugin.messageHandler.getMessage("unjail", "unjail_message"))
+                plugin.messageHandler.getSmartMessage(
+                    "unjail",
+                    "unjail_message"
+                ).forEach { msg -> player.sendMessage(msg) }
             }
         }
 
         plugin.cache.removePunishment(uuid)
         plugin.databaseHandler.removePunishment(uuid.toString(), "JAIL")
 
-        val broadcastMessage =
-            plugin.messageHandler.getMessage("unjail", "broadcast", mapOf("player" to playerName))
+        val broadcastMessages =
+            plugin.messageHandler.getSmartMessage("unjail", "broadcast", mapOf("player" to playerName))
 
         plugin.server.onlinePlayers.forEach { onlinePlayer ->
             if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_UNJAIL)) {
-                onlinePlayer.sendMessage(broadcastMessage)
+                broadcastMessages.forEach { msg -> onlinePlayer.sendMessage(msg) }
             }
         }
 
-        stack.sender.sendMessage(
-            plugin.messageHandler.getMessage("unjail", "success", mapOf("player" to playerName))
-        )
+        plugin.messageHandler.getSmartMessage(
+            "unjail",
+            "success",
+            mapOf("player" to playerName)
+        ).forEach { stack.sender.sendMessage(it) }
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {

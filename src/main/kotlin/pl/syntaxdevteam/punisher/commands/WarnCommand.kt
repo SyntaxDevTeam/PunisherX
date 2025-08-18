@@ -41,14 +41,41 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                     plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
 
                     val warnCount = plugin.databaseHandler.getActiveWarnCount(uuid.toString())
-                    stack.sender.sendMessage(plugin.messageHandler.getMessage("warn", "warn", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime), "warn_no" to warnCount.toString())))
-                    val warnMessage = plugin.messageHandler.getMessage("warn", "warn_message", mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime), "warn_no" to warnCount.toString()))
-                    targetPlayer?.sendMessage(warnMessage)
+                    plugin.messageHandler.getSmartMessage(
+                        "warn",
+                        "warn",
+                        mapOf(
+                            "player" to player,
+                            "reason" to reason,
+                            "time" to plugin.timeHandler.formatTime(gtime),
+                            "warn_no" to warnCount.toString()
+                        )
+                    ).forEach { stack.sender.sendMessage(it) }
 
-                    val broadcastMessage = plugin.messageHandler.getMessage("warn", "broadcast", mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime), "warn_no" to warnCount.toString()))
+                    val warnMessages = plugin.messageHandler.getSmartMessage(
+                        "warn",
+                        "warn_message",
+                        mapOf(
+                            "reason" to reason,
+                            "time" to plugin.timeHandler.formatTime(gtime),
+                            "warn_no" to warnCount.toString()
+                        )
+                    )
+                    targetPlayer?.let { p -> warnMessages.forEach { p.sendMessage(it) } }
+
+                    val broadcastMessages = plugin.messageHandler.getSmartMessage(
+                        "warn",
+                        "broadcast",
+                        mapOf(
+                            "player" to player,
+                            "reason" to reason,
+                            "time" to plugin.timeHandler.formatTime(gtime),
+                            "warn_no" to warnCount.toString()
+                        )
+                    )
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_WARN)) {
-                            onlinePlayer.sendMessage(broadcastMessage)
+                            broadcastMessages.forEach { onlinePlayer.sendMessage(it) }
                         }
                     }
                     executeWarnAction(player, warnCount)

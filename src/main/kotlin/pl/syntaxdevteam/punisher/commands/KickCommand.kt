@@ -60,25 +60,33 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                     )
                 }
 
-                // Kick with message
-                val kickMessages = plugin.messageHandler.getComplexMessage("kick", "kick_message", mapOf("reason" to reason))
+                val kickMessages = plugin.messageHandler.getSmartMessage(
+                    "kick",
+                    "kick_message",
+                    mapOf("reason" to reason)
+                )
                 val kickMessageBuilder = Component.text()
                 kickMessages.forEach { line ->
                     kickMessageBuilder.append(line).append(Component.newline())
                 }
                 target.kick(kickMessageBuilder.build())
 
-                stack.sender.sendMessage(
-                    plugin.messageHandler.getMessage(
-                        "kick", "kick", mapOf("player" to target.name, "reason" to reason)
-                    )
-                )
+                plugin.messageHandler.getSmartMessage(
+                    "kick",
+                    "kick",
+                    mapOf("player" to target.name, "reason" to reason)
+                ).forEach { stack.sender.sendMessage(it) }
             }
 
-            val broadcastMessage = plugin.messageHandler.getMessage("kick", "broadcast", mapOf("player" to "all", "reason" to reason))
+            val broadcastMessages = plugin.messageHandler.getSmartMessage(
+                "kick",
+                "broadcast",
+                mapOf("player" to "all", "reason" to reason)
+            )
+
             plugin.server.onlinePlayers.forEach { onlinePlayer ->
                 if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_KICK)) {
-                    onlinePlayer.sendMessage(broadcastMessage)
+                    broadcastMessages.forEach { onlinePlayer.sendMessage(it) }
                 }
             }
             return
@@ -119,7 +127,11 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         if (targetPlayer != null) {
-            val kickMessages = plugin.messageHandler.getComplexMessage("kick", "kick_message", mapOf("reason" to reason))
+            val kickMessages = plugin.messageHandler.getSmartMessage(
+                "kick",
+                "kick_message",
+                mapOf("reason" to reason)
+            )
             val kickMessageBuilder = Component.text()
             kickMessages.forEach { line ->
                 kickMessageBuilder.append(line).append(Component.newline())
@@ -127,14 +139,20 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
             targetPlayer.kick(kickMessageBuilder.build())
         }
 
-        stack.sender.sendMessage(
-            plugin.messageHandler.getMessage("kick", "kick", mapOf("player" to targetArg, "reason" to reason))
-        )
+        plugin.messageHandler.getSmartMessage(
+            "kick",
+            "kick",
+            mapOf("player" to targetArg, "reason" to reason)
+        ).forEach { stack.sender.sendMessage(it) }
 
-        val broadcastMessage = plugin.messageHandler.getMessage("kick", "broadcast", mapOf("player" to targetArg, "reason" to reason))
+        val broadcastMessages = plugin.messageHandler.getSmartMessage(
+            "kick",
+            "broadcast",
+            mapOf("player" to targetArg, "reason" to reason)
+        )
         plugin.server.onlinePlayers.forEach { onlinePlayer ->
             if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_KICK)) {
-                onlinePlayer.sendMessage(broadcastMessage)
+                broadcastMessages.forEach { onlinePlayer.sendMessage(it) }
             }
         }
     }

@@ -42,11 +42,9 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         val targetUUID: UUID? = when {
-            // jeśli podano IP, szukamy w cache rekordu z tym IP
             IP_REGEX.matches(rawTarget) -> plugin.playerIPManager.getAllDecryptedRecords()
                 .find { it.playerIP == rawTarget }
                 ?.let { UUID.fromString(it.playerUUID) }
-            // jeśli podano UUID lub nazwę, korzystamy z managera UUID
             else -> plugin.uuidManager.getUUID(rawTarget)
         }
         val targetPlayer: Player? = targetUUID?.let { Bukkit.getPlayer(it) }
@@ -78,18 +76,25 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
             "BANIP", start, end ?: -1)
 
         if (targetPlayer != null) {
-            val lines = plugin.messageHandler.getComplexMessage("banip", "kick_message",
-                mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(timeArg)))
+            val lines = plugin.messageHandler.getSmartMessage(
+                "banip",
+                "kick_message",
+                mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(timeArg))
+            )
             val builder = Component.text()
             lines.forEach { builder.append(it).append(Component.newline()) }
             targetPlayer.kick(builder.build())
         }
 
-        val msg = plugin.messageHandler.getMessage("banip", "ban",
-            mapOf("player" to rawTarget, "reason" to reason, "time" to plugin.timeHandler.formatTime(timeArg)))
-        stack.sender.sendMessage(msg)
+        val msgLines = plugin.messageHandler.getSmartMessage(
+            "banip",
+            "ban",
+            mapOf("player" to rawTarget, "reason" to reason, "time" to plugin.timeHandler.formatTime(timeArg))
+        )
+        msgLines.forEach { stack.sender.sendMessage(it) }
+
         plugin.server.onlinePlayers.filter { PermissionChecker.hasWithSee(it, PermissionChecker.PermissionKey.SEE_BANIP) }
-            .forEach { it.sendMessage(msg) }
+            .forEach { player -> msgLines.forEach { player.sendMessage(it) } }
 
         if (isForce) plugin.logger.warning("Force by ${stack.sender.name} on $rawTarget")
     }

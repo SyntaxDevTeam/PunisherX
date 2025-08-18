@@ -34,8 +34,16 @@ class LegacyLoginListener(private val plugin: PunisherX) : Listener {
                         val duration = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(remainingTime.toString())
                         val reason = punishment.reason
                         val kickMessages = when (punishment.type) {
-                            "BAN" -> plugin.messageHandler.getComplexMessage("ban", "kick_message", mapOf("reason" to reason, "time" to duration))
-                            "BANIP" -> plugin.messageHandler.getComplexMessage("banip", "kick_message", mapOf("reason" to reason, "time" to duration))
+                            "BAN" -> plugin.messageHandler.getSmartMessage(
+                                "ban",
+                                "kick_message",
+                                mapOf("reason" to reason, "time" to duration)
+                            )
+                            "BANIP" -> plugin.messageHandler.getSmartMessage(
+                                "banip",
+                                "kick_message",
+                                mapOf("reason" to reason, "time" to duration)
+                            )
                             else -> emptyList()
                         }
                         val kickMessage = Component.text()

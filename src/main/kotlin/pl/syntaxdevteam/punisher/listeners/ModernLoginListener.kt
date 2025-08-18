@@ -51,11 +51,15 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
                     else plugin.timeHandler.formatTime(remainingSecs.toString())
                     val reason = punishment.reason
                     val kickLines = when (punishment.type) {
-                        "BAN"   -> plugin.messageHandler.getComplexMessage(
-                            "ban", "kick_message", mapOf("reason" to reason, "time" to duration)
+                        "BAN"   -> plugin.messageHandler.getSmartMessage(
+                            "ban",
+                            "kick_message",
+                            mapOf("reason" to reason, "time" to duration)
                         )
-                        "BANIP" -> plugin.messageHandler.getComplexMessage(
-                            "banip", "kick_message", mapOf("reason" to reason, "time" to duration)
+                        "BANIP" -> plugin.messageHandler.getSmartMessage(
+                            "banip",
+                            "kick_message",
+                            mapOf("reason" to reason, "time" to duration)
                         )
                         else    -> emptyList()
                     }

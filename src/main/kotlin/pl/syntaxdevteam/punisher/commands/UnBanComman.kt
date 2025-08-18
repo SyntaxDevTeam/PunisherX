@@ -67,7 +67,11 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         if (unbanned) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("unban", "unban", mapOf("player" to playerName)))
+            plugin.messageHandler.getSmartMessage(
+                "unban",
+                "unban",
+                mapOf("player" to playerName)
+            ).forEach { stack.sender.sendMessage(it) }
             broadcastUnban(playerName)
         }
 
@@ -94,7 +98,11 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         if (unbanned) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("unban", "unban", mapOf("player" to ip)))
+            plugin.messageHandler.getSmartMessage(
+                "unban",
+                "unban",
+                mapOf("player" to ip)
+            ).forEach { stack.sender.sendMessage(it) }
             broadcastUnban(ip)
         }
 
@@ -102,11 +110,11 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     private fun broadcastUnban(playerOrIp: String) {
-        val message = plugin.messageHandler.getMessage("unban", "unban", mapOf("player" to playerOrIp))
+        val messages = plugin.messageHandler.getSmartMessage("unban", "unban", mapOf("player" to playerOrIp))
 
         plugin.server.onlinePlayers
             .filter { PermissionChecker.hasWithSee(it, PermissionChecker.PermissionKey.SEE_UNBAN) }
-            .forEach { it.sendMessage(message) }
+            .forEach { player -> messages.forEach { player.sendMessage(it) } }
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
