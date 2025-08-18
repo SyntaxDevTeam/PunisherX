@@ -1,6 +1,5 @@
 package pl.syntaxdevteam.punisher.gui
 
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
