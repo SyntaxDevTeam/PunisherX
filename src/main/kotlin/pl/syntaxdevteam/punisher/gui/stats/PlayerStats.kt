@@ -88,6 +88,13 @@ object PlayerStatsService {
         return Instant.ofEpochMilli(ts).atZone(zone).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
     }
 
+    fun getLastActiveString(uuid: UUID, zone: ZoneId = ZoneId.systemDefault()): String? {
+        val off = Bukkit.getOfflinePlayer(uuid)
+        val ts = if (off.isOnline) off.lastLogin else off.lastSeen
+        if (ts <= 0) return null
+        return Instant.ofEpochMilli(ts).atZone(zone).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+    }
+
     private fun formatDuration(d: Duration): String {
         val h = d.toHours()
         val m = d.toMinutesPart()

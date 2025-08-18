@@ -75,8 +75,8 @@ class PlayerListGUI(private val plugin: PunisherX) : GUI {
                 val totalStr   = PlayerStatsService.getTotalPlaytimeString(uuid) ?: mH.getCleanMessage("error", "no_data")
                 val punishStr  = plugin.databaseHandler.countPlayerAllPunishmentHistory(uuid).toString()
                 val playerIP   = plugin.playerIPManager.getPlayerIPByName(target.name) ?: mH.getCleanMessage("error", "no_data")
-                val punishments = "brak"
-                val lastActive = "????-?? ??-?? ?? ??-??:??:??" // Placeholder for last active time
+                val punishments = plugin.databaseHandler.getActivePunishmentsString(uuid) ?: mH.getCleanMessage("error", "no_data")
+                val lastActive = PlayerStatsService.getLastActiveString(uuid) ?: mH.getCleanMessage("error", "no_data")
 
                 Bukkit.getScheduler().runTask(plugin, Runnable {
                     if (!holder.inv.viewers.contains(player)) return@Runnable
@@ -133,7 +133,7 @@ class PlayerListGUI(private val plugin: PunisherX) : GUI {
     }
 
     override fun getTitle(): Component {
-        return mH.getLogMessage("GUI", "PlayerList.title")
+        return mH.getLogMessage("GUI", "PunisherMain.playerOnline.title")
     }
     private fun createNavItem(material: Material, name: String): ItemStack {
         val item = ItemStack(material)
