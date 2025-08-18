@@ -363,6 +363,12 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return punishments
     }
 
+    fun getActivePunishmentsString(uuid: UUID): String? {
+        val punishments = getPunishments(uuid.toString())
+        if (punishments.isEmpty()) return null
+        return punishments.joinToString(", ") { it.type }
+    }
+
     fun getPunishmentsByIP(ip: String): List<PunishmentData> {
         val punishments = mutableListOf<PunishmentData>()
         try {

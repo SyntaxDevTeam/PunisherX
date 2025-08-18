@@ -149,6 +149,12 @@ fun hasWithSee(sender: CommandSender, key: PermissionKey): Boolean {
     if (sender is Player && canSee(sender)) return true
     return has(sender, key)
 }
+    fun hasPermissionStartingWith(sender: CommandSender, prefix: String): Boolean {
+        if (sender is ConsoleCommandSender) return true
+        if (sender.isOp) return true
+        if (sender.hasPermission(prefix) || sender.hasPermission("$prefix.*")) return true
+        return sender is Player && sender.effectivePermissions.any { it.value && it.permission.startsWith(prefix) }
+    }
 
     fun isAuthor(uuid: UUID): Boolean {
         return uuid == AUTHOR_UUID

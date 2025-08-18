@@ -33,7 +33,8 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
         MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOnline.title"), Material.PLAYER_HEAD, 19) { player ->
             PlayerListGUI(plugin).open(player)
         },
-        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.adminOnline.title"), Material.COMMAND_BLOCK, 22) { _ ->
+        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.adminOnline.title"), Material.COMMAND_BLOCK, 22) { player ->
+            AdminListGUI(plugin).open(player)
         },
         MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.compare.title"), Material.GOLDEN_CARROT, 25) { _ ->
         },
@@ -81,7 +82,7 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
     }
 
     override fun getTitle(): Component {
-        return plugin.messageHandler.getLogMessage("GUI", "PunisherMain.playerOnline.title")
+        return plugin.messageHandler.getLogMessage("GUI", "PunisherMain.title")
     }
 
     private fun createItem(material: Material, name: String, loreLines: List<String> = emptyList()): ItemStack {
