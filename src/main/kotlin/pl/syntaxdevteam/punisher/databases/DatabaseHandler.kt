@@ -3,6 +3,8 @@ package pl.syntaxdevteam.punisher.databases
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import pl.syntaxdevteam.punisher.PunisherX
+import java.time.LocalDate
+import java.time.ZoneId
 import java.io.File
 import java.io.IOException
 import java.sql.*
@@ -565,6 +567,26 @@ fun countAllPunishments(): Int {
             } ?: throw SQLException("No connection available")
         } catch (e: SQLException) {
             plugin.logger.err("Failed to count punishment history. ${e.message}")
+        }
+        return count
+    }
+
+    fun countTodayPunishments(): Int {
+        var count = 0
+        val startOfDay = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000
+        try {
+            getConnection()?.use { conn ->
+                conn.prepareStatement("SELECT COUNT(*) FROM punishments WHERE start >= ?").use { ps ->
+                    ps.setLong(1, startOfDay)
+                    ps.executeQuery().use { rs -> if (rs.next()) count += rs.getInt(1) }
+                }
+                conn.prepareStatement("SELECT COUNT(*) FROM punishmenthistory WHERE start >= ?").use { ps ->
+                    ps.setLong(1, startOfDay)
+                    ps.executeQuery().use { rs -> if (rs.next()) count += rs.getInt(1) }
+                }
+            } ?: throw SQLException("No connection available")
+        } catch (e: SQLException) {
+            plugin.logger.err("Failed to count today's punishments. ${e.message}")
         }
         return count
     }

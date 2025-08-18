@@ -8,7 +8,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.stats.PlayerStatsService
+import java.lang.management.ManagementFactory
 
 /**
  * Main menu of PunisherX.
@@ -44,9 +44,10 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
         val inventory = Bukkit.createInventory(null, 36, getTitle())
         val serverName = plugin.getServerName()
         val onlinePlayers = Bukkit.getOnlinePlayers().size.toString()
-        val daily = "0"
-        val time = "1h"
-        val tps = "20.0"
+        val daily = plugin.databaseHandler.countTodayPunishments().toString()
+        val uptimeSeconds = ManagementFactory.getRuntimeMXBean().uptime / 1000
+        val time = plugin.timeHandler.formatTime(uptimeSeconds.toString())
+        val tps = getServerTPS()
 
         menuEntries.forEach { entry ->
             val lore = when (entry.slot) {
@@ -83,6 +84,16 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
 
     override fun getTitle(): Component {
         return plugin.messageHandler.getLogMessage("GUI", "PunisherMain.title")
+    }
+
+    private fun getServerTPS(): String {
+        return try {
+            val method = Bukkit.getServer()::class.java.getMethod("getTPS")
+            val tps = method.invoke(Bukkit.getServer()) as? DoubleArray
+            if (tps != null && tps.isNotEmpty()) String.format("%.2f", tps[0]) else "N/A"
+        } catch (_: Exception) {
+            "N/A"
+        }
     }
 
     private fun createItem(material: Material, name: String, loreLines: List<String> = emptyList()): ItemStack {

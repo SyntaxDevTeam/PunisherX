@@ -265,7 +265,7 @@ GUI:
       daily:       "<gray>Ilość wykonanych kar dzisiaj: <yellow><daily></yellow>"
       tps:         "<gray>Czas działania serwera: <green><time></green> (<green><tps></green>)"
     playerOnline:
-      title:       "<gold>Lista graczy online</gold>"
+      title:       "<green>Lista graczy online</green>"
       online:      "<gray>Ilość graczy online: <green><onlineplayers></green>"
       clickToView: "<gray><b>Kliknij, aby zobaczyć listę graczy</b></gray>"
     adminOnline:
