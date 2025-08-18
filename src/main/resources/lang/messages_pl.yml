@@ -282,6 +282,10 @@ GUI:
       lastActive:   "<gray>Poprzednio widziany: <yellow><lastactive></yellow>"
       punishments:  "<gray>Aktualna kara: <yellow><punishments></yellow>"
       punishStr:    "<gray>Łącznie kar: <yellow><punishstr></yellow>"
+  Nav:
+    next: "<gray>Następna strona</gray>"
+    previous: "<gray>Poprzednia strona</gray>"
+    back: "<gray>Wróć do poprzedniego menu</gray>"
   Test:
     - "Test 1"
     - "Test 2"
