@@ -531,6 +531,24 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
+    fun deletePlayerData(uuid: String) {
+        try {
+            getConnection()?.use { conn ->
+                logger.debug("Database connection established from deletePlayerData")
+                conn.prepareStatement("DELETE FROM punishments WHERE uuid = ?").use { ps ->
+                    ps.setString(1, uuid)
+                    ps.executeUpdate()
+                }
+                conn.prepareStatement("DELETE FROM punishmenthistory WHERE uuid = ?").use { ps ->
+                    ps.setString(1, uuid)
+                    ps.executeUpdate()
+                }
+            } ?: throw SQLException("No connection available")
+        } catch (e: SQLException) {
+            plugin.logger.err("Failed to delete data for UUID: $uuid. ${e.message}")
+        }
+    }
+
     fun getActiveWarnCount(uuid: String): Int {
         val punishments = mutableListOf<PunishmentData>()
         try {
