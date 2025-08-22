@@ -9,6 +9,9 @@ import java.io.File
 import java.io.IOException
 import java.sql.*
 import java.util.UUID
+import java.util.Locale
+import java.nio.file.Files
+import java.nio.file.Path
 
 class DatabaseHandler(private val plugin: PunisherX) {
     private var dataSource: HikariDataSource? = null
@@ -42,10 +45,14 @@ class DatabaseHandler(private val plugin: PunisherX) {
             }
 
             "sqlite" -> {
-                hikariConfig.jdbcUrl = "jdbc:sqlite:${plugin.dataFolder}/$dbName.db"
+                // [CHANGED] – inteligentny URL + bezpieczne parametry startowe (bez WAL)
+                val dbPath = plugin.dataFolder.toPath().resolve("$dbName.db")
+                Files.createDirectories(dbPath.parent)
+                val initialMode = decideInitialJournalMode(dbPath) // WAL lub DELETE
+                hikariConfig.jdbcUrl =
+                    "jdbc:sqlite:${dbPath.toAbsolutePath()}?journal_mode=$initialMode&busy_timeout=5000&synchronous=NORMAL"
                 hikariConfig.driverClassName = "org.sqlite.JDBC"
             }
-
             "h2" -> {
                 hikariConfig.jdbcUrl = "jdbc:h2:./${plugin.dataFolder}/$dbName"
                 hikariConfig.username = user
@@ -56,12 +63,17 @@ class DatabaseHandler(private val plugin: PunisherX) {
             else -> throw IllegalArgumentException("Unsupported database type: $dbType")
         }
         if (dbType == "sqlite") {
-            hikariConfig.maximumPoolSize = 2
+            // [CHANGED] – pool dla SQLite
+            hikariConfig.maximumPoolSize = 1
             hikariConfig.minimumIdle = 1
             hikariConfig.connectionTimeout = 30000
-            hikariConfig.idleTimeout = 10000
-            hikariConfig.maxLifetime = 60000
-            hikariConfig.keepaliveTime = 30000
+            hikariConfig.idleTimeout = 30000
+            hikariConfig.maxLifetime = 300000
+            hikariConfig.keepaliveTime = 0
+            hikariConfig.connectionTestQuery = "SELECT 1"
+            hikariConfig.initializationFailTimeout = 0
+            // PRAGMA, które zawsze chcemy
+            hikariConfig.connectionInitSql = "PRAGMA foreign_keys = ON;"
         } else {
             hikariConfig.maximumPoolSize = 20
             hikariConfig.minimumIdle = 2
@@ -76,6 +88,11 @@ class DatabaseHandler(private val plugin: PunisherX) {
         try {
             dataSource = HikariDataSource(hikariConfig)
             logger.debug("HikariCP data source initialized successfully for $dbType.")
+
+            // [CHANGED] – jeżeli SQLite i heurystyka nie wymusiła DELETE, spróbuj włączyć WAL runtime’em
+            if (dbType == "sqlite") {
+                tryEnableWalOrFallback(dataSource!!)
+            }
         } catch (e: Exception) {
             logger.err("Failed to initialize HikariCP data source: ${e.message}")
             throw e
@@ -90,8 +107,11 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun closeConnection() {
         try {
+            val total = dataSource?.hikariPoolMXBean?.totalConnections
+            val active = dataSource?.hikariPoolMXBean?.activeConnections
+            val idle = dataSource?.hikariPoolMXBean?.idleConnections
             dataSource?.close()
-            logger.info("HikariCP pool shut down. Total=${dataSource?.hikariPoolMXBean?.totalConnections}, Active=${dataSource?.hikariPoolMXBean?.activeConnections}, Idle=${dataSource?.hikariPoolMXBean?.idleConnections}")
+            logger.info("HikariCP pool shut down. Total=$total, Active=$active, Idle=$idle")
         } catch (e: SQLException) {
             logger.err("Error while closing HikariCP pool: ${e.message}")
         }
@@ -100,9 +120,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
     private fun getConnection(): Connection? {
         return try {
             val connection = dataSource?.connection
-            if (connection != null && dbType == "sqlite") {
-                enableSQLiteWAL(connection)
-            }
             logger.debug("Connection obtained: Active=${dataSource?.hikariPoolMXBean?.activeConnections}, Idle=${dataSource?.hikariPoolMXBean?.idleConnections}")
             connection
         } catch (e: SQLException) {
@@ -111,15 +128,75 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    private fun enableSQLiteWAL(connection: Connection) {
-        logger.debug("SQLite connection detected! I'm enabling WAL mode")
-        try {
-            connection.createStatement().use { statement ->
-                statement.execute("PRAGMA journal_mode=WAL;")
-                logger.debug("SQLite WAL mode enabled.")
+    // ======== WAL detection/fallback for SQLite ========
+
+    private val fsWalSafe = setOf("ext2", "ext3", "ext4", "xfs", "btrfs", "zfs", "apfs", "ufs")
+    private val fsWalUnsafe = setOf("ntfs", "exfat", "cifs", "smbfs", "fuseblk", "vboxsf")
+
+    private fun decideInitialJournalMode(dbPath: Path): String {
+        return try {
+            val fsType = Files.getFileStore(dbPath.parent).type().lowercase(Locale.ROOT)
+            when {
+                fsWalUnsafe.contains(fsType) -> {
+                    logger.warning("Detected filesystem '$fsType' – forcing journal_mode=DELETE (no WAL).")
+                    "DELETE"
+                }
+                fsWalSafe.contains(fsType) -> "WAL"
+                else -> "WAL" // spróbujemy, a jak się wywali – przełączymy
             }
-        } catch (e: SQLException) {
-            logger.err("Failed to enable SQLite WAL mode. ${e.message}")
+        } catch (_: Throwable) {
+            // Nieznany FS – spróbujemy WAL z fallbackiem
+            "WAL"
+        }
+    }
+
+    private fun tryEnableWalOrFallback(hikari: HikariDataSource) {
+        // jeśli URL już wymusił DELETE (np. NTFS) – nic nie rób
+        val url = hikari.jdbcUrl ?: return
+        if (url.contains("journal_mode=DELETE", ignoreCase = true)) return
+
+        fun containsShmMapMarkers(t: Throwable): Boolean {
+            val msg = (t.message ?: "") + " " + t.stackTraceToString()
+            return msg.contains("SQLITE_IOERR_SHMMAP", ignoreCase = true) ||
+                    msg.contains("xShmMap", ignoreCase = true) ||
+                    msg.contains("shared memory segment", ignoreCase = true)
+        }
+
+        try {
+            logger.debug("Trying to enable WAL mode on SQLite...")
+            hikari.connection.use { conn ->
+                conn.createStatement().use { st ->
+                    // Wymuś WAL i sprawdź co faktycznie zwróci SQLite
+                    st.executeQuery("PRAGMA journal_mode=WAL;").use { rs ->
+                        if (rs.next()) {
+                            val mode = rs.getString(1)
+                            logger.debug("SQLite journal_mode reported: $mode")
+                        }
+                    }
+                    // Mała operacja dla sanity-check
+                    st.executeQuery("SELECT 1;").use { _ -> }
+                    // Opcjonalnie:
+                    st.execute("PRAGMA wal_autocheckpoint = 1000;")
+                }
+            }
+            logger.debug("SQLite WAL mode enabled successfully.")
+        } catch (t: Throwable) {
+            if (containsShmMapMarkers(t)) {
+                logger.warning("WAL failed with SHMMAP; switching to journal_mode=DELETE. Cause: ${t.message}")
+                try {
+                    hikari.connection.use { conn ->
+                        conn.createStatement().use { st ->
+                            st.executeQuery("PRAGMA journal_mode=DELETE;").use { _ -> }
+                            st.execute("PRAGMA synchronous = NORMAL;")
+                        }
+                    }
+                } catch (inner: Throwable) {
+                    logger.err("Failed to switch to journal_mode=DELETE after SHMMAP: ${inner.message}")
+                }
+            } else {
+                // inny błąd – przekaż dalej, żeby nie maskować realnych problemów (R/O, brak miejsca itd.)
+                throw t
+            }
         }
     }
 
