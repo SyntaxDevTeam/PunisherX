@@ -68,8 +68,17 @@ class PluginInitializer(private val plugin: PunisherX) {
      */
     private fun setupDatabase() {
         plugin.databaseHandler = DatabaseHandler(plugin)
-        plugin.databaseHandler.openConnection()
-        plugin.databaseHandler.createTables()
+        if (plugin.server.name.contains("Folia")) {
+            plugin.logger.debug("Detected Folia server, using sync database connection handling.")
+            plugin.databaseHandler.openConnection()
+            plugin.databaseHandler.createTables()
+        }else{
+            plugin.server.scheduler.runTaskAsynchronously(plugin, Runnable {
+                plugin.databaseHandler.openConnection()
+                plugin.databaseHandler.createTables()
+            })
+        }
+
     }
 
     /**
