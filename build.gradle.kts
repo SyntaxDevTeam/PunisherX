@@ -30,12 +30,13 @@ repositories {
     maven("https://repo.codemc.org/repository/maven-public/") // VaultUnlockedAPI
     maven("https://jitpack.io") // VaultAPI
     maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/") //SyntaxDevTeam
+    maven("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/") //SyntaxDevTeam
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:core:1.1.0")
+    compileOnly("pl.syntaxdevteam:core:1.2.0-SNAPSHOT")
     //implementation(files("libs/SyntaxCore-1.1.0-all.jar"))
     compileOnly("pl.syntaxdevteam:cleanerx:1.5.2")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")

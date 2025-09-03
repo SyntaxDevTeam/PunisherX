@@ -24,6 +24,7 @@ class SyntaxLoader : PluginLoader {
         resolver.addRepository(RemoteRepository.Builder("jitpack", "default", "https://jitpack.io/").build())
         resolver.addRepository(RemoteRepository.Builder("codemc-snapshots", "default", "https://repo.codemc.io/repository/maven-snapshots/").build())
         resolver.addRepository(RemoteRepository.Builder("syntaxdevteam", "default", "https://nexus.syntaxdevteam.pl/repository/maven-releases/").build())
+        resolver.addRepository(RemoteRepository.Builder("syntaxdevteam", "snapshot", "https://nexus.syntaxdevteam.pl/repository/maven-snapshots/").build())
         pluginClasspath.addLibrary(resolver)
     }
 
