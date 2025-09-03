@@ -282,6 +282,23 @@ GUI:
       lastActive:   "<gray>Poprzednio widziany: <yellow><lastactive></yellow>"
       punishments:  "<gray>Aktualna kara: <yellow><punishments></yellow>"
       punishStr:    "<gray>Łącznie kar: <yellow><punishstr></yellow>"
+  PlayerAction:
+    title: "<yellow>Menu gracza</yellow>"
+    punish: "<yellow>Ukaraj</yellow>"
+    kick: "<yellow>Wyrzuć</yellow>"
+    delete: "<yellow>Usuń konto</yellow>"
+    deleteMessage: "<red>Twoje konto zostało usunięte</red>"
+
+  PunishType:
+    title: "<yellow>Wybierz rodzaj kary</yellow>"
+    ban: "<yellow>Ban</yellow>"
+    jail: "<yellow>Więzienie</yellow>"
+    mute: "<yellow>Wyciszenie</yellow>"
+    warn: "<yellow>Ostrzeżenie</yellow>"
+  PunishTime:
+    title: "<yellow>Wybierz czas</yellow>"
+  PunishReason:
+    title: "<yellow>Wybierz powód</yellow>"
   Nav:
     next: "<gray>Następna strona</gray>"
     previous: "<gray>Poprzednia strona</gray>"

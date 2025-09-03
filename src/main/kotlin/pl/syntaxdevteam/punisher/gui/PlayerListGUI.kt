@@ -124,7 +124,14 @@ class PlayerListGUI(private val plugin: PunisherX) : GUI {
         val playersPerPage = 27
         val totalPages = if (online.isEmpty()) 1 else (online.size - 1) / playersPerPage + 1
         val slot = event.rawSlot
-
+        if (slot in 0 until playersPerPage) {
+            val index = holder.page * playersPerPage + slot
+            if (index < online.size) {
+                val target = online[index]
+                PlayerActionGUI(plugin).open(player, target)
+            }
+            return
+        }
         when (slot) {
             36 -> if (holder.page > 0) open(player, holder.page - 1)
             40 -> PunisherMain(plugin).open(player)

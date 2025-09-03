@@ -128,6 +128,17 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         return ip
     }
 
+    fun deletePlayerInfo(playerUUID: UUID) {
+        val lines = cacheFile.readLines()
+        val filtered = lines.filter { line ->
+            val info = parsePlayerInfo(decrypt(line))
+            info?.playerUUID != playerUUID.toString()
+        }
+        cacheFile.writeText("")
+        filtered.forEach { cacheFile.appendText("$it\n") }
+        plugin.logger.debug("Removed player info for UUID: $playerUUID")
+    }
+
     // Przeszukuje cache i zwraca obiekt PlayerInfo, jeśli znajdzie pasujący rekord
     private fun searchCache(playerName: String, playerUUID: String, playerIP: String): PlayerInfo? {
         plugin.logger.debug("Searching cache")

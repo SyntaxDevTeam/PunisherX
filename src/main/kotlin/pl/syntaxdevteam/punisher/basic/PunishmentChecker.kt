@@ -13,14 +13,14 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import pl.syntaxdevteam.core.SyntaxCore
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.common.UpdateChecker
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.*
 
 class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
-    private val updateChecker = UpdateChecker(plugin)
+    private val updateChecker = SyntaxCore.updateChecker
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerJoin(event: PlayerJoinEvent) {
