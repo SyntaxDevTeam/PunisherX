@@ -2,7 +2,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.2.20-RC2"
+    kotlin("jvm") version "2.2.10"
     id("com.gradleup.shadow") version "9.1.0"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
@@ -29,8 +29,8 @@ repositories {
     maven("https://repo.extendedclip.com/releases/") // PlaceholderAPI
     maven("https://repo.codemc.org/repository/maven-public/") // VaultUnlockedAPI
     maven("https://jitpack.io") // VaultAPI
-    maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/") //SyntaxDevTeam
     maven("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/") //SyntaxDevTeam
+    maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/") //SyntaxDevTeam
 }
 
 dependencies {
