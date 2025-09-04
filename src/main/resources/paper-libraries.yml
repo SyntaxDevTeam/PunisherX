@@ -15,4 +15,4 @@ libraries:
   - com.h2database:h2:2.3.232
   - com.zaxxer:HikariCP:7.0.2
   - com.github.ben-manes.caffeine:caffeine:3.2.2
-  - pl.syntaxdevteam:core:1.2.0-SNAPSHOT
+  - pl.syntaxdevteam:core:1.2.1-SNAPSHOT

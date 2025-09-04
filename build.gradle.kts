@@ -2,7 +2,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.2.10"
+    kotlin("jvm") version "2.2.20-RC2"
     id("com.gradleup.shadow") version "9.1.0"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
@@ -36,7 +36,7 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:core:1.2.0-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:core:1.2.1-SNAPSHOT")
     //implementation(files("libs/SyntaxCore-1.1.0-all.jar"))
     compileOnly("pl.syntaxdevteam:cleanerx:1.5.2")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
