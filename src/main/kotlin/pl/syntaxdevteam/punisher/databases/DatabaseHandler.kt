@@ -46,12 +46,12 @@ class DatabaseHandler(private val plugin: PunisherX) {
     }
 
     /** Utility for executing update/insert/delete statements. */
-    private fun execute(sql: String, vararg params: Any?) {
+    private fun execute(sql: String, vararg params: Any) {
         db.execute(sql, *params)
     }
 
     /** Utility for running select queries. */
-    private fun <T> query(sql: String, vararg params: Any?, mapper: (java.sql.ResultSet) -> T): List<T> {
+    private fun <T> query(sql: String, vararg params: Any, mapper: (java.sql.ResultSet) -> T): List<T> {
         return db.query(sql, *params, mapper = mapper)
     }
 
@@ -154,7 +154,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
 
         try {
-            val params = mutableListOf<Any?>(uuidOrIp, punishmentType)
+            val params = mutableListOf<Any>(uuidOrIp, punishmentType)
             if (!removeAll && (dbType == DatabaseType.POSTGRESQL || dbType == DatabaseType.H2 || dbType == DatabaseType.SQLITE)) {
                 params.add(uuidOrIp)
                 params.add(punishmentType)
@@ -197,7 +197,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         )
 
         var sql = "SELECT * FROM punishments WHERE uuid = ?"
-        val params = mutableListOf<Any?>(uuid)
+        val params = mutableListOf<Any>(uuid)
 
         if (supportsOrderAndLimit && limit != null && offset != null) {
             sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
@@ -266,7 +266,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         )
 
         var sql = "SELECT * FROM punishmenthistory WHERE uuid = ?"
-        val params = mutableListOf<Any?>(uuid)
+        val params = mutableListOf<Any>(uuid)
         if (supportsOrderAndLimit && limit != null && offset != null) {
             sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
             params.add(limit)
@@ -301,7 +301,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         )
 
         var sql = "SELECT * FROM punishments WHERE punishmentType IN ('BAN', 'BANIP')"
-        val params = mutableListOf<Any?>()
+        val params = mutableListOf<Any>()
         if (supportsOrderAndLimit) {
             sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
             params.add(limit)
@@ -336,7 +336,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         )
 
         var sql = "SELECT * FROM punishmenthistory WHERE punishmentType IN ('BAN', 'BANIP')"
-        val params = mutableListOf<Any?>()
+        val params = mutableListOf<Any>()
         if (supportsOrderAndLimit) {
             sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
             params.add(limit)
