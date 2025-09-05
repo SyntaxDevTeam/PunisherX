@@ -100,6 +100,9 @@ class PunisherX : JavaPlugin(), Listener {
         } catch (e: Exception) {
             logger.err("${messageHandler.getMessage("error", "reload")} ${e.message}")
         }
+        this.saveDefaultConfig()
+        this.configHandler = ConfigHandler(this)
+        this.configHandler.verifyAndUpdateConfig()
         databaseHandler = DatabaseHandler(this)
         databaseHandler.openConnection()
         databaseHandler.createTables()
