@@ -64,11 +64,11 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             args[0].equals("import", ignoreCase = true) -> {
                 plugin.databaseHandler.importDatabase()
             }
-
+            /*
             args[0].equals("panel", ignoreCase = true) -> {
                 PunisherMain(plugin).open(stack.sender as Player)
             }
-
+*/
             else -> {
 
                 stack.sender.sendMessage(

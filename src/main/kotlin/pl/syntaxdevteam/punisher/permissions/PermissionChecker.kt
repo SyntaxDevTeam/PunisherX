@@ -43,6 +43,7 @@ object PermissionChecker { private val AUTHOR_UUID: UUID = UUID.fromString("248e
 
         // Komendy pomocnicze
         PUNISHERX_COMMAND("punisherx.cmd.prx"),
+        PANELS_COMMAND("punisherx.cmd.panel"),
 
         //Komunikaty
         SEE("punisherx.see"),
@@ -111,44 +112,45 @@ object PermissionChecker { private val AUTHOR_UUID: UUID = UUID.fromString("248e
 
         PermissionKey.SEE_UPDATE -> "Allows viewing update notifications."
         PermissionKey.PUNISHERX_COMMAND -> "Allows using the /punisherx and /prx command."
+        PermissionKey.PANELS_COMMAND -> "Allows using the /panel command to open the PunisherX GUI."
         PermissionKey.VIEW_IP -> "Allows viewing the player's IP in the /check and /history command."
     }
 
-fun has(sender: CommandSender, key: PermissionKey): Boolean {
-    if (sender is ConsoleCommandSender) return true
-    if (sender.isOp) return true
-    if (sender.hasPermission("*") ||
-        sender.hasPermission("punisherx.*") ||
-        sender.hasPermission(PermissionKey.OWNER.node)) return true
-    return sender.hasPermission(key.node)
-}
+    fun has(sender: CommandSender, key: PermissionKey): Boolean {
+        if (sender is ConsoleCommandSender) return true
+        if (sender.isOp) return true
+        if (sender.hasPermission("*") ||
+            sender.hasPermission("punisherx.*") ||
+            sender.hasPermission(PermissionKey.OWNER.node)) return true
+        return sender.hasPermission(key.node)
+    }
 
-fun hasWithBypass(sender: CommandSender, key: PermissionKey): Boolean {
-    if (sender is ConsoleCommandSender) return true
-    if (sender is Player && sender.uniqueId == AUTHOR_UUID) return true
-    if (sender.isOp) return true
-    if (sender.hasPermission("*") || sender.hasPermission("punisherx.cmd.*")) return true
-    if (sender is Player && canBypass(sender)) return true
-    return has(sender, key)
-}
+    fun hasWithBypass(sender: CommandSender, key: PermissionKey): Boolean {
+        if (sender is ConsoleCommandSender) return true
+        if (sender is Player && sender.uniqueId == AUTHOR_UUID) return true
+        if (sender.isOp) return true
+        if (sender.hasPermission("*") || sender.hasPermission("punisherx.cmd.*")) return true
+        if (sender is Player && canBypass(sender)) return true
+        return has(sender, key)
+    }
 
-fun hasWithManage(sender: CommandSender, key: PermissionKey): Boolean {
-    if (sender is ConsoleCommandSender) return true
-    if (sender is Player && sender.uniqueId == AUTHOR_UUID) return true
-    if (sender.isOp) return true
-    if (sender.hasPermission("*") || sender.hasPermission("punisherx.manage.*")) return true
-    if (sender is Player && canManage(sender)) return true
-    return has(sender, key)
-}
+    fun hasWithManage(sender: CommandSender, key: PermissionKey): Boolean {
+        if (sender is ConsoleCommandSender) return true
+        if (sender is Player && sender.uniqueId == AUTHOR_UUID) return true
+        if (sender.isOp) return true
+        if (sender.hasPermission("*") || sender.hasPermission("punisherx.manage.*")) return true
+        if (sender is Player && canManage(sender)) return true
+        return has(sender, key)
+    }
 
-fun hasWithSee(sender: CommandSender, key: PermissionKey): Boolean {
-    if (sender is ConsoleCommandSender) return true
-    if (sender is Player && sender.uniqueId == AUTHOR_UUID) return true
-    if (sender.isOp) return true
-    if (sender.hasPermission("*") || sender.hasPermission("punisherx.see.*")) return true
-    if (sender is Player && canSee(sender)) return true
-    return has(sender, key)
-}
+    fun hasWithSee(sender: CommandSender, key: PermissionKey): Boolean {
+        if (sender is ConsoleCommandSender) return true
+        if (sender is Player && sender.uniqueId == AUTHOR_UUID) return true
+        if (sender.isOp) return true
+        if (sender.hasPermission("*") || sender.hasPermission("punisherx.see.*")) return true
+        if (sender is Player && canSee(sender)) return true
+        return has(sender, key)
+    }
     fun hasPermissionStartingWith(sender: CommandSender, prefix: String): Boolean {
         if (sender is ConsoleCommandSender) return true
         if (sender.isOp) return true

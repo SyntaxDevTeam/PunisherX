@@ -106,7 +106,16 @@ class CommandManager(private val plugin: PunisherX) {
                 plugin.messageHandler.getSimpleMessage("change-reason", "usage"),
                 ChangeReasonCommand(plugin)
             )
-            commands.register("clearall", plugin.messageHandler.getSimpleMessage("clear", "usage"), ClearAllCommand(plugin))
+            commands.register(
+                "clearall",
+                plugin.messageHandler.getSimpleMessage("clear", "usage"),
+                ClearAllCommand(plugin)
+            )
+            commands.register(
+                "panel",
+                "Opens the PunisherX GUI with lots of useful information and commands.",
+                PanelCommand(plugin)
+            )
             val aliases = plugin.config.getConfigurationSection("aliases")
             aliases?.getKeys(false)?.forEach { key ->
                 val commandName = aliases.getString(key) ?: key
@@ -204,6 +213,11 @@ class CommandManager(private val plugin: PunisherX) {
                         commandName,
                         plugin.messageHandler.getSimpleMessage("clear", "usage"),
                         ClearAllCommand(plugin)
+                    )
+                    "panel" -> commands.register(
+                        commandName,
+                        "Opens the PunisherX GUI with lots of useful information and commands.",
+                        PanelCommand(plugin)
                     )
                 }
             }
