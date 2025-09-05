@@ -40,11 +40,23 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
         val holder = event.view.topInventory.holder as? Holder ?: return
         val player = event.whoClicked as? Player ?: return
         val target = Bukkit.getPlayer(holder.target) ?: return
+        val reason = mH.getLogMessage("kick", "no_reasons")
+        val force = plugin.config.getBoolean("gui.punish.use_force", false)
+
         when (event.rawSlot) {
             10 -> PunishTypeGUI(plugin).open(player, target)
             12 -> {
                 player.closeInventory()
-                player.performCommand("kick ${target.name} --force")
+
+                val command = buildString {
+                    append("kick ")
+                    append(target.name)
+                    append(' ')
+                    append(reason)
+                    if (force) append(" --force")
+                }
+
+                player.performCommand(command)
             }
             14 -> {
                 player.closeInventory()
