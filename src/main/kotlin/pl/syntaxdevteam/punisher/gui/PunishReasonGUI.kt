@@ -41,17 +41,23 @@ class PunishReasonGUI(private val plugin: PunisherX) : GUI {
         val player = event.whoClicked as? Player ?: return
         val target = Bukkit.getPlayer(holder.target) ?: return
         val reasons = plugin.config.getStringList("gui.punish.reasons")
+        val force = plugin.config.getBoolean("gui.punish.use_force", false)
+
         val slot = event.rawSlot
         if (slot in 0 until reasons.size) {
             val reason = reasons[slot]
             player.closeInventory()
-            val command = if (holder.time.equals("perm", true)) {
+
+            val base = if (holder.time.equals("perm", true)) {
                 "${holder.type} ${target.name} $reason"
             } else {
                 "${holder.type} ${target.name} ${holder.time} $reason"
             }
+
+            val command = base + if (force) " --force" else ""
             player.performCommand(command)
         }
+
     }
 
     override fun getTitle(): Component {
