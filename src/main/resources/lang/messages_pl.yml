@@ -286,8 +286,8 @@ GUI:
     title: "<yellow>Menu gracza</yellow>"
     punish: "<yellow>Ukaraj</yellow>"
     kick: "<yellow>Wyrzuć</yellow>"
-    delete: "<yellow>Usuń konto</yellow>"
-    deleteMessage: "<red>Twoje konto zostało usunięte</red>"
+    delete: "<yellow>Wyczyść dane konta</yellow>"
+    deleteMessage: "<red>Twoje konto zostało wyczyszczone</red>"
 
   PunishType:
     title: "<yellow>Wybierz rodzaj kary</yellow>"
