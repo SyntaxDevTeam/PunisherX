@@ -362,10 +362,11 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
     fun getActiveWarnCount(uuid: String): Int {
+        val currentTime = System.currentTimeMillis()
         return try {
             query(
-                "SELECT COUNT(*) AS cnt FROM punishments WHERE uuid = ? AND punishmentType = 'WARN'",
-                uuid
+                "SELECT COUNT(*) AS cnt FROM punishments WHERE uuid = ? AND punishmentType = 'WARN' AND (endTime = -1 OR endTime > ?)",
+                uuid, currentTime
             ) { rs -> rs.getInt("cnt") }.firstOrNull() ?: 0
         } catch (e: Exception) {
             logger.err("Failed to count active warns: ${e.message}")
