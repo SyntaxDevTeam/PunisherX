@@ -107,9 +107,9 @@ gui:
       - "Griefing"
       - "Spamming"
       - "Offensive language"
-  # Should I add the "--force" parameter to the end of commands?
-  #This bypasses the "bypass" permissions most often granted to administrators.
-  use_force: false
+    # Should I add the "--force" parameter to the end of commands?
+    #This bypasses the "bypass" permissions most often granted to administrators.
+    use_force: true
 
 # /********************************************/
 #    Internal settings

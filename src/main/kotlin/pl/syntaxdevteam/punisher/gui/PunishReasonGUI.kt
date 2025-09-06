@@ -48,13 +48,11 @@ class PunishReasonGUI(private val plugin: PunisherX) : GUI {
             val reason = reasons[slot]
             player.closeInventory()
 
-            val base = if (holder.time.equals("perm", true)) {
-                "${holder.type} ${target.name} $reason"
+            val command = if (holder.time.equals("perm", true)) {
+                "${holder.type} ${target.name} $reason" + if (force) " --force" else ""
             } else {
-                "${holder.type} ${target.name} ${holder.time} $reason"
+                "${holder.type} ${target.name} ${holder.time} $reason" + if (force) " --force" else ""
             }
-
-            val command = base + if (force) " --force" else ""
             player.performCommand(command)
         }
 
