@@ -53,7 +53,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             args[0].equals("reload", ignoreCase = true) -> {
                 plugin.onReload()
                 stack.sender.sendMessage(
-                    mH.miniMessageFormat("$prefix <green>The configuration file has been reloaded.</green>")
+                    mH.miniMessageFormat("$prefix <green>PunisherX has been reloaded.</green>")
                 )
             }
 
