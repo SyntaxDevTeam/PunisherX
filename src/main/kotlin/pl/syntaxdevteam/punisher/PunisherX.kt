@@ -10,6 +10,8 @@ import pl.syntaxdevteam.core.stats.StatsCollector
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
+import pl.syntaxdevteam.core.update.GitHubSource
+import pl.syntaxdevteam.core.update.ModrinthSource
 import pl.syntaxdevteam.punisher.api.PunisherXApi
 import pl.syntaxdevteam.punisher.basic.*
 import pl.syntaxdevteam.punisher.commands.CommandManager
@@ -57,6 +59,10 @@ class PunisherX : JavaPlugin(), Listener {
      * Initializes the configuration, database, handlers, events, and commands.
      */
     override fun onEnable() {
+        SyntaxCore.registerUpdateSources(
+            GitHubSource("SyntaxDevTeam/PunisherX"),
+            ModrinthSource("VCNRcwC2")
+        )
         SyntaxCore.init(this)
         pluginInitializer = PluginInitializer(this)
         pluginInitializer.onEnable()

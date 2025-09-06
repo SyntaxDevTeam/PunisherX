@@ -136,6 +136,7 @@ aliases:
   clearall: "ca"
   setjail:  "sjail"
   setspawn: "sspawn"
+  panel:    "px"
 
 geoDatabase:
   # To use GeoIP functionality, you need a MaxMind license key.
@@ -147,13 +148,15 @@ webhook:
   discord:
     enabled: false
     url: "YOUR_WEBHOOK_URL_HERE"
-    # Experimental setting (may not work properly).
-    # If true, the `kick all <reason>` command logs each player's kick separately.
-    kickall: true
 
 # Update check and auto-download settings.
-checkForUpdates:       true
-autoDownloadUpdates:   false
+update:
+  check-for-updates: true
+  auto-download: false
+  hangar: true
+  github: true
+  modrinth: true
+
 
 # Debug mode: when true, provides more detailed console logs.
 debug: false
