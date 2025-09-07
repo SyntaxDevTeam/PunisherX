@@ -509,4 +509,71 @@ class DatabaseHandler(private val plugin: PunisherX) {
             logger.err("Failed to import database. ${e.message}")
         }
     }
+
+
+    fun migrateDatabase(from: DatabaseType, to: DatabaseType) {
+        if (from != dbType) {
+            logger.err("Migration aborted: configured database type is $dbType but received $from")
+            return
+        }
+
+        exportDatabase()
+        val backupFile = File(plugin.dataFolder, "dump/backup.sql")
+        if (!backupFile.exists()) {
+            logger.err("Backup file not found. Migration aborted.")
+            return
+        }
+
+        val targetConfig = DatabaseConfig(
+            type = to,
+            host = plugin.config.getString("database.sql.host") ?: "localhost",
+            port = plugin.config.getInt("database.sql.port").takeIf { it != 0 } ?: 3306,
+            database = plugin.config.getString("database.sql.dbname") ?: plugin.name,
+            username = plugin.config.getString("database.sql.username") ?: "ROOT",
+            password = plugin.config.getString("database.sql.password") ?: "U5eV3ryStr0ngP4ssw0rd"
+        )
+
+        val targetDb = DatabaseManager(targetConfig, logger)
+        try {
+            targetDb.connect()
+
+            val idDef = when (to) {
+                DatabaseType.SQLITE -> "INTEGER PRIMARY KEY AUTOINCREMENT"
+                DatabaseType.POSTGRESQL -> "SERIAL PRIMARY KEY"
+                else -> "INT AUTO_INCREMENT PRIMARY KEY"
+            }
+            val punishmentSchema = TableSchema(
+                "punishments",
+                listOf(
+                    Column("id", idDef),
+                    Column("name", "VARCHAR(32)"),
+                    Column("uuid", "VARCHAR(36)"),
+                    Column("reason", "VARCHAR(255)"),
+                    Column("operator", "VARCHAR(16)"),
+                    Column("punishmentType", "VARCHAR(16)"),
+                    Column("start", "BIGINT"),
+                    Column("endTime", "BIGINT")
+                )
+            )
+            val historySchema = punishmentSchema.copy(name = "punishmenthistory")
+            targetDb.createTable(punishmentSchema)
+            targetDb.createTable(historySchema)
+
+            val lines = backupFile.readLines()
+            val sql = StringBuilder()
+            for (line in lines) {
+                sql.append(line)
+                if (line.trim().endsWith(";")) {
+                    targetDb.execute(sql.toString())
+                    sql.setLength(0)
+                }
+            }
+
+            logger.success("Database migrated from $from to $to")
+        } catch (e: Exception) {
+            logger.err("Failed to migrate database. ${e.message}")
+        } finally {
+            targetDb.close()
+        }
+    }
 }
