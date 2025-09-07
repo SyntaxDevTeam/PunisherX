@@ -10,9 +10,12 @@ import pl.syntaxdevteam.core.stats.StatsCollector
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.event.HandlerList
+import org.bukkit.plugin.ServicePriority
 import pl.syntaxdevteam.core.update.GitHubSource
 import pl.syntaxdevteam.core.update.ModrinthSource
 import pl.syntaxdevteam.punisher.api.PunisherXApi
+import pl.syntaxdevteam.punisher.api.PunisherXApiImpl
 import pl.syntaxdevteam.punisher.basic.*
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
@@ -106,12 +109,37 @@ class PunisherX : JavaPlugin(), Listener {
         } catch (e: Exception) {
             logger.err("${messageHandler.getMessage("error", "reload")} ${e.message}")
         }
-        this.saveDefaultConfig()
-        this.configHandler = ConfigHandler(this)
-        this.configHandler.verifyAndUpdateConfig()
+
+        saveDefaultConfig()
+        reloadConfig()
+        configHandler = ConfigHandler(this)
+        configHandler.verifyAndUpdateConfig()
+
         databaseHandler = DatabaseHandler(this)
-        databaseHandler.openConnection()
-        databaseHandler.createTables()
+        if (server.name.contains("Folia")) {
+            databaseHandler.openConnection()
+            databaseHandler.createTables()
+        } else {
+            server.scheduler.runTaskAsynchronously(this, Runnable {
+                databaseHandler.openConnection()
+                databaseHandler.createTables()
+            })
+        }
+
+        server.servicesManager.unregister(punisherXApi)
+        punisherXApi = PunisherXApiImpl(databaseHandler)
+        server.servicesManager.register(
+            PunisherXApi::class.java,
+            punisherXApi,
+            this,
+            ServicePriority.Normal
+        )
+
+        discordWebhook = DiscordWebhook(this)
+        HandlerList.unregisterAll(playerIPManager)
+        geoIPHandler = GeoIPHandler(this)
+        playerIPManager = PlayerIPManager(this, geoIPHandler)
+        server.pluginManager.registerEvents(playerIPManager, this)
     }
 
     /**
