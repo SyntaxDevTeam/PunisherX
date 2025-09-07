@@ -116,6 +116,11 @@ class CommandManager(private val plugin: PunisherX) {
                 "Opens the PunisherX GUI with lots of useful information and commands.",
                 PanelCommand(plugin)
             )
+            commands.register(
+                "langfix",
+                "Converts legacy translation placeholders from {} to <>",
+                PlaceholderFixCommand(plugin)
+            )
             val aliases = plugin.config.getConfigurationSection("aliases")
             aliases?.getKeys(false)?.forEach { key ->
                 val commandName = aliases.getString(key) ?: key
