@@ -3,10 +3,9 @@ package pl.syntaxdevteam.punisher.commands
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventOwner
-import org.bukkit.entity.Player
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.gui.PunisherMain
+import pl.syntaxdevteam.core.database.DatabaseType
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
@@ -63,6 +62,22 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
 
             args[0].equals("import", ignoreCase = true) -> {
                 plugin.databaseHandler.importDatabase()
+            }
+
+            args[0].equals("migrate", ignoreCase = true) -> {
+                val from = args.getOrNull(1)
+                val to = args.getOrNull(2)
+                if (from == null || to == null) {
+                    stack.sender.sendMessage(mH.miniMessageFormat("$prefix <red>Usage: /prx migrate <from> <to></red>"))
+                    return
+                }
+                val fromType = runCatching { DatabaseType.valueOf(from.uppercase()) }.getOrNull()
+                val toType = runCatching { DatabaseType.valueOf(to.uppercase()) }.getOrNull()
+                if (fromType == null || toType == null) {
+                    stack.sender.sendMessage(mH.miniMessageFormat("$prefix <red>Unknown database type.</red>"))
+                    return
+                }
+                plugin.databaseHandler.migrateDatabase(fromType, toType)
             }
             /*
             args[0].equals("panel", ignoreCase = true) -> {
@@ -163,8 +178,16 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
                         baseSuggestions.add(cmd)
                     }
                 }
+                if ("migrate".startsWith(args[0], ignoreCase = true)) {
+                    baseSuggestions.add("migrate")
+                }
             }
             return baseSuggestions
+        }
+        if (args.size in 2..3 && args[0].equals("migrate", ignoreCase = true)) {
+            val types = DatabaseType.entries.map { it.name.lowercase() }
+            val current = args[args.size - 1]
+            return types.filter { it.startsWith(current.lowercase()) }
         }
         return emptyList()
     }
