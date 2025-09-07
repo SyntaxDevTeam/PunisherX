@@ -15,7 +15,7 @@ A detailed configuration file and support for various database types (MySQL/Mari
 * [x] Language file with full **MiniMessage** and Legacy formatting support.
 * [x] Support for Discord webhook integration.
 * [x] PlaceholderAPI support for dynamic placeholders.
-* [x] Easy database export/import via simple commands.
+* [x] Easy database export/import/migrate via simple commands.
 * [x] Extensive configuration file for flexible customization.  
   → Check the default settings [here](https://github.com/SyntaxDevTeam/PunisherX/blob/main/src/main/resources/config.yml)
 * [x] Update notification system with optional auto-update support.
@@ -52,6 +52,13 @@ If you have questions or need help, feel free to join our [Discord](https://disc
 ---
 
 ## 💬 Commands & Permissions
+
+PunisherX groups permissions by their purpose:
+
+* `punisherx.cmd.*` – access to commands
+* `punisherx.manage.*` – administrative configuration tasks
+* `punisherx.see.*` – visibility of broadcasted punishments or updates
+* `punisherx.bypass.*` – ability to ignore specific punishments
 
 A full list of commands and permissions is available in the **[Wiki](https://github.com/SyntaxDevTeam/PunisherX/wiki)**.
 
