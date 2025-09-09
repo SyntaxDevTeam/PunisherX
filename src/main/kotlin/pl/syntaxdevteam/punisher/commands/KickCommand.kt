@@ -105,10 +105,10 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                 return
             }
         }
-
+      val prefix = plugin.messageHandler.getPrefix()
         if (PermissionChecker.isAuthor(uuid)) {
             stack.sender.sendMessage(
-                plugin.messageHandler.formatMixedTextToMiniMessage("<red>You can't punish the plugin author</red>",
+                plugin.messageHandler.formatMixedTextToMiniMessage("$prefix <red>You can't punish the plugin author</red>",
                     TagResolver.empty())
             )
             return
