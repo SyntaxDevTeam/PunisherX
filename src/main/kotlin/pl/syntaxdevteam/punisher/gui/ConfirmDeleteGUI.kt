@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack
 import pl.syntaxdevteam.punisher.PunisherX
 import java.util.UUID
 
-class PlayerActionGUI(private val plugin: PunisherX) : GUI {
+class ConfirmDeleteGUI(private val plugin: PunisherX) : GUI {
 
     private val mH = plugin.messageHandler
 
@@ -26,9 +26,8 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
         val inventory = Bukkit.createInventory(holder, 27, getTitle())
         holder.inv = inventory
 
-        inventory.setItem(10, createItem(Material.ANVIL, mH.getCleanMessage("GUI", "PlayerAction.punish")))
-        inventory.setItem(12, createItem(Material.BLAZE_ROD, mH.getCleanMessage("GUI", "PlayerAction.kick")))
-        inventory.setItem(14, createItem(Material.TNT, mH.getCleanMessage("GUI", "PlayerAction.delete")))
+        inventory.setItem(11, createItem(Material.GREEN_WOOL, mH.getCleanMessage("GUI", "PlayerAction.confirmDelete.confirm")))
+        inventory.setItem(15, createItem(Material.RED_WOOL, mH.getCleanMessage("GUI", "PlayerAction.confirmDelete.cancel")))
 
         player.openInventory(inventory)
     }
@@ -40,30 +39,23 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
         val holder = event.view.topInventory.holder as? Holder ?: return
         val player = event.whoClicked as? Player ?: return
         val target = Bukkit.getPlayer(holder.target) ?: return
-        val reason = mH.getLogMessage("kick", "no_reasons")
-        val force = plugin.config.getBoolean("gui.punish.use_force", false)
 
         when (event.rawSlot) {
-            10 -> PunishTypeGUI(plugin).open(player, target)
-            12 -> {
+            11 -> {
                 player.closeInventory()
-
-                val command = buildString {
-                    append("kick ")
-                    append(target.name)
-                    append(' ')
-                    append(reason)
-                    if (force) append(" --force")
-                }
-
-                player.performCommand(command)
+                target.kick(mH.getLogMessage("GUI", "PlayerAction.deleteMessage"))
+                plugin.databaseHandler.deletePlayerData(target.uniqueId.toString())
+                plugin.playerIPManager.deletePlayerInfo(target.uniqueId)
             }
-            14 -> ConfirmDeleteGUI(plugin).open(player, target)
+            15 -> {
+                player.closeInventory()
+                PlayerActionGUI(plugin).open(player, target)
+            }
         }
     }
 
     override fun getTitle(): Component {
-        return mH.getLogMessage("GUI", "PlayerAction.title")
+        return mH.getLogMessage("GUI", "PlayerAction.confirmDelete.title")
     }
 
     private fun createItem(material: Material, name: String): ItemStack {

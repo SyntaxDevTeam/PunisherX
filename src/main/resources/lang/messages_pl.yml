@@ -288,6 +288,11 @@ GUI:
     kick: "<yellow>Wyrzuć</yellow>"
     delete: "<yellow>Wyczyść dane konta</yellow>"
     deleteMessage: "<red>Twoje konto zostało wyczyszczone</red>"
+    confirmDelete:
+      title: "<red>Potwierdź czyszczenie danych</red>"
+      confirm: "<green>Potwierdź</green>"
+      cancel: "<red>Anuluj</red>"
+
 
   PunishType:
     title: "<yellow>Wybierz rodzaj kary</yellow>"
