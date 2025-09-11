@@ -13,6 +13,10 @@ database:
     username: "root"
     password: "password"
 
+playerCache:
+  # Choose where player IP information is stored: "file" or "database"
+  storage: "file"
+
 
 # /********************************************/
 #    Settings for main commands
