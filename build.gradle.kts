@@ -1,12 +1,14 @@
 import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
+
 plugins {
-    kotlin("jvm") version "2.2.20-RC2"
+    kotlin("jvm") version "2.2.20"
     id("com.gradleup.shadow") version "9.1.0"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
-    id("xyz.jpenilla.run-paper") version "3.0.0-beta.1"
+    id("xyz.jpenilla.run-paper") version "3.0.0"
+    id("pl.syntaxdevteam.plugindeployer") version "1.0.1"
 }
 
 group = "pl.syntaxdevteam.punisher"
@@ -19,6 +21,7 @@ kotlin {
 }
 
 repositories {
+    gradlePluginPortal()
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/") {
         name = "papermc-repo"
@@ -152,20 +155,7 @@ hangarPublish {
     }
 }
 
-tasks.register("prepareChangelog") {
-    doLast {
-        val changelogFile = File("CHANGELOG.md")
-        val lines = changelogFile.readLines()
-        val latestChangelog = lines
-            .takeLastWhile { it.startsWith("##") }
-            .joinToString("\n")
-        project.extensions.getByType(io.papermc.hangarpublishplugin.HangarPublishExtension::class.java)
-            .publications
-            .findByName("plugin")
-            ?.changelog?.set(latestChangelog)
-    }
-}
-
-tasks.named("publishPluginPublicationToHangar") {
-    dependsOn("prepareChangelog")
+plugindeployer {
+    paper { dir = "/home/debian/poligon/1.21.8/Paper/plugins" }
+    folia { dir = "/home/debian/poligon/1.21.8/Folia/plugins" }
 }
