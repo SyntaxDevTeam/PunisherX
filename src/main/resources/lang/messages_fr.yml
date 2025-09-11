@@ -37,7 +37,7 @@ jail:
   jail: "<green>Vous avez emprisonné le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
   usage: "L'utilisation correcte est : <gold>/jail <nom_du_joueur> (temps) <raison>"
   jail_message: "<red>Vous avez été emprisonné pour <b><reason></b> pendant <b><time></b></red>"
-  jail_info_message: "<red>Vous essayez de parler, mais personne ne peut vous entendre depuis la prison</red>"
+  mute_info_message: "<red>Vous essayez de parler, mais personne ne peut vous entendre depuis la prison</red>"
   jail_restrict_message: "Quitter la zone de la prison est interdit. Vous avez été téléporté de retour à l'emplacement désigné."
   broadcast: "<dark_gray>Le joueur <gray><player></gray> a été emprisonné pour <gray><reason></gray> pendant <gray><time></gray></dark_gray>"
   log: "<dark_gray>Le joueur emprisonné <gray><player></gray> <dark_gray>crie depuis sa cellule : <gray><message></gray>"

@@ -37,7 +37,7 @@ jail:
   jail: "<green>Has encarcelado al jugador <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green>"
   usage: "El uso correcto es: <gold>/jail <nombre_del_jugador> (tiempo) <razón>"
   jail_message: "<red>Has sido encarcelado por <b><reason></b> durante <b><time></b></red>"
-  jail_info_message: "<red>Intentas hablar, pero nadie puede escucharte desde la cárcel</red>"
+  mute_info_message: "<red>Intentas hablar, pero nadie puede escucharte desde la cárcel</red>"
   jail_restrict_message: "Salir del área de la cárcel está prohibido. Has sido teletransportado de vuelta a la ubicación designada."
   broadcast: "<dark_gray>El jugador <gray><player></gray> ha sido encarcelado por <gray><reason></gray> durante <gray><time></gray></dark_gray>"
   log: "<dark_gray>El jugador encarcelado <gray><player></gray> <dark_gray>está gritando desde su celda: <gray><message></gray>"

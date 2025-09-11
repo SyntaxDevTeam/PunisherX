@@ -36,7 +36,7 @@ jail:
   jail: "<green>Sie haben den Spieler <gold><player></gold> für <gold><reason></gold> für <gold><time></gold> eingesperrt</green>"
   usage: "Die korrekte Verwendung ist: <gold>/jail <spielername> (zeit) <grund>"
   jail_message: "<red>Sie wurden für <b><reason></b> für <b><time></b> eingesperrt</red>"
-  jail_info_message: "<red>Sie versuchen zu sprechen, aber niemand kann Sie aus dem Gefängnis hören</red>"
+  mute_info_message: "<red>Sie versuchen zu sprechen, aber niemand kann Sie aus dem Gefängnis hören</red>"
   jail_restrict_message: "Das Verlassen des Gefängnisbereichs ist verboten. Sie wurden zurück zum vorgesehenen Ort teleportiert."
   broadcast: "<dark_gray>Spieler <gray><player></gray> wurde für <gray><reason></gray> für <gray><time></gray> eingesperrt</dark_gray>"
   log: "<dark_gray>Der eingesperrte Spieler <gray><player></gray> <dark_gray>schreit aus seiner Zelle: <gray><message></gray>"
