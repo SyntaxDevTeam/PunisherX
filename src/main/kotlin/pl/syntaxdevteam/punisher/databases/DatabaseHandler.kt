@@ -82,6 +82,15 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
         db.createTable(punishmentSchema)
         db.createTable(historySchema)
+
+        val playerCacheSchema = TableSchema(
+            "playercache",
+            listOf(
+                Column("id", idDefinition()),
+                Column("data", "TEXT")
+            )
+        )
+        db.createTable(playerCacheSchema)
     }
 
     // ---------------------------------------------------------------------
@@ -181,6 +190,34 @@ class DatabaseHandler(private val plugin: PunisherX) {
         } catch (e: Exception) {
             logger.err("Failed to update punishment reason for ID: $id. ${e.message}")
             false
+        }
+    }
+
+    // Player cache helpers -------------------------------------------------
+
+    fun savePlayerCacheLine(data: String) {
+        try {
+            execute("INSERT INTO playercache (data) VALUES (?)", data)
+        } catch (e: Exception) {
+            logger.err("Failed to save player cache line. ${e.message}")
+        }
+    }
+
+    fun getPlayerCacheLines(): List<String> {
+        return try {
+            query("SELECT data FROM playercache") { rs -> rs.getString("data") }
+        } catch (e: Exception) {
+            logger.err("Failed to load player cache lines. ${e.message}")
+            emptyList()
+        }
+    }
+
+    fun overwritePlayerCache(lines: List<String>) {
+        try {
+            execute("DELETE FROM playercache")
+            lines.forEach { execute("INSERT INTO playercache (data) VALUES (?)", it) }
+        } catch (e: Exception) {
+            logger.err("Failed to overwrite player cache. ${e.message}")
         }
     }
 

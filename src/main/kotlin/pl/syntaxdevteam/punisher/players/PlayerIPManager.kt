@@ -27,11 +27,14 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
     private val secretKey: Key = generateKey()
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
+    private val useDatabase = plugin.config.getString("playerCache.storage")
+        ?.equals("database", ignoreCase = true) == true
+
     // Ustalony separator – używamy znaku, który nie występuje w danych
     private val separator = "|"
 
     init {
-        if (!cacheFile.exists()) {
+        if (!useDatabase && !cacheFile.exists()) {
             cacheFile.parentFile.mkdirs()
             cacheFile.createNewFile()
         }
@@ -64,10 +67,9 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
     }
 
     private fun savePlayerInfo(playerName: String, playerUUID: String, playerIP: String, geoLocation: String, lastUpdated: String) {
-
         val dataLine = "$playerName$separator$playerUUID$separator$playerIP$separator$geoLocation$separator$lastUpdated"
         val encryptedData = encrypt(dataLine)
-        cacheFile.appendText("$encryptedData\n")
+        appendLine(encryptedData)
         plugin.logger.debug("Encrypted data saved -> $dataLine")
     }
 
@@ -99,7 +101,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
 
     // Zwraca listę rekordów jako obiekty PlayerInfo
     fun getAllDecryptedRecords(): List<PlayerInfo> {
-        return cacheFile.readLines().mapNotNull { line ->
+        return readLines().mapNotNull { line ->
             try {
                 val decrypted = decrypt(line)
                 parsePlayerInfo(decrypted)
@@ -129,7 +131,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
     }
 
     fun deletePlayerInfo(playerUUID: UUID) {
-        val lines = cacheFile.readLines()
+        val lines = readLines()
         val filtered = lines.filter { line ->
             val info = parsePlayerInfo(decrypt(line))
             info?.playerUUID != playerUUID.toString()
@@ -142,7 +144,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
     // Przeszukuje cache i zwraca obiekt PlayerInfo, jeśli znajdzie pasujący rekord
     private fun searchCache(playerName: String, playerUUID: String, playerIP: String): PlayerInfo? {
         plugin.logger.debug("Searching cache")
-        val lines = cacheFile.readLines()
+        val lines = readLines()
         plugin.logger.debug("Number of lines in cache: ${lines.size}")
         for (line in lines) {
             val decryptedLine = decrypt(line)
@@ -161,6 +163,11 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         return null
     }
 
+
+    fun getPlayersByIP(targetIP: String): List<PlayerInfo> {
+        return getAllDecryptedRecords().filter { it.playerIP.equals(targetIP, ignoreCase = true) }
+    }
+
     // Pomocnicza metoda do parsowania odszyfrowanego ciągu na obiekt PlayerInfo
     private fun parsePlayerInfo(decryptedLine: String): PlayerInfo? {
         val parts = decryptedLine.split(separator).map { it.trim() }
@@ -175,6 +182,22 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         } else {
             plugin.logger.err("Invalid record format: $decryptedLine")
             null
+        }
+    }
+
+    private fun readLines(): List<String> =
+        if (useDatabase) plugin.databaseHandler.getPlayerCacheLines() else cacheFile.readLines()
+
+    private fun appendLine(encryptedData: String) {
+        if (useDatabase) plugin.databaseHandler.savePlayerCacheLine(encryptedData)
+        else cacheFile.appendText("$encryptedData\n")
+    }
+
+    private fun overwriteLines(lines: List<String>) {
+        if (useDatabase) plugin.databaseHandler.overwritePlayerCache(lines)
+        else {
+            cacheFile.writeText("")
+            lines.forEach { cacheFile.appendText("$it\n") }
         }
     }
 }
