@@ -33,7 +33,10 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
         MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOnline.title"), Material.PLAYER_HEAD, 19) { player ->
             PlayerListGUI(plugin).open(player)
         },
-        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.adminOnline.title"), Material.COMMAND_BLOCK, 22) { player ->
+        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOffline.title"), Material.SKELETON_SKULL, 21) { player ->
+            OfflinePlayerListGUI(plugin).open(player)
+        },
+        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.adminOnline.title"), Material.COMMAND_BLOCK, 23) { player ->
             AdminListGUI(plugin).open(player)
         },
         MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.compare.title"), Material.GOLDEN_CARROT, 25) { _ ->
@@ -44,6 +47,7 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
         val inventory = Bukkit.createInventory(null, 36, getTitle())
         val serverName = plugin.getServerName()
         val onlinePlayers = Bukkit.getOnlinePlayers().size.toString()
+        val totalPlayers = plugin.playerIPManager.getAllDecryptedRecords().size.toString()
         val daily = plugin.databaseHandler.countTodayPunishments().toString()
         val uptimeSeconds = ManagementFactory.getRuntimeMXBean().uptime / 1000
         val time = plugin.timeHandler.formatTime(uptimeSeconds.toString())
@@ -59,6 +63,10 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
                 19 -> listOf(
                     plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOnline.online", mapOf("onlineplayers" to onlinePlayers)),
                     plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOnline.clickToView")
+                )
+                21 -> listOf(
+                    plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOffline.total", mapOf("totalplayers" to totalPlayers)),
+                    plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOffline.clickToView")
                 )
                 else -> emptyList()
             }

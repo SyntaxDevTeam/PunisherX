@@ -268,6 +268,10 @@ GUI:
       title:       "<green>Lista graczy online</green>"
       online:      "<gray>Ilość graczy online: <green><onlineplayers></green>"
       clickToView: "<gray><b>Kliknij, aby zobaczyć listę graczy</b></gray>"
+    playerOffline:
+      title:       "<gray>Lista graczy offline</gray>"
+      total:       "<gray>Łącznie graczy: <green><totalplayers></green>"
+      clickToView: "<gray><b>Kliknij, aby zobaczyć listę offline</b></gray>"
     adminOnline:
       title:       "<red>Lista administracji online</red>"
     compare:
@@ -282,6 +286,21 @@ GUI:
       lastActive:   "<gray>Poprzednio widziany: <yellow><lastactive></yellow>"
       punishments:  "<gray>Aktualna kara: <yellow><punishments></yellow>"
       punishStr:    "<gray>Łącznie kar: <yellow><punishstr></yellow>"
+  OfflineList:
+    loading: "<gray>Trwa ładowanie danych...</gray>"
+    sort:
+      nameAsc: "<gray>Sortuj: <green>Nick A-Z</green>"
+      nameDesc: "<gray>Sortuj: <green>Nick Z-A</green>"
+      lastSeenDesc: "<gray>Sortuj: <green>Ostatnio widziani ↓</green>"
+      lastSeenAsc: "<gray>Sortuj: <green>Ostatnio widziani ↑</green>"
+    hover:
+      uuid: "<gray>UUID: <yellow><uuid></yellow>"
+      ip: "<gray>IP: <yellow><ip></yellow>"
+      geo: "<gray>Lokalizacja: <yellow><geo></yellow>"
+      lastSeen: "<gray>Ostatnio widziany: <yellow><lastseen></yellow>"
+      lastLocation: "<gray>Ostatnia lokalizacja: <yellow><lastlocation></yellow>"
+      logout: "<gray>Wylogował się: <yellow><logout></yellow>"
+      offlineTime: "<gray>Nie ma go od: <yellow><offlinetime></yellow>"
   PlayerAction:
     title: "<yellow>Menu gracza</yellow>"
     punish: "<yellow>Ukaraj</yellow>"

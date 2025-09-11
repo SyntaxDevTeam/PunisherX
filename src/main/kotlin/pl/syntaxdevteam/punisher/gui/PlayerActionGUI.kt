@@ -5,6 +5,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.OfflinePlayer
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
@@ -21,14 +22,16 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
         override fun getInventory(): Inventory = inv
     }
 
-    fun open(player: Player, target: Player) {
+    fun open(player: Player, target: OfflinePlayer) {
         val holder = Holder(target.uniqueId)
         val inventory = Bukkit.createInventory(holder, 27, getTitle())
         holder.inv = inventory
 
-        inventory.setItem(10, createItem(Material.ANVIL, mH.getCleanMessage("GUI", "PlayerAction.punish")))
-        inventory.setItem(12, createItem(Material.BLAZE_ROD, mH.getCleanMessage("GUI", "PlayerAction.kick")))
-        inventory.setItem(14, createItem(Material.TNT, mH.getCleanMessage("GUI", "PlayerAction.delete")))
+        inventory.setItem(10, createItem(Material.MACE, mH.getCleanMessage("GUI", "PlayerAction.punish")))
+        if (target.isOnline) {
+            inventory.setItem(13, createItem(Material.BLAZE_ROD, mH.getCleanMessage("GUI", "PlayerAction.kick")))
+        }
+        inventory.setItem(16, createItem(Material.TNT, mH.getCleanMessage("GUI", "PlayerAction.delete")))
 
         player.openInventory(inventory)
     }
@@ -39,18 +42,19 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
         event.isCancelled = true
         val holder = event.view.topInventory.holder as? Holder ?: return
         val player = event.whoClicked as? Player ?: return
-        val target = Bukkit.getPlayer(holder.target) ?: return
+        val target = Bukkit.getOfflinePlayer(holder.target)
         val reason = mH.getLogMessage("kick", "no_reasons")
         val force = plugin.config.getBoolean("gui.punish.use_force", false)
 
         when (event.rawSlot) {
             10 -> PunishTypeGUI(plugin).open(player, target)
-            12 -> {
+            13 -> {
+                val online = target.player ?: return
                 player.closeInventory()
 
                 val command = buildString {
                     append("kick ")
-                    append(target.name)
+                    append(online.name)
                     append(' ')
                     append(reason)
                     if (force) append(" --force")
@@ -58,7 +62,7 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
 
                 player.performCommand(command)
             }
-            14 -> ConfirmDeleteGUI(plugin).open(player, target)
+            16 -> ConfirmDeleteGUI(plugin).open(player, target)
         }
     }
 

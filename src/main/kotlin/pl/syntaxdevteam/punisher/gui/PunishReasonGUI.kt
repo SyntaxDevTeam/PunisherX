@@ -5,6 +5,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.OfflinePlayer
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
@@ -21,7 +22,7 @@ class PunishReasonGUI(private val plugin: PunisherX) : GUI {
         override fun getInventory(): Inventory = inv
     }
 
-    fun open(player: Player, target: Player, type: String, time: String) {
+    fun open(player: Player, target: OfflinePlayer, type: String, time: String) {
         val holder = Holder(target.uniqueId, type, time)
         val reasons = plugin.config.getStringList("gui.punish.reasons")
         val size = ((reasons.size / 9) + 1) * 9
@@ -39,7 +40,7 @@ class PunishReasonGUI(private val plugin: PunisherX) : GUI {
         event.isCancelled = true
         val holder = event.view.topInventory.holder as? Holder ?: return
         val player = event.whoClicked as? Player ?: return
-        val target = Bukkit.getPlayer(holder.target) ?: return
+        val target = Bukkit.getOfflinePlayer(holder.target)
         val reasons = plugin.config.getStringList("gui.punish.reasons")
         val force = plugin.config.getBoolean("gui.punish.use_force", false)
 

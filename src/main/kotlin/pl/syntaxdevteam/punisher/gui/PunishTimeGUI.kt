@@ -5,6 +5,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.OfflinePlayer
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
@@ -21,7 +22,7 @@ class PunishTimeGUI(private val plugin: PunisherX) : GUI {
         override fun getInventory(): Inventory = inv
     }
 
-    fun open(player: Player, target: Player, type: String) {
+    fun open(player: Player, target: OfflinePlayer, type: String) {
         val holder = Holder(target.uniqueId, type)
         val inventory = Bukkit.createInventory(holder, 27, getTitle())
         holder.inv = inventory
@@ -38,7 +39,7 @@ class PunishTimeGUI(private val plugin: PunisherX) : GUI {
         event.isCancelled = true
         val holder = event.view.topInventory.holder as? Holder ?: return
         val player = event.whoClicked as? Player ?: return
-        val target = Bukkit.getPlayer(holder.target) ?: return
+        val target = Bukkit.getOfflinePlayer(holder.target)
         val times = plugin.config.getStringList("gui.punish.times")
         val slot = event.rawSlot
         if (slot in 10 until 10 + times.size) {

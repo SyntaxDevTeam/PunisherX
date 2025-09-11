@@ -15,6 +15,7 @@ class GUIHandler(private val plugin: PunisherX) : Listener {
             plugin.messageHandler.getLogMessage("GUI", "PunisherMain.title") -> PunisherMain(plugin).handleClick(event)
             plugin.messageHandler.getLogMessage("GUI", "PunisherMain.playerOnline.title") -> PlayerListGUI(plugin).handleClick(event)
             plugin.messageHandler.getLogMessage("GUI", "PunisherMain.adminOnline.title") -> AdminListGUI(plugin).handleClick(event)
+            plugin.messageHandler.getLogMessage("GUI", "PunisherMain.playerOffline.title") -> OfflinePlayerListGUI(plugin).handleClick(event)
             plugin.messageHandler.getLogMessage("GUI", "PlayerAction.title") -> PlayerActionGUI(plugin).handleClick(event)
             plugin.messageHandler.getLogMessage("GUI", "PlayerAction.confirmDelete.title") -> ConfirmDeleteGUI(plugin).handleClick(event)
             plugin.messageHandler.getLogMessage("GUI", "PunishType.title") -> PunishTypeGUI(plugin).handleClick(event)
