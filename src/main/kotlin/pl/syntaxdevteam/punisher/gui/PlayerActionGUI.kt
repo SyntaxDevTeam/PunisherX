@@ -43,7 +43,7 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
         val holder = event.view.topInventory.holder as? Holder ?: return
         val player = event.whoClicked as? Player ?: return
         val target = Bukkit.getOfflinePlayer(holder.target)
-        val reason = mH.getLogMessage("kick", "no_reasons")
+        val reason = mH.getSimpleMessage("kick", "no_reasons")
         val force = plugin.config.getBoolean("gui.punish.use_force", false)
 
         when (event.rawSlot) {
