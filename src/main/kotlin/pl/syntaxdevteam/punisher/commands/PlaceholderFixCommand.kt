@@ -32,14 +32,15 @@ class PlaceholderFixCommand(private val plugin: PunisherX) : BasicCommand {
             stack.sender.sendMessage("Language file for $lang not found.")
             return
         }
-
+        val prefix = plugin.messageHandler.getPrefix()
         try {
             val content = langFile.readText(Charsets.UTF_8)
             val updated = content.replace(Regex("\\{(\\w+)}"), "<$1>")
             langFile.writeText(updated, Charsets.UTF_8)
-            stack.sender.sendMessage("Converted placeholders in ${langFile.name}.")
+
+            stack.sender.sendMessage("$prefix Converted placeholders in ${langFile.name}.")
         } catch (e: Exception) {
-            stack.sender.sendMessage("Failed to convert placeholders: ${e.message}")
+            stack.sender.sendMessage("$prefix Failed to convert placeholders: ${e.message}")
         }
     }
 
