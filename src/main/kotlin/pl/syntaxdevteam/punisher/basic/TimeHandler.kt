@@ -5,7 +5,7 @@ import pl.syntaxdevteam.punisher.PunisherX
 class TimeHandler(private val plugin: PunisherX) {
 
     fun parseTime(time: String): Long {
-        val amount = time.substring(0, time.length - 1).toLong()
+        val amount = time.dropLast(1).toLong()
         val unit = time.last()
 
         return when (unit) {
@@ -42,7 +42,7 @@ class TimeHandler(private val plugin: PunisherX) {
             return timeComponents.joinToString(", ")
         }
 
-        val amount = time.substring(0, time.length - 1).toLong()
+        val amount = time.dropLast(1).toLong()
         val unit = time.last()
 
         return when (unit) {
