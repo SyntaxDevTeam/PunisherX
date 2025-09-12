@@ -32,6 +32,10 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
             inventory.setItem(13, createItem(Material.BLAZE_ROD, mH.getCleanMessage("GUI", "PlayerAction.kick")))
         }
         inventory.setItem(16, createItem(Material.TNT, mH.getCleanMessage("GUI", "PlayerAction.delete")))
+        for (slot in 18 until 27) {
+            inventory.setItem(slot, createFillerItem())
+        }
+        inventory.setItem(22, createNavItem(Material.BARRIER, mH.getCleanMessage("GUI", "Nav.back")))
 
         player.openInventory(inventory)
     }
@@ -63,6 +67,7 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
                 player.performCommand(command)
             }
             16 -> ConfirmDeleteGUI(plugin).open(player, target)
+            22 -> if (target.isOnline) PlayerListGUI(plugin).open(player) else OfflinePlayerListGUI(plugin).open(player)
         }
     }
 
@@ -74,6 +79,22 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
         val item = ItemStack(material)
         val meta = item.itemMeta
         meta.displayName(mH.formatMixedTextToMiniMessage(name, TagResolver.empty()))
+        item.itemMeta = meta
+        return item
+    }
+
+    private fun createNavItem(material: Material, name: String): ItemStack {
+        val item = ItemStack(material)
+        val meta = item.itemMeta
+        meta.displayName(mH.formatMixedTextToMiniMessage(name, TagResolver.empty()))
+        item.itemMeta = meta
+        return item
+    }
+
+    private fun createFillerItem(): ItemStack {
+        val item = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
+        val meta = item.itemMeta
+        meta.displayName(Component.text(" "))
         item.itemMeta = meta
         return item
     }
