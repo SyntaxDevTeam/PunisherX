@@ -12,9 +12,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import com.destroystokyo.paper.profile.PlayerProfile
 import pl.syntaxdevteam.punisher.PunisherX
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
@@ -40,17 +37,6 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
         open(player, 0, SortMode.NAME_ASC)
     }
 
-    private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-
-    private fun parseDate(date: String): Long? = try {
-        LocalDateTime.parse(date, dateFormatter)
-            .atZone(ZoneId.systemDefault())
-            .toInstant()
-            .toEpochMilli()
-    } catch (_: Exception) {
-        null
-    }
-
     private fun open(player: Player, page: Int, sort: SortMode) {
         val records = plugin.playerIPManager.getAllDecryptedRecords()
         val players = records.mapNotNull { info ->
@@ -61,8 +47,8 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
         val sorted = when (sort) {
             SortMode.NAME_ASC -> players.sortedBy { it.playerName.lowercase() }
             SortMode.NAME_DESC -> players.sortedByDescending { it.playerName.lowercase() }
-            SortMode.LAST_SEEN_DESC -> players.sortedByDescending { parseDate(it.lastUpdated) ?: 0L }
-            SortMode.LAST_SEEN_ASC -> players.sortedBy { parseDate(it.lastUpdated) ?: Long.MAX_VALUE }
+            SortMode.LAST_SEEN_DESC -> players.sortedByDescending { plugin.timeHandler.parseDate(it.lastUpdated) ?: 0L }
+            SortMode.LAST_SEEN_ASC -> players.sortedBy { plugin.timeHandler.parseDate(it.lastUpdated) ?: Long.MAX_VALUE }
         }
 
         val playersPerPage = 27
@@ -98,11 +84,11 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
             inventory.setItem(index, head)
 
             Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
-                val offlineTime = getOfflineDuration(info.lastUpdated)
+                val offlineTime = plugin.timeHandler.getOfflineDuration(info.lastUpdated)
                 val lastSeenDate = info.lastUpdated
                 val ipHistory = records
                     .filter { it.playerUUID == info.playerUUID }
-                    .sortedByDescending { parseDate(it.lastUpdated) ?: 0L }
+                    .sortedByDescending { plugin.timeHandler.parseDate(it.lastUpdated) ?: 0L }
                     .map { it.playerIP }
                     .distinct()
                     .take(3)
@@ -166,8 +152,8 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
             when (holder.sort) {
                 SortMode.NAME_ASC -> list.sortedBy { it.playerName.lowercase() }
                 SortMode.NAME_DESC -> list.sortedByDescending { it.playerName.lowercase() }
-                SortMode.LAST_SEEN_DESC -> list.sortedByDescending { parseDate(it.lastUpdated) ?: 0L }
-                SortMode.LAST_SEEN_ASC -> list.sortedBy { parseDate(it.lastUpdated) ?: Long.MAX_VALUE }
+                SortMode.LAST_SEEN_DESC -> list.sortedByDescending { plugin.timeHandler.parseDate(it.lastUpdated) ?: 0L }
+                SortMode.LAST_SEEN_ASC -> list.sortedBy { plugin.timeHandler.parseDate(it.lastUpdated) ?: Long.MAX_VALUE }
             }
         }
 
@@ -208,32 +194,6 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
         meta.displayName(Component.text(" "))
         item.itemMeta = meta
         return item
-    }
-
-    private fun getOfflineDuration(lastUpdated: String): String {
-        val ts = parseDate(lastUpdated) ?: return mH.getCleanMessage("error", "no_data")
-        var seconds = ((System.currentTimeMillis() - ts) / 1000).coerceAtLeast(0)
-        val years = seconds / (60 * 60 * 24 * 365)
-        seconds %= 60 * 60 * 24 * 365
-        val months = seconds / (60 * 60 * 24 * 30)
-        seconds %= 60 * 60 * 24 * 30
-        val weeks = seconds / (60 * 60 * 24 * 7)
-        seconds %= 60 * 60 * 24 * 7
-        val days = seconds / (60 * 60 * 24)
-        seconds %= 60 * 60 * 24
-        val hours = seconds / (60 * 60)
-        seconds %= 60 * 60
-        val minutes = seconds / 60
-        seconds %= 60
-        val parts = mutableListOf<String>()
-        if (years > 0) parts.add("${years}Y")
-        if (months > 0) parts.add("${months}M")
-        if (weeks > 0) parts.add("${weeks}W")
-        if (days > 0) parts.add("${days}d")
-        if (hours > 0) parts.add("${hours}h")
-        if (minutes > 0) parts.add("${minutes}m")
-        if (seconds > 0 || parts.isEmpty()) parts.add("${seconds}s")
-        return parts.joinToString(" ")
     }
 
     private fun getLastLocation(uuid: UUID): String? {

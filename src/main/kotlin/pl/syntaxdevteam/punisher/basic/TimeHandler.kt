@@ -1,8 +1,13 @@
 package pl.syntaxdevteam.punisher.basic
 
 import pl.syntaxdevteam.punisher.PunisherX
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 class TimeHandler(private val plugin: PunisherX) {
+
+    private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     fun parseTime(time: String): Long {
         val amount = time.dropLast(1).toLong()
@@ -52,6 +57,41 @@ class TimeHandler(private val plugin: PunisherX) {
             'd' -> "$amount ${getLocalizedMessage("day", amount)}"
             else -> plugin.messageHandler.getCleanMessage("formatTime", "undefined")
         }
+    }
+
+    fun parseDate(date: String): Long? = try {
+        LocalDateTime.parse(date, dateFormatter)
+            .atZone(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+    } catch (_: Exception) {
+        null
+    }
+
+    fun getOfflineDuration(lastUpdated: String): String {
+        val ts = parseDate(lastUpdated) ?: return plugin.messageHandler.getCleanMessage("error", "no_data")
+        var seconds = ((System.currentTimeMillis() - ts) / 1000).coerceAtLeast(0)
+        val years = seconds / (60 * 60 * 24 * 365)
+        seconds %= 60 * 60 * 24 * 365
+        val months = seconds / (60 * 60 * 24 * 30)
+        seconds %= 60 * 60 * 24 * 30
+        val weeks = seconds / (60 * 60 * 24 * 7)
+        seconds %= 60 * 60 * 24 * 7
+        val days = seconds / (60 * 60 * 24)
+        seconds %= 60 * 60 * 24
+        val hours = seconds / (60 * 60)
+        seconds %= 60 * 60
+        val minutes = seconds / 60
+        seconds %= 60
+        val parts = mutableListOf<String>()
+        if (years > 0) parts.add("${years}Y")
+        if (months > 0) parts.add("${months}M")
+        if (weeks > 0) parts.add("${weeks}W")
+        if (days > 0) parts.add("${days}d")
+        if (hours > 0) parts.add("${hours}h")
+        if (minutes > 0) parts.add("${minutes}m")
+        if (seconds > 0 || parts.isEmpty()) parts.add("${seconds}s")
+        return parts.joinToString(" ")
     }
 
     private fun getLocalizedMessage(unit: String, amount: Long): String {
