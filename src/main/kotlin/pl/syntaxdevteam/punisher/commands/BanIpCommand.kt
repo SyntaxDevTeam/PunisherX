@@ -30,13 +30,13 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
 
         val rawTarget = args[0]
         val isForce = args.contains("--force")
-        val playerIP: String? = when {
-            IP_REGEX.matches(rawTarget) -> rawTarget
-            UUID_REGEX.matches(rawTarget) -> plugin.playerIPManager.getPlayerIPByUUID(rawTarget)
-            else -> plugin.playerIPManager.getPlayerIPByName(rawTarget.lowercase())
+        val playerIPs: List<String> = when {
+            IP_REGEX.matches(rawTarget) -> listOf(rawTarget)
+            UUID_REGEX.matches(rawTarget) -> plugin.playerIPManager.getPlayerIPsByUUID(rawTarget)
+            else -> plugin.playerIPManager.getPlayerIPsByName(rawTarget.lowercase())
         }
 
-        if (playerIP == null) {
+        if (playerIPs.isEmpty()) {
             stack.sender.sendMessage(plugin.messageHandler.getMessage("banip", "not_found"))
             return
         }
@@ -64,16 +64,20 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
         val start = System.currentTimeMillis()
         val end = durationSec?.let { start + it * 1000 }
 
-        val success = plugin.databaseHandler.addPunishment(rawTarget, playerIP, reason, stack.sender.name,
-            "BANIP", start, end ?: -1)
-        if (!success) {
-            plugin.logger.err("DB error ban-ip $rawTarget")
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "db_error"))
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban-ip $rawTarget")
+        var dbError = false
+        playerIPs.forEach { ip ->
+            val success = plugin.databaseHandler.addPunishment(rawTarget, ip, reason, stack.sender.name,
+                "BANIP", start, end ?: -1)
+            if (!success) {
+                plugin.logger.err("DB error ban-ip $ip")
+                dbError = true
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban-ip $ip")
+            }
+            plugin.databaseHandler.addPunishmentHistory(rawTarget, ip, reason, stack.sender.name,
+                "BANIP", start, end ?: -1)
         }
         clp.logCommand(stack.sender.name, "BANIP", rawTarget, reason)
-        plugin.databaseHandler.addPunishmentHistory(rawTarget, playerIP, reason, stack.sender.name,
-            "BANIP", start, end ?: -1)
+        if (dbError) stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "db_error"))
 
         if (targetPlayer != null) {
             val lines = plugin.messageHandler.getSmartMessage(

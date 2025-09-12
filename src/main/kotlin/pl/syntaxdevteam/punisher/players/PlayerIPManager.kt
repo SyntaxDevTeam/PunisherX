@@ -130,6 +130,24 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         return ip
     }
 
+    // Pobiera wszystkie IP na podstawie nazwy gracza
+    fun getPlayerIPsByName(playerName: String): List<String> {
+        plugin.logger.debug("Fetching all IPs for player: $playerName")
+        return getAllDecryptedRecords()
+            .filter { it.playerName.equals(playerName, ignoreCase = true) }
+            .map { it.playerIP }
+            .also { plugin.logger.debug("Found IPs for player $playerName: $it") }
+    }
+
+    // Pobiera wszystkie IP na podstawie UUID
+    fun getPlayerIPsByUUID(playerUUID: String): List<String> {
+        plugin.logger.debug("Fetching all IPs for UUID: $playerUUID")
+        return getAllDecryptedRecords()
+            .filter { it.playerUUID.equals(playerUUID, ignoreCase = true) }
+            .map { it.playerIP }
+            .also { plugin.logger.debug("Found IPs for UUID $playerUUID: $it") }
+    }
+
     fun deletePlayerInfo(playerUUID: UUID) {
         val lines = readLines()
         val filtered = lines.filter { line ->

@@ -34,15 +34,19 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        val ip = plugin.playerIPManager.getPlayerIPByName(playerOrIpOrUUID)
-        if (ip == null) {
+        val ips = plugin.playerIPManager.getPlayerIPsByName(playerOrIpOrUUID)
+        if (ips.isEmpty()) {
             stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
             return
         }
 
-        plugin.logger.debug("Assigned IP for player $playerOrIpOrUUID: [$ip]")
+        plugin.logger.debug("Assigned IPs for player $playerOrIpOrUUID: $ips")
 
-        if (!unbanIP(stack, ip)) {
+        var anyUnbanned = false
+        ips.forEach { ip ->
+            if (unbanIP(stack, ip)) anyUnbanned = true
+        }
+        if (!anyUnbanned) {
             stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
         }
     }
