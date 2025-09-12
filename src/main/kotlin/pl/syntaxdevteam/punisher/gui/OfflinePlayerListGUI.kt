@@ -12,7 +12,9 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import com.destroystokyo.paper.profile.PlayerProfile
 import pl.syntaxdevteam.punisher.PunisherX
-import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
@@ -38,10 +40,13 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
         open(player, 0, SortMode.NAME_ASC)
     }
 
-    private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     private fun parseDate(date: String): Long? = try {
-        dateFormat.parse(date)?.time
+        LocalDateTime.parse(date, dateFormatter)
+            .atZone(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
     } catch (_: Exception) {
         null
     }
@@ -95,7 +100,13 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
                 val offlineTime = getOfflineDuration(info.lastUpdated)
                 val lastSeenDate = info.lastUpdated
-                val ip = info.playerIP
+                val ipHistory = records
+                    .filter { it.playerUUID == info.playerUUID }
+                    .sortedByDescending { parseDate(it.lastUpdated) ?: 0L }
+                    .map { it.playerIP }
+                    .distinct()
+                    .take(3)
+                val ipLine = ipHistory.joinToString(", ")
                 val geo = info.geoLocation
                 val lastLocation = getLastLocation(uuid) ?: mH.getCleanMessage("error", "no_data")
                 Bukkit.getScheduler().runTask(plugin, Runnable {
@@ -105,7 +116,7 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
                     im.lore(
                         listOf(
                             mH.getLogMessage("GUI", "OfflineList.hover.uuid", mapOf("uuid" to info.playerUUID)),
-                            mH.getLogMessage("GUI", "OfflineList.hover.ip", mapOf("ip" to ip)),
+                            mH.getLogMessage("GUI", "OfflineList.hover.ip", mapOf("ip" to ipLine)),
                             mH.getLogMessage("GUI", "OfflineList.hover.geo", mapOf("geo" to geo)),
                             mH.getLogMessage("GUI", "OfflineList.hover.lastSeen", mapOf("lastseen" to lastSeenDate)),
                             mH.getLogMessage("GUI", "OfflineList.hover.lastLocation", mapOf("lastlocation" to lastLocation)),
@@ -201,7 +212,7 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
 
     private fun getOfflineDuration(lastUpdated: String): String {
         val ts = parseDate(lastUpdated) ?: return mH.getCleanMessage("error", "no_data")
-        var seconds = (System.currentTimeMillis() - ts) / 1000
+        var seconds = ((System.currentTimeMillis() - ts) / 1000).coerceAtLeast(0)
         val years = seconds / (60 * 60 * 24 * 365)
         seconds %= 60 * 60 * 24 * 365
         val months = seconds / (60 * 60 * 24 * 30)
