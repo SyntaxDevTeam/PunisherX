@@ -38,9 +38,9 @@ class PlaceholderFixCommand(private val plugin: PunisherX) : BasicCommand {
             val updated = content.replace(Regex("\\{(\\w+)}"), "<$1>")
             langFile.writeText(updated, Charsets.UTF_8)
 
-            stack.sender.sendMessage("$prefix Converted placeholders in ${langFile.name}.")
+            stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("$prefix Converted placeholders in ${langFile.name}."))
         } catch (e: Exception) {
-            stack.sender.sendMessage("$prefix Failed to convert placeholders: ${e.message}")
+            stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("$prefix Failed to convert placeholders: ${e.message}"))
         }
     }
 
