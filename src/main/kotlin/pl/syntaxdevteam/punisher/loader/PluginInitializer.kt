@@ -1,6 +1,7 @@
 package pl.syntaxdevteam.punisher.loader
 
 import org.bukkit.plugin.ServicePriority
+import org.bukkit.scheduler.BukkitRunnable
 import pl.syntaxdevteam.core.SyntaxCore
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.api.PunisherXApi
@@ -20,8 +21,9 @@ import pl.syntaxdevteam.punisher.hooks.HookHandler
 import pl.syntaxdevteam.punisher.listeners.LegacyLoginListener
 import pl.syntaxdevteam.punisher.listeners.ModernLoginListener
 import pl.syntaxdevteam.punisher.placeholders.PlaceholderHandler
-import pl.syntaxdevteam.punisher.players.GeoIPHandler
-import pl.syntaxdevteam.punisher.players.PlayerIPManager
+import pl.syntaxdevteam.punisher.players.*
+import java.io.File
+import java.util.Locale
 
 class PluginInitializer(private val plugin: PunisherX) {
 
@@ -95,6 +97,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.hookHandler = HookHandler(plugin)
         plugin.discordWebhook = DiscordWebhook(plugin)
         plugin.playerIPManager = PlayerIPManager(plugin, plugin.geoIPHandler)
+        checkLegacyPlaceholders()
     }
 
     /**
@@ -133,5 +136,49 @@ class PluginInitializer(private val plugin: PunisherX) {
     private fun checkForUpdates() {
         plugin.statsCollector = SyntaxCore.statsCollector
         SyntaxCore.updateChecker.checkAsync()
+    }
+
+    /**
+     * Checks the selected language file for legacy placeholders formatted with curly braces.
+     * If found, logs a warning and periodically reminds the console to run the placeholder
+     * conversion command or regenerate the file.
+     */
+    private fun checkLegacyPlaceholders() {
+        val lang = plugin.config.getString("language")?.lowercase(Locale.getDefault()) ?: "en"
+        val langDir = File(plugin.dataFolder, "lang")
+        val candidates = listOf(
+            File(langDir, "messages_$lang.yml"),
+            File(langDir, "message_$lang.yml")
+        )
+        val langFile = candidates.firstOrNull { it.exists() } ?: return
+
+        val legacyPattern = Regex("\\{\\w+}")
+        val warnMsg = "Language file ${langFile.name} uses legacy placeholders with {}. Run /langfix or delete the file to regenerate."
+
+        try {
+            val content = langFile.readText(Charsets.UTF_8)
+            if (!legacyPattern.containsMatchIn(content)) return
+        } catch (e: Exception) {
+            plugin.logger.warning("Could not check language file placeholders: ${e.message}")
+            return
+        }
+
+        plugin.logger.warning(warnMsg)
+
+        object : BukkitRunnable() {
+            override fun run() {
+                try {
+                    val content = langFile.readText(Charsets.UTF_8)
+                    if (legacyPattern.containsMatchIn(content)) {
+                        plugin.logger.warning(warnMsg)
+                    } else {
+                        cancel()
+                    }
+                } catch (e: Exception) {
+                    plugin.logger.warning("Could not check language file placeholders: ${e.message}")
+                    cancel()
+                }
+            }
+        }.runTaskTimer(plugin, 20L * 60L * 5L, 20L * 60L * 5L)
     }
 }
