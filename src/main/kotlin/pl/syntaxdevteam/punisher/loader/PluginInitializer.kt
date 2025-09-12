@@ -138,6 +138,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         SyntaxCore.updateChecker.checkAsync()
     }
 
+
     /**
      * Checks the selected language file for legacy placeholders formatted with curly braces.
      * If found, logs a warning and periodically reminds the console to run the placeholder
@@ -153,7 +154,8 @@ class PluginInitializer(private val plugin: PunisherX) {
         val langFile = candidates.firstOrNull { it.exists() } ?: return
 
         val legacyPattern = Regex("\\{\\w+}")
-        val warnMsg = "Language file ${langFile.name} uses legacy placeholders with {}. Run /langfix or delete the file to regenerate."
+        val warnMsg =
+            "Language file ${langFile.name} uses legacy placeholders with {}. Run /langfix or delete the file to regenerate."
 
         try {
             val content = langFile.readText(Charsets.UTF_8)
@@ -165,20 +167,37 @@ class PluginInitializer(private val plugin: PunisherX) {
 
         plugin.logger.warning(warnMsg)
 
-        object : BukkitRunnable() {
-            override fun run() {
+        val delay = 20L * 10L
+        if (plugin.server.name.contains("Folia", ignoreCase = true)) {
+            plugin.server.globalRegionScheduler.runAtFixedRate(plugin, { task ->
                 try {
                     val content = langFile.readText(Charsets.UTF_8)
                     if (legacyPattern.containsMatchIn(content)) {
                         plugin.logger.warning(warnMsg)
                     } else {
-                        cancel()
+                        task.cancel()
                     }
                 } catch (e: Exception) {
                     plugin.logger.warning("Could not check language file placeholders: ${e.message}")
-                    cancel()
+                    task.cancel()
                 }
-            }
-        }.runTaskTimer(plugin, 20L * 60L * 5L, 20L * 60L * 5L)
+            }, delay, delay)
+        } else {
+            object : BukkitRunnable() {
+                override fun run() {
+                    try {
+                        val content = langFile.readText(Charsets.UTF_8)
+                        if (legacyPattern.containsMatchIn(content)) {
+                            plugin.logger.warning(warnMsg)
+                        } else {
+                            cancel()
+                        }
+                    } catch (e: Exception) {
+                        plugin.logger.warning("Could not check language file placeholders: ${e.message}")
+                        cancel()
+                    }
+                }
+            }.runTaskTimer(plugin, delay, delay)
+        }
     }
 }
