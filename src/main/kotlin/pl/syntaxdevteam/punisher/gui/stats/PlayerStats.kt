@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.stats
+package pl.syntaxdevteam.punisher.gui.stats
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -9,6 +9,10 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 import org.bukkit.Bukkit
+import org.bukkit.NamespacedKey
+import net.kyori.adventure.nbt.BinaryTagIO
+import net.kyori.adventure.nbt.BinaryTagTypes
+import net.kyori.adventure.nbt.CompoundBinaryTag
 
 /**
  * Provides access to basic player statistics stored in the vanilla stats JSON files
@@ -93,6 +97,30 @@ object PlayerStatsService {
         val ts = if (off.isOnline) off.lastLogin else off.lastSeen
         if (ts <= 0) return null
         return Instant.ofEpochMilli(ts).atZone(zone).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+    }
+
+    fun getLastLocationString(uuid: UUID): String? {
+        return try {
+            val worldFolder = Bukkit.getWorlds().firstOrNull()?.worldFolder ?: return null
+            val dataFile = File(worldFolder, "playerdata/$uuid.dat")
+            if (!dataFile.exists()) return null
+
+            val tag = BinaryTagIO.reader()
+                .read(dataFile.toPath(), BinaryTagIO.Compression.GZIP)
+
+            val pos = tag.getList("Pos", BinaryTagTypes.DOUBLE)
+            val x = pos.getDouble(0)
+            val y = pos.getDouble(1)
+            val z = pos.getDouble(2)
+
+            val worldKey = NamespacedKey.fromString(tag.getString("Dimension"))
+            val worldName = worldKey?.let { Bukkit.getWorld(it)?.name } ?: tag.getString("Dimension")
+
+            "$worldName: ${x.toInt()}, ${y.toInt()}, ${z.toInt()}"
+        } catch (ex: Exception) {
+            Bukkit.getLogger().fine("Failed to load last location for $uuid: $ex")
+            null
+        }
     }
 
     private fun formatDuration(d: Duration): String {

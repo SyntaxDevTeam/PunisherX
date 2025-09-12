@@ -2,6 +2,7 @@ package pl.syntaxdevteam.punisher.gui
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -94,7 +95,8 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
                     .take(3)
                 val ipLine = ipHistory.joinToString(", ")
                 val geo = info.geoLocation
-                val lastLocation = getLastLocation(uuid) ?: mH.getCleanMessage("error", "no_data")
+                val lastLocation = PlayerStatsService.getLastLocationString(uuid)
+                    ?: mH.getCleanMessage("error", "no_data")
                 Bukkit.getScheduler().runTask(plugin, Runnable {
                     if (!holder.inv.viewers.contains(player)) return@Runnable
                     val item = inventory.getItem(index) ?: return@Runnable
@@ -194,9 +196,5 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
         meta.displayName(Component.text(" "))
         item.itemMeta = meta
         return item
-    }
-
-    private fun getLastLocation(uuid: UUID): String? {
-        return null
     }
 }

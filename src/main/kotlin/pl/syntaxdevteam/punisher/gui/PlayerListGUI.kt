@@ -11,7 +11,7 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.stats.PlayerStatsService
+import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
 
 /**
  * GUI displaying currently online players.

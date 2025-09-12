@@ -50,6 +50,7 @@ dependencies {
     compileOnly("net.kyori:adventure-text-serializer-gson:4.24.0")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.24.0")
     compileOnly("net.kyori:adventure-text-serializer-ansi:4.24.0")
+    compileOnly("net.kyori:adventure-nbt:4.24.0")
     compileOnly("com.maxmind.geoip2:geoip2:4.4.0")
     compileOnly("org.apache.ant:ant:1.10.15")
     compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.5")
