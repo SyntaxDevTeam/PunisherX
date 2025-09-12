@@ -11,6 +11,7 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
 import java.util.UUID
 
 class PlayerActionGUI(private val plugin: PunisherX) : GUI {
@@ -24,18 +25,21 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
 
     fun open(player: Player, target: OfflinePlayer) {
         val holder = Holder(target.uniqueId)
-        val inventory = Bukkit.createInventory(holder, 27, getTitle())
+        val inventory = Bukkit.createInventory(holder, 45, getTitle())
         holder.inv = inventory
 
-        inventory.setItem(10, createItem(Material.MACE, mH.getCleanMessage("GUI", "PlayerAction.punish")))
+        for (slot in 0 until 45) {
+            inventory.setItem(slot, createFillerItem())
+        }
+
+        inventory.setItem(11, createItem(Material.MACE, mH.getCleanMessage("GUI", "PlayerAction.punish")))
         if (target.isOnline) {
             inventory.setItem(13, createItem(Material.BLAZE_ROD, mH.getCleanMessage("GUI", "PlayerAction.kick")))
         }
-        inventory.setItem(16, createItem(Material.TNT, mH.getCleanMessage("GUI", "PlayerAction.delete")))
-        for (slot in 18 until 27) {
-            inventory.setItem(slot, createFillerItem())
-        }
-        inventory.setItem(22, createNavItem(Material.BARRIER, mH.getCleanMessage("GUI", "Nav.back")))
+        inventory.setItem(15, createItem(Material.REDSTONE_BLOCK, mH.getCleanMessage("GUI", "PlayerAction.banip")))
+        inventory.setItem(29, createItem(Material.ENDER_PEARL, mH.getCleanMessage("GUI", "PlayerAction.teleport")))
+        inventory.setItem(33, createItem(Material.TNT, mH.getCleanMessage("GUI", "PlayerAction.delete")))
+        inventory.setItem(40, createNavItem(Material.BARRIER, mH.getCleanMessage("GUI", "Nav.back")))
 
         player.openInventory(inventory)
     }
@@ -47,11 +51,12 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
         val holder = event.view.topInventory.holder as? Holder ?: return
         val player = event.whoClicked as? Player ?: return
         val target = Bukkit.getOfflinePlayer(holder.target)
-        val reason = mH.getSimpleMessage("kick", "no_reasons")
+        val reasonKick = mH.getSimpleMessage("kick", "no_reasons")
+        val reasonBan = mH.getSimpleMessage("banip", "no_reasons")
         val force = plugin.config.getBoolean("gui.punish.use_force", false)
 
         when (event.rawSlot) {
-            10 -> PunishTypeGUI(plugin).open(player, target)
+            11 -> PunishTypeGUI(plugin).open(player, target)
             13 -> {
                 val online = target.player ?: return
                 player.closeInventory()
@@ -60,14 +65,39 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
                     append("kick ")
                     append(online.name)
                     append(' ')
-                    append(reason)
+                    append(reasonKick)
                     if (force) append(" --force")
                 }
 
                 player.performCommand(command)
             }
-            16 -> ConfirmDeleteGUI(plugin).open(player, target)
-            22 -> if (target.isOnline) PlayerListGUI(plugin).open(player) else OfflinePlayerListGUI(plugin).open(player)
+            15 -> {
+                player.closeInventory()
+                val command = buildString {
+                    append("banip ")
+                    append(target.name)
+                    append(' ')
+                    append(reasonBan)
+                    if (force) append(" --force")
+                }
+                player.performCommand(command)
+            }
+            29 -> {
+                player.closeInventory()
+                val online = target.player
+                if (online != null) {
+                    player.teleport(online)
+                } else {
+                    val loc = PlayerStatsService.getLastLocation(target.uniqueId)
+                    if (loc != null) {
+                        player.teleport(loc)
+                    } else {
+                        player.sendMessage(mH.getMessage("error", "no_data"))
+                    }
+                }
+            }
+            33 -> ConfirmDeleteGUI(plugin).open(player, target)
+            40 -> if (target.isOnline) PlayerListGUI(plugin).open(player) else OfflinePlayerListGUI(plugin).open(player)
         }
     }
 

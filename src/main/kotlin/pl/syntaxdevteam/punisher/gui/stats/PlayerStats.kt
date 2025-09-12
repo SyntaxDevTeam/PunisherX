@@ -12,7 +12,7 @@ import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import net.kyori.adventure.nbt.BinaryTagIO
 import net.kyori.adventure.nbt.BinaryTagTypes
-import net.kyori.adventure.nbt.CompoundBinaryTag
+import org.bukkit.Location
 
 /**
  * Provides access to basic player statistics stored in the vanilla stats JSON files
@@ -77,7 +77,7 @@ object PlayerStatsService {
             } else null
         }
     }
-
+    //TODO: sprawdzić dlaczego nie są używane te metody i czy w ogóle są potrzebne.
     fun getLastLoginDate(uuid: UUID, zone: ZoneId = ZoneId.systemDefault()): String? {
         val off = Bukkit.getOfflinePlayer(uuid)
         val ts = off.lastLogin
@@ -98,7 +98,8 @@ object PlayerStatsService {
         if (ts <= 0) return null
         return Instant.ofEpochMilli(ts).atZone(zone).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
     }
-
+    //TODO: Zredukować kod dla getLastLocation i getLastLocationString do jednej metody a następnie poprawić logikę w GUI w miejscu użycia tych metod.
+    @Suppress("UnstableApiUsage")
     fun getLastLocationString(uuid: UUID): String? {
         return try {
             val worldFolder = Bukkit.getWorlds().firstOrNull()?.worldFolder ?: return null
@@ -122,6 +123,31 @@ object PlayerStatsService {
             null
         }
     }
+
+    fun getLastLocation(uuid: UUID): Location? {
+        return try {
+            val worldFolder = Bukkit.getWorlds().firstOrNull()?.worldFolder ?: return null
+            val dataFile = File(worldFolder, "playerdata/$uuid.dat")
+            if (!dataFile.exists()) return null
+
+            val tag = BinaryTagIO.reader()
+                .read(dataFile.toPath(), BinaryTagIO.Compression.GZIP)
+
+            val pos = tag.getList("Pos", BinaryTagTypes.DOUBLE)
+            val x = pos.getDouble(0)
+            val y = pos.getDouble(1)
+            val z = pos.getDouble(2)
+
+            val worldKey = NamespacedKey.fromString(tag.getString("Dimension"))
+            val world = worldKey?.let { Bukkit.getWorld(it) } ?: Bukkit.getWorld(tag.getString("Dimension"))
+
+            world?.let { Location(it, x, y, z) }
+        } catch (ex: Exception) {
+            Bukkit.getLogger().fine("Failed to load last location for $uuid: $ex")
+            null
+        }
+    }
+
 
     private fun formatDuration(d: Duration): String {
         val h = d.toHours()
