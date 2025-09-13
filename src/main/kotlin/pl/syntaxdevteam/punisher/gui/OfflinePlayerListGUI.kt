@@ -172,8 +172,8 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
         }
         when (slot) {
             36 -> if (holder.page > 0) open(player, holder.page - 1, holder.sort)
+            38 -> open(player, 0, holder.sort.next())
             40 -> PunisherMain(plugin).open(player)
-            41 -> open(player, 0, holder.sort.next())
             44 -> if (holder.page < (players.size - 1) / playersPerPage) open(player, holder.page + 1, holder.sort)
         }
     }
