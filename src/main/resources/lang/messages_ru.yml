@@ -1,55 +1,52 @@
-# Ver. 1.0.0
+# Author: marat2509 (Marat Budkevich)
+# Версия 1.0.0
 # Форматирование сообщений:
-# Можно использовать форматирование MiniMessage или Legacy (Minecraft).
+# Вы можете использовать MiniMessage и Legacy (Minecraft) форматирование.
 # Примеры использования MiniMessage: https://docs.advntr.dev/minimessage/format.html
-# Не смешивайте форматы в одном сообщении. Если используете Legacy, не добавляйте MiniMessage,
-# иначе будет применён только последний.
+# Не смешивайте форматы в одном сообщении. Если вы используете Legacy, не вставляйте форматирование MiniMessage, иначе будет использоваться только последнее.
 
 prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>"
 
 # Сообщения об ошибках
 error:
-  no_permission: "<red>У вас нет прав для использования этой команды.</red>"
+  no_permission: "<red>У вас нет прав на использование этой команды.</red>"
   player_not_found: "<gold>Игрок с ником <player> не найден.</gold>"
-  player_not_punished: "<gold>Игрок <player> не имеет такого наказания.</gold>"
   ip_not_found: "<gold>Игрок с IP <ip> не найден.</gold>"
-  no_data: "<red>Нет данных для отображения.</red>"
-  db_error: "Произошла ошибка при добавлении наказания в базу данных. Используется резервный метод. Проверьте консоль!"
-  console: "<red>Эту команду может использовать только игрок.</red>"
-  reload: "<red>Произошла ошибка при перезагрузке конфигурации:</red>"
-  bypass: "<red><b>ВНИМАНИЕ!</b> Игрок <gold><player></gold> не может быть наказан из-за своих прав (OP или bypass).</red><newline><dark_gray>Возможно, есть способ это обойти...</dark_gray>"
+  player_not_punished: "<gold>У игрока <player> нет такого наказания.</gold>"
+  reload: "<red>Произошла ошибка при перезагрузке конфигурации:</red> "
+  bypass: "<red><b>ВНИМАНИЕ!</b> Игрок <gold><player><gold/> <red>не может быть наказан из-за его прав (OP или обход).</red><dark_gray>Возможно, это можно было бы обойти..."
 
 # Сообщения команды /setjail
 setjail:
   usage: "Правильное использование: <gold>/setjail <радиус>"
   set: "<green>Местоположение тюрьмы установлено: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>] с радиусом <gold><radius></gold>"
-  set_error: "<red>Не удалось установить местоположение тюрьмы.</red>"
-  invalid_radius: "<red>Укажите правильный радиус (число больше 0).</red>"
+  set_error: "<red>Не удалось установить местоположение тюрьмы</red>"
+  invalid_radius: "<red>Пожалуйста, укажите действительный радиус (число больше 0)</red>"
 
 # Сообщения команды /setspawn
 setspawn:
   usage: "Правильное использование: <gold>/setspawn</gold>"
-  set: "<green>Точка возрождения установлена: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
-  set_error: "<red>Не удалось установить точку возрождения.</red>"
+  set: "<green>Местоположение спавна установлено: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
+  set_error: "<red>Не удалось установить местоположение спавна</red>"
 
 # Сообщения команды /jail
 jail:
   jail: "<green>Вы посадили игрока <gold><player></gold> в тюрьму за <gold><reason></gold> на <gold><time></gold></green>"
-  usage: "Правильное использование: <gold>/jail <ник_игрока> (время) <причина>"
+  usage: "Правильное использование: <gold>/jail <игрок> (время) <причина>"
   jail_message: "<red>Вы были посажены в тюрьму за <b><reason></b> на <b><time></b></red>"
-  mute_info_message: "<red>Вы пытаетесь что-то сказать, но из тюрьмы вас никто не слышит...</red>"
-  jail_restrict_message: "Покидать зону тюрьмы запрещено. Вы были возвращены на назначенное место."
+  mute_info_message: "<red>Вы пытаетесь говорить, но из тюрьмы вас никто не слышит</red>"
+  jail_restrict_message: "Запрещено покидать территорию тюрьмы. Вы были телепортированы обратно в назначенное место."
   broadcast: "<dark_gray>Игрок <gray><player></gray> был посажен в тюрьму за <gray><reason></gray> на <gray><time></gray></dark_gray>"
-  # Альтернативно можно использовать следующий формат сообщения, если хотите выделить уведомление сильнее
-  # broadcast:
-  #   - "<dark_gray>*************** Название вашего сервера *************** </dark_gray>"
-  #   - ""
-  #   - "<red>   Игрок <white><player></white> был посажен в тюрьму</red>"
-  #   - "   Причина: <white><reason></white>"
-  #   - "   Время: <white><time></white>"
-  #   - ""
-  #   - "<dark_gray>*************************************************** </dark_gray>"
-  log: "<dark_gray>Игрок <gray><player></gray> кричит из своей камеры: <gray><message></gray></dark_gray>"
+    # В качестве альтернативы вы можете использовать формат сообщения ниже, если хотите дополнительно выделить это сообщение
+    # broadcast:
+    #- "<dark_gray>*************** Название Вашего Сервера *************** </dark_gray>"
+    #- ""
+    #- "<red>   Игрок <white><player></white> был заточён в тюрьму</red>"
+    #- "   Причина: <white><reason></white>"
+    #- "   Срок: <white><time></white>"
+    #- ""
+  #- "<dark_gray>*************************************************** </dark_gray>"
+  log: "<dark_gray>Заключённый игрок <gray><player></gray> <dark_gray>кричит из своей камеры: <gray><message></gray>"
   no_reasons: "без причины"
   reasons:
     - "Реклама"
@@ -60,163 +57,164 @@ jail:
 # Сообщения команды /unjail
 unjail:
   unjail: "<green>Вы освободили игрока <gold><player></gold> из тюрьмы</green>"
-  usage: "Правильное использование: <gold>/unjail <ник_игрока>"
-  unjail_message: "<green>Ваш срок в тюрьме закончился! Не упустите этот шанс!</green>"
-  success: "<green>Игрок <gold><player></gold> успешно освобождён из тюрьмы.</green>"
-  broadcast: "Игрок <gold><player></gold> был освобождён из тюрьмы. Будьте осторожны..."
+  usage: "Правильное использование: <gold>/unjail <игрок>"
+  unjail_message: "<green>Ваш срок заключения закончился! Не упустите этот шанс!</green>"
+  success: "<green>Игрок <gold><player></gold> был успешно освобождён из тюрьмы."
+  broadcast: "Игрок <gold><player></gold> был освобождён из тюрьмы. Лучше поберегитесь..."
 
 # Сообщения команды /ban
 ban:
-  ban: "<green>Вы забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
-  usage: "Правильное использование: <gold>/ban <ник_игрока> (время) <причина>"
+  ban: "<green>Вы забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></green>"
+  usage: "Правильное использование: <gold>/ban <игрок> (время) <причина>"
   kick_message:
-    # Вы можете изменить сообщение, отображаемое забаненному игроку
-    - 'Название сервера'
+    # Вы можете настроить сообщение для выгнанного игрока
+    - 'Название Сервера'
     - 'PunisherX &8» &7Вы были забанены'
     - '&7'
     - '&7'
     - "&cПричина &8» &7<reason>"
-    - "&cВремя &8» &7<time>"
+    - "&cНа срок &8» &7<time>"
     - '&7'
-    - '&8Вы можете подать апелляцию на:'
-    - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
-  broadcast: "<dark_gray>Игрок <gray><player></gray> был забанен по причине <gray><reason></gray> на <gray><time></gray></dark_gray>"
-    # Альтернативно можно использовать следующий формат сообщения, если хотите выделить уведомление сильнее
+    - '&8Вы можете подать апелляцию:'
+    - "&eDiscord &8» &c&nhttps://servername.pl/discord"
+  broadcast: "<dark_gray>Игрок <gray><player></gray> был забанен за <gray><reason></gray> на <gray><time></gray></dark_gray>"
+    # В качестве альтернативы вы можете использовать формат сообщения ниже, если хотите дополнительно выделить это сообщение
     # broadcast:
-    #- "<dark_gray>*************** Название вашего сервера *************** </dark_gray>"
+    #- "<dark_gray>*************** Название Вашего Сервера *************** </dark_gray>"
     #- ""
     #- "<red>   Игрок <white><player></white> был забанен</red>"
     #- "   Причина: <white><reason></white>"
-    #- "   Время: <white><time></white>"
+    #- "   Срок: <white><time></white>"
     #- ""
   #- "<dark_gray>*************************************************** </dark_gray>"
   no_reasons: "без причины"
-  reasons: # Добавьте свои причины, которые будут предлагаться при выполнении команды
-    - "Читы"
+  reasons: # Добавьте свои собственные причины, которые будут предложены при выполнении команды
+    - "Читерство"
     - "Гриферство"
     - "Спам"
-    - "Нецензурная лексика"
+    - "Оскорбительная лексика"
 
 # Сообщения команды /banip
 banip:
-  ban: "<green>Вы забанили IP игрока за <gold><reason></gold> на <gold><time></gold></green>"
+  ban: "<green>Вы забанили IP игрока за <gold><reason></gold> на <gold><time></green>"
   usage: "Правильное использование: <gold>/banip <игрок|ip> (время) <причина>"
   kick_message:
-    # Вы можете изменить сообщение, отображаемое забаненному игроку
-    - 'Название сервера'
+    # Вы можете настроить сообщение для выгнанного игрока
+    - 'Название Сервера'
     - 'PunisherX &8» &7Ваш IP был забанен!'
     - '&7'
     - '&7'
     - "&cПричина &8» &7<reason>"
-    - "&cВремя &8» &7<time>"
+    - "&cНа срок &8» &7<time>"
     - '&7'
-    - '&8Вы можете подать апелляцию на:'
+    - '&8Вы можете подать апелляцию:'
     - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.pl/discord"
-  broadcast: "<dark_gray>Игрок <gray><player></gray> был забанен по причине <gray><reason></gray> на <gray><time></gray></dark_gray>"
+  broadcast: "<dark_gray>Игрок <gray><player></gray> был забанен за <gray><reason></gray> на <gray><time></gray></dark_gray>"
   no_reasons: "без причины"
   reasons:
-    - "Мультиаккаунт"
+    - "Мультиаккаунты"
     - "Гриферство"
     - "Спам"
-    - "Нецензурная лексика"
+    - "Оскорбительная лексика"
 
 # Сообщения команды /unban
 unban:
   unban: "<green>Игрок <gold><player></gold> был разбанен</green>"
-  usage: "Правильное использование: <gold>/unban <ник_игрока>"
+  usage: "Правильное использование: <gold>/unban <игрок>"
   broadcast: "<dark_gray>Игрок <gray><player></gray> был разбанен</dark_gray>"
+
 # Сообщения команды /mute
 mute:
-  mute: "<green>Вы заглушили игрока <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
-  usage: "Правильное использование: <gold>/mute <ник_игрока> (время) <причина>"
+  mute: "<green>Вы заглушили игрока <gold><player></gold> за <gold><reason></gold> на <gold><time></green>"
+  usage: "Правильное использование: <gold>/mute <игрок> (время) <причина>"
   mute_message: "<red>Вы были заглушены за <b><reason></b> на <b><time></b></red>"
-  mute_info_message: "<red>Вы пытаетесь что-то сказать, но вы всё ещё заглушены на <time>.</red>"
+  mute_info_message: "<red>Вы пытаетесь говорить, но вы заглушены</red>"
   broadcast: "<dark_gray>Игрок <gray><player></gray> был заглушен за <gray><reason></gray> на <gray><time></gray></dark_gray>"
-    # Альтернативно можно использовать следующий формат сообщения, если хотите выделить уведомление сильнее
+    # В качестве альтернативы вы можете использовать формат сообщения ниже, если хотите дополнительно выделить это сообщение
     # broadcast:
-    #- "<dark_gray>*************** Название вашего сервера *************** </dark_gray>"
-    #- ""
-    #- "<red>   Игрок <white><player></white> был заглушен</red>"
-    #- "   Причина: <white><reason></white>"
-    #- "   Время: <white><time></white>"
-    #- ""
-  #- "<dark_gray>*************************************************** </dark_gray>"
-  log: "<dark_gray>Заглушенный игрок <gray><player></gray> отправил сообщение: <gray><message></gray></dark_gray>"
+    #   - "<dark_gray>*************** Название Вашего Сервера *************** </dark_gray>"
+    #   - ""
+    #   - "<red>   Игрок <white><player></white> был заглушен</red>"
+    #   - "   Причина: <white><reason></white>"
+    #   - "   Срок: <white><time></white>"
+    #   - ""
+  #   - "<dark_gray>*************************************************** </dark_gray>"
+  log: "<dark_gray>Заглушенный игрок <gray><player></gray> <dark_gray>отправил сообщение: <gray><message></gray>"
   no_reasons: "без причины"
   reasons:
     - "Реклама"
     - "Спам"
     - "Оскорбление игрока"
-    - "Нецензурная лексика"
+    - "Оскорбительная лексика"
 
 # Сообщения команды /unmute
 unmute:
   unmute: "<green>Вы сняли заглушение с игрока <gold><player></gold></green>"
-  usage: "Правильное использование: <gold>/unmute <ник_игрока>"
+  usage: "Правильное использование: <gold>/unmute <игрок>"
   unmute_message: "<green>С вас снято заглушение!</green>"
 
 # Сообщения команды /warn
 warn:
-  warn: "<green>Вы предупредили (<warn_no> раз) игрока <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
-  usage: "Правильное использование: <gold>/warn <ник_игрока> (время) <причина>"
-  warn_message: "<red>Вы получили предупреждение №<b><warn_no></b>!</red>"
+  warn: "<green>Вы выдали предупреждение (<warn_no> раз) игроку <gold><player></gold> за <gold><reason></gold> на <gold><time></green>"
+  usage: "Правильное использование: <gold>/warn <игрок> (время) <причина>"
+  warn_message: "<red>Вы получили <b><warn_no></b> предупреждение!</red>"
   broadcast: "<dark_gray>Игрок <gray><player></gray> получил предупреждение за <gray><reason></gray> на <gray><time></gray></dark_gray>"
-  # Альтернативно можно использовать следующий формат сообщения, если хотите выделить уведомление сильнее
-  # broadcast:
-  #   - "<dark_gray>*************** Название вашего сервера *************** </dark_gray>"
-  #   - ""
-  #   - "<red>   Игрок <white><player></white> получил предупреждение №<warn_no></red>"
-  #   - "   Причина: <white><reason></white>"
-  #   - "   Время: <white><time></white>"
-  #   - ""
-  #   - "<dark_gray>*************************************************** </dark_gray>"
+    # В качестве альтернативы вы можете использовать формат сообщения ниже, если хотите дополнительно выделить это сообщение
+    # broadcast:
+    # - "<dark_gray>*************** Название Вашего Сервера *************** </dark_gray>"
+    # - ""
+    # - "<red>   Игрок <white><player></white> получил предупреждение</red>"
+    # - "   Причина: <white><reason></white>"
+    # - "   Срок: <white><time></white>"
+    # - ""
+  # - "<dark_gray>*************************************************** </dark_gray>"
   no_reasons: "без причины"
   reasons:
     - "Реклама"
     - "Спам"
     - "Оскорбление игрока"
-    - "Нецензурная лексика"
+    - "Оскорбительная лексика"
 
 # Сообщения команды /unwarn
 unwarn:
   unwarn: "<green>Вы сняли предупреждение с игрока <gold><player></gold></green>"
-  usage: "Правильное использование: <gold>/unwarn <ник_игрока>"
+  usage: "Правильное использование: <gold>/unwarn <игрок>"
 
 # Сообщения команды /kick
 kick:
-  kick: "<green>Вы выгнали <gold><player></gold> за <gold><reason></gold></green>"
-  usage: "Правильное использование: <gold>/kick <ник_игрока> <причина>"
+  kick: "<green>Вы выгнали <gold><player></gold> по причине <gold><reason></gold></green>"
+  usage: "Правильное использование: <gold>/kick <игрок> <причина>"
   kick_message:
-    # Вы можете изменить сообщение, отображаемое выгнанному игроку
-    - 'Название сервера'
+    # Вы можете настроить сообщение для выгнанного игрока
+    - 'Название Сервера'
     - 'PunisherX &8» &7Вы были выгнаны'
     - '&7'
     - '&7'
     - "&cПричина &8» &7<reason>"
     - '&7'
     - '&7'
-    - '&8Вы можете подать апелляцию на:'
-    - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
-  broadcast: "<dark_gray>Игрок <gray><player></gray> был выгнан по причине <gray><reason></gray></dark_gray>"
-    # Альтернативно можно использовать следующий формат сообщения, если хотите выделить уведомление сильнее
+    - '&8Вы можете подать апелляцию:'
+    - "&eDiscord &8» &c&nhttps://servername.pl/discord"
+  broadcast: "<dark_gray>Игрок <gray><player></gray> был выгнан за <gray><reason></gray></dark_gray>"
+    # В качестве альтернативы вы можете использовать формат сообщения ниже, если хотите дополнительно выделить это сообщение
     # broadcast:
-    #- "<dark_gray>*************** Название вашего сервера *************** </dark_gray>"
-    #- ""
-    #- "<red>   Игрок <white><player></white> был выгнан</red>"
-    #- "   Причина: <white><reason></white>"
-    #- ""
-  #- "<dark_gray>*************************************************** </dark_gray>"
+    # - "<dark_gray>*************** Название Вашего Сервера *************** </dark_gray>"
+    # - ""
+    # - "<red>   Игрок <white><player></white> был выгнан</red>"
+    # - "   Причина: <white><reason></white>"
+    # - ""
+  # - "<dark_gray>*************************************************** </dark_gray>"
   no_reasons: "без причины"
   reasons:
     - "Флуд"
     - "Спам"
-    - "Нецензурная лексика"
+    - "Оскорбительная лексика"
 
 # Сообщения команды /check
 check:
-  usage: "Правильное использование: <gold>/check <ник_игрока> <all|ban|jail|mute|warn>"
+  usage: "Правильное использование: <gold>/check <игрок> <all|ban|jail|mute|warn>"
   invalid_type: "<red>Неверный тип наказания. Используйте: all, ban, jail, mute, warn.</red>"
-  no_punishments: "<dark_green>Игрок <gold><player></gold> не имеет активных наказаний.</dark_green>"
+  no_punishments: "<dark_green>У игрока <gold><player></gold> нет наказаний.</dark_green>"
   title: "<dark_gray>Активные наказания для</dark_gray>"
   id: "<dark_gray>ID</dark_gray>"
   type: "<dark_gray>Тип</dark_gray>"
@@ -225,35 +223,35 @@ check:
 
 # Сообщения команды /history
 history:
-  usage: "Правильное использование: <gold>/history <ник_игрока>"
-  no_punishments: "<dark_green>Игрок <gold><player></gold> не имеет наказаний.</dark_green>"
+  usage: "Правильное использование: <gold>/history <игрок>"
+  no_punishments: "<dark_green>У игрока <gold><player></gold> нет истории наказаний.</dark_green>"
   title: "<dark_gray>История наказаний для</dark_gray>"
   id: "<dark_gray>ID</dark_gray>"
   type: "<dark_gray>Тип</dark_gray>"
   reason: "<dark_gray>Причина</dark_gray>"
   time: "<dark_gray>Время</dark_gray>"
 
-# Сообщения команды /banlist
+# Сообщения для команды /banlist
 banlist:
   usage: "Правильное использование: <gold>/banlist"
-  no_punishments: "<dark_green>Список забаненных пуст.</dark_green>"
-  title: "<blue>|   <gray>Список забаненных игроков:</gray></blue>"
+  no_punishments: "<dark_green>Список банов пуст.</dark_green>"
+  title: "<blue>|   <gray>Список забаненных игроков:</gray>"
   top_header: "<blue>--------------------------------------------------</blue>"
-  table_header: "<blue>|    Ник          |          Тип           |          Когда</blue>"
-  ban_list: "<blue>|   <hover:show_text:'<white>UUID:</white> <gold><uuid></gold>'><white><player></white></hover>   |   <hover:show_text:'<white>ID:</white> <gold>#<id><newline><white>Оператор:</white> <gold><operator></gold><newline><white>Причина:</white> <gold><reason></gold>'><white><type></white></hover>   |   <white><time></white></blue>"
+  table_header: "<blue>|    Имя           |          Тип           |          Когда</blue>"
+  ban_list: "<blue>|   <hover:show_text:'<white>UUID:</white> <gold><uuid></gold>'><white><player></white></hover>   |   <hover:show_text:'<white>ID:</white> <gold>#<id><newline><white>Выдал:</white> <gold><operator></gold><newline><white>Причина:</white> <gold><reason></gold>'><white><type></white></hover>   |   <white><time></white></blue>"
 
 # Сообщения команды /change-reason
 change-reason:
   usage: "Правильное использование: <gold>/change-reason <ID_наказания> <новая_причина>"
-  invalid_id: "<red>Неверный идентификатор наказания</red>"
-  success: "<green>Причина наказания с ID <gold><id></gold> изменена на \"<gold><reason></gold>\".</green>"
-  failure: "<red>Не удалось обновить причину наказания с ID <gold><id></gold>.</red>"
+  invalid_id: "<red>Неверный ID наказания</red>"
+  success: "<green>Причина для наказания с ID: <gold><id></gold> изменена на \"<gold><reason></gold>\"</green>"
+  failure: "<red>Не удалось обновить причину для наказания с ID: <gold><id></gold></red>"
 
-# Сообщения команды /clearall
+# Сообщения для команды /clearall
 clear:
-  usage: "Правильное использование: <gold>/clearall <ник_игрока>"
-  clearall: "<green>Все активные наказания игрока <gold><player></gold> были сняты.</green>"
-  clear_message: "<green>Все ваши активные наказания были отменены!</green> <gray>Псс! Может, у вас связи с администрацией?</gray>"
+  usage: "Правильное использование: <gold>/clearall <игрок>"
+  clearall: "<green>Все активные наказания для игрока </green><gold><player></gold><green> были сняты</green>"
+  clear_message: "<green>Все ваши активные наказания были отменены! </green><dark_gray>Псс! У тебя что, есть связи с администрацией?"
 
 # Сообщения GUI
 GUI:
