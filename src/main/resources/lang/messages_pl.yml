@@ -301,6 +301,8 @@ GUI:
       lastLocation: "<gray>Ostatnia lokalizacja: <yellow><lastlocation></yellow>"
       logout: "<gray>Wylogował się: <yellow><logout></yellow>"
       offlineTime: "<gray>Nie ma go od: <yellow><offlinetime></yellow>"
+      punishment: "<gray>Kara: <yellow><punishment></yellow>"
+      noPunishments: "<gray>Brak historii kar</gray>"
   PlayerAction:
     title: "<yellow>Menu gracza</yellow>"
     punish: "<yellow>Ukaraj</yellow>"
@@ -313,8 +315,6 @@ GUI:
       title: "<red>Potwierdź czyszczenie danych</red>"
       confirm: "<green>Potwierdź</green>"
       cancel: "<red>Anuluj</red>"
-
-
   PunishType:
     title: "<yellow>Wybierz rodzaj kary</yellow>"
     ban: "<yellow>Ban</yellow>"
@@ -329,15 +329,8 @@ GUI:
     next: "<gray>Następna strona</gray>"
     previous: "<gray>Poprzednia strona</gray>"
     back: "<gray>Wróć do poprzedniego menu</gray>"
-  Test:
-    - "Test 1"
-    - "Test 2"
-    - "Test 3"
-    - "Test 4"
-    - "Test 5"
 
-
-# Wiadomości webhooka
+# Wiadomości dla Discord webhook
 webhook:
   title: "Nowa kara na serwerze"
   player: "Gracz"
@@ -347,7 +340,7 @@ webhook:
   time: "Czas zakończenia"
   app_name: "PunisherX • "
 
-# Wiadomości dla placeholderów
+# Wiadomości dla PlaceholderAPI
 placeholders:
   mute_remaining_time: "<gray>Wyciszony do: <gold>"
   warn_remaining_time: "<gray>Ostrzeżenie ważne do: <gold>"

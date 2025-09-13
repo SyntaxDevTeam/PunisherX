@@ -97,21 +97,36 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
                 val geo = info.geoLocation
                 val lastLocation = PlayerStatsService.getLastLocationString(uuid)
                     ?: mH.getCleanMessage("error", "no_data")
+                val punishments = plugin.databaseHandler
+                    .getPunishmentHistory(info.playerUUID, limit = 3, offset = 0)
+                val punishmentLines = punishments.map { "${it.type}: ${it.reason}" }
                 Bukkit.getScheduler().runTask(plugin, Runnable {
                     if (!holder.inv.viewers.contains(player)) return@Runnable
                     val item = inventory.getItem(index) ?: return@Runnable
                     val im = item.itemMeta as SkullMeta
-                    im.lore(
-                        listOf(
-                            mH.getLogMessage("GUI", "OfflineList.hover.uuid", mapOf("uuid" to info.playerUUID)),
-                            mH.getLogMessage("GUI", "OfflineList.hover.ip", mapOf("ip" to ipLine)),
-                            mH.getLogMessage("GUI", "OfflineList.hover.geo", mapOf("geo" to geo)),
-                            mH.getLogMessage("GUI", "OfflineList.hover.lastSeen", mapOf("lastseen" to lastSeenDate)),
-                            mH.getLogMessage("GUI", "OfflineList.hover.lastLocation", mapOf("lastlocation" to lastLocation)),
-                            mH.getLogMessage("GUI", "OfflineList.hover.logout", mapOf("logout" to lastSeenDate)),
-                            mH.getLogMessage("GUI", "OfflineList.hover.offlineTime", mapOf("offlinetime" to offlineTime)),
-                        )
+                    val loreLines = mutableListOf(
+                        mH.getLogMessage("GUI", "OfflineList.hover.uuid", mapOf("uuid" to info.playerUUID)),
+                        mH.getLogMessage("GUI", "OfflineList.hover.ip", mapOf("ip" to ipLine)),
+                        mH.getLogMessage("GUI", "OfflineList.hover.geo", mapOf("geo" to geo)),
+                        mH.getLogMessage("GUI", "OfflineList.hover.lastSeen", mapOf("lastseen" to lastSeenDate)),
+                        mH.getLogMessage("GUI", "OfflineList.hover.lastLocation", mapOf("lastlocation" to lastLocation)),
+                        mH.getLogMessage("GUI", "OfflineList.hover.logout", mapOf("logout" to lastSeenDate)),
+                        mH.getLogMessage("GUI", "OfflineList.hover.offlineTime", mapOf("offlinetime" to offlineTime)),
                     )
+                    if (punishmentLines.isEmpty()) {
+                        loreLines.add(mH.getLogMessage("GUI", "OfflineList.hover.noPunishments"))
+                    } else {
+                        punishmentLines.forEach { line ->
+                            loreLines.add(
+                                mH.getLogMessage(
+                                    "GUI",
+                                    "OfflineList.hover.punishment",
+                                    mapOf("punishment" to line)
+                                )
+                            )
+                        }
+                    }
+                    im.lore(loreLines)
                     item.itemMeta = im
                     inventory.setItem(index, item)
                 })
