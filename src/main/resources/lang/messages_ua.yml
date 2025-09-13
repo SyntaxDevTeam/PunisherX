@@ -1,0 +1,369 @@
+# Ver. 1.0.0
+# Форматування повідомлень:
+# Ви можете використовувати форматування MiniMessage або Legacy (Minecraft).
+# Приклади використання MiniMessage: https://docs.advntr.dev/minimessage/format.html
+# Не змішуйте формати в одному повідомленні. Якщо ви використовуєте Legacy, не додавайте MiniMessage,
+# інакше буде застосований тільки останній.
+
+prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>"
+
+# Повідомлення про помилки
+error:
+  no_permission: "<red>У вас немає дозволу на використання цієї команди.</red>"
+  player_not_found: "<gold>Гравця з ніком <player> не знайдено.</gold>"
+  player_not_punished: "<gold>Гравець <player> не має такого покарання.</gold>"
+  ip_not_found: "<gold>Гравця з IP <ip> не знайдено.</gold>"
+  no_data: "<red>Немає даних для відображення.</red>"
+  db_error: "Сталася помилка при додаванні покарання в базу даних. Використовується запасний метод. Перевірте консоль!"
+  console: "<red>Цю команду може використовувати лише гравець.</red>"
+  reload: "<red>Сталася помилка під час перезавантаження конфігурації:</red>"
+  bypass: "<red><b>УВАГА!</b> Гравець <gold><player></gold> не може бути покараний через свої дозволи (OP або bypass).</red><newline><dark_gray>Можливо, це можна обійти...</dark_gray>"
+
+# Повідомлення команди /setjail
+setjail:
+  usage: "Правильне використання: <gold>/setjail <радіус>"
+  set: "<green>Локацію в'язниці встановлено: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>] з радіусом <gold><radius></gold>"
+  set_error: "<red>Не вдалося встановити локацію в'язниці.</red>"
+  invalid_radius: "<red>Вкажіть правильний радіус (число більше за 0).</red>"
+
+# Повідомлення команди /setspawn
+setspawn:
+  usage: "Правильне використання: <gold>/setspawn</gold>"
+  set: "<green>Точку відродження встановлено: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
+  set_error: "<red>Не вдалося встановити точку відродження.</red>"
+
+# Повідомлення команди /jail
+jail:
+  jail: "<green>Ви ув'язнили гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  usage: "Правильне використання: <gold>/jail <нік_гравця> (час) <причина>"
+  jail_message: "<red>Вас було ув'язнено за <b><reason></b> на <b><time></b></red>"
+  mute_info_message: "<red>Ви намагаєтесь щось сказати, але з в'язниці вас ніхто не чує...</red>"
+  jail_restrict_message: "Покидати територію в'язниці заборонено. Вас телепортовано назад у визначене місце."
+  broadcast: "<dark_gray>Гравець <gray><player></gray> був ув'язнений за <gray><reason></gray> на <gray><time></gray></dark_gray>"
+  # Альтернативно можна використати цей формат повідомлення, якщо хочете більше виділити оголошення
+  # broadcast:
+  #   - "<dark_gray>*************** Назва вашого сервера *************** </dark_gray>"
+  #   - ""
+  #   - "<red>   Гравець <white><player></white> був ув'язнений</red>"
+  #   - "   Причина: <white><reason></white>"
+  #   - "   Час: <white><time></white>"
+  #   - ""
+  #   - "<dark_gray>*************************************************** </dark_gray>"
+  log: "<dark_gray>Ув'язнений гравець <gray><player></gray> кричить зі своєї камери: <gray><message></gray></dark_gray>"
+  no_reasons: "без причини"
+  reasons:
+    - "Реклама"
+    - "Спам"
+    - "Образа гравця"
+    - "Нецензурна мова"
+
+# Повідомлення команди /unjail
+unjail:
+  unjail: "<green>Ви звільнили гравця <gold><player></gold> з в'язниці</green>"
+  usage: "Правильне використання: <gold>/unjail <нік_гравця>"
+  unjail_message: "<green>Ваш термін у в'язниці закінчився! Не марнуйте цей шанс!</green>"
+  success: "<green>Гравця <gold><player></gold> успішно звільнено з в'язниці.</green>"
+  broadcast: "Гравець <gold><player></gold> був звільнений з в'язниці. Будьте обережні..."
+
+# Повідомлення команди /ban
+ban:
+  ban: "<green>Ви забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  usage: "Правильне використання: <gold>/ban <нік_гравця> (час) <причина>"
+  kick_message:
+    # Ви можете змінити повідомлення для забаненого гравця
+    - 'Назва сервера'
+    - 'PunisherX &8» &7Вас забанено'
+    - '&7'
+    - '&7'
+    - "&cПричина &8» &7<reason>"
+    - "&cТермін &8» &7<time>"
+    - '&7'
+    - '&8Ви можете подати апеляцію на:'
+    - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
+  broadcast: "<dark_gray>Гравець <gray><player></gray> був забанений за <gray><reason></gray> на <gray><time></gray></dark_gray>"
+    # Альтернативно можна використати цей формат повідомлення, якщо хочете більше виділити оголошення
+    # broadcast:
+    #- "<dark_gray>*************** Назва вашого сервера *************** </dark_gray>"
+    #- ""
+    #- "<red>   Гравець <white><player></white> був забанений</red>"
+    #- "   Причина: <white><reason></white>"
+    #- "   Час: <white><time></white>"
+    #- ""
+  #- "<dark_gray>*************************************************** </dark_gray>"
+  no_reasons: "без причини"
+  reasons: # Додайте власні причини, які будуть пропонуватися під час виконання команди
+    - "Чит"
+    - "Гріфінг"
+    - "Спам"
+    - "Нецензурна мова"
+
+# Повідомлення команди /banip
+banip:
+  ban: "<green>Ви забанили IP гравця за <gold><reason></gold> на <gold><time></gold></green>"
+  usage: "Правильне використання: <gold>/banip <гравець|ip> (час) <причина>"
+  kick_message:
+    # Ви можете змінити повідомлення для забаненого гравця
+    - 'Назва сервера'
+    - 'PunisherX &8» &7Ваш IP було забанено!'
+    - '&7'
+    - '&7'
+    - "&cПричина &8» &7<reason>"
+    - "&cТермін &8» &7<time>"
+    - '&7'
+    - '&8Ви можете подати апеляцію на:'
+    - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.pl/discord"
+  broadcast: "<dark_gray>Гравець <gray><player></gray> був забанений за <gray><reason></gray> на <gray><time></gray></dark_gray>"
+  no_reasons: "без причини"
+  reasons:
+    - "Мультиакаунт"
+    - "Гріфінг"
+    - "Спам"
+    - "Нецензурна мова"
+
+# Повідомлення команди /unban
+unban:
+  unban: "<green>Гравець <gold><player></gold> був розбанений</green>"
+  usage: "Правильне використання: <gold>/unban <нік_гравця>"
+  broadcast: "<dark_gray>Гравець <gray><player></gray> був розбанений</dark_gray>"
+# Повідомлення команди /mute
+mute:
+  mute: "<green>Ви заглушили гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  usage: "Правильне використання: <gold>/mute <нік_гравця> (час) <причина>"
+  mute_message: "<red>Вас було заглушено за <b><reason></b> на <b><time></b></red>"
+  mute_info_message: "<red>Ви намагаєтесь щось сказати, але ви все ще заглушені ще <time>.</red>"
+  broadcast: "<dark_gray>Гравець <gray><player></gray> був заглушений за <gray><reason></gray> на <gray><time></gray></dark_gray>"
+    # Альтернативно можна використати цей формат повідомлення, якщо хочете більше виділити оголошення
+    # broadcast:
+    #- "<dark_gray>*************** Назва вашого сервера *************** </dark_gray>"
+    #- ""
+    #- "<red>   Гравець <white><player></white> був заглушений</red>"
+    #- "   Причина: <white><reason></white>"
+    #- "   Час: <white><time></white>"
+    #- ""
+  #- "<dark_gray>*************************************************** </dark_gray>"
+  log: "<dark_gray>Заглушений гравець <gray><player></gray> написав повідомлення: <gray><message></gray></dark_gray>"
+  no_reasons: "без причини"
+  reasons:
+    - "Реклама"
+    - "Спам"
+    - "Образа гравця"
+    - "Нецензурна мова"
+
+# Повідомлення команди /unmute
+unmute:
+  unmute: "<green>Ви зняли заглушення з гравця <gold><player></gold></green>"
+  usage: "Правильне використання: <gold>/unmute <нік_гравця>"
+  unmute_message: "<green>З вас знято заглушення!</green>"
+
+# Повідомлення команди /warn
+warn:
+  warn: "<green>Ви попередили (<warn_no> раз) гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  usage: "Правильне використання: <gold>/warn <нік_гравця> (час) <причина>"
+  warn_message: "<red>Ви отримали попередження №<b><warn_no></b>!</red>"
+  broadcast: "<dark_gray>Гравець <gray><player></gray> отримав попередження за <gray><reason></gray> на <gray><time></gray></dark_gray>"
+  # Альтернативно можна використати цей формат повідомлення, якщо хочете більше виділити оголошення
+  # broadcast:
+  #   - "<dark_gray>*************** Назва вашого сервера *************** </dark_gray>"
+  #   - ""
+  #   - "<red>   Гравець <white><player></white> отримав попередження №<warn_no></red>"
+  #   - "   Причина: <white><reason></white>"
+  #   - "   Час: <white><time></white>"
+  #   - ""
+  #   - "<dark_gray>*************************************************** </dark_gray>"
+  no_reasons: "без причини"
+  reasons:
+    - "Реклама"
+    - "Спам"
+    - "Образа гравця"
+    - "Нецензурна мова"
+
+# Повідомлення команди /unwarn
+unwarn:
+  unwarn: "<green>Ви зняли попередження з гравця <gold><player></gold></green>"
+  usage: "Правильне використання: <gold>/unwarn <нік_гравця>"
+
+# Повідомлення команди /kick
+kick:
+  kick: "<green>Ви вигнали <gold><player></gold> за <gold><reason></gold></green>"
+  usage: "Правильне використання: <gold>/kick <нік_гравця> <причина>"
+  kick_message:
+    # Ви можете змінити повідомлення для вигнаного гравця
+    - 'Назва сервера'
+    - 'PunisherX &8» &7Вас було вигнано'
+    - '&7'
+    - '&7'
+    - "&cПричина &8» &7<reason>"
+    - '&7'
+    - '&7'
+    - '&8Ви можете подати апеляцію на:'
+    - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
+  broadcast: "<dark_gray>Гравець <gray><player></gray> був вигнаний за <gray><reason></gray></dark_gray>"
+    # Альтернативно можна використати цей формат повідомлення, якщо хочете більше виділити оголошення
+    # broadcast:
+    #- "<dark_gray>*************** Назва вашого сервера *************** </dark_gray>"
+    #- ""
+    #- "<red>   Гравець <white><player></white> був вигнаний</red>"
+    #- "   Причина: <white><reason></white>"
+    #- ""
+  #- "<dark_gray>*************************************************** </dark_gray>"
+  no_reasons: "без причини"
+  reasons:
+    - "Флуд"
+    - "Спам"
+    - "Нецензурна мова"
+
+# Повідомлення команди /check
+check:
+  usage: "Правильне використання: <gold>/check <нік_гравця> <all|ban|jail|mute|warn>"
+  invalid_type: "<red>Неправильний тип покарання. Використовуйте: all, ban, jail, mute, warn.</red>"
+  no_punishments: "<dark_green>Гравець <gold><player></gold> не має активних покарань.</dark_green>"
+  title: "<dark_gray>Активні покарання для</dark_gray>"
+  id: "<dark_gray>ID</dark_gray>"
+  type: "<dark_gray>Тип</dark_gray>"
+  reason: "<dark_gray>Причина</dark_gray>"
+  time: "<dark_gray>Залишок часу</dark_gray>"
+
+# Повідомлення команди /history
+history:
+  usage: "Правильне використання: <gold>/history <нік_гравця>"
+  no_punishments: "<dark_green>Гравець <gold><player></gold> не має покарань.</dark_green>"
+  title: "<dark_gray>Історія покарань для</dark_gray>"
+  id: "<dark_gray>ID</dark_gray>"
+  type: "<dark_gray>Тип</dark_gray>"
+  reason: "<dark_gray>Причина</dark_gray>"
+  time: "<dark_gray>Час</dark_gray>"
+
+# Повідомлення команди /banlist
+banlist:
+  usage: "Правильне використання: <gold>/banlist"
+  no_punishments: "<dark_green>Список забанених порожній.</dark_green>"
+  title: "<blue>|   <gray>Список забанених гравців:</gray></blue>"
+  top_header: "<blue>--------------------------------------------------</blue>"
+  table_header: "<blue>|    Нік          |          Тип           |          Коли</blue>"
+  ban_list: "<blue>|   <hover:show_text:'<white>UUID:</white> <gold><uuid></gold>'><white><player></white></hover>   |   <hover:show_text:'<white>ID:</white> <gold>#<id><newline><white>Оператор:</white> <gold><operator></gold><newline><white>Причина:</white> <gold><reason></gold>'><white><type></white></hover>   |   <white><time></white></blue>"
+
+# Повідомлення команди /change-reason
+change-reason:
+  usage: "Правильне використання: <gold>/change-reason <ID_покарання> <нова_причина>"
+  invalid_id: "<red>Невірний ідентифікатор покарання</red>"
+  success: "<green>Причину покарання з ID <gold><id></gold> змінено на \"<gold><reason></gold>\".</green>"
+  failure: "<red>Не вдалося оновити причину покарання з ID <gold><id></gold>.</red>"
+
+# Повідомлення команди /clearall
+clear:
+  usage: "Правильне використання: <gold>/clearall <нік_гравця>"
+  clearall: "<green>Усі активні покарання гравця <gold><player></gold> були очищені.</green>"
+  clear_message: "<green>Усі ваші активні покарання було скасовано!</green> <gray>Псс! У вас зв'язки з адміністрацією?</gray>"
+
+# Повідомлення GUI
+GUI:
+  PunisherMain:
+    title:         "<dark_gray>Головне меню PunisherX</dark_gray>"
+    serwerInfo:
+      title:       "<gold>Інформація про сервер</gold>"
+      serverName:  "<gray>Назва сервера: <green><servername></green></gray>"
+      daily:       "<gray>Кількість покарань сьогодні: <yellow><daily></yellow></gray>"
+      tps:         "<gray>Час роботи сервера: <green><time></green> (<green><tps></green>)</gray>"
+    playerOnline:
+      title:       "<green>Список гравців онлайн</green>"
+      online:      "<gray>Кількість гравців онлайн: <green><onlineplayers></green></gray>"
+      clickToView: "<gray><b>Натисніть, щоб побачити список гравців</b></gray>"
+    playerOffline:
+      title:       "<gray>Список гравців офлайн</gray>"
+      total:       "<gray>Всього гравців: <green><totalplayers></green></gray>"
+      clickToView: "<gray><b>Натисніть, щоб побачити офлайн</b></gray>"
+    adminOnline:
+      title:       "<red>Список адміністрації онлайн</red>"
+    compare:
+      title:       "<blue>Порівняти гравців</blue>"
+  PlayerList:
+    loading: "<gray>Завантаження даних...</gray>"
+    hover:
+      uuid:         "<gray>UUID: <yellow><uuid></yellow></gray>"
+      playerIP:     "<gray>Поточний IP: <yellow><playerip></yellow></gray>"
+      onlineStr:    "<gray>Час онлайн: <green><onlinestr></green></gray>"
+      totalStr:     "<gray>Загальний час: <green><totalstr></green></gray>"
+      lastActive:   "<gray>Останній раз в мережі: <yellow><lastactive></yellow></gray>"
+      punishments:  "<gray>Поточне покарання: <yellow><punishments></yellow></gray>"
+      punishStr:    "<gray>Усього покарань: <yellow><punishstr></yellow></gray>"
+  OfflineList:
+    loading: "<gray>Завантаження даних...</gray>"
+    sort:
+      nameAsc: "<gray>Сортувати: <green>Нік A-Z</green></gray>"
+      nameDesc: "<gray>Сортувати: <green>Нік Z-A</green></gray>"
+      lastSeenDesc: "<gray>Сортувати: <green>Останні ↓</green></gray>"
+      lastSeenAsc: "<gray>Сортувати: <green>Останні ↑</green></gray>"
+    hover:
+      uuid: "<gray>UUID: <yellow><uuid></yellow></gray>"
+      ip: "<gray>IP: <yellow><ip></yellow></gray>"
+      geo: "<gray>Локація: <yellow><geo></yellow></gray>"
+      lastSeen: "<gray>Останній раз в мережі: <yellow><lastseen></yellow></gray>"
+      lastLocation: "<gray>Останнє місце: <yellow><lastlocation></yellow></gray>"
+      logout: "<gray>Вийшов: <yellow><logout></yellow></gray>"
+      offlineTime: "<gray>Офлайн вже: <yellow><offlinetime></yellow></gray>"
+      punishment: "<gray>Покарання: <yellow><punishment></yellow></gray>"
+      noPunishments: "<gray>Немає історії покарань</gray>"
+  PlayerAction:
+    title: "<yellow>Меню гравця</yellow>"
+    punish: "<yellow>Покарати</yellow>"
+    kick: "<yellow>Вигнати</yellow>"
+    banip: "<yellow>Забанити IP</yellow>"
+    teleport: "<yellow>Телепортувати</yellow>"
+    delete: "<yellow>Видалити акаунт</yellow>"
+    deleteMessage: "<red>Ваш акаунт було видалено</red>"
+    confirmDelete:
+      title: "<red>Підтвердіть видалення акаунта</red>"
+      confirm: "<green>Підтвердити</green>"
+      cancel: "<red>Скасувати</red>"
+  PunishType:
+    title: "<yellow>Виберіть тип покарання</yellow>"
+    ban: "<yellow>Бан</yellow>"
+    jail: "<yellow>В'язниця</yellow>"
+    mute: "<yellow>Заглушення</yellow>"
+    warn: "<yellow>Попередження</yellow>"
+  PunishTime:
+    title: "<yellow>Виберіть час</yellow>"
+  PunishReason:
+    title: "<yellow>Виберіть причину</yellow>"
+  Nav:
+    next: "<gray>Наступна сторінка</gray>"
+    previous: "<gray>Попередня сторінка</gray>"
+    back: "<gray>Назад до попереднього меню</gray>"
+
+# Повідомлення для Discord webhook
+webhook:
+  title: "Нове покарання на сервері"
+  player: "Гравець"
+  operator: "Адміністратор"
+  reason: "Причина"
+  type: "Тип покарання"
+  time: "Час завершення"
+  app_name: "PunisherX • "
+
+# Повідомлення для PlaceholderAPI
+placeholders:
+  mute_remaining_time: "<gray>Заглушений до: <gold>"
+  warn_remaining_time: "<gray>Попередження дійсне до: <gold>"
+  jail_remaining_time: "<gray>У в'язниці до: <gold>"
+  total_punishments: "<gray>Усього покарань: <gold>"
+  total_active_punishments: "<gray>Усього активних покарань: <gold>"
+
+# Форматування часу
+formatTime:
+  undefined: "невизначено"
+  minute:
+    one: "хвилина"
+    few: "хвилини"
+    many: "хвилин"
+  second:
+    one: "секунда"
+    few: "секунди"
+    many: "секунд"
+  hour:
+    one: "година"
+    few: "години"
+    many: "годин"
+  day:
+    one: "день"
+    few: "дні"
+    many: "днів"

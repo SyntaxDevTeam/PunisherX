@@ -1,0 +1,369 @@
+# Ver. 1.0.0
+# Formatage des messages :
+# Vous pouvez utiliser le formatage MiniMessage ou Legacy (Minecraft).
+# Exemples d'utilisation de MiniMessage : https://docs.advntr.dev/minimessage/format.html
+# Ne mélangez pas les formats dans un même message. Si vous utilisez Legacy, n’ajoutez pas MiniMessage,
+# sinon seul ce dernier sera appliqué.
+
+prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>"
+
+# Messages d’erreur
+error:
+  no_permission: "<red>Vous n’avez pas la permission d’utiliser cette commande.</red>"
+  player_not_found: "<gold>Aucun joueur trouvé avec le pseudo <player>.</gold>"
+  player_not_punished: "<gold>Le joueur <player> n’a pas cette sanction.</gold>"
+  ip_not_found: "<gold>Aucun joueur trouvé avec l’IP <ip>.</gold>"
+  no_data: "<red>Aucune donnée à afficher.</red>"
+  db_error: "Une erreur est survenue lors de l’ajout de la sanction dans la base de données. Utilisation de la méthode de secours. Vérifiez la console !"
+  console: "<red>Seul un joueur peut utiliser cette commande.</red>"
+  reload: "<red>Une erreur est survenue lors du rechargement de la configuration :</red>"
+  bypass: "<red><b>ATTENTION !</b> Le joueur <gold><player></gold> ne peut pas être sanctionné en raison de ses permissions (OP ou bypass).</red><newline><dark_gray>Il y a peut-être un moyen de contourner cela...</dark_gray>"
+
+# Messages de la commande /setjail
+setjail:
+  usage: "Utilisation correcte : <gold>/setjail <rayon>"
+  set: "<green>La prison a été définie : <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>] avec un rayon de <gold><radius></gold>"
+  set_error: "<red>Impossible de définir la prison.</red>"
+  invalid_radius: "<red>Veuillez entrer un rayon valide (nombre supérieur à 0).</red>"
+
+# Messages de la commande /setspawn
+setspawn:
+  usage: "Utilisation correcte : <gold>/setspawn</gold>"
+  set: "<green>Le point de réapparition a été défini : <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
+  set_error: "<red>Impossible de définir le point de réapparition.</red>"
+
+# Messages de la commande /jail
+jail:
+  jail: "<green>Vous avez emprisonné le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
+  usage: "Utilisation correcte : <gold>/jail <pseudo> (durée) <raison>"
+  jail_message: "<red>Vous avez été emprisonné pour <b><reason></b> pendant <b><time></b></red>"
+  mute_info_message: "<red>Vous essayez de parler, mais personne ne vous entend depuis la prison...</red>"
+  jail_restrict_message: "Quitter la zone de la prison est interdit. Vous avez été téléporté à l’endroit assigné."
+  broadcast: "<dark_gray>Le joueur <gray><player></gray> a été emprisonné pour <gray><reason></gray> pendant <gray><time></gray></dark_gray>"
+  # Vous pouvez également utiliser ce format si vous voulez mettre davantage en avant le message
+  # broadcast:
+  #   - "<dark_gray>*************** Nom de votre serveur *************** </dark_gray>"
+  #   - ""
+  #   - "<red>   Le joueur <white><player></white> a été emprisonné</red>"
+  #   - "   Raison : <white><reason></white>"
+  #   - "   Durée : <white><time></white>"
+  #   - ""
+  #   - "<dark_gray>*************************************************** </dark_gray>"
+  log: "<dark_gray>Le joueur emprisonné <gray><player></gray> crie depuis sa cellule : <gray><message></gray></dark_gray>"
+  no_reasons: "sans raison"
+  reasons:
+    - "Publicité"
+    - "Spam"
+    - "Insulte envers un joueur"
+    - "Langage vulgaire"
+
+# Messages de la commande /unjail
+unjail:
+  unjail: "<green>Vous avez libéré le joueur <gold><player></gold> de prison</green>"
+  usage: "Utilisation correcte : <gold>/unjail <pseudo>"
+  unjail_message: "<green>Votre peine de prison est terminée ! Ne gâchez pas cette chance !</green>"
+  success: "<green>Le joueur <gold><player></gold> a été libéré de prison avec succès.</green>"
+  broadcast: "Le joueur <gold><player></gold> a été libéré de prison. Faites attention..."
+
+# Messages de la commande /ban
+ban:
+  ban: "<green>Vous avez banni <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
+  usage: "Utilisation correcte : <gold>/ban <pseudo> (durée) <raison>"
+  kick_message:
+    # Vous pouvez personnaliser le message affiché au joueur banni
+    - 'Nom du serveur'
+    - 'PunisherX &8» &7Vous avez été banni'
+    - '&7'
+    - '&7'
+    - "&cRaison &8» &7<reason>"
+    - "&cDurée &8» &7<time>"
+    - '&7'
+    - '&8Vous pouvez faire appel sur :'
+    - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
+  broadcast: "<dark_gray>Le joueur <gray><player></gray> a été banni pour <gray><reason></gray> pendant <gray><time></gray></dark_gray>"
+    # Vous pouvez également utiliser ce format si vous voulez mettre davantage en avant le message
+    # broadcast:
+    #- "<dark_gray>*************** Nom de votre serveur *************** </dark_gray>"
+    #- ""
+    #- "<red>   Le joueur <white><player></white> a été banni</red>"
+    #- "   Raison : <white><reason></white>"
+    #- "   Durée : <white><time></white>"
+    #- ""
+  #- "<dark_gray>*************************************************** </dark_gray>"
+  no_reasons: "sans raison"
+  reasons: # Ajoutez vos propres raisons qui seront suggérées lors de l’exécution de la commande
+    - "Triche"
+    - "Grief"
+    - "Spam"
+    - "Langage vulgaire"
+
+# Messages de la commande /banip
+banip:
+  ban: "<green>Vous avez banni l’IP du joueur pour <gold><reason></gold> pendant <gold><time></gold></green>"
+  usage: "Utilisation correcte : <gold>/banip <joueur|ip> (durée) <raison>"
+  kick_message:
+    # Vous pouvez personnaliser le message affiché au joueur banni
+    - 'Nom du serveur'
+    - 'PunisherX &8» &7Votre IP a été bannie !'
+    - '&7'
+    - '&7'
+    - "&cRaison &8» &7<reason>"
+    - "&cDurée &8» &7<time>"
+    - '&7'
+    - '&8Vous pouvez faire appel sur :'
+    - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.pl/discord"
+  broadcast: "<dark_gray>Le joueur <gray><player></gray> a été banni pour <gray><reason></gray> pendant <gray><time></gray></dark_gray>"
+  no_reasons: "sans raison"
+  reasons:
+    - "Multi-compte"
+    - "Grief"
+    - "Spam"
+    - "Langage vulgaire"
+
+# Messages de la commande /unban
+unban:
+  unban: "<green>Le joueur <gold><player></gold> a été débanni</green>"
+  usage: "Utilisation correcte : <gold>/unban <pseudo>"
+  broadcast: "<dark_gray>Le joueur <gray><player></gray> a été débanni</dark_gray>"
+# Messages de la commande /mute
+mute:
+  mute: "<green>Vous avez réduit au silence le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
+  usage: "Utilisation correcte : <gold>/mute <pseudo> (durée) <raison>"
+  mute_message: "<red>Vous avez été réduit au silence pour <b><reason></b> pendant <b><time></b></red>"
+  mute_info_message: "<red>Vous essayez de parler, mais vous êtes encore réduit au silence pendant <time>.</red>"
+  broadcast: "<dark_gray>Le joueur <gray><player></gray> a été réduit au silence pour <gray><reason></gray> pendant <gray><time></gray></dark_gray>"
+    # Vous pouvez également utiliser ce format si vous voulez mettre davantage en avant le message
+    # broadcast:
+    #- "<dark_gray>*************** Nom de votre serveur *************** </dark_gray>"
+    #- ""
+    #- "<red>   Le joueur <white><player></white> a été réduit au silence</red>"
+    #- "   Raison : <white><reason></white>"
+    #- "   Durée : <white><time></white>"
+    #- ""
+  #- "<dark_gray>*************************************************** </dark_gray>"
+  log: "<dark_gray>Le joueur réduit au silence <gray><player></gray> a envoyé un message : <gray><message></gray></dark_gray>"
+  no_reasons: "sans raison"
+  reasons:
+    - "Publicité"
+    - "Spam"
+    - "Insulte envers un joueur"
+    - "Langage vulgaire"
+
+# Messages de la commande /unmute
+unmute:
+  unmute: "<green>Vous avez levé le silence du joueur <gold><player></gold></green>"
+  usage: "Utilisation correcte : <gold>/unmute <pseudo>"
+  unmute_message: "<green>Votre silence a été levé !</green>"
+
+# Messages de la commande /warn
+warn:
+  warn: "<green>Vous avez averti (<warn_no> fois) le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
+  usage: "Utilisation correcte : <gold>/warn <pseudo> (durée) <raison>"
+  warn_message: "<red>Vous avez reçu un avertissement n°<b><warn_no></b> !</red>"
+  broadcast: "<dark_gray>Le joueur <gray><player></gray> a reçu un avertissement pour <gray><reason></gray> pendant <gray><time></gray></dark_gray>"
+  # Vous pouvez également utiliser ce format si vous voulez mettre davantage en avant le message
+  # broadcast:
+  #   - "<dark_gray>*************** Nom de votre serveur *************** </dark_gray>"
+  #   - ""
+  #   - "<red>   Le joueur <white><player></white> a reçu un avertissement n°<warn_no></red>"
+  #   - "   Raison : <white><reason></white>"
+  #   - "   Durée : <white><time></white>"
+  #   - ""
+  #   - "<dark_gray>*************************************************** </dark_gray>"
+  no_reasons: "sans raison"
+  reasons:
+    - "Publicité"
+    - "Spam"
+    - "Insulte envers un joueur"
+    - "Langage vulgaire"
+
+# Messages de la commande /unwarn
+unwarn:
+  unwarn: "<green>Vous avez retiré un avertissement au joueur <gold><player></gold></green>"
+  usage: "Utilisation correcte : <gold>/unwarn <pseudo>"
+
+# Messages de la commande /kick
+kick:
+  kick: "<green>Vous avez expulsé <gold><player></gold> pour <gold><reason></gold></green>"
+  usage: "Utilisation correcte : <gold>/kick <pseudo> <raison>"
+  kick_message:
+    # Vous pouvez personnaliser le message affiché au joueur expulsé
+    - 'Nom du serveur'
+    - 'PunisherX &8» &7Vous avez été expulsé'
+    - '&7'
+    - '&7'
+    - "&cRaison &8» &7<reason>"
+    - '&7'
+    - '&7'
+    - '&8Vous pouvez faire appel sur :'
+    - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
+  broadcast: "<dark_gray>Le joueur <gray><player></gray> a été expulsé pour <gray><reason></gray></dark_gray>"
+    # Vous pouvez également utiliser ce format si vous voulez mettre davantage en avant le message
+    # broadcast:
+    #- "<dark_gray>*************** Nom de votre serveur *************** </dark_gray>"
+    #- ""
+    #- "<red>   Le joueur <white><player></white> a été expulsé</red>"
+    #- "   Raison : <white><reason></white>"
+    #- ""
+  #- "<dark_gray>*************************************************** </dark_gray>"
+  no_reasons: "sans raison"
+  reasons:
+    - "Flood"
+    - "Spam"
+    - "Langage vulgaire"
+
+# Messages de la commande /check
+check:
+  usage: "Utilisation correcte : <gold>/check <pseudo> <all|ban|jail|mute|warn>"
+  invalid_type: "<red>Type de sanction invalide. Utilisez : all, ban, jail, mute, warn.</red>"
+  no_punishments: "<dark_green>Le joueur <gold><player></gold> n’a aucune sanction active.</dark_green>"
+  title: "<dark_gray>Sanctions actives de</dark_gray>"
+  id: "<dark_gray>ID</dark_gray>"
+  type: "<dark_gray>Type</dark_gray>"
+  reason: "<dark_gray>Raison</dark_gray>"
+  time: "<dark_gray>Temps restant</dark_gray>"
+
+# Messages de la commande /history
+history:
+  usage: "Utilisation correcte : <gold>/history <pseudo>"
+  no_punishments: "<dark_green>Le joueur <gold><player></gold> n’a aucune sanction.</dark_green>"
+  title: "<dark_gray>Historique des sanctions de</dark_gray>"
+  id: "<dark_gray>ID</dark_gray>"
+  type: "<dark_gray>Type</dark_gray>"
+  reason: "<dark_gray>Raison</dark_gray>"
+  time: "<dark_gray>Temps</dark_gray>"
+
+# Messages de la commande /banlist
+banlist:
+  usage: "Utilisation correcte : <gold>/banlist"
+  no_punishments: "<dark_green>La liste des bannis est vide.</dark_green>"
+  title: "<blue>|   <gray>Liste des joueurs bannis :</gray></blue>"
+  top_header: "<blue>--------------------------------------------------</blue>"
+  table_header: "<blue>|    Pseudo       |          Type           |          Quand</blue>"
+  ban_list: "<blue>|   <hover:show_text:'<white>UUID :</white> <gold><uuid></gold>'><white><player></white></hover>   |   <hover:show_text:'<white>ID :</white> <gold>#<id><newline><white>Opérateur :</white> <gold><operator></gold><newline><white>Raison :</white> <gold><reason></gold>'><white><type></white></hover>   |   <white><time></white></blue>"
+
+# Messages de la commande /change-reason
+change-reason:
+  usage: "Utilisation correcte : <gold>/change-reason <ID_sanction> <nouvelle_raison>"
+  invalid_id: "<red>Identifiant de sanction invalide</red>"
+  success: "<green>La raison de la sanction avec l’ID <gold><id></gold> a été modifiée en « <gold><reason></gold> ».</green>"
+  failure: "<red>Impossible de mettre à jour la raison de la sanction avec l’ID <gold><id></gold>.</red>"
+
+# Messages de la commande /clearall
+clear:
+  usage: "Utilisation correcte : <gold>/clearall <pseudo>"
+  clearall: "<green>Toutes les sanctions actives du joueur <gold><player></gold> ont été supprimées.</green>"
+  clear_message: "<green>Toutes vos sanctions actives ont été annulées !</green> <gray>Pssst ! Vous avez des relations avec l’admin ?</gray>"
+
+# Messages de l’interface graphique (GUI)
+GUI:
+  PunisherMain:
+    title:         "<dark_gray>Menu principal PunisherX</dark_gray>"
+    serwerInfo:
+      title:       "<gold>Informations du serveur</gold>"
+      serverName:  "<gray>Nom du serveur : <green><servername></green></gray>"
+      daily:       "<gray>Nombre de sanctions aujourd’hui : <yellow><daily></yellow></gray>"
+      tps:         "<gray>Durée de fonctionnement du serveur : <green><time></green> (<green><tps></green>)</gray>"
+    playerOnline:
+      title:       "<green>Liste des joueurs en ligne</green>"
+      online:      "<gray>Joueurs en ligne : <green><onlineplayers></green></gray>"
+      clickToView: "<gray><b>Cliquez pour voir la liste des joueurs</b></gray>"
+    playerOffline:
+      title:       "<gray>Liste des joueurs hors ligne</gray>"
+      total:       "<gray>Total de joueurs : <green><totalplayers></green></gray>"
+      clickToView: "<gray><b>Cliquez pour voir la liste hors ligne</b></gray>"
+    adminOnline:
+      title:       "<red>Liste des administrateurs en ligne</red>"
+    compare:
+      title:       "<blue>Comparer les joueurs</blue>"
+  PlayerList:
+    loading: "<gray>Chargement des données...</gray>"
+    hover:
+      uuid:         "<gray>UUID : <yellow><uuid></yellow></gray>"
+      playerIP:     "<gray>IP actuelle : <yellow><playerip></yellow></gray>"
+      onlineStr:    "<gray>Temps en ligne : <green><onlinestr></green></gray>"
+      totalStr:     "<gray>Temps total : <green><totalstr></green></gray>"
+      lastActive:   "<gray>Dernière activité : <yellow><lastactive></yellow></gray>"
+      punishments:  "<gray>Sanction actuelle : <yellow><punishments></yellow></gray>"
+      punishStr:    "<gray>Total des sanctions : <yellow><punishstr></yellow></gray>"
+  OfflineList:
+    loading: "<gray>Chargement des données...</gray>"
+    sort:
+      nameAsc: "<gray>Trier : <green>Pseudo A-Z</green></gray>"
+      nameDesc: "<gray>Trier : <green>Pseudo Z-A</green></gray>"
+      lastSeenDesc: "<gray>Trier : <green>Dernière activité ↓</green></gray>"
+      lastSeenAsc: "<gray>Trier : <green>Dernière activité ↑</green></gray>"
+    hover:
+      uuid: "<gray>UUID : <yellow><uuid></yellow></gray>"
+      ip: "<gray>IP : <yellow><ip></yellow></gray>"
+      geo: "<gray>Localisation : <yellow><geo></yellow></gray>"
+      lastSeen: "<gray>Dernière activité : <yellow><lastseen></yellow></gray>"
+      lastLocation: "<gray>Dernière position : <yellow><lastlocation></yellow></gray>"
+      logout: "<gray>Déconnexion à : <yellow><logout></yellow></gray>"
+      offlineTime: "<gray>Hors ligne depuis : <yellow><offlinetime></yellow></gray>"
+      punishment: "<gray>Sanction : <yellow><punishment></yellow></gray>"
+      noPunishments: "<gray>Aucun historique de sanctions</gray>"
+  PlayerAction:
+    title: "<yellow>Menu du joueur</yellow>"
+    punish: "<yellow>Sanctionner</yellow>"
+    kick: "<yellow>Expulser</yellow>"
+    banip: "<yellow>Bannir IP</yellow>"
+    teleport: "<yellow>Téléporter</yellow>"
+    delete: "<yellow>Supprimer le compte</yellow>"
+    deleteMessage: "<red>Votre compte a été supprimé</red>"
+    confirmDelete:
+      title: "<red>Confirmer la suppression du compte</red>"
+      confirm: "<green>Confirmer</green>"
+      cancel: "<red>Annuler</red>"
+  PunishType:
+    title: "<yellow>Choisissez le type de sanction</yellow>"
+    ban: "<yellow>Ban</yellow>"
+    jail: "<yellow>Prison</yellow>"
+    mute: "<yellow>Silence</yellow>"
+    warn: "<yellow>Avertissement</yellow>"
+  PunishTime:
+    title: "<yellow>Choisissez la durée</yellow>"
+  PunishReason:
+    title: "<yellow>Choisissez la raison</yellow>"
+  Nav:
+    next: "<gray>Page suivante</gray>"
+    previous: "<gray>Page précédente</gray>"
+    back: "<gray>Retour au menu précédent</gray>"
+
+# Messages pour le webhook Discord
+webhook:
+  title: "Nouvelle sanction sur le serveur"
+  player: "Joueur"
+  operator: "Administrateur"
+  reason: "Raison"
+  type: "Type de sanction"
+  time: "Heure de fin"
+  app_name: "PunisherX • "
+
+# Messages pour PlaceholderAPI
+placeholders:
+  mute_remaining_time: "<gray>Réduit au silence jusqu’à : <gold>"
+  warn_remaining_time: "<gray>Avertissement valable jusqu’à : <gold>"
+  jail_remaining_time: "<gray>En prison jusqu’à : <gold>"
+  total_punishments: "<gray>Total des sanctions : <gold>"
+  total_active_punishments: "<gray>Total des sanctions actives : <gold>"
+
+# Formatage du temps
+formatTime:
+  undefined: "indéfini"
+  minute:
+    one: "minute"
+    few: "minutes"
+    many: "minutes"
+  second:
+    one: "seconde"
+    few: "secondes"
+    many: "secondes"
+  hour:
+    one: "heure"
+    few: "heures"
+    many: "heures"
+  day:
+    one: "jour"
+    few: "jours"
+    many: "jours"

@@ -119,7 +119,7 @@ gui:
 #    Internal settings
 # /********************************************/
 
-# Plugin language selection. Possible values: EN, PL, NL, ES, FR, DE, RU.
+# Plugin language selection. Possible values: EN, PL, NL, ES, FR, DE, RU, UK, IT, PT.
 # To add your own language file, please contact us on Discord: https://discord.gg/Zk6mxv7eMh
 language: "EN"
 
