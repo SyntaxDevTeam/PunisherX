@@ -9,12 +9,12 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 
 # Сообщения об ошибках
 error:
-  no_permission: "<red>У вас нет прав на использование этой команды.</red>"
+  no_permission: "<red>У вас нет разрешения на использование этой команды.</red>"
   player_not_found: "<gold>Игрок с ником <player> не найден.</gold>"
   ip_not_found: "<gold>Игрок с IP <ip> не найден.</gold>"
   player_not_punished: "<gold>У игрока <player> нет такого наказания.</gold>"
   reload: "<red>Произошла ошибка при перезагрузке конфигурации:</red> "
-  bypass: "<red><b>ВНИМАНИЕ!</b> Игрок <gold><player><gold/> <red>не может быть наказан из-за его прав (OP или обход).</red><dark_gray>Возможно, это можно было бы обойти..."
+  bypass: "<red><b>ВНИМАНИЕ!</b> Игрок <gold><player></gold> не может быть наказан из-за своих прав (OP или bypass).</red><newline><dark_gray>Возможно, это можно обойти...</dark_gray>"
 
 # Сообщения команды /setjail
 setjail:
@@ -64,7 +64,7 @@ unjail:
 
 # Сообщения команды /ban
 ban:
-  ban: "<green>Вы забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></green>"
+  ban: "<green>Вы забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
   usage: "Правильное использование: <gold>/ban <игрок> (время) <причина>"
   kick_message:
     # Вы можете настроить сообщение для выгнанного игрока
@@ -76,7 +76,7 @@ ban:
     - "&cНа срок &8» &7<time>"
     - '&7'
     - '&8Вы можете подать апелляцию:'
-    - "&eDiscord &8» &c&nhttps://servername.pl/discord"
+    - "&eDiscord &8» &c&nhttps://vashserver.ru/discord"
   broadcast: "<dark_gray>Игрок <gray><player></gray> был забанен за <gray><reason></gray> на <gray><time></gray></dark_gray>"
     # В качестве альтернативы вы можете использовать формат сообщения ниже, если хотите дополнительно выделить это сообщение
     # broadcast:
@@ -96,7 +96,7 @@ ban:
 
 # Сообщения команды /banip
 banip:
-  ban: "<green>Вы забанили IP игрока за <gold><reason></gold> на <gold><time></green>"
+  ban: "<green>Вы забанили IP игрока за <gold><reason></gold> на <gold><time></gold></green>"
   usage: "Правильное использование: <gold>/banip <игрок|ip> (время) <причина>"
   kick_message:
     # Вы можете настроить сообщение для выгнанного игрока
@@ -125,10 +125,10 @@ unban:
 
 # Сообщения команды /mute
 mute:
-  mute: "<green>Вы заглушили игрока <gold><player></gold> за <gold><reason></gold> на <gold><time></green>"
+  mute: "<green>Вы заглушили игрока <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
   usage: "Правильное использование: <gold>/mute <игрок> (время) <причина>"
   mute_message: "<red>Вы были заглушены за <b><reason></b> на <b><time></b></red>"
-  mute_info_message: "<red>Вы пытаетесь говорить, но вы заглушены</red>"
+  mute_info_message: "<red>Вы пытаетесь говорить, но вы заглушены ещё <time>.</red>"
   broadcast: "<dark_gray>Игрок <gray><player></gray> был заглушен за <gray><reason></gray> на <gray><time></gray></dark_gray>"
     # В качестве альтернативы вы можете использовать формат сообщения ниже, если хотите дополнительно выделить это сообщение
     # broadcast:
@@ -155,7 +155,7 @@ unmute:
 
 # Сообщения команды /warn
 warn:
-  warn: "<green>Вы выдали предупреждение (<warn_no> раз) игроку <gold><player></gold> за <gold><reason></gold> на <gold><time></green>"
+  warn: "<green>Вы выдали предупреждение (<warn_no> раз) игроку <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
   usage: "Правильное использование: <gold>/warn <игрок> (время) <причина>"
   warn_message: "<red>Вы получили <b><warn_no></b> предупреждение!</red>"
   broadcast: "<dark_gray>Игрок <gray><player></gray> получил предупреждение за <gray><reason></gray> на <gray><time></gray></dark_gray>"
@@ -194,7 +194,7 @@ kick:
     - '&7'
     - '&7'
     - '&8Вы можете подать апелляцию:'
-    - "&eDiscord &8» &c&nhttps://servername.pl/discord"
+    - "&eDiscord &8» &c&nhttps://vashserver.ru/discord"
   broadcast: "<dark_gray>Игрок <gray><player></gray> был выгнан за <gray><reason></gray></dark_gray>"
     # В качестве альтернативы вы можете использовать формат сообщения ниже, если хотите дополнительно выделить это сообщение
     # broadcast:

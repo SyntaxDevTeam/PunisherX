@@ -79,7 +79,7 @@ ban:
     - "&cТермін &8» &7<time>"
     - '&7'
     - '&8Ви можете подати апеляцію на:'
-    - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
+    - "&eDiscord &8» &c&nhttps://vashserver.ua/discord"
   broadcast: "<dark_gray>Гравець <gray><player></gray> був забанений за <gray><reason></gray> на <gray><time></gray></dark_gray>"
     # Альтернативно можна використати цей формат повідомлення, якщо хочете більше виділити оголошення
     # broadcast:
@@ -196,7 +196,7 @@ kick:
     - '&7'
     - '&7'
     - '&8Ви можете подати апеляцію на:'
-    - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
+    - "&eDiscord &8» &c&nhttps://vashserver.ua/discord"
   broadcast: "<dark_gray>Гравець <gray><player></gray> був вигнаний за <gray><reason></gray></dark_gray>"
     # Альтернативно можна використати цей формат повідомлення, якщо хочете більше виділити оголошення
     # broadcast:

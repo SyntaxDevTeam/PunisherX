@@ -79,7 +79,7 @@ ban:
     - "&cDauer &8» &7<time>"
     - '&7'
     - '&8Du kannst Einspruch einlegen unter:'
-    - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
+    - "&eDiscord &8» &c&nhttps://deinserver.de/discord"
   broadcast: "<dark_gray>Spieler <gray><player></gray> wurde für <gray><reason></gray> für <gray><time></gray> gebannt</dark_gray>"
     # Alternativ kannst du folgendes Nachrichtenformat verwenden, wenn du die Nachricht deutlicher hervorheben möchtest
     # broadcast:
@@ -196,7 +196,7 @@ kick:
     - '&7'
     - '&7'
     - '&8Du kannst Einspruch einlegen unter:'
-    - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
+    - "&eDiscord &8» &c&nhttps://deinserver.de/discord"
   broadcast: "<dark_gray>Spieler <gray><player></gray> wurde wegen <gray><reason></gray> gekickt</dark_gray>"
     # Alternativ kannst du folgendes Nachrichtenformat verwenden, wenn du die Nachricht deutlicher hervorheben möchtest
     # broadcast:

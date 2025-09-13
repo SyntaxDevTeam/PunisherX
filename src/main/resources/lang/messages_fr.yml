@@ -79,7 +79,7 @@ ban:
     - "&cDurée &8» &7<time>"
     - '&7'
     - '&8Vous pouvez faire appel sur :'
-    - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
+    - "&eDiscord &8» &c&nhttps://votreserveur.fr/discord"
   broadcast: "<dark_gray>Le joueur <gray><player></gray> a été banni pour <gray><reason></gray> pendant <gray><time></gray></dark_gray>"
     # Vous pouvez également utiliser ce format si vous voulez mettre davantage en avant le message
     # broadcast:
@@ -196,7 +196,7 @@ kick:
     - '&7'
     - '&7'
     - '&8Vous pouvez faire appel sur :'
-    - "&eDiscord &8» &c&nhttps://nazwaserwera.pl/discord"
+    - "&eDiscord &8» &c&nhttps://votreserveur.fr/discord"
   broadcast: "<dark_gray>Le joueur <gray><player></gray> a été expulsé pour <gray><reason></gray></dark_gray>"
     # Vous pouvez également utiliser ce format si vous voulez mettre davantage en avant le message
     # broadcast:
