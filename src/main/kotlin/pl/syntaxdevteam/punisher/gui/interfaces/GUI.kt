@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.gui
+package pl.syntaxdevteam.punisher.gui.interfaces
 
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player

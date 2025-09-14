@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.gui
+package pl.syntaxdevteam.punisher.gui.player.action
 
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -8,8 +8,9 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
-import org.bukkit.inventory.ItemStack
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
+import pl.syntaxdevteam.punisher.gui.player.action.PlayerActionGUI
 import java.util.UUID
 
 class ConfirmDeleteGUI(plugin: PunisherX) : BaseGUI(plugin) {

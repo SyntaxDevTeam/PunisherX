@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.gui
+package pl.syntaxdevteam.punisher.gui.player
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -13,6 +13,9 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import com.destroystokyo.paper.profile.PlayerProfile
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.gui.PunisherMain
+import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
+import pl.syntaxdevteam.punisher.gui.player.action.PlayerActionGUI
 import java.util.UUID
 
 class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {

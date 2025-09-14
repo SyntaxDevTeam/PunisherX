@@ -1,17 +1,19 @@
-package pl.syntaxdevteam.punisher.gui
+package pl.syntaxdevteam.punisher.gui.player.action
 
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
-import org.bukkit.entity.Player
 import org.bukkit.OfflinePlayer
+import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
-import org.bukkit.inventory.ItemStack
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
 import pl.syntaxdevteam.punisher.common.TeleportUtils
+import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
+import pl.syntaxdevteam.punisher.gui.player.OfflinePlayerListGUI
+import pl.syntaxdevteam.punisher.gui.player.PlayerListGUI
+import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
 import java.util.UUID
 
 class PlayerActionGUI(plugin: PunisherX) : BaseGUI(plugin) {

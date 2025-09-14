@@ -15,7 +15,7 @@ import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigHandler
 import pl.syntaxdevteam.punisher.common.UUIDManager
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
-import pl.syntaxdevteam.punisher.gui.GUIHandler
+import pl.syntaxdevteam.punisher.gui.interfaces.GUIHandler
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
 import pl.syntaxdevteam.punisher.listeners.LegacyLoginListener

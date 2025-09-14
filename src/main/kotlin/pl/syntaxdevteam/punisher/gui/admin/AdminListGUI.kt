@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.gui
+package pl.syntaxdevteam.punisher.gui.admin
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -11,12 +11,16 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.gui.PunisherMain
+import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
 import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 /**
- * GUI displaying currently online players.
+ * GUI displaying currently online administrators.
  */
-class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
+class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
+
     /**
      * Inventory holder used to store the current page of the GUI.
      */
@@ -30,10 +34,12 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
     }
 
     /**
-     * Opens the player list GUI for the given page.
+     * Opens the admin list GUI for the given page.
      */
     private fun open(player: Player, page: Int) {
-        val online = plugin.server.onlinePlayers.toList()
+        val online = plugin.server.onlinePlayers.filter {
+            PermissionChecker.hasPermissionStartingWith(it, "punisherx")
+        }
         val playersPerPage = 27 // 3 rows of heads
         val totalPages = if (online.isEmpty()) 1 else (online.size - 1) / playersPerPage + 1
         val currentPage = page.coerceIn(0, totalPages - 1)
@@ -71,10 +77,10 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
             Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
                 val uuid = target.uniqueId
-                val onlineStr  = PlayerStatsService.getCurrentOnlineString(uuid) ?: mH.getCleanMessage("error", "no_data")
-                val totalStr   = PlayerStatsService.getTotalPlaytimeString(uuid) ?: mH.getCleanMessage("error", "no_data")
+                val onlineStr  = PlayerStatsService.getCurrentOnlineString(uuid) ?: "Brak danych"
+                val totalStr   = PlayerStatsService.getTotalPlaytimeString(uuid) ?: "Brak danych"
                 val punishStr  = plugin.databaseHandler.countPlayerAllPunishmentHistory(uuid).toString()
-                val playerIP   = plugin.playerIPManager.getPlayerIPByName(target.name) ?: mH.getCleanMessage("error", "no_data")
+                val playerIP   = plugin.playerIPManager.getPlayerIPByName(target.name) ?: "Brak danych"
                 val punishments = plugin.databaseHandler.getActivePunishmentsString(uuid) ?: mH.getCleanMessage("error", "no_data")
                 val lastActive = PlayerStatsService.getLastActiveString(uuid) ?: mH.getCleanMessage("error", "no_data")
 
@@ -100,13 +106,13 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         }
 
         if (currentPage > 0) {
-            inventory.setItem(36, createNavItem(Material.PAPER, mH.getCleanMessage("GUI", "Nav.previous")))
+            inventory.setItem(36, createNavItem(Material.PAPER, "<yellow>Poprzednia strona</yellow>"))
         }
 
-        inventory.setItem(40, createNavItem(Material.BARRIER, mH.getCleanMessage("GUI", "Nav.back")))
+        inventory.setItem(40, createNavItem(Material.BARRIER, "<yellow>Powrót</yellow>"))
 
         if (currentPage < totalPages - 1) {
-            inventory.setItem(44, createNavItem(Material.BOOK, mH.getCleanMessage("GUI", "Nav.next")))
+            inventory.setItem(44, createNavItem(Material.BOOK, "<yellow>Następna strona</yellow>"))
         }
 
         player.openInventory(inventory)
@@ -117,18 +123,13 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         val holder = event.view.topInventory.holder as? Holder ?: return
         val player = event.whoClicked as? Player ?: return
 
-        val online = plugin.server.onlinePlayers.toList()
+        val online = plugin.server.onlinePlayers.filter {
+            PermissionChecker.hasPermissionStartingWith(it, "punisherx")
+        }
         val playersPerPage = 27
         val totalPages = if (online.isEmpty()) 1 else (online.size - 1) / playersPerPage + 1
         val slot = event.rawSlot
-        if (slot in 0 until playersPerPage) {
-            val index = holder.page * playersPerPage + slot
-            if (index < online.size) {
-                val target = online[index]
-                PlayerActionGUI(plugin).open(player, target)
-            }
-            return
-        }
+
         when (slot) {
             36 -> if (holder.page > 0) open(player, holder.page - 1)
             40 -> PunisherMain(plugin).open(player)
@@ -137,6 +138,6 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
     }
 
     override fun getTitle(): Component {
-        return mH.getLogMessage("GUI", "PunisherMain.playerOnline.title")
+        return mH.getLogMessage("GUI", "PunisherMain.adminOnline.title")
     }
 }
