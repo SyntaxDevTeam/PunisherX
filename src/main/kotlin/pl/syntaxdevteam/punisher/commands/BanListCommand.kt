@@ -14,7 +14,7 @@ class BanListCommand(private val plugin: PunisherX) : BasicCommand {
     private val mh = plugin.messageHandler
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN_LIST)) {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN_LIST)) {
             stack.sender.sendMessage(mh.getMessage("error", "no_permission"))
             return
         }
