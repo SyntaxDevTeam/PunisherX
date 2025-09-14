@@ -59,4 +59,13 @@ package pl.syntaxdevteam.punisher.api
       * @return A CompletableFuture containing a list of PunishmentData records for banned players from the history.
       */
      fun getHistoryBannedPlayers(limit: Int, offset: Int): CompletableFuture<List<PunishmentData>>
+
+     /**
+      * Retrieves a list of jailed players.
+      *
+      * @param limit The maximum number of records to return.
+      * @param offset The number of records to skip.
+      * @return A CompletableFuture containing a list of PunishmentData records for jailed players.
+      */
+     fun getJailedPlayers(limit: Int, offset: Int): CompletableFuture<List<PunishmentData>>
  }

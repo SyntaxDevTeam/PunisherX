@@ -52,4 +52,10 @@ class PunisherXApiImpl(private val databaseHandler: DatabaseHandler) : PunisherX
             databaseHandler.getHistoryBannedPlayers(limit, offset)
         }
     }
+
+    override fun getJailedPlayers(limit: Int, offset: Int): CompletableFuture<List<PunishmentData>> {
+        return CompletableFuture.supplyAsync {
+            databaseHandler.getJailedPlayers(limit, offset)
+        }
+    }
 }
