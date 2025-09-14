@@ -6,7 +6,6 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import pl.syntaxdevteam.punisher.PunisherX
 
@@ -15,12 +14,13 @@ class ConfigGUI(private val plugin: PunisherX) : GUI {
     private val mH = plugin.messageHandler
 
     override fun open(player: Player) {
-        val inventory = Bukkit.createInventory(null, 27, getTitle())
-        for (slot in 0 until 27) {
+        val inventory = Bukkit.createInventory(null, 45, getTitle())
+        for (slot in 0 until 45) {
             inventory.setItem(slot, createFillerItem())
         }
-        inventory.setItem(11, createItem(Material.COMPASS, mH.getCleanMessage("GUI", "Config.setspawn")))
-        inventory.setItem(15, createItem(Material.CHAIN, mH.getCleanMessage("GUI", "Config.setjail")))
+        inventory.setItem(20, createItem(Material.COMPASS, mH.getCleanMessage("GUI", "Config.setspawn")))
+        inventory.setItem(24, createItem(Material.CHAIN, mH.getCleanMessage("GUI", "Config.setjail")))
+        inventory.setItem(40, createNavItem(Material.BARRIER, mH.getCleanMessage("GUI", "Nav.back")))
         player.openInventory(inventory)
     }
 
@@ -28,14 +28,15 @@ class ConfigGUI(private val plugin: PunisherX) : GUI {
         event.isCancelled = true
         val player = event.whoClicked as? Player ?: return
         when (event.rawSlot) {
-            11 -> {
+            20 -> {
                 player.closeInventory()
                 player.performCommand("setspawn")
             }
-            15 -> {
+            24 -> {
                 player.closeInventory()
                 player.performCommand("setjail 5")
             }
+            40 -> PunisherMain(plugin).open(player)
         }
     }
 
@@ -44,6 +45,14 @@ class ConfigGUI(private val plugin: PunisherX) : GUI {
     }
 
     private fun createItem(material: Material, name: String): ItemStack {
+        val item = ItemStack(material)
+        val meta = item.itemMeta
+        meta.displayName(mH.formatMixedTextToMiniMessage(name, TagResolver.empty()))
+        item.itemMeta = meta
+        return item
+    }
+
+    private fun createNavItem(material: Material, name: String): ItemStack {
         val item = ItemStack(material)
         val meta = item.itemMeta
         meta.displayName(mH.formatMixedTextToMiniMessage(name, TagResolver.empty()))
