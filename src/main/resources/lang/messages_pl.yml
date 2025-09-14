@@ -308,6 +308,11 @@ GUI:
     kick: "<yellow>Wyrzuć</yellow>"
     banip: "<yellow>Zbanuj IP</yellow>"
     teleport: "<yellow>Teleportuj</yellow>"
+    undo: "<yellow>Cofnij karę</yellow>"
+    history: "<yellow>Historia kar</yellow>"
+    active: "<yellow>Aktywne kary</yellow>"
+    list: "<yellow>Lista ukaranych</yellow>"
+    config: "<yellow>Konfiguracja</yellow>"
     delete: "<yellow>Wyczyść dane konta</yellow>"
     deleteMessage: "<red>Twoje konto zostało wyczyszczone</red>"
     confirmDelete:
@@ -320,10 +325,20 @@ GUI:
     jail: "<yellow>Więzienie</yellow>"
     mute: "<yellow>Wyciszenie</yellow>"
     warn: "<yellow>Ostrzeżenie</yellow>"
+    banip: "<yellow>Zbanuj IP</yellow>"
+    kick: "<yellow>Wyrzuć</yellow>"
   PunishTime:
     title: "<yellow>Wybierz czas</yellow>"
   PunishReason:
     title: "<yellow>Wybierz powód</yellow>"
+  PunishedList:
+    title: "<yellow>Lista ukaranych</yellow>"
+    banned: "<yellow>Zbanowani</yellow>"
+    jailed: "<yellow>W więzieniu</yellow>"
+  Config:
+    title: "<yellow>Konfiguracja</yellow>"
+    setspawn: "<yellow>Ustaw spawn</yellow>"
+    setjail: "<yellow>Ustaw więzienie</yellow>"
   Nav:
     next: "<gray>Następna strona</gray>"
     previous: "<gray>Poprzednia strona</gray>"

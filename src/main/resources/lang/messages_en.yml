@@ -310,6 +310,11 @@ GUI:
     kick: "<yellow>Kick</yellow>"
     banip: "<yellow>Ban IP</yellow>"
     teleport: "<yellow>Teleport</yellow>"
+    undo: "<yellow>Undo punishment</yellow>"
+    history: "<yellow>Punishment history</yellow>"
+    active: "<yellow>Active punishments</yellow>"
+    list: "<yellow>Punished list</yellow>"
+    config: "<yellow>Configuration</yellow>"
     delete: "<yellow>Clear account data</yellow>"
     deleteMessage: "<red>Your account data has been cleared</red>"
     confirmDelete:
@@ -322,10 +327,20 @@ GUI:
     jail: "<yellow>Jail</yellow>"
     mute: "<yellow>Mute</yellow>"
     warn: "<yellow>Warn</yellow>"
+    banip: "<yellow>Ban IP</yellow>"
+    kick: "<yellow>Kick</yellow>"
   PunishTime:
     title: "<yellow>Select duration</yellow>"
   PunishReason:
     title: "<yellow>Select reason</yellow>"
+  PunishedList:
+    title: "<yellow>Punished players</yellow>"
+    banned: "<yellow>Banned players</yellow>"
+    jailed: "<yellow>Jailed players</yellow>"
+  Config:
+    title: "<yellow>Configuration</yellow>"
+    setspawn: "<yellow>Set spawn</yellow>"
+    setjail: "<yellow>Set jail</yellow>"
   Nav:
     next: "<gray>Next page</gray>"
     previous: "<gray>Previous page</gray>"

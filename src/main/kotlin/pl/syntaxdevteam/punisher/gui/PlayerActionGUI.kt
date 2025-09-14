@@ -33,12 +33,14 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
         }
 
         inventory.setItem(11, createItem(Material.MACE, mH.getCleanMessage("GUI", "PlayerAction.punish")))
-        if (target.isOnline) {
-            inventory.setItem(13, createItem(Material.BLAZE_ROD, mH.getCleanMessage("GUI", "PlayerAction.kick")))
-        }
-        inventory.setItem(15, createItem(Material.REDSTONE_BLOCK, mH.getCleanMessage("GUI", "PlayerAction.banip")))
-        inventory.setItem(29, createItem(Material.ENDER_PEARL, mH.getCleanMessage("GUI", "PlayerAction.teleport")))
-        inventory.setItem(33, createItem(Material.TNT, mH.getCleanMessage("GUI", "PlayerAction.delete")))
+
+        inventory.setItem(13, createItem(Material.TOTEM_OF_UNDYING, mH.getCleanMessage("GUI", "PlayerAction.undo")))
+        inventory.setItem(15, createItem(Material.BOOK, mH.getCleanMessage("GUI", "PlayerAction.history")))
+        inventory.setItem(29, createItem(Material.PAPER, mH.getCleanMessage("GUI", "PlayerAction.active")))
+        inventory.setItem(31, createItem(Material.IRON_BARS, mH.getCleanMessage("GUI", "PlayerAction.list")))
+        inventory.setItem(33, createItem(Material.COMPARATOR, mH.getCleanMessage("GUI", "PlayerAction.config")))
+        inventory.setItem(35, createItem(Material.ENDER_PEARL, mH.getCleanMessage("GUI", "PlayerAction.teleport")))
+        inventory.setItem(41, createItem(Material.TNT, mH.getCleanMessage("GUI", "PlayerAction.delete")))
         inventory.setItem(40, createNavItem(Material.BARRIER, mH.getCleanMessage("GUI", "Nav.back")))
 
         player.openInventory(inventory)
@@ -51,38 +53,48 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
         val holder = event.view.topInventory.holder as? Holder ?: return
         val player = event.whoClicked as? Player ?: return
         val target = Bukkit.getOfflinePlayer(holder.target)
-        val reasonKick = mH.getSimpleMessage("kick", "no_reasons")
-        val reasonBan = mH.getSimpleMessage("banip", "no_reasons")
-        val force = plugin.config.getBoolean("gui.punish.use_force", false)
+        val targetName = target.name ?: return
+
 
         when (event.rawSlot) {
             11 -> PunishTypeGUI(plugin).open(player, target)
             13 -> {
-                val online = target.player ?: return
                 player.closeInventory()
-
-                val command = buildString {
-                    append("kick ")
-                    append(online.name)
-                    append(' ')
-                    append(reasonKick)
-                    if (force) append(" --force")
+                val punishments = plugin.databaseHandler.getPunishments(target.uniqueId.toString())
+                if (punishments.isEmpty()) {
+                    player.sendMessage(mH.getMessage("error", "no_data"))
+                } else {
+                    punishments.forEach { punishment ->
+                        val command = when (punishment.type) {
+                            "BAN", "BANIP" -> "unban $targetName"
+                            "MUTE" -> "unmute $targetName"
+                            "WARN" -> "unwarn $targetName"
+                            "JAIL" -> "unjail $targetName"
+                            else -> null
+                        }
+                        if (command != null) {
+                            player.performCommand(command)
+                        }
+                    }
                 }
-
-                player.performCommand(command)
             }
             15 -> {
                 player.closeInventory()
-                val command = buildString {
-                    append("banip ")
-                    append(target.name)
-                    append(' ')
-                    append(reasonBan)
-                    if (force) append(" --force")
-                }
-                player.performCommand(command)
+                player.performCommand("history $targetName")
             }
             29 -> {
+                player.closeInventory()
+                player.performCommand("check $targetName all")
+            }
+            31 -> {
+                player.closeInventory()
+                PunishedListGUI(plugin).open(player)
+            }
+            33 -> {
+                player.closeInventory()
+                ConfigGUI(plugin).open(player)
+            }
+            35 -> {
                 player.closeInventory()
                 val online = target.player
                 if (online != null) {
@@ -96,7 +108,7 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
                     }
                 }
             }
-            33 -> ConfirmDeleteGUI(plugin).open(player, target)
+            41 -> ConfirmDeleteGUI(plugin).open(player, target)
             40 -> if (target.isOnline) PlayerListGUI(plugin).open(player) else OfflinePlayerListGUI(plugin).open(player)
         }
     }

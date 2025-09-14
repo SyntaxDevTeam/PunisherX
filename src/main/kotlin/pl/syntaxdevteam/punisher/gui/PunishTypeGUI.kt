@@ -28,8 +28,10 @@ class PunishTypeGUI(private val plugin: PunisherX) : GUI {
         holder.inv = inventory
 
         inventory.setItem(10, createItem(Material.IRON_SWORD, mH.getCleanMessage("GUI", "PunishType.ban")))
-        inventory.setItem(12, createItem(Material.IRON_BARS, mH.getCleanMessage("GUI", "PunishType.jail")))
-        inventory.setItem(14, createItem(Material.BOOK, mH.getCleanMessage("GUI", "PunishType.mute")))
+        inventory.setItem(11, createItem(Material.REDSTONE_BLOCK, mH.getCleanMessage("GUI", "PunishType.banip")))
+        inventory.setItem(12, createItem(Material.BLAZE_ROD, mH.getCleanMessage("GUI", "PunishType.kick")))
+        inventory.setItem(14, createItem(Material.IRON_BARS, mH.getCleanMessage("GUI", "PunishType.jail")))
+        inventory.setItem(15, createItem(Material.BOOK, mH.getCleanMessage("GUI", "PunishType.mute")))
         inventory.setItem(16, createItem(Material.PAPER, mH.getCleanMessage("GUI", "PunishType.warn")))
 
         player.openInventory(inventory)
@@ -42,10 +44,36 @@ class PunishTypeGUI(private val plugin: PunisherX) : GUI {
         val holder = event.view.topInventory.holder as? Holder ?: return
         val player = event.whoClicked as? Player ?: return
         val target = Bukkit.getOfflinePlayer(holder.target)
+        val reasonKick = mH.getSimpleMessage("kick", "no_reasons")
+        val reasonBan = mH.getSimpleMessage("banip", "no_reasons")
+        val force = plugin.config.getBoolean("gui.punish.use_force", false)
         when (event.rawSlot) {
             10 -> PunishTimeGUI(plugin).open(player, target, "ban")
-            12 -> PunishTimeGUI(plugin).open(player, target, "jail")
-            14 -> PunishTimeGUI(plugin).open(player, target, "mute")
+            11 -> {
+                player.closeInventory()
+                val command = buildString {
+                    append("banip ")
+                    append(target.name)
+                    append(' ')
+                    append(reasonBan)
+                    if (force) append(" --force")
+                }
+                player.performCommand(command)
+            }
+            12 -> {
+                val online = target.player ?: return
+                player.closeInventory()
+                val command = buildString {
+                    append("kick ")
+                    append(online.name)
+                    append(' ')
+                    append(reasonKick)
+                    if (force) append(" --force")
+                }
+                player.performCommand(command)
+            }
+            14 -> PunishTimeGUI(plugin).open(player, target, "jail")
+            15 -> PunishTimeGUI(plugin).open(player, target, "mute")
             16 -> PunishTimeGUI(plugin).open(player, target, "warn")
         }
     }
