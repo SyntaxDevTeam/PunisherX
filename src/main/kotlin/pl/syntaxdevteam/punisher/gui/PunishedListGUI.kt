@@ -32,8 +32,7 @@ class PunishedListGUI(private val plugin: PunisherX) : GUI {
                 BanListGUI(plugin).open(player)
             }
             24 -> {
-                player.closeInventory()
-                player.sendMessage(Component.text("Not implemented"))
+                JailListGUI(plugin).open(player)
             }
             40 -> PunisherMain(plugin).open(player)
         }

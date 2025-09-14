@@ -398,6 +398,42 @@ class DatabaseHandler(private val plugin: PunisherX) {
             mutableListOf()
         }
     }
+
+    fun getJailedPlayers(limit: Int, offset: Int): MutableList<PunishmentData> {
+        val supportsOrderAndLimit = dbType in setOf(
+            DatabaseType.MYSQL,
+            DatabaseType.MARIADB,
+            DatabaseType.POSTGRESQL,
+            DatabaseType.SQLITE
+        )
+
+        var sql = "SELECT * FROM punishments WHERE punishmentType = 'JAIL'"
+        val params = mutableListOf<Any>()
+        if (supportsOrderAndLimit) {
+            sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
+            params.add(limit)
+            params.add(offset)
+        }
+
+        return try {
+            query(sql, *params.toTypedArray()) { rs ->
+                PunishmentData(
+                    rs.getInt("id"),
+                    rs.getString("uuid"),
+                    rs.getString("punishmentType"),
+                    rs.getString("reason"),
+                    rs.getLong("start"),
+                    rs.getLong("endTime"),
+                    rs.getString("name"),
+                    rs.getString("operator")
+                )
+            }.toMutableList()
+        } catch (e: Exception) {
+            logger.err("Failed to get jailed players: ${e.message}")
+            mutableListOf()
+        }
+    }
+
     fun getActiveWarnCount(uuid: String): Int {
         val currentTime = System.currentTimeMillis()
         return try {

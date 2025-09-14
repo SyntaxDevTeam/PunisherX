@@ -344,6 +344,15 @@ GUI:
       remaining: "<gray>Pozostały czas: <yellow><time></yellow></gray>"
       operator: "<gray>Administrator: <yellow><operator></yellow></gray>"
       reason: "<gray>Powód: <yellow><reason></yellow></gray>"
+  JailList:
+    title: "<yellow>Lista więźniów</yellow>"
+    permanent: "Stały"
+    hover:
+      id: "<gray>ID: <yellow><id></yellow></gray>"
+      date: "<gray>Data: <yellow><date></yellow></gray>"
+      remaining: "<gray>Pozostały czas: <yellow><time></yellow></gray>"
+      operator: "<gray>Administrator: <yellow><operator></yellow></gray>"
+      reason: "<gray>Powód: <yellow><reason></yellow></gray>"
   Config:
     title: "<yellow>Konfiguracja</yellow>"
     setspawn: "<yellow>Ustaw spawn</yellow>"
