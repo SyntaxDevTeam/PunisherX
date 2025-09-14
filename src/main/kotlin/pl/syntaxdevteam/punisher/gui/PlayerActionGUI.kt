@@ -37,9 +37,7 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
         inventory.setItem(13, createItem(Material.TOTEM_OF_UNDYING, mH.getCleanMessage("GUI", "PlayerAction.undo")))
         inventory.setItem(15, createItem(Material.BOOK, mH.getCleanMessage("GUI", "PlayerAction.history")))
         inventory.setItem(29, createItem(Material.PAPER, mH.getCleanMessage("GUI", "PlayerAction.active")))
-        inventory.setItem(31, createItem(Material.IRON_BARS, mH.getCleanMessage("GUI", "PlayerAction.list")))
-        inventory.setItem(33, createItem(Material.COMPARATOR, mH.getCleanMessage("GUI", "PlayerAction.config")))
-        inventory.setItem(35, createItem(Material.ENDER_PEARL, mH.getCleanMessage("GUI", "PlayerAction.teleport")))
+        inventory.setItem(33, createItem(Material.ENDER_PEARL, mH.getCleanMessage("GUI", "PlayerAction.teleport")))
         inventory.setItem(41, createItem(Material.TNT, mH.getCleanMessage("GUI", "PlayerAction.delete")))
         inventory.setItem(40, createNavItem(Material.BARRIER, mH.getCleanMessage("GUI", "Nav.back")))
 
@@ -86,15 +84,8 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
                 player.closeInventory()
                 player.performCommand("check $targetName all")
             }
-            31 -> {
-                player.closeInventory()
-                PunishedListGUI(plugin).open(player)
-            }
+
             33 -> {
-                player.closeInventory()
-                ConfigGUI(plugin).open(player)
-            }
-            35 -> {
                 player.closeInventory()
                 val online = target.player
                 if (online != null) {
