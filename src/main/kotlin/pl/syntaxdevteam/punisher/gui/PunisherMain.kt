@@ -30,16 +30,16 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
      */
     private val menuEntries = listOf(
         MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.serwerInfo.title"), Material.PAPER, 4) { _ -> },
-        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOnline.title"), Material.PLAYER_HEAD, 19) { player ->
+        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOnline.title"), Material.PLAYER_HEAD, 10) { player ->
             PlayerListGUI(plugin).open(player)
         },
-        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOffline.title"), Material.SKELETON_SKULL, 21) { player ->
+        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOffline.title"), Material.SKELETON_SKULL, 16) { player ->
             OfflinePlayerListGUI(plugin).open(player)
         },
-        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.adminOnline.title"), Material.COMMAND_BLOCK, 23) { player ->
+        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.adminOnline.title"), Material.COMMAND_BLOCK, 22) { player ->
             AdminListGUI(plugin).open(player)
         },
-        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PlayerAction.list"), Material.IRON_BARS, 31) { player ->
+        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PlayerAction.list"), Material.IRON_BARS, 29) { player ->
             PunishedListGUI(plugin).open(player)
         },
         MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PlayerAction.config"), Material.COMPARATOR, 33) { player ->
@@ -48,7 +48,7 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
     )
 
     override fun open(player: Player) {
-        val inventory = Bukkit.createInventory(null, 36, getTitle())
+        val inventory = Bukkit.createInventory(null, 45, getTitle())
         val serverName = plugin.getServerName()
         val onlinePlayers = Bukkit.getOnlinePlayers().size.toString()
         val totalPlayers = plugin.playerIPManager.getAllDecryptedRecords().size.toString()
@@ -64,11 +64,11 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
                     plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.serwerInfo.daily", mapOf("daily" to daily)),
                     plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.serwerInfo.tps", mapOf("time" to time, "tps" to tps)),
                 )
-                19 -> listOf(
+                10 -> listOf(
                     plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOnline.online", mapOf("onlineplayers" to onlinePlayers)),
                     plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOnline.clickToView")
                 )
-                21 -> listOf(
+                16 -> listOf(
                     plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOffline.total", mapOf("totalplayers" to totalPlayers)),
                     plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOffline.clickToView")
                 )
