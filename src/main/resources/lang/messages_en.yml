@@ -337,6 +337,15 @@ GUI:
     title: "<yellow>Punished players</yellow>"
     banned: "<yellow>Banned players</yellow>"
     jailed: "<yellow>Jailed players</yellow>"
+  BanList:
+    title: "<yellow>Ban list</yellow>"
+    permanent: "Permanent"
+    hover:
+      id: "<gray>ID: <yellow><id></yellow></gray>"
+      date: "<gray>Date: <yellow><date></yellow></gray>"
+      remaining: "<gray>Time left: <yellow><time></yellow></gray>"
+      operator: "<gray>Operator: <yellow><operator></yellow></gray>"
+      reason: "<gray>Reason: <yellow><reason></yellow></gray>"
   Config:
     title: "<yellow>Configuration</yellow>"
     setspawn: "<yellow>Set spawn</yellow>"

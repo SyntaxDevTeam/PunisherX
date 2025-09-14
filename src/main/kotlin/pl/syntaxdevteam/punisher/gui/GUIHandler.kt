@@ -22,6 +22,7 @@ class GUIHandler(private val plugin: PunisherX) : Listener {
             plugin.messageHandler.getLogMessage("GUI", "PunishTime.title") -> PunishTimeGUI(plugin).handleClick(event)
             plugin.messageHandler.getLogMessage("GUI", "PunishReason.title") -> PunishReasonGUI(plugin).handleClick(event)
             plugin.messageHandler.getLogMessage("GUI", "PunishedList.title") -> PunishedListGUI(plugin).handleClick(event)
+            plugin.messageHandler.getLogMessage("GUI", "BanList.title") -> BanListGUI(plugin).handleClick(event)
             plugin.messageHandler.getLogMessage("GUI", "Config.title") -> ConfigGUI(plugin).handleClick(event)
         }
     }
