@@ -38,8 +38,8 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
         inventory.setItem(13, createItem(Material.TOTEM_OF_UNDYING, mH.getCleanMessage("GUI", "PlayerAction.undo")))
         inventory.setItem(15, createItem(Material.BOOK, mH.getCleanMessage("GUI", "PlayerAction.history")))
         inventory.setItem(29, createItem(Material.PAPER, mH.getCleanMessage("GUI", "PlayerAction.active")))
-        inventory.setItem(33, createItem(Material.ENDER_PEARL, mH.getCleanMessage("GUI", "PlayerAction.teleport")))
-        inventory.setItem(41, createItem(Material.TNT, mH.getCleanMessage("GUI", "PlayerAction.delete")))
+        inventory.setItem(31, createItem(Material.ENDER_PEARL, mH.getCleanMessage("GUI", "PlayerAction.teleport")))
+        inventory.setItem(33, createItem(Material.TNT, mH.getCleanMessage("GUI", "PlayerAction.delete")))
         inventory.setItem(40, createNavItem(Material.BARRIER, mH.getCleanMessage("GUI", "Nav.back")))
 
         player.openInventory(inventory)
@@ -86,7 +86,7 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
                 player.performCommand("check $targetName all")
             }
 
-            33 -> {
+            31 -> {
                 player.closeInventory()
                 val online = target.player
                 if (online != null) {
@@ -100,7 +100,7 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
                     }
                 }
             }
-            41 -> ConfirmDeleteGUI(plugin).open(player, target)
+            33 -> ConfirmDeleteGUI(plugin).open(player, target)
             40 -> if (target.isOnline) PlayerListGUI(plugin).open(player) else OfflinePlayerListGUI(plugin).open(player)
         }
     }
