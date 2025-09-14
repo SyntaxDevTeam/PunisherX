@@ -1,7 +1,6 @@
 package pl.syntaxdevteam.punisher.gui
 
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -13,9 +12,7 @@ import org.bukkit.inventory.ItemStack
 import pl.syntaxdevteam.punisher.PunisherX
 import java.util.UUID
 
-class PunishReasonGUI(private val plugin: PunisherX) : GUI {
-
-    private val mH = plugin.messageHandler
+class PunishReasonGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
     private class Holder(val target: UUID, val type: String, val time: String) : InventoryHolder {
         lateinit var inv: Inventory
@@ -28,6 +25,7 @@ class PunishReasonGUI(private val plugin: PunisherX) : GUI {
         val size = ((reasons.size / 9) + 1) * 9
         val inventory = Bukkit.createInventory(holder, if (size < 27) 27 else size, getTitle())
         holder.inv = inventory
+        inventory.fillWithFiller()
         reasons.forEachIndexed { index, reason ->
             inventory.setItem(index, createItem(Material.PAPER, "<yellow>$reason</yellow>"))
         }
@@ -61,13 +59,5 @@ class PunishReasonGUI(private val plugin: PunisherX) : GUI {
 
     override fun getTitle(): Component {
         return mH.getLogMessage("GUI", "PunishReason.title")
-    }
-
-    private fun createItem(material: Material, name: String): ItemStack {
-        val item = ItemStack(material)
-        val meta = item.itemMeta
-        meta.displayName(mH.formatMixedTextToMiniMessage(name, TagResolver.empty()))
-        item.itemMeta = meta
-        return item
     }
 }

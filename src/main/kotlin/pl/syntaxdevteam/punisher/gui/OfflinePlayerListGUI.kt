@@ -15,9 +15,7 @@ import com.destroystokyo.paper.profile.PlayerProfile
 import pl.syntaxdevteam.punisher.PunisherX
 import java.util.UUID
 
-class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
-
-    private val mH = plugin.messageHandler
+class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
     private enum class SortMode {
         NAME_ASC, NAME_DESC, LAST_SEEN_DESC, LAST_SEEN_ASC;
@@ -61,6 +59,8 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
         val holder = Holder(currentPage, sort)
         val inventory = Bukkit.createInventory(holder, 45, getTitle())
         holder.inv = inventory
+
+        inventory.fillWithFiller()
 
         pageList.forEachIndexed { index, info ->
             val uuid = UUID.fromString(info.playerUUID)
@@ -133,10 +133,6 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
             })
         }
 
-        for (slot in 27 until 36) {
-            inventory.setItem(slot, createFillerItem())
-        }
-
         if (currentPage > 0) {
             inventory.setItem(36, createNavItem(Material.PAPER, mH.getCleanMessage("GUI", "Nav.previous")))
         }
@@ -195,21 +191,5 @@ class OfflinePlayerListGUI(private val plugin: PunisherX) : GUI {
 
     override fun getTitle(): Component {
         return mH.getLogMessage("GUI", "PunisherMain.playerOffline.title")
-    }
-
-    private fun createNavItem(material: Material, name: String): ItemStack {
-        val item = ItemStack(material)
-        val meta = item.itemMeta
-        meta.displayName(mH.formatMixedTextToMiniMessage(name, TagResolver.empty()))
-        item.itemMeta = meta
-        return item
-    }
-
-    private fun createFillerItem(): ItemStack {
-        val item = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
-        val meta = item.itemMeta
-        meta.displayName(Component.text(" "))
-        item.itemMeta = meta
-        return item
     }
 }

@@ -1,7 +1,6 @@
 package pl.syntaxdevteam.punisher.gui
 
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -15,9 +14,7 @@ import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
 import pl.syntaxdevteam.punisher.common.TeleportUtils
 import java.util.UUID
 
-class PlayerActionGUI(private val plugin: PunisherX) : GUI {
-
-    private val mH = plugin.messageHandler
+class PlayerActionGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
     private class Holder(val target: UUID) : InventoryHolder {
         lateinit var inv: Inventory
@@ -29,9 +26,7 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
         val inventory = Bukkit.createInventory(holder, 45, getTitle())
         holder.inv = inventory
 
-        for (slot in 0 until 45) {
-            inventory.setItem(slot, createFillerItem())
-        }
+        inventory.fillWithFiller()
 
         inventory.setItem(11, createItem(Material.MACE, mH.getCleanMessage("GUI", "PlayerAction.punish")))
 
@@ -107,29 +102,5 @@ class PlayerActionGUI(private val plugin: PunisherX) : GUI {
 
     override fun getTitle(): Component {
         return mH.getLogMessage("GUI", "PlayerAction.title")
-    }
-
-    private fun createItem(material: Material, name: String): ItemStack {
-        val item = ItemStack(material)
-        val meta = item.itemMeta
-        meta.displayName(mH.formatMixedTextToMiniMessage(name, TagResolver.empty()))
-        item.itemMeta = meta
-        return item
-    }
-
-    private fun createNavItem(material: Material, name: String): ItemStack {
-        val item = ItemStack(material)
-        val meta = item.itemMeta
-        meta.displayName(mH.formatMixedTextToMiniMessage(name, TagResolver.empty()))
-        item.itemMeta = meta
-        return item
-    }
-
-    private fun createFillerItem(): ItemStack {
-        val item = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
-        val meta = item.itemMeta
-        meta.displayName(Component.text(" "))
-        item.itemMeta = meta
-        return item
     }
 }

@@ -16,9 +16,7 @@ import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
 /**
  * GUI displaying currently online players.
  */
-class PlayerListGUI(private val plugin: PunisherX) : GUI {
-
-    private val mH = plugin.messageHandler
+class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
     /**
      * Inventory holder used to store the current page of the GUI.
      */
@@ -46,6 +44,8 @@ class PlayerListGUI(private val plugin: PunisherX) : GUI {
         val holder = Holder(currentPage)
         val inventory = Bukkit.createInventory(holder, 45, getTitle())
         holder.inv = inventory
+
+        inventory.fillWithFiller()
 
         playersPage.forEachIndexed { index, target ->
             val head = ItemStack(Material.PLAYER_HEAD)
@@ -97,9 +97,6 @@ class PlayerListGUI(private val plugin: PunisherX) : GUI {
                     inventory.setItem(index, item)
                 })
             })
-            for (slot in 27 until 36) {
-                inventory.setItem(slot, createFillerItem())
-            }
         }
 
         if (currentPage > 0) {
@@ -141,20 +138,5 @@ class PlayerListGUI(private val plugin: PunisherX) : GUI {
 
     override fun getTitle(): Component {
         return mH.getLogMessage("GUI", "PunisherMain.playerOnline.title")
-    }
-    private fun createNavItem(material: Material, name: String): ItemStack {
-        val item = ItemStack(material)
-        val meta = item.itemMeta
-        meta.displayName(mH.formatMixedTextToMiniMessage(name, TagResolver.empty()))
-        item.itemMeta = meta
-        return item
-    }
-
-    private fun createFillerItem(): ItemStack {
-        val item = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
-        val meta = item.itemMeta
-        meta.displayName(Component.text(" "))
-        item.itemMeta = meta
-        return item
     }
 }

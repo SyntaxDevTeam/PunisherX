@@ -15,9 +15,7 @@ import pl.syntaxdevteam.punisher.databases.PunishmentData
 import java.text.SimpleDateFormat
 import java.util.Date
 
-class BanListGUI(private val plugin: PunisherX) : GUI {
-
-    private val mH = plugin.messageHandler
+class BanListGUI(plugin: PunisherX) : BaseGUI(plugin) {
     private val dateFormat = SimpleDateFormat("yy-MM-dd HH:mm:ss")
 
     private class Holder(var page: Int) : InventoryHolder {
@@ -39,9 +37,7 @@ class BanListGUI(private val plugin: PunisherX) : GUI {
         val inventory = Bukkit.createInventory(holder, 45, getTitle())
         holder.inv = inventory
 
-        for (slot in 0 until 45) {
-            inventory.setItem(slot, createFillerItem())
-        }
+        inventory.fillWithFiller()
 
         punishments.forEachIndexed { index, punishment ->
             inventory.setItem(index, createHead(punishment))
@@ -97,21 +93,5 @@ class BanListGUI(private val plugin: PunisherX) : GUI {
 
     override fun getTitle(): Component {
         return mH.getLogMessage("GUI", "BanList.title")
-    }
-
-    private fun createNavItem(material: Material, name: String): ItemStack {
-        val item = ItemStack(material)
-        val meta = item.itemMeta
-        meta.displayName(mH.formatMixedTextToMiniMessage(name, TagResolver.empty()))
-        item.itemMeta = meta
-        return item
-    }
-
-    private fun createFillerItem(): ItemStack {
-        val item = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
-        val meta = item.itemMeta
-        meta.displayName(Component.text(" "))
-        item.itemMeta = meta
-        return item
     }
 }

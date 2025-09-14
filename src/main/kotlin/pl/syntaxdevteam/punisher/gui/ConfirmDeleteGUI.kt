@@ -1,7 +1,6 @@
 package pl.syntaxdevteam.punisher.gui
 
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -13,9 +12,7 @@ import org.bukkit.inventory.ItemStack
 import pl.syntaxdevteam.punisher.PunisherX
 import java.util.UUID
 
-class ConfirmDeleteGUI(private val plugin: PunisherX) : GUI {
-
-    private val mH = plugin.messageHandler
+class ConfirmDeleteGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
     private class Holder(val target: UUID) : InventoryHolder {
         lateinit var inv: Inventory
@@ -26,6 +23,8 @@ class ConfirmDeleteGUI(private val plugin: PunisherX) : GUI {
         val holder = Holder(target.uniqueId)
         val inventory = Bukkit.createInventory(holder, 27, getTitle())
         holder.inv = inventory
+
+        inventory.fillWithFiller()
 
         inventory.setItem(11, createItem(Material.GREEN_WOOL, mH.getCleanMessage("GUI", "PlayerAction.confirmDelete.confirm")))
         inventory.setItem(15, createItem(Material.RED_WOOL, mH.getCleanMessage("GUI", "PlayerAction.confirmDelete.cancel")))
@@ -57,13 +56,5 @@ class ConfirmDeleteGUI(private val plugin: PunisherX) : GUI {
 
     override fun getTitle(): Component {
         return mH.getLogMessage("GUI", "PlayerAction.confirmDelete.title")
-    }
-
-    private fun createItem(material: Material, name: String): ItemStack {
-        val item = ItemStack(material)
-        val meta = item.itemMeta
-        meta.displayName(mH.formatMixedTextToMiniMessage(name, TagResolver.empty()))
-        item.itemMeta = meta
-        return item
     }
 }

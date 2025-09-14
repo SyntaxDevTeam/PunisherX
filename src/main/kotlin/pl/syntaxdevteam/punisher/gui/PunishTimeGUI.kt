@@ -1,7 +1,6 @@
 package pl.syntaxdevteam.punisher.gui
 
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -13,9 +12,7 @@ import org.bukkit.inventory.ItemStack
 import pl.syntaxdevteam.punisher.PunisherX
 import java.util.UUID
 
-class PunishTimeGUI(private val plugin: PunisherX) : GUI {
-
-    private val mH = plugin.messageHandler
+class PunishTimeGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
     private class Holder(val target: UUID, val type: String) : InventoryHolder {
         lateinit var inv: Inventory
@@ -26,6 +23,7 @@ class PunishTimeGUI(private val plugin: PunisherX) : GUI {
         val holder = Holder(target.uniqueId, type)
         val inventory = Bukkit.createInventory(holder, 27, getTitle())
         holder.inv = inventory
+        inventory.fillWithFiller()
         val times = plugin.config.getStringList("gui.punish.times")
         times.forEachIndexed { index, time ->
             inventory.setItem(10 + index, createItem(Material.PAPER, "<yellow>$time</yellow>"))
@@ -50,13 +48,5 @@ class PunishTimeGUI(private val plugin: PunisherX) : GUI {
 
     override fun getTitle(): Component {
         return mH.getLogMessage("GUI", "PunishTime.title")
-    }
-
-    private fun createItem(material: Material, name: String): ItemStack {
-        val item = ItemStack(material)
-        val meta = item.itemMeta
-        meta.displayName(mH.formatMixedTextToMiniMessage(name, TagResolver.empty()))
-        item.itemMeta = meta
-        return item
     }
 }

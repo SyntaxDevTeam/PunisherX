@@ -1,7 +1,6 @@
 package pl.syntaxdevteam.punisher.gui
 
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -13,7 +12,7 @@ import java.lang.management.ManagementFactory
 /**
  * Main menu of PunisherX.
  */
-class PunisherMain(private val plugin: PunisherX) : GUI {
+class PunisherMain(plugin: PunisherX) : BaseGUI(plugin) {
 
     /**
      * Representation of a clickable menu entry.
@@ -49,6 +48,7 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
 
     override fun open(player: Player) {
         val inventory = Bukkit.createInventory(null, 45, getTitle())
+        inventory.fillWithFiller()
         val serverName = plugin.getServerName()
         val onlinePlayers = Bukkit.getOnlinePlayers().size.toString()
         val totalPlayers = plugin.playerIPManager.getAllDecryptedRecords().size.toString()
@@ -106,16 +106,5 @@ class PunisherMain(private val plugin: PunisherX) : GUI {
         } catch (_: Exception) {
             "N/A"
         }
-    }
-
-    private fun createItem(material: Material, name: String, loreLines: List<String> = emptyList()): ItemStack {
-        val item = ItemStack(material)
-        val meta = item.itemMeta
-        meta.displayName(plugin.messageHandler.formatMixedTextToMiniMessage(name, TagResolver.empty()))
-        if (loreLines.isNotEmpty()) {
-            meta.lore(loreLines.map { plugin.messageHandler.formatMixedTextToMiniMessage(it, TagResolver.empty()) })
-        }
-        item.itemMeta = meta
-        return item
     }
 }
