@@ -8,6 +8,7 @@ import org.bukkit.GameMode
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.basic.JailUtils
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+import pl.syntaxdevteam.punisher.common.TeleportUtils
 
 class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
 
@@ -30,35 +31,17 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
 
             val spawnLocation = JailUtils.getUnjailLocation(plugin.config) ?: return
 
-            if (plugin.server.name.contains("Folia")) {
-                Bukkit.getServer().globalRegionScheduler.execute(plugin) {
-                    try {
-                        player.teleportAsync(spawnLocation).thenAccept { success ->
-                            if (success) {
-                                player.gameMode = GameMode.SURVIVAL
-                                plugin.messageHandler.getSmartMessage(
-                                    "unjail",
-                                    "unjail_message"
-                                ).forEach { msg -> player.sendMessage(msg) }
-                                plugin.logger.debug("<green>Player $playerName successfully unjailed (Folia).</green>")
-                            } else {
-                                plugin.logger.debug("<red>Failed to teleport player $playerName during unjail (Folia).</red>")
-                            }
-                        }.exceptionally { throwable ->
-                            plugin.logger.debug("<red>Error while teleporting $playerName during unjail: ${throwable.message}</red>")
-                            null
-                        }
-                    } catch (e: Exception) {
-                        plugin.logger.debug("<red>Error during Folia unjail for $playerName: ${e.message}</red>")
-                    }
+            TeleportUtils.teleportSafely(plugin, player, spawnLocation) { success ->
+                if (success) {
+                    player.gameMode = GameMode.SURVIVAL
+                    plugin.messageHandler.getSmartMessage(
+                        "unjail",
+                        "unjail_message"
+                    ).forEach { msg -> player.sendMessage(msg) }
+                    plugin.logger.debug("<green>Player $playerName successfully unjailed.</green>")
+                } else {
+                    plugin.logger.debug("<red>Failed to teleport player $playerName during unjail.</red>")
                 }
-            } else {
-                player.teleport(spawnLocation)
-                player.gameMode = GameMode.SURVIVAL
-                plugin.messageHandler.getSmartMessage(
-                    "unjail",
-                    "unjail_message"
-                ).forEach { msg -> player.sendMessage(msg) }
             }
         }
 
