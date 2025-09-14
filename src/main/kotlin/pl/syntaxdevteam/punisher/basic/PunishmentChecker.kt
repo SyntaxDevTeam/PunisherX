@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerMoveEvent
 import pl.syntaxdevteam.core.SyntaxCore
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+import pl.syntaxdevteam.punisher.common.TeleportUtils
 import java.util.*
 
 class PunishmentChecker(private val plugin: PunisherX) : Listener {
@@ -73,43 +74,12 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             plugin.logger.warning("Brak świata dla $targetLoc")
             return
         }
-
-        if (plugin.server.name.contains("Folia")) {
-            Bukkit.getServer().regionScheduler.execute(plugin, targetLoc) {
-                world.getChunkAtAsync(targetLoc.blockX shr 4, targetLoc.blockZ shr 4).thenRun {
-                    Bukkit.getServer().globalRegionScheduler.execute(plugin) {
-                        player.teleportAsync(targetLoc).thenAccept { success ->
-                            if (success) {
-                                player.gameMode = mode
-                                plugin.logger.debug("Player ${player.name} teleported to $targetLoc and set to $mode")
-                            } else {
-                                plugin.logger.debug("<red>Failed to teleport ${player.name} to $targetLoc.</red>")
-                            }
-                        }.exceptionally { thr ->
-                            plugin.logger.debug("<red>Teleportation error: ${thr.message}</red>")
-                            null
-                        }
-                    }
-                }.exceptionally { thr ->
-                    plugin.logger.debug("<red>Chunk load error: ${thr.message}</red>")
-                    null
-                }
-            }
-        } else {
-            val chunk = world.getChunkAt(targetLoc.blockX shr 4, targetLoc.blockZ shr 4)
-            if (!chunk.isLoaded) {
-                try {
-                    chunk.load(true)
-                } catch (e: Exception) {
-                    plugin.logger.debug("<red>Error loading chunk for ${player.name}: ${e.message}</red>")
-                }
-            }
-            try {
-                player.teleport(targetLoc)
+        TeleportUtils.teleportSafely(plugin, player, targetLoc) { success ->
+            if (success) {
                 player.gameMode = mode
-                plugin.logger.debug("<green>Player ${player.name} teleported to $targetLoc and set to $mode.</green>")
-            } catch (e: Exception) {
-                plugin.logger.debug("<red>Error while teleporting ${player.name}: ${e.message}</red>")
+                plugin.logger.debug("Player ${player.name} teleported to $targetLoc and set to $mode")
+            } else {
+                plugin.logger.debug("<red>Failed to teleport ${player.name} to $targetLoc.</red>")
             }
         }
     }

@@ -9,6 +9,7 @@ import org.bukkit.GameMode
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.basic.JailUtils
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+import pl.syntaxdevteam.punisher.common.TeleportUtils
 
 class JailCommand(private val plugin: PunisherX) : BasicCommand {
 
@@ -64,38 +65,11 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         plugin.logger.debug("<yellow>Jail location: ${jailLocation}</yellow>")
 
         targetPlayer?.apply {
-            if (plugin.server.name.contains("Folia")) {
-                Bukkit.getServer().regionScheduler.execute(plugin, jailLocation) {
-                    try {
-                        if (!jailLocation.chunk.isLoaded) {
-                            jailLocation.chunk.load()
-                        }
-
-                        Bukkit.getServer().globalRegionScheduler.execute(plugin) {
-                            teleportAsync(jailLocation).thenAccept { success ->
-                                if (success) {
-                                    plugin.logger.debug("<green>Player successfully teleported to jail.</green>")
-                                } else {
-                                    plugin.logger.debug("<red>Failed to teleport player to jail.</red>")
-                                }
-                            }.exceptionally { throwable ->
-                                plugin.logger.debug("<red>Teleportation error: ${throwable.message}</red>")
-                                null
-                            }
-                        }
-                    } catch (e: Exception) {
-                        plugin.logger.debug("<red>Error in regionScheduler execution: ${e.message}</red>")
-                    }
-                }
-            } else {
-                if (!jailLocation.chunk.isLoaded) {
-                    jailLocation.chunk.load()
-                }
-                try {
-                    teleport(jailLocation)
+            TeleportUtils.teleportSafely(plugin, this, jailLocation) { success ->
+                if (success) {
                     plugin.logger.debug("<green>Player successfully teleported to jail.</green>")
-                } catch (e: Exception) {
-                    plugin.logger.debug("<red>Error while teleporting player: ${e.message}</red>")
+                } else {
+                    plugin.logger.debug("<red>Failed to teleport player to jail.</red>")
                 }
             }
             gameMode = GameMode.ADVENTURE
