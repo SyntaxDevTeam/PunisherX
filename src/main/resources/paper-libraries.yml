@@ -1,7 +1,7 @@
 libraries:
   - org.eclipse.aether:aether-api:1.1.0
   - org.yaml:snakeyaml:2.5
-  - com.google.code.gson:gson:2.13.1
+  - com.google.code.gson:gson:2.13.2
   - net.kyori:adventure-text-minimessage:4.24.0
   - net.kyori:adventure-text-serializer-gson:4.24.0
   - net.kyori:adventure-text-serializer-legacy:4.24.0
@@ -10,10 +10,6 @@ libraries:
   - net.kyori:adventure-nbt:4.24.0
   - com.maxmind.geoip2:geoip2:4.4.0
   - org.apache.ant:ant:1.10.15
-  - org.mariadb.jdbc:mariadb-java-client:3.5.5
-  - org.xerial:sqlite-jdbc:3.50.3.0
-  - org.postgresql:postgresql:42.7.7
-  - com.h2database:h2:2.3.232
   - com.zaxxer:HikariCP:7.0.2
   - com.github.ben-manes.caffeine:caffeine:3.2.2
   - pl.syntaxdevteam:core:1.2.4-SNAPSHOT
