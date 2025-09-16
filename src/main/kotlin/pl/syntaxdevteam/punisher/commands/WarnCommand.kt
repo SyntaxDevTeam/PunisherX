@@ -18,7 +18,8 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                     val player = args[0]
                     val uuid = plugin.uuidManager.getUUID(player)
                     val targetPlayer = Bukkit.getPlayer(uuid)
-                    if (targetPlayer != null && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_WARN)) {
+                    val isForce = args.contains("--force")
+                    if (!isForce && targetPlayer != null && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_WARN)) {
                         stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
                         return
                     }
@@ -27,10 +28,10 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                     try {
                         gtime = args[1]
                         plugin.timeHandler.parseTime(gtime)
-                        reason = args.slice(2 until args.size).joinToString(" ")
-                    } catch (e: NumberFormatException) {
+                        reason = args.slice(2 until args.size).filterNot { it == "--force" }.joinToString(" ")
+                    } catch (_: NumberFormatException) {
                         gtime = null
-                        reason = args.slice(1 until args.size).joinToString(" ")
+                        reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
                     }
 
                     val punishmentType = "WARN"
@@ -77,6 +78,9 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                         if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_WARN)) {
                             broadcastMessages.forEach { onlinePlayer.sendMessage(it) }
                         }
+                    }
+                    if (isForce) {
+                        plugin.logger.warning("Force-warned by ${stack.sender.name} on $player")
                     }
                     executeWarnAction(player, warnCount)
                 }
