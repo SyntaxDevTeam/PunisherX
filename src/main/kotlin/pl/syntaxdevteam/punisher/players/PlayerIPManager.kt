@@ -1,8 +1,6 @@
 package pl.syntaxdevteam.punisher.players
 
 import pl.syntaxdevteam.punisher.PunisherX
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import java.io.File
 import java.security.Key
@@ -12,7 +10,7 @@ import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 import kotlin.text.Charsets.UTF_8
 
-class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHandler) : Listener {
+class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHandler) {
 
     data class PlayerInfo(
         val playerName: String,
@@ -38,8 +36,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         }
     }
 
-    @EventHandler
-    fun onPlayerJoin(event: PlayerJoinEvent) {
+    fun handlePlayerJoin(event: PlayerJoinEvent) {
         val player = event.player
         val playerName = player.name
         val playerUUID = player.uniqueId.toString()

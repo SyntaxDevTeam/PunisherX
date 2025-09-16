@@ -20,6 +20,7 @@ import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
 import pl.syntaxdevteam.punisher.listeners.LegacyLoginListener
 import pl.syntaxdevteam.punisher.listeners.ModernLoginListener
+import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
 import pl.syntaxdevteam.punisher.placeholders.PlaceholderHandler
 import pl.syntaxdevteam.punisher.players.*
 import java.io.File
@@ -97,6 +98,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.hookHandler = HookHandler(plugin)
         plugin.discordWebhook = DiscordWebhook(plugin)
         plugin.playerIPManager = PlayerIPManager(plugin, plugin.geoIPHandler)
+        plugin.punishmentChecker = PunishmentChecker(plugin)
         checkLegacyPlaceholders()
     }
 
@@ -113,8 +115,9 @@ class PluginInitializer(private val plugin: PunisherX) {
      * Registers the plugin events.
      */
     private fun registerEvents() {
-        plugin.server.pluginManager.registerEvents(plugin.playerIPManager, plugin)
-        plugin.server.pluginManager.registerEvents(PunishmentChecker(plugin), plugin)
+        plugin.playerJoinListener = PlayerJoinListener(plugin.playerIPManager, plugin.punishmentChecker)
+        plugin.server.pluginManager.registerEvents(plugin.playerJoinListener, plugin)
+        plugin.server.pluginManager.registerEvents(plugin.punishmentChecker, plugin)
         plugin.versionChecker = VersionChecker(plugin)
         if (plugin.versionChecker.isAtLeast("1.21.7")) {
             plugin.server.pluginManager.registerEvents(ModernLoginListener(plugin), plugin)

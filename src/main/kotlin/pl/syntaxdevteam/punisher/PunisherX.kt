@@ -27,6 +27,7 @@ import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
 import pl.syntaxdevteam.punisher.loader.PluginInitializer
 import pl.syntaxdevteam.punisher.loader.VersionChecker
+import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
 import java.io.File
 import java.util.*
 
@@ -42,6 +43,8 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var pluginConfig: FileConfiguration
     lateinit var statsCollector: StatsCollector
 
+    lateinit var punishmentChecker: PunishmentChecker
+    lateinit var playerJoinListener: PlayerJoinListener
 
     lateinit var databaseHandler: DatabaseHandler
     lateinit var timeHandler: TimeHandler
@@ -136,10 +139,14 @@ class PunisherX : JavaPlugin(), Listener {
         )
 
         discordWebhook = DiscordWebhook(this)
-        HandlerList.unregisterAll(playerIPManager)
+        HandlerList.unregisterAll(playerJoinListener)
+        HandlerList.unregisterAll(punishmentChecker)
         geoIPHandler = GeoIPHandler(this)
         playerIPManager = PlayerIPManager(this, geoIPHandler)
-        server.pluginManager.registerEvents(playerIPManager, this)
+        punishmentChecker = PunishmentChecker(this)
+        playerJoinListener = PlayerJoinListener(playerIPManager, punishmentChecker)
+        server.pluginManager.registerEvents(playerJoinListener, this)
+        server.pluginManager.registerEvents(punishmentChecker, this)
     }
 
     /**

@@ -6,7 +6,6 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -23,8 +22,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
     private val updateChecker = SyntaxCore.updateChecker
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    fun onPlayerJoin(event: PlayerJoinEvent) {
+    fun handlePlayerJoin(event: PlayerJoinEvent) {
         val player    = event.player
         val name      = player.name
         val uuid      = plugin.uuidManager.getUUID(name)
@@ -56,8 +54,18 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                     return
                 }
             }
-
-            scheduleTeleport(player, targetLoc, targetMode)
+            val world = targetLoc.world ?: run {
+                plugin.logger.warning("Brak świata dla $targetLoc")
+                return
+            }
+            TeleportUtils.teleportSafely(plugin, player, targetLoc) { success ->
+                if (success) {
+                    player.gameMode = targetMode
+                    plugin.logger.debug("Player ${player.name} teleported to $targetLoc and set to $targetMode")
+                } else {
+                    plugin.logger.debug("<red>Failed to teleport ${player.name} to $targetLoc.</red>")
+                }
+            }
             plugin.logger.debug("Scheduling teleport of $name to $targetLoc with gamemode $targetMode (jailed=$isJailed)")
         }
 
@@ -66,21 +74,6 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             plugin.logger.debug("Checking for updates for player: $name")
         } else {
             plugin.logger.debug("Player $name does not have permission to see updates.")
-        }
-    }
-
-    private fun scheduleTeleport(player: Player, targetLoc: Location, mode: GameMode) {
-        val world = targetLoc.world ?: run {
-            plugin.logger.warning("Brak świata dla $targetLoc")
-            return
-        }
-        TeleportUtils.teleportSafely(plugin, player, targetLoc) { success ->
-            if (success) {
-                player.gameMode = mode
-                plugin.logger.debug("Player ${player.name} teleported to $targetLoc and set to $mode")
-            } else {
-                plugin.logger.debug("<red>Failed to teleport ${player.name} to $targetLoc.</red>")
-            }
         }
     }
 
