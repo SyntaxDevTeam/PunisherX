@@ -14,7 +14,6 @@ import kotlin.text.Charsets.UTF_8
 
 class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHandler) : Listener {
 
-    // Data class reprezentująca pojedynczy wpis
     data class PlayerInfo(
         val playerName: String,
         val playerUUID: String,
@@ -30,7 +29,6 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
     private val useDatabase = plugin.config.getString("playerCache.storage")
         ?.equals("database", ignoreCase = true) == true
 
-    // Ustalony separator – używamy znaku, który nie występuje w danych
     private val separator = "|"
 
     init {
@@ -99,7 +97,6 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         }
     }
 
-    // Zwraca listę rekordów jako obiekty PlayerInfo
     fun getAllDecryptedRecords(): List<PlayerInfo> {
         return readLines().mapNotNull { line ->
             try {
@@ -112,7 +109,6 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         }
     }
 
-    // Pobiera tylko IP na podstawie nazwy gracza – wyodrębnia odpowiednie pole
     fun getPlayerIPByName(playerName: String): String? {
         plugin.logger.debug("Fetching IP for player: $playerName")
         val info = searchCache(playerName, "", "")
@@ -121,7 +117,6 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         return ip
     }
 
-    // Pobiera tylko IP na podstawie UUID
     fun getPlayerIPByUUID(playerUUID: String): String? {
         plugin.logger.debug("Fetching IP for UUID: $playerUUID")
         val info = searchCache("", playerUUID, "")
@@ -130,7 +125,6 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         return ip
     }
 
-    // Pobiera wszystkie IP na podstawie nazwy gracza
     fun getPlayerIPsByName(playerName: String): List<String> {
         plugin.logger.debug("Fetching all IPs for player: $playerName")
         return getAllDecryptedRecords()
@@ -139,7 +133,6 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
             .also { plugin.logger.debug("Found IPs for player $playerName: $it") }
     }
 
-    // Pobiera wszystkie IP na podstawie UUID
     fun getPlayerIPsByUUID(playerUUID: String): List<String> {
         plugin.logger.debug("Fetching all IPs for UUID: $playerUUID")
         return getAllDecryptedRecords()
@@ -159,7 +152,6 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         plugin.logger.debug("Removed player info for UUID: $playerUUID")
     }
 
-    // Przeszukuje cache i zwraca obiekt PlayerInfo, jeśli znajdzie pasujący rekord
     private fun searchCache(playerName: String, playerUUID: String, playerIP: String): PlayerInfo? {
         plugin.logger.debug("Searching cache")
         val lines = readLines()
@@ -186,7 +178,6 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         return getAllDecryptedRecords().filter { it.playerIP.equals(targetIP, ignoreCase = true) }
     }
 
-    // Pomocnicza metoda do parsowania odszyfrowanego ciągu na obiekt PlayerInfo
     private fun parsePlayerInfo(decryptedLine: String): PlayerInfo? {
         val parts = decryptedLine.split(separator).map { it.trim() }
         return if (parts.size >= 5) {
