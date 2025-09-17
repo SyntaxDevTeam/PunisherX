@@ -54,7 +54,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                     return
                 }
             }
-            val world = targetLoc.world ?: run {
+            if (targetLoc.world == null) {
                 plugin.logger.warning("Brak świata dla $targetLoc")
                 return
             }
@@ -181,18 +181,13 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         }
 
         val radius = plugin.config.getDouble("jail.radius", 10.0)
-        if (plugin.server.name.contains("Folia")) {
-            Bukkit.getServer().regionScheduler.execute(plugin, jailLocation) {
-                try {
-                    val isInJail = isPlayerInJail(player.location, jailLocation, radius)
-                    if (!isInJail) {
-                        Bukkit.getServer().globalRegionScheduler.execute(plugin) {
-                            player.teleportAsync(jailLocation).thenAccept { success ->
-                                if (success) {
-                                    val message = plugin.messageHandler.getMessage(
-                                        "jail",
-                                        "jail_restrict_message",
-                                        mapOf()
+                if (isPlayerInJail(player.location, jailLocation, radius)) {
+            return
+        }
+
+        TeleportUtils.teleportSafely(plugin, player, jailLocation) { success ->
+            if (success) {
+                val message = plugin.messageHandler.getMessage("jail", "jail_restrict_message", emptyMap())
                                     )
                                     player.sendMessage(message)
                                 } else {
@@ -213,6 +208,8 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                 player.teleport(jailLocation)
                 val message = plugin.messageHandler.getMessage("jail", "jail_restrict_message", mapOf())
                 player.sendMessage(message)
+            } else {
+                plugin.logger.debug("<red>Failed to teleport ${player.name} back to jail.</red>")
             }
         }
     }
