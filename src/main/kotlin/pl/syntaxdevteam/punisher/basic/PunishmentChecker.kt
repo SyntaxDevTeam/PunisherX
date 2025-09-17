@@ -188,7 +188,6 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         TeleportUtils.teleportSafely(plugin, player, jailLocation) { success ->
             if (success) {
                 val message = plugin.messageHandler.getMessage("jail", "jail_restrict_message", emptyMap())
-                                    )
                                     player.sendMessage(message)
                                 } else {
                                     plugin.logger.debug("<red>Failed to teleport player back to jail in Folia.</red>")
