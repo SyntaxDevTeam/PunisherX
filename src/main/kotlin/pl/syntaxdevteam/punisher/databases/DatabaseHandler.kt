@@ -615,6 +615,15 @@ class DatabaseHandler(private val plugin: PunisherX) {
                 DatabaseType.POSTGRESQL -> "SERIAL PRIMARY KEY"
                 else -> "INT AUTO_INCREMENT PRIMARY KEY"
             }
+            val tables = listOf("punishments", "punishmenthistory")
+            tables.forEach { table ->
+                try {
+                    targetDb.execute("DROP TABLE IF EXISTS $table")
+                } catch (dropError: Exception) {
+                    logger.warning("Unable to drop table '$table' before migration: ${dropError.message}")
+                }
+            }
+
             val punishmentSchema = TableSchema(
                 "punishments",
                 listOf(
@@ -635,9 +644,17 @@ class DatabaseHandler(private val plugin: PunisherX) {
             val lines = backupFile.readLines()
             val sql = StringBuilder()
             for (line in lines) {
+                val trimmedLine = line.trim()
+                if (trimmedLine.isEmpty() || trimmedLine.startsWith("--")) {
+                    continue
+                }
+
                 sql.append(line)
-                if (line.trim().endsWith(";")) {
-                    targetDb.execute(sql.toString())
+                if (trimmedLine.endsWith(";")) {
+                    val statement = sql.toString().trim()
+                    if (statement.isNotEmpty()) {
+                        targetDb.execute(statement)
+                    }
                     sql.setLength(0)
                 }
             }
