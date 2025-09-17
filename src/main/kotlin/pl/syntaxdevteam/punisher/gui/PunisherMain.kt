@@ -92,9 +92,9 @@ class PunisherMain(plugin: PunisherX) : BaseGUI(plugin) {
 
         if (slot !in 0 until topSize) return
 
-        val entry = menuEntries.firstOrNull { it.slot == slot } ?: return
-
         event.isCancelled = true
+
+        val entry = menuEntries.firstOrNull { it.slot == slot } ?: return
         val player = event.whoClicked as? Player ?: return
         entry.onClick(player)
     }
