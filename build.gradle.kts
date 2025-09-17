@@ -60,11 +60,16 @@ dependencies {
     compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
     compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.15")
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.2")
+
+    testImplementation(kotlin("test"))
 }
 
 tasks {
     build {
         dependsOn(shadowJar)
+    }
+    test {
+        useJUnitPlatform()
     }
     runServer {
         minecraftVersion("1.21.8")

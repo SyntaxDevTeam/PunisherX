@@ -5,7 +5,15 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-class TimeHandler(private val plugin: PunisherX) {
+class TimeHandler(
+    private val messageProvider: MessageProvider,
+    private val currentTime: () -> Long = System::currentTimeMillis
+) {
+
+    constructor(plugin: PunisherX) : this(
+        MessageProvider { path, key -> plugin.messageHandler.getCleanMessage(path, key) },
+        System::currentTimeMillis
+    )
 
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
@@ -23,7 +31,7 @@ class TimeHandler(private val plugin: PunisherX) {
     }
 
     fun formatTime(time: String?): String {
-        if (time == null) return plugin.messageHandler.getCleanMessage("formatTime", "undefined")
+        if (time == null) return messageProvider.getCleanMessage("formatTime", "undefined")
 
         val isNumeric = time.all { it.isDigit() }
         if (isNumeric) {
@@ -55,7 +63,7 @@ class TimeHandler(private val plugin: PunisherX) {
             'm' -> "$amount ${getLocalizedMessage("minute", amount)}"
             'h' -> "$amount ${getLocalizedMessage("hour", amount)}"
             'd' -> "$amount ${getLocalizedMessage("day", amount)}"
-            else -> plugin.messageHandler.getCleanMessage("formatTime", "undefined")
+            else -> messageProvider.getCleanMessage("formatTime", "undefined")
         }
     }
 
@@ -69,8 +77,8 @@ class TimeHandler(private val plugin: PunisherX) {
     }
 
     fun getOfflineDuration(lastUpdated: String): String {
-        val ts = parseDate(lastUpdated) ?: return plugin.messageHandler.getCleanMessage("error", "no_data")
-        var seconds = ((System.currentTimeMillis() - ts) / 1000).coerceAtLeast(0)
+        val ts = parseDate(lastUpdated) ?: return messageProvider.getCleanMessage("error", "no_data")
+        var seconds = ((currentTime() - ts) / 1000).coerceAtLeast(0)
         val years = seconds / (60 * 60 * 24 * 365)
         seconds %= 60 * 60 * 24 * 365
         val months = seconds / (60 * 60 * 24 * 30)
@@ -97,9 +105,13 @@ class TimeHandler(private val plugin: PunisherX) {
     private fun getLocalizedMessage(unit: String, amount: Long): String {
         val unitPath = "formatTime.$unit"
         return when (amount) {
-            1L -> plugin.messageHandler.getCleanMessage(unitPath, "one")
-            in 2..4 -> plugin.messageHandler.getCleanMessage(unitPath, "few")
-            else -> plugin.messageHandler.getCleanMessage(unitPath, "many")
+            1L -> messageProvider.getCleanMessage(unitPath, "one")
+            in 2..4 -> messageProvider.getCleanMessage(unitPath, "few")
+            else -> messageProvider.getCleanMessage(unitPath, "many")
         }
+    }
+
+    fun interface MessageProvider {
+        fun getCleanMessage(path: String, key: String): String
     }
 }
