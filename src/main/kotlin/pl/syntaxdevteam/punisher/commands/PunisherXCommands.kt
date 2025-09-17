@@ -185,7 +185,10 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             return baseSuggestions
         }
         if (args.size in 2..3 && args[0].equals("migrate", ignoreCase = true)) {
-            val types = DatabaseType.values().map { it.name.lowercase() }
+            //val types = DatabaseType.values().map { it.name.lowercase() }
+            val types = DatabaseType::class.java.enumConstants
+                ?.map { it.name.lowercase() }
+                ?: emptyList()
             val current = args[args.size - 1]
             return types.filter { it.startsWith(current.lowercase()) }
         }
