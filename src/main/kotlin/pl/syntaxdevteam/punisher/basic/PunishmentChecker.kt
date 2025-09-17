@@ -181,34 +181,16 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         }
 
         val radius = plugin.config.getDouble("jail.radius", 10.0)
-                if (isPlayerInJail(player.location, jailLocation, radius)) {
+        if (isPlayerInJail(player.location, jailLocation, radius)) {
             return
         }
 
         TeleportUtils.teleportSafely(plugin, player, jailLocation) { success ->
             if (success) {
                 val message = plugin.messageHandler.getMessage("jail", "jail_restrict_message", emptyMap())
-                                    player.sendMessage(message)
-                                } else {
-                                    plugin.logger.debug("<red>Failed to teleport player back to jail in Folia.</red>")
-                                }
-                            }.exceptionally { throwable ->
-                                plugin.logger.debug("<red>Error while teleporting back to jail: ${throwable.message}</red>")
-                                null
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    plugin.logger.debug("<red>Error while checking player in jail: ${e.message}</red>")
-                }
-            }
-        } else {
-            if (!isPlayerInJail(player.location, jailLocation, radius)) {
-                player.teleport(jailLocation)
-                val message = plugin.messageHandler.getMessage("jail", "jail_restrict_message", mapOf())
                 player.sendMessage(message)
             } else {
-                plugin.logger.debug("<red>Failed to teleport ${player.name} back to jail.</red>")
+                plugin.logger.debug("<red>Failed to teleport player back to jail.</red>")
             }
         }
     }
