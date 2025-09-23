@@ -5,29 +5,46 @@ import com.google.gson.JsonObject
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URI
-import java.util.*
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
+import java.time.Duration
+import java.util.Locale
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 class UUIDManager(private val plugin: PunisherX) {
-    private val activeUUIDs: MutableMap<String, UUID> = HashMap()
+    private data class CachedUuid(val value: UUID, val expiresAt: Long) {
+        fun isExpired(now: Long): Boolean = now > expiresAt
+    }
+
+    private val cacheTtl = Duration.ofHours(6).toMillis()
+    private val activeUUIDs: MutableMap<String, CachedUuid> = ConcurrentHashMap()
     private val gson = Gson()
 
     fun getUUID(playerName: String): UUID {
+        val now = System.currentTimeMillis()
+        val key = playerName.lowercase(Locale.ROOT)
+        activeUUIDs[key]?.takeUnless { it.isExpired(now) }?.let { return it.value }
         val player: Player? = Bukkit.getPlayer(playerName)
         if (player != null) {
-            return player.uniqueId
+            return remember(key, player.uniqueId)
         }
         val offlinePlayer: OfflinePlayer = Bukkit.getOfflinePlayer(playerName)
         if (offlinePlayer.hasPlayedBefore()) {
-            return offlinePlayer.uniqueId
+            return remember(key, offlinePlayer.uniqueId)
         }
         val uuid = fetchUUIDFromAPI(playerName)
             ?: fetchUUIDFromPlayerDB(playerName)
             ?: generateOfflineUUID(playerName)
-        return uuid
+        return remember(key, uuid)
+    }
+
+    fun getCachedUUID(playerName: String): UUID? {
+        val now = System.currentTimeMillis()
+        val key = playerName.lowercase(Locale.ROOT)
+        return activeUUIDs[key]?.takeUnless { it.isExpired(now) }?.value
     }
 
     private fun fetchUUIDFromAPI(playerName: String): UUID? {
@@ -48,9 +65,6 @@ class UUIDManager(private val plugin: PunisherX) {
 
                 val uuid = parseUUIDFromResponse(response)
                 plugin.logger.debug("parseUUIDFromResponse(response): $uuid")
-                if (uuid != null) {
-                    activeUUIDs[playerName.lowercase(Locale.getDefault())] = uuid
-                }
                 uuid
             } else {
                 plugin.logger.err("Failed to fetch UUID from API. Response code: ${connection.responseCode}")
@@ -82,9 +96,6 @@ class UUIDManager(private val plugin: PunisherX) {
                     "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)".toRegex(),
                     "$1-$2-$3-$4-$5"
                 ))
-                if (uuid != null) {
-                    activeUUIDs[playerName.lowercase(Locale.getDefault())] = uuid
-                }
                 uuid
             } else {
                 plugin.logger.err("Failed to fetch UUID from PlayerDB API. Response code: ${connection.responseCode}")
@@ -115,5 +126,10 @@ class UUIDManager(private val plugin: PunisherX) {
         val offlineUUID = UUID.nameUUIDFromBytes("OfflinePlayer:$playerName".toByteArray())
         plugin.logger.debug("Generated offline UUID for $playerName: $offlineUUID")
         return offlineUUID
+    }
+
+    private fun remember(key: String, uuid: UUID): UUID {
+        activeUUIDs[key] = CachedUuid(uuid, System.currentTimeMillis() + cacheTtl)
+        return uuid
     }
 }
