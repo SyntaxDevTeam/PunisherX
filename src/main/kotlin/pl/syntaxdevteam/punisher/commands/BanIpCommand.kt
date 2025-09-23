@@ -45,7 +45,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
             IP_REGEX.matches(rawTarget) -> plugin.playerIPManager.getAllDecryptedRecords()
                 .find { it.playerIP == rawTarget }
                 ?.let { UUID.fromString(it.playerUUID) }
-            else -> plugin.uuidManager.getUUID(rawTarget)
+            else -> plugin.resolvePlayerUuid(rawTarget)
         }
         val targetPlayer: Player? = targetUUID?.let { Bukkit.getPlayer(it) }
 

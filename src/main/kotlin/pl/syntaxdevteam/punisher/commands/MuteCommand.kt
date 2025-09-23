@@ -30,7 +30,7 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                             return
                         }
                     }
-                    val uuid = plugin.uuidManager.getUUID(player).toString()
+                    val uuid = plugin.resolvePlayerUuid(player).toString()
 
                     var gtime: String?
                     var reason: String

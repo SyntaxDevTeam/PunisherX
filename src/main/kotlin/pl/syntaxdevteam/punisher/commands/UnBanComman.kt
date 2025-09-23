@@ -26,7 +26,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        val uuid = plugin.uuidManager.getUUID(playerOrIpOrUUID).toString()
+        val uuid = plugin.resolvePlayerUuid(playerOrIpOrUUID).toString()
 
         plugin.logger.debug("UUID for player $playerOrIpOrUUID: [$uuid]")
 

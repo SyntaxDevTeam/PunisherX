@@ -13,7 +13,6 @@ import pl.syntaxdevteam.punisher.basic.TimeHandler
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigHandler
-import pl.syntaxdevteam.punisher.common.UUIDManager
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import pl.syntaxdevteam.punisher.gui.interfaces.GUIHandler
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
@@ -31,7 +30,7 @@ class PluginInitializer(private val plugin: PunisherX) {
     fun onEnable() {
         setUpLogger()
         setupConfig()
-        setupUUID()
+
         setupDatabase()
         setupHandlers()
         registerEvents()
@@ -56,14 +55,6 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.saveDefaultConfig()
         plugin.configHandler = ConfigHandler(plugin)
         plugin.configHandler.verifyAndUpdateConfig()
-    }
-
-    /**
-     * Setup players uuid manager
-     *
-     */
-    private fun setupUUID() {
-        plugin.uuidManager = UUIDManager(plugin)
     }
 
     /**

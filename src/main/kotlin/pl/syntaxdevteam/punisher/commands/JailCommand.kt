@@ -25,7 +25,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         val playerName = args[0]
-        val uuid = plugin.uuidManager.getUUID(playerName)
+        val uuid = plugin.resolvePlayerUuid(playerName)
         val targetPlayer = Bukkit.getPlayer(uuid)
         val isForce = args.contains("--force")
 

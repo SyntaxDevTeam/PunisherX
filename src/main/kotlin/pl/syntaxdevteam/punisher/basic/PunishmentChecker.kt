@@ -3,7 +3,6 @@ package pl.syntaxdevteam.punisher.basic
 import io.papermc.paper.event.player.AsyncChatEvent
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
-import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
@@ -25,7 +24,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
     fun handlePlayerJoin(event: PlayerJoinEvent) {
         val player    = event.player
         val name      = player.name
-        val uuid      = plugin.uuidManager.getUUID(name)
+        val uuid      = player.uniqueId
         val radius    = plugin.config.getDouble("jail.radius", 10.0)
         val jailLoc   = JailUtils.getJailLocation(plugin.config)
         val unjailLoc = JailUtils.getUnjailLocation(plugin.config)
@@ -82,7 +81,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         val player = event.player
         val playerName = player.name
         try {
-            val uuid = plugin.uuidManager.getUUID(playerName).toString()
+            val uuid = player.uniqueId.toString()
             val messageComponent = event.message()
             val plainMessage = PlainTextComponentSerializer.plainText().serialize(messageComponent)
 
@@ -128,7 +127,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
     fun onPlayerCommand(event: PlayerCommandPreprocessEvent) {
         try {
             val player = event.player
-            val uuid = plugin.uuidManager.getUUID(player.name).toString()
+            val uuid = player.uniqueId.toString()
             val command = event.message.split(" ")[0].lowercase(Locale.getDefault()).removePrefix("/")
 
             if (plugin.config.getBoolean("mute.pm")) {
@@ -166,7 +165,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerMove(event: PlayerMoveEvent) {
         val player = event.player
-        val uuid = plugin.uuidManager.getUUID(player.name)
+        val uuid = player.uniqueId
         val jailLocation = JailUtils.getJailLocation(plugin.config) ?: return
         val punishmentEnd = plugin.cache.getPunishmentEnd(uuid) ?: return
 

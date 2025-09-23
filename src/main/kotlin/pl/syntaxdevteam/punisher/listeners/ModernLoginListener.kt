@@ -39,7 +39,7 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
         }
 
         try {
-            val uuid = plugin.uuidManager.getUUID(playerName)
+            val uuid = plugin.resolvePlayerUuid(playerName)
             when (val action = evaluatePunishments(uuid, playerName, ip)) {
                 is LoginAction.Allow -> {
                     pendingDecisions.remove(playerName.lowercase(Locale.ROOT))

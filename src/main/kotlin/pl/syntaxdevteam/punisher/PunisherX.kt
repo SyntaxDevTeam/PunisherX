@@ -1,17 +1,18 @@
 package pl.syntaxdevteam.punisher
 
 import io.papermc.paper.event.player.AsyncChatEvent
+import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
-import pl.syntaxdevteam.core.SyntaxCore
-import pl.syntaxdevteam.core.manager.PluginManagerX
-import pl.syntaxdevteam.core.messaging.MessageHandler
-import pl.syntaxdevteam.core.logging.Logger
-import pl.syntaxdevteam.core.stats.StatsCollector
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.event.HandlerList
 import org.bukkit.plugin.ServicePriority
+import pl.syntaxdevteam.core.SyntaxCore
+import pl.syntaxdevteam.core.manager.PluginManagerX
+import pl.syntaxdevteam.core.messaging.MessageHandler
+import pl.syntaxdevteam.core.logging.Logger
+import pl.syntaxdevteam.core.stats.StatsCollector
 import pl.syntaxdevteam.core.update.GitHubSource
 import pl.syntaxdevteam.core.update.ModrinthSource
 import pl.syntaxdevteam.punisher.api.PunisherXApi
@@ -20,7 +21,6 @@ import pl.syntaxdevteam.punisher.basic.*
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigHandler
-import pl.syntaxdevteam.punisher.common.UUIDManager
 import pl.syntaxdevteam.punisher.databases.*
 import pl.syntaxdevteam.punisher.players.*
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
@@ -38,7 +38,6 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var messageHandler: MessageHandler
     lateinit var pluginsManager: PluginManagerX
 
-    lateinit var uuidManager: UUIDManager
     lateinit var configHandler: ConfigHandler
     lateinit var pluginConfig: FileConfiguration
     lateinit var statsCollector: StatsCollector
@@ -101,6 +100,14 @@ class PunisherX : JavaPlugin(), Listener {
     fun getPluginFile(): File {
         return this.file
     }
+
+    fun resolvePlayerUuid(identifier: String): UUID {
+        runCatching { UUID.fromString(identifier) }.getOrNull()?.let { return it }
+        Bukkit.getPlayerUniqueId(identifier)?.let { return it }
+        Bukkit.getOfflinePlayerIfCached(identifier)?.uniqueId?.let { return it }
+        return Bukkit.getOfflinePlayer(identifier).uniqueId
+    }
+
 
     /**
      * Reloads the plugin configuration and reinitializes the database connection.

@@ -16,7 +16,7 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                     stack.sender.sendMessage(plugin.messageHandler.getMessage("warn", "usage"))
                 } else {
                     val player = args[0]
-                    val uuid = plugin.uuidManager.getUUID(player)
+                    val uuid = plugin.resolvePlayerUuid(player)
                     val targetPlayer = Bukkit.getPlayer(uuid)
                     val isForce = args.contains("--force")
                     if (!isForce && targetPlayer != null && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_WARN)) {

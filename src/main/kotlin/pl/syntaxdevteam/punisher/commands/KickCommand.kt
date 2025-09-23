@@ -92,7 +92,7 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        val uuid = plugin.uuidManager.getUUID(targetArg)
+        val uuid = plugin.resolvePlayerUuid(targetArg)
         val targetPlayer = Bukkit.getPlayer(uuid)
 
         if (targetPlayer != null) {

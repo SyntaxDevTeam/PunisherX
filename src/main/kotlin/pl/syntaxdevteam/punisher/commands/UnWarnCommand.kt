@@ -12,7 +12,7 @@ class UnWarnCommand(private val plugin: PunisherX) : BasicCommand {
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNWARN)) {
             if (args.isNotEmpty()) {
                 val player = args[0]
-                val uuid = plugin.uuidManager.getUUID(player).toString()
+                val uuid = plugin.resolvePlayerUuid(player).toString()
                 val punishments = plugin.databaseHandler.getPunishments(uuid)
                 val warnPunishments = punishments.filter { it.type == "WARN" }
                 if (warnPunishments.isNotEmpty()) {

@@ -22,7 +22,7 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                     stack.sender.sendMessage(plugin.messageHandler.getMessage("ban", "usage"))
                 } else {
                     val player = args[0]
-                    val uuid = plugin.uuidManager.getUUID(player)
+                    val uuid = plugin.resolvePlayerUuid(player)
                     val targetPlayer = Bukkit.getPlayer(uuid)
                     val isForce = args.contains("--force")
                     if (targetPlayer != null) {
@@ -55,7 +55,7 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                     if (!success) {
                         plugin.logger.err("Failed to add ban to database for player $player. Using fallback method.")
                         stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "db_error"))
-                        val playerProfile = Bukkit.createProfile(UUID.fromString(uuid.toString()), player)
+                        val playerProfile = Bukkit.createProfile(uuid, player)
                         val banList: ProfileBanList = Bukkit.getBanList(BanListType.PROFILE)
                         val banEndDate = if (gtime != null) Date(System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
                         banList.addBan(playerProfile, reason, banEndDate, stack.sender.name)

@@ -35,7 +35,7 @@ class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion()
     }
 
     private fun getPunishmentEndTime(player: String, punishType: String): String? {
-        val uuid = plugin.uuidManager.getUUID(player)
+        val uuid = plugin.resolvePlayerUuid(player)
         val punishments = plugin.databaseHandler.getPunishments(uuid.toString())
         val punishData = punishments.find { it.type == punishType && it.end > System.currentTimeMillis() } ?: return null
         val punishment = when (punishType) {

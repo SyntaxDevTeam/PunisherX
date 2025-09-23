@@ -23,7 +23,7 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
                 stack.sender.sendMessage(plugin.messageHandler.getMessage("check", "usage"))
             } else {
                 val type = args[1]
-                val uuid = plugin.uuidManager.getUUID(player)
+                val uuid = plugin.resolvePlayerUuid(player)
                 val targetPlayer = when (Bukkit.getPlayer(player)?.name) {
                     null -> Bukkit.getOfflinePlayer(uuid).name
                     else -> Bukkit.getPlayer(player)?.name

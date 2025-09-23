@@ -24,9 +24,9 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         val playerName = args[0]
-        val uuid = plugin.uuidManager.getUUID(playerName)
-
+        val uuid = plugin.resolvePlayerUuid(playerName)
         val player = Bukkit.getPlayer(uuid)
+
         if (player != null) {
 
             val spawnLocation = JailUtils.getUnjailLocation(plugin.config) ?: return

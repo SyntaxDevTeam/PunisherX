@@ -13,7 +13,7 @@ class ClearAllCommand(private val plugin: PunisherX) : BasicCommand {
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.CLEAR_ALL)) {
             if (args.isNotEmpty()) {
                 val player = args[0]
-                val uuid = plugin.uuidManager.getUUID(player).toString()
+                val uuid = plugin.resolvePlayerUuid(player).toString()
                 val punishments = plugin.databaseHandler.getPunishments(uuid)
                 if (punishments.isNotEmpty()) {
                     punishments.forEach { punishment ->
