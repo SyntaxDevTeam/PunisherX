@@ -17,4 +17,3 @@ libraries:
   - com.h2database:h2:2.3.232
   - com.github.ben-manes.caffeine:caffeine:3.2.2
   - pl.syntaxdevteam:core:1.2.4-SNAPSHOT
-  - pl.syntaxdevteam.license:license-client:0.1.0
