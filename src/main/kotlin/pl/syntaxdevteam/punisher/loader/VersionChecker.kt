@@ -17,7 +17,8 @@ class VersionChecker(private val plugin: PunisherX) {
             "1.21.5",
             "1.21.6",
             "1.21.7",
-            "1.21.8"
+            "1.21.8",
+            "1.21.9"
         )
     }
 
