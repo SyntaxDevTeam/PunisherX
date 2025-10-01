@@ -79,12 +79,21 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
     private fun encrypt(data: String): String {
         val cipher = Cipher.getInstance("AES")
         cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-        return cipher.doFinal(data.toByteArray(UTF_8)).joinToString("") { "%02x".format(it) }
+        return cipher.doFinal(data.toByteArray(UTF_8)).toHexString()
     }
 
     private fun decrypt(data: String): String {
+        if (data.isBlank()) {
+            return ""
+        }
+
+        if (data.length % 2 != 0) {
+            plugin.logger.err("Failed to decrypt data: invalid hex length -> $data")
+            return ""
+        }
+
         return try {
-            val bytes = data.chunked(2).map { it.toInt(16).toByte() }.toByteArray()
+            val bytes = hexStringToByteArray(data)
             val cipher = Cipher.getInstance("AES")
             cipher.init(Cipher.DECRYPT_MODE, secretKey)
             String(cipher.doFinal(bytes), UTF_8)

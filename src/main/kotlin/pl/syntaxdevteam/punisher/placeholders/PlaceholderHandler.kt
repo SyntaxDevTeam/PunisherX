@@ -4,7 +4,6 @@ import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
 import me.clip.placeholderapi.expansion.PlaceholderExpansion
 
-@Suppress("UnstableApiUsage")
 class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion() {
 
     override fun getIdentifier(): String {
