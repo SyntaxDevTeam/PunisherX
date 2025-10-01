@@ -123,8 +123,9 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                 val command = plugin.config.getString("warn.actions.$key")
                 if (command != null) {
                     val formattedCommand = command.replace("{player}", player).replace("{warn_no}", warnCount.toString())
+                    val filtredCommand = formattedCommand.replace (" --force", "" )
                     plugin.server.dispatchCommand(plugin.server.consoleSender, formattedCommand)
-                    plugin.logger.debug("Executed command for $player: $formattedCommand")
+                    plugin.logger.debug("Executed command for $player: $filtredCommand")
                 }
             }
         }
