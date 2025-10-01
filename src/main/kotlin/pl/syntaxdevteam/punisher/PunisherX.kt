@@ -21,6 +21,7 @@ import pl.syntaxdevteam.punisher.basic.*
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigHandler
+import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.databases.*
 import pl.syntaxdevteam.punisher.players.*
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
@@ -57,6 +58,7 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var commandManager: CommandManager
     lateinit var playerIPManager: PlayerIPManager
     lateinit var versionChecker: VersionChecker
+    lateinit var versionCompatibility: VersionCompatibility
 
 
     /**

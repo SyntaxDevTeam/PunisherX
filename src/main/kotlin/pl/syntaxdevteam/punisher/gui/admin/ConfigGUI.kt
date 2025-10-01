@@ -17,7 +17,13 @@ class ConfigGUI(plugin: PunisherX) : BaseGUI(plugin) {
         inventory.fillWithFiller()
 
         inventory.setItem(20, createItem(Material.COMPASS, mH.getCleanMessage("GUI", "Config.setspawn")))
-        inventory.setItem(24, createItem(Material.CHAIN, mH.getCleanMessage("GUI", "Config.setjail")))
+        inventory.setItem(
+            24,
+            createItem(
+                plugin.versionCompatibility.resolveMaterial("CHAIN", "IRON_BARS"),
+                mH.getCleanMessage("GUI", "Config.setjail")
+            )
+        )
         inventory.setItem(40, createNavItem(Material.BARRIER, mH.getCleanMessage("GUI", "Nav.back")))
         player.openInventory(inventory)
     }

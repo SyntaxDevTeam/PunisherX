@@ -14,6 +14,7 @@ import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigHandler
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
+import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.gui.interfaces.GUIHandler
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
@@ -90,6 +91,8 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.discordWebhook = DiscordWebhook(plugin)
         plugin.playerIPManager = PlayerIPManager(plugin, plugin.geoIPHandler)
         plugin.punishmentChecker = PunishmentChecker(plugin)
+        plugin.versionChecker = VersionChecker(plugin)
+        plugin.versionCompatibility = VersionCompatibility(plugin.versionChecker)
         checkLegacyPlaceholders()
     }
 
@@ -106,11 +109,14 @@ class PluginInitializer(private val plugin: PunisherX) {
      * Registers the plugin events.
      */
     private fun registerEvents() {
+        val versionChecker = runCatching { plugin.versionChecker }
+            .getOrElse {
+                VersionChecker(plugin).also { plugin.versionChecker = it }
+            }
         plugin.playerJoinListener = PlayerJoinListener(plugin.playerIPManager, plugin.punishmentChecker)
         plugin.server.pluginManager.registerEvents(plugin.playerJoinListener, plugin)
         plugin.server.pluginManager.registerEvents(plugin.punishmentChecker, plugin)
-        plugin.versionChecker = VersionChecker(plugin)
-        if (plugin.versionChecker.isAtLeast("1.21.7")) {
+        if (versionChecker.isAtLeast("1.21.7")) {
             plugin.server.pluginManager.registerEvents(ModernLoginListener(plugin), plugin)
             plugin.logger.debug("Registered ModernLoginListener for 1.21.7+")
         } else {

@@ -42,29 +42,11 @@ class VersionChecker(private val plugin: PunisherX) {
         }
     }
 
+    fun getSemanticVersion(): SemanticVersion = SemanticVersion.parse(getServerVersion())
+
     fun isAtLeast(minVersion: String): Boolean {
-        val current = getServerVersion().normalizeVersion()
-        val required = minVersion.normalizeVersion()
-        return compareVersions(current, required) >= 0
-    }
-
-    private fun compareVersions(a: List<Int>, b: List<Int>): Int {
-        for (i in 0..2) {
-            val cmp = a.getOrElse(i) { 0 }.compareTo(b.getOrElse(i) { 0 })
-            if (cmp != 0) return cmp
-        }
-        return 0
-    }
-
-    private fun String.normalizeVersion(): List<Int> {
-        return this.split(".")
-            .map { it.toIntOrNull() ?: 0 }
-            .let {
-                when (it.size) {
-                    1 -> listOf(it[0], 0, 0)
-                    2 -> listOf(it[0], it[1], 0)
-                    else -> listOf(it[0], it[1], it[2])
-                }
-            }
+        val current = getSemanticVersion()
+        val required = SemanticVersion.parse(minVersion)
+        return current >= required
     }
 }
