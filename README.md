@@ -10,7 +10,7 @@ It also offers a complete message file for full translation and customization, s
 A detailed configuration file and support for various database types (MySQL/MariaDB, PostgreSQL for multi-server sync, and SQLite/H2 for high-performance standalone use) make it flexible and production-ready.
 
 ## ✅ Key Features
-* [x] Built specifically for Paper 1.20.6, 1.21+, and compatible forks.
+* [x] Built specifically for Paper 1.20.6-1.21.8, and compatible forks.
 * [x] Actively maintained with up-to-date APIs and full backward compatibility.
 * [x] Language file with full **MiniMessage** and Legacy formatting support.
 * [x] Support for Discord webhook integration.
