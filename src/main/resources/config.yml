@@ -76,6 +76,8 @@ jail:
     x: 100.0
     y: 64.0
     z: 200.0
+    yaw: 0.0
+    pitch: 0.0
   radius: 5
 
 spawn:
@@ -85,6 +87,8 @@ spawn:
     x: 0.0
     y: 64.0
     z: 0.0
+    yaw: 0.0
+    pitch: 0.0
   # Experimental setting (may not work properly).
   use_external_set:
     enabled: false

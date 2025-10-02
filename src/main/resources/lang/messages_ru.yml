@@ -34,6 +34,7 @@ jail:
   jail: "<green>Вы посадили игрока <gold><player></gold> в тюрьму за <gold><reason></gold> на <gold><time></gold></green>"
   usage: "Правильное использование: <gold>/jail <игрок> (время) <причина>"
   jail_message: "<red>Вы были посажены в тюрьму за <b><reason></b> на <b><time></b></red>"
+  teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
   mute_info_message: "<red>Вы пытаетесь говорить, но из тюрьмы вас никто не слышит</red>"
   jail_restrict_message: "Запрещено покидать территорию тюрьмы. Вы были телепортированы обратно в назначенное место."
   broadcast: "<dark_gray>Игрок <gray><player></gray> был посажен в тюрьму за <gray><reason></gray> на <gray><time></gray></dark_gray>"
@@ -59,6 +60,7 @@ unjail:
   unjail: "<green>Вы освободили игрока <gold><player></gold> из тюрьмы</green>"
   usage: "Правильное использование: <gold>/unjail <игрок>"
   unjail_message: "<green>Ваш срок заключения закончился! Не упустите этот шанс!</green>"
+  teleport_failed: "<red>Teleportation cancelled: the configured spawn location is unsafe.</red>"
   success: "<green>Игрок <gold><player></gold> был успешно освобождён из тюрьмы."
   broadcast: "Игрок <gold><player></gold> был освобождён из тюрьмы. Лучше поберегитесь..."
 

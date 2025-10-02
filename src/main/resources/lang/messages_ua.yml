@@ -37,6 +37,7 @@ jail:
   jail: "<green>Ви ув'язнили гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
   usage: "Правильне використання: <gold>/jail <нік_гравця> (час) <причина>"
   jail_message: "<red>Вас було ув'язнено за <b><reason></b> на <b><time></b></red>"
+  teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
   mute_info_message: "<red>Ви намагаєтесь щось сказати, але з в'язниці вас ніхто не чує...</red>"
   jail_restrict_message: "Покидати територію в'язниці заборонено. Вас телепортовано назад у визначене місце."
   broadcast: "<dark_gray>Гравець <gray><player></gray> був ув'язнений за <gray><reason></gray> на <gray><time></gray></dark_gray>"
@@ -62,6 +63,7 @@ unjail:
   unjail: "<green>Ви звільнили гравця <gold><player></gold> з в'язниці</green>"
   usage: "Правильне використання: <gold>/unjail <нік_гравця>"
   unjail_message: "<green>Ваш термін у в'язниці закінчився! Не марнуйте цей шанс!</green>"
+  teleport_failed: "<red>Teleportation cancelled: the configured spawn location is unsafe.</red>"
   success: "<green>Гравця <gold><player></gold> успішно звільнено з в'язниці.</green>"
   broadcast: "Гравець <gold><player></gold> був звільнений з в'язниці. Будьте обережні..."
 

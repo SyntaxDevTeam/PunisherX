@@ -25,12 +25,47 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
 
         val playerName = args[0]
         val uuid = plugin.resolvePlayerUuid(playerName)
+
+        if (!plugin.cache.isPlayerInCache(uuid)) {
+            stack.sender.sendMessage(
+                plugin.messageHandler.getMessage(
+                    "error",
+                    "player_not_punished",
+                    mapOf("player" to playerName)
+                )
+            )
+            return
+        }
+
         val player = Bukkit.getPlayer(uuid)
 
-        if (player != null) {
+        val spawnLocation = JailUtils.getUnjailLocation(plugin.config)
+        if (player != null && spawnLocation == null) {
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("setspawn", "set_error"))
+            return
+        }
 
-            val spawnLocation = JailUtils.getUnjailLocation(plugin.config) ?: return
+        fun completeUnjail() {
+            plugin.cache.removePunishment(uuid)
+            plugin.databaseHandler.removePunishment(uuid.toString(), "JAIL")
 
+            val broadcastMessages =
+                plugin.messageHandler.getSmartMessage("unjail", "broadcast", mapOf("player" to playerName))
+
+            plugin.server.onlinePlayers.forEach { onlinePlayer ->
+                if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_UNJAIL)) {
+                    broadcastMessages.forEach { msg -> onlinePlayer.sendMessage(msg) }
+                }
+            }
+
+            plugin.messageHandler.getSmartMessage(
+                "unjail",
+                "success",
+                mapOf("player" to playerName)
+            ).forEach { stack.sender.sendMessage(it) }
+        }
+
+        if (player != null && spawnLocation != null) {
             TeleportUtils.teleportSafely(plugin, player, spawnLocation) { success ->
                 if (success) {
                     player.gameMode = GameMode.SURVIVAL
@@ -39,29 +74,21 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
                         "unjail_message"
                     ).forEach { msg -> player.sendMessage(msg) }
                     plugin.logger.debug("<green>Player $playerName successfully unjailed.</green>")
+                    completeUnjail()
                 } else {
+                    val failureMessage = plugin.messageHandler.getMessage(
+                        "unjail",
+                        "teleport_failed",
+                        mapOf("player" to playerName)
+                    )
+                    stack.sender.sendMessage(failureMessage)
+                    player.sendMessage(failureMessage)
                     plugin.logger.debug("<red>Failed to teleport player $playerName during unjail.</red>")
                 }
             }
+        } else {
+            completeUnjail()
         }
-
-        plugin.cache.removePunishment(uuid)
-        plugin.databaseHandler.removePunishment(uuid.toString(), "JAIL")
-
-        val broadcastMessages =
-            plugin.messageHandler.getSmartMessage("unjail", "broadcast", mapOf("player" to playerName))
-
-        plugin.server.onlinePlayers.forEach { onlinePlayer ->
-            if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_UNJAIL)) {
-                broadcastMessages.forEach { msg -> onlinePlayer.sendMessage(msg) }
-            }
-        }
-
-        plugin.messageHandler.getSmartMessage(
-            "unjail",
-            "success",
-            mapOf("player" to playerName)
-        ).forEach { stack.sender.sendMessage(it) }
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {

@@ -64,47 +64,60 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         }
         plugin.logger.debug("<yellow>Jail location: ${jailLocation}</yellow>")
 
-        targetPlayer?.apply {
-            TeleportUtils.teleportSafely(plugin, this, jailLocation) { success ->
-                if (success) {
-                    plugin.logger.debug("<green>Player successfully teleported to jail.</green>")
-                } else {
-                    plugin.logger.debug("<red>Failed to teleport player to jail.</red>")
-                }
-            }
-            gameMode = GameMode.ADVENTURE
+        val formattedTime = plugin.timeHandler.formatTime(gtime)
 
-            plugin.logger.debug("Changing gamemode ($gameMode) and teleporting $name to $jailLocation")
+        fun finalizePunishment() {
+            plugin.databaseHandler.addPunishment(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+            plugin.databaseHandler.addPunishmentHistory(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+            plugin.cache.addOrUpdatePunishment(uuid, end ?: -1)
 
-        }
-
-        plugin.databaseHandler.addPunishment(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
-        plugin.databaseHandler.addPunishmentHistory(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
-        plugin.cache.addOrUpdatePunishment(uuid, end ?: -1)
-
-        targetPlayer?.sendMessage(
-            plugin.messageHandler.getMessage(
-                "jail", "jail_message",
-                mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
+            targetPlayer?.sendMessage(
+                plugin.messageHandler.getMessage(
+                    "jail", "jail_message",
+                    mapOf("reason" to reason, "time" to formattedTime)
+                )
             )
-        )
-        val broadcastMessages = plugin.messageHandler.getSmartMessage(
-            "jail", "broadcast",
-            mapOf("player" to playerName, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
-        )
-        plugin.server.onlinePlayers.forEach { onlinePlayer ->
-            if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_JAIL)) {
-                broadcastMessages.forEach { message ->
-                    onlinePlayer.sendMessage(message)
+
+            val broadcastMessages = plugin.messageHandler.getSmartMessage(
+                "jail", "broadcast",
+                mapOf("player" to playerName, "reason" to reason, "time" to formattedTime)
+            )
+            plugin.server.onlinePlayers.forEach { onlinePlayer ->
+                if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_JAIL)) {
+                    broadcastMessages.forEach { message ->
+                        onlinePlayer.sendMessage(message)
+                    }
                 }
             }
+
+            plugin.messageHandler.getSmartMessage(
+                "jail",
+                "jail",
+                mapOf("player" to playerName, "reason" to reason, "time" to formattedTime)
+            ).forEach { stack.sender.sendMessage(it) }
         }
 
-        plugin.messageHandler.getSmartMessage(
-            "jail",
-            "jail",
-            mapOf("player" to playerName, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
-        ).forEach { stack.sender.sendMessage(it) }
+        if (targetPlayer != null) {
+            TeleportUtils.teleportSafely(plugin, targetPlayer, jailLocation) { success ->
+                if (success) {
+                    targetPlayer.gameMode = GameMode.ADVENTURE
+                    plugin.logger.debug("<green>Player successfully teleported to jail.</green>")
+                    plugin.logger.debug("Changing gamemode (${targetPlayer.gameMode}) and teleporting ${targetPlayer.name} to $jailLocation")
+                    finalizePunishment()
+                } else {
+                    stack.sender.sendMessage(
+                        plugin.messageHandler.getMessage(
+                            "jail",
+                            "teleport_failed",
+                            mapOf("player" to playerName)
+                        )
+                    )
+                    plugin.logger.debug("<red>Failed to teleport player to jail. Command aborted.</red>")
+                }
+            }
+        } else {
+            finalizePunishment()
+        }
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {

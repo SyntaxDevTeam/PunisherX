@@ -12,9 +12,9 @@ object JailUtils {
         val x = config.getDouble("jail.location.x")
         val y = config.getDouble("jail.location.y")
         val z = config.getDouble("jail.location.z")
-        val location = Location(world, x, y, z)
-
-        return location
+        val yaw = config.getDouble("jail.location.yaw", 0.0).toFloat()
+        val pitch = config.getDouble("jail.location.pitch", 0.0).toFloat()
+        return Location(world, x, y, z, yaw, pitch)
     }
 
     fun setJailLocation(config: FileConfiguration, location: Location, radius: Double): Boolean {
@@ -25,6 +25,8 @@ object JailUtils {
         config.set("jail.location.y", location.y)
         config.set("jail.location.z", location.z)
         config.set("jail.radius", radius)
+        config.set("jail.location.yaw", location.yaw.toDouble())
+        config.set("jail.location.pitch", location.pitch.toDouble())
 
         return true
     }
@@ -36,6 +38,8 @@ object JailUtils {
         config.set("spawn.location.x", location.x)
         config.set("spawn.location.y", location.y)
         config.set("spawn.location.z", location.z)
+        config.set("spawn.location.yaw", location.yaw.toDouble())
+        config.set("spawn.location.pitch", location.pitch.toDouble())
 
         return true
     }
@@ -46,8 +50,8 @@ object JailUtils {
         val x = config.getDouble("spawn.location.x")
         val y = config.getDouble("spawn.location.y")
         val z = config.getDouble("spawn.location.z")
-        val location = Location(world, x, y, z)
-
-        return location
+        val yaw = config.getDouble("spawn.location.yaw", 0.0).toFloat()
+        val pitch = config.getDouble("spawn.location.pitch", 0.0).toFloat()
+        return Location(world, x, y, z, yaw, pitch)
     }
 }

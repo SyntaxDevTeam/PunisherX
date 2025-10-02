@@ -37,6 +37,7 @@ jail:
   jail: "<green>Hai imprigionato il giocatore <gold><player></gold> per <gold><reason></gold> per <gold><time></gold></green>"
   usage: "Uso corretto: <gold>/jail <nome_giocatore> (tempo) <motivo>"
   jail_message: "<red>Sei stato imprigionato per <b><reason></b> per <b><time></b></red>"
+  teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
   mute_info_message: "<red>Stai cercando di parlare, ma dalla prigione nessuno ti sente...</red>"
   jail_restrict_message: "Lasciare l’area della prigione è vietato. Sei stato teletrasportato al punto assegnato."
   broadcast: "<dark_gray>Il giocatore <gray><player></gray> è stato imprigionato per <gray><reason></gray> per <gray><time></gray></dark_gray>"
@@ -62,6 +63,7 @@ unjail:
   unjail: "<green>Hai liberato il giocatore <gold><player></gold> dalla prigione</green>"
   usage: "Uso corretto: <gold>/unjail <nome_giocatore>"
   unjail_message: "<green>La tua pena in prigione è finita! Non sprecare questa occasione!</green>"
+  teleport_failed: "<red>Teleportation cancelled: the configured spawn location is unsafe.</red>"
   success: "<green>Il giocatore <gold><player></gold> è stato liberato con successo dalla prigione.</green>"
   broadcast: "Il giocatore <gold><player></gold> è stato liberato dalla prigione. State attenti..."
 

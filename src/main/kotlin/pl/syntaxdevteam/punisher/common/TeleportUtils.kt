@@ -59,14 +59,20 @@ object TeleportUtils {
      * occurs asynchronously, and the destination is made safe.
      */
     fun teleportSafely(plugin: Plugin, player: Player, location: Location, callback: (Boolean) -> Unit = {}) {
+        val target = location.clone()
         if (isFolia()) {
-            Bukkit.getServer().regionScheduler.execute(plugin, location) {
-                if (!location.chunk.isLoaded) {
-                    location.chunk.load()
+            Bukkit.getServer().regionScheduler.execute(plugin, target) {
+                if (!target.chunk.isLoaded) {
+                    target.chunk.load()
                 }
-                val safe = findSafeLocation(location)
+                if (!isLocationSafe(target)) {
+                    Bukkit.getServer().globalRegionScheduler.execute(plugin) {
+                        callback(false)
+                    }
+                    return@execute
+                }
                 Bukkit.getServer().globalRegionScheduler.execute(plugin) {
-                    player.teleportAsync(safe).thenAccept { result ->
+                    player.teleportAsync(target).thenAccept { result ->
                         callback(result)
                     }.exceptionally {
                         callback(false)
@@ -76,32 +82,55 @@ object TeleportUtils {
             }
         } else {
             runSync(plugin) {
-                if (!location.chunk.isLoaded) {
-                    location.chunk.load()
+                if (!target.chunk.isLoaded) {
+                    target.chunk.load()
                 }
-                val safe = findSafeLocation(location)
-                val result = player.teleport(safe)
+                if (!isLocationSafe(target)) {
+                    callback(false)
+                    return@runSync
+                }
+                val result = player.teleport(target)
                 callback(result)
             }
         }
     }
 
-    private fun findSafeLocation(location: Location): Location {
-        val world = location.world ?: return location
-        val x = location.blockX
-        val z = location.blockZ
-        var block = world.getHighestBlockAt(x, z)
-        while (isUnsafe(block) && block.y > world.minHeight) {
-            block = block.getRelative(BlockFace.DOWN)
+    private fun isLocationSafe(location: Location): Boolean {
+        val world = location.world ?: return false
+        val feetBlock = world.getBlockAt(location)
+        val headBlock = feetBlock.getRelative(BlockFace.UP)
+        val belowBlock = feetBlock.getRelative(BlockFace.DOWN)
+
+        if (!isPassable(feetBlock) || !isPassable(headBlock)) {
+            return false
         }
-        val safe = block.location.add(0.5, 1.0, 0.5)
-        safe.yaw = location.yaw
-        safe.pitch = location.pitch
-        return safe
+
+        if (!isSafeFloor(belowBlock)) {
+            return false
+        }
+
+        return true
     }
 
-    private fun isUnsafe(block: Block): Boolean {
+    private fun isPassable(block: Block): Boolean {
         val type = block.type
-        return type == Material.LAVA || type == Material.FIRE || !type.isSolid
+        if (type == Material.LAVA || type == Material.FIRE || type == Material.CACTUS ||
+            type == Material.SWEET_BERRY_BUSH || type == Material.CAMPFIRE || type == Material.SOUL_CAMPFIRE ||
+            type == Material.MAGMA_BLOCK
+        ) {
+            return false
+        }
+        return block.isPassable || type == Material.AIR
+    }
+
+    private fun isSafeFloor(block: Block): Boolean {
+        val type = block.type
+        if (type == Material.AIR || !type.isSolid) {
+            return false
+        }
+        if (type == Material.LAVA || type == Material.FIRE) {
+            return false
+        }
+        return true
     }
 }

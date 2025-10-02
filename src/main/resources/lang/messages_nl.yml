@@ -28,6 +28,7 @@ jail:
   jail: "<green>Je hebt speler <gold><player></gold> opgesloten voor <gold><reason></gold> voor <gold><time></gold></green>"
   usage: "Correct gebruik is: <gold>/jail <speler_naam> (tijd) <reden>"
   jail_message: "<red>Je bent opgesloten voor <b><reason></b> voor <b><time></b></red>"
+  teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
   jail_info_message: "<red>Je probeert te spreken, maar niemand kan je horen vanuit de gevangenis</red>"
   jail_restrict_message: "Het verlaten van het gevangenisgebied is verboden. Je bent teruggeteleporteerd naar de aangewezen locatie."
   broadcast: "<dark_gray>Speler <gray><player></gray> is opgesloten voor <gray><reason></gray> voor <gray><time></gray></dark_gray>"
@@ -44,6 +45,7 @@ unjail:
   unjail: "<green>Je hebt speler <gold><player></gold> uit de gevangenis vrijgelaten</green>"
   usage: "Correct gebruik is: <gold>/unjail <speler_naam>"
   unjail_message: "<green>Je gevangenisstraf is beëindigd! Verspil deze kans niet!</green>"
+  teleport_failed: "<red>Teleportation cancelled: the configured spawn location is unsafe.</red>"
   success: "<green>Speler <gold><player></gold> is succesvol uit de gevangenis vrijgelaten.</green>"
   broadcast: "Speler <gold><player></gold> is uit de gevangenis vrijgelaten. Kijk uit..."
 

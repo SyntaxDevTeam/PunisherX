@@ -37,6 +37,7 @@ jail:
   jail: "<green>Du hast Spieler <gold><player></gold> für <gold><reason></gold> für <gold><time></gold> ins Gefängnis gesteckt</green>"
   usage: "Richtige Verwendung: <gold>/jail <spielername> (zeit) <grund>"
   jail_message: "<red>Du wurdest für <b><reason></b> für <b><time></b> ins Gefängnis gesteckt</red>"
+  teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
   mute_info_message: "<red>Du versuchst zu sprechen, aber aus dem Gefängnis hört dich niemand...</red>"
   jail_restrict_message: "Das Verlassen des Gefängnisbereichs ist verboten. Du wurdest zurück an den festgelegten Ort teleportiert."
   broadcast: "<dark_gray>Spieler <gray><player></gray> wurde für <gray><reason></gray> für <gray><time></gray> ins Gefängnis gesteckt</dark_gray>"
@@ -62,6 +63,7 @@ unjail:
   unjail: "<green>Du hast Spieler <gold><player></gold> aus dem Gefängnis entlassen</green>"
   usage: "Richtige Verwendung: <gold>/unjail <spielername>"
   unjail_message: "<green>Deine Gefängnisstrafe ist vorbei! Verschwende diese Chance nicht!</green>"
+  teleport_failed: "<red>Teleportation cancelled: the configured spawn location is unsafe.</red>"
   success: "<green>Spieler <gold><player></gold> wurde erfolgreich aus dem Gefängnis entlassen.</green>"
   broadcast: "Spieler <gold><player></gold> wurde aus dem Gefängnis entlassen. Passt besser auf..."
 
