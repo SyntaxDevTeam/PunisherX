@@ -1,11 +1,130 @@
 # Changelog
-## [1.4.2] 
+
+## [1.5.0] - 2025-10-04
+
+### Functional changes:
+- [x] **Added support for the latest version 1.21.9**
+    * Added version compatibility management
+    * Added appropriate checks and methods to maintain compatibility between Minecraft versions 1.20.6 and 1.21.9
+- [x] Updated placeholder formatting. Changed from `{}` to `<>`
+    - Twice the messaging performance by using the built-in TagResolver for the MiniMessage format
+    - **Attention!** Due to the use of the MiniMessage format for Placeholders, it is necessary to work with the previous version of the language files.
+
+      After starting the server, the following commands are required:
+        * `/langfix` - for a quick update to the new version of the messages_xx.yml file
+        * `/prx reload` or restart the server to reload the correct placeholders
+        * You can also skip the previous steps and simply delete the `lang` folder from the PunisherX directory. The plugin will generate a default file with the latest version.
+      > Using `/prx reload` does not guarantee reloading messages downloaded "permanently" at plugin startup
+
+      > Never use `/reload` commands to attempt to reload a plugin. This can cause serious performance issues for the plugin and the entire server.
+- [x] Added "all" argument for use instead of player name in `/kick` command to kick all players at once.
+- [x] The config.yml file has been rebuilt to be more intuitive and adapted to the latest improvements.
+- [x] Added the ability to set an alias for the setspawn command
+- [x] Full integration with the getSmartMessage method providing greater flexibility in notification settings for kick, mute, ban, jail, etc. commands.
+
+  Usage example in messages_en.yml:
+    ```YAML
+   broadcast: "<dark_gray>Player <gray><player></gray> was jailed for <gray><reason></gray> for <gray><time></gray></dark_gray>"
+    ```
+  lub
+    ```YAML
+       broadcast:
+          - "<dark_gray>*************** Your Server Name *************** </dark_gray>"
+          - ""
+          - "<red>   Player <white><player></white> was jailed</red>"
+          - "   Reason: <white><reason></white>"
+          - "   Duration: <white><time></white>"
+          - ""
+          - "<dark_gray>*************************************************** </dark_gray>"
+    ```
+- [x] Restored functionality for "auto-download"
+    * Added search for the latest version in several locations.
+    * Added the ability to set where to search for and download the latest plugin version.
+
+  New settings structure in config.yml:
+  ```YAML
+  update:
+    check-for-updates: true
+    auto-download: false
+    hangar: true
+    github: true
+    modrinth: true 
+  ```
+- [x] Player cache data can now be stored in the database.
+    - Settings have been added to config.
+  ```YAML
+  playerCache:
+    # Choose where player IP information is stored: "file" or "database"
+    storage: "file"
+  ```
+- [x] Improved handling of teleporting to and from prison.
+    - Added a check to ensure the destination is safe, and the entire process is fully asynchronous.
+- [x] Added support for UK, IT and PT languages
+
+### Technical changes:
+- [x] Redesigned `/banip` command handling logic (improved performance and efficiency)
+- [x] Added plugin initialization in a separate class to improve code clarity and performance
+- [x] Improved plugin reload logic for the `/prx reload` command
+- [x] Refactored PlayerJoinEvent handling and minor corrections
+- [x] Optimized login checks with asynchronous UUID cache
+- [x] Improved handling of teleporting to and from prison.
+    - Added a check to ensure the destination is safe, and the entire process is fully asynchronous.
+- [x] Refactored UUIDManager usage to Paper/Bukkit
+- [x] HOTFIX: "Failed to decrypt data" error
+- [x] HOTFIX: `/prx checkupdates` command not working
+
+### In testing phase (experimental – full functionality in a future version):
+- [x] Added GUI for managing players and punishments (kick, ban, mute, etc.
+    - Asynchronous data downloads minimize latency.
+    - Ability to search for players by nickname.
+    - Ability to sort players (online, offline, banned, muted, etc.).
+- [x] The DatabaseHandler class has been adapted to use the latest version of the SyntaxCore 1.2.5-SNAPSHOT authoring library.
+    - Added support for asynchronous database operations to minimize server lag.
+    - Improved error handling and logging for better debugging and maintenance.
+    - Optimized database queries for better performance and efficiency.
+    - Added support MSSQL database type
+- [x] Added migrateDatabase method
+    * **(Highly experimental)** Added the ability to migrate from one database type to another `prx migrateDatabase <from> <to>`. Supported types: `sqlite`, `mysql`, `mariadb`, `postgresql`, `mssql`
+
+      Example:
+      ```LOG
+      /prx migrateDatabase sqlite mysql
+      ```
+
+## [1.4.3] - 2025-07-19
+## Technical changes:
+* Added support for version 1.21.8
+* Added support for Folia to JAIL related methods
+* Improved the permissions system and eliminated minor bugs
+* Updated dependencies and libraries
+
+## [1.4.2-HOTFIX] - 2025-07-16
+**HOTFIX**: Typo in permission logic for banip command
+
+## [1.4.2-SNAPSHOT] - 2025-07-10
+## Functional changes
+* Added support for version 1.21.7
+* Added Russian translation (thanks to [marat2509](https://github.com/marat2509))
+* Changed message for muted players (remaining penalty time)
+```YAML
+mute:
+  mute_info_message: "<red>You're trying to speak but you're still muted for {time}</red>"
+```
+
+## Technical changes:
+* **HOTFIX**: Tightening the permissions system
+    * Fixed a logical error with permission checking
+* Improved logic when failing to ban a player
+* Added support for version 1.21.7
+    * Listener registration based on the appropriate server version for backward compatibility
+    * Added methods to check the minimum server version
+    * Dropped PlayerLoginEvent usage for servers from 1.21.7
+* Added information about support or lack thereof for a given server version
 
 ## [1.4.1] - 2025-06-24
-### Changes:
+* Added support for version 1.21.6
 * Fixed a logical error in permissions checking.
 * Updated libraries and dependencies
-* Added support for version 1.21.6
 
 ## [1.4.0] - 2025-06-06
 ### Functional Changes:
