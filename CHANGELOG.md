@@ -74,8 +74,16 @@
 - [x] HOTFIX: `/prx checkupdates` command not working
 - [x] HOTFIX: Fixed teleportation logic in jail commands
 - [x] HOTFIX: Fixed teleportation after jail sentence
+- [x] HOTFIX: Fixed a critical bug that blocked penalty escalations after using `/warn`
+- [x] FIXED: "The player had access to commands despite his prison sentence."
+- [x] FIXED: Fixed duplicate player exit messages on UNJAIL
 - [x] Updated all dependencies and libraries to their latest versions
 - [x] Many minor and major code fixes to improve plugin performance.
+
+### Other changes:
+* Update actions/checkout action to v5 by @renovate[bot] in [#39](https://github.com/SyntaxDevTeam/PunisherX/pull/39)
+* Update dependency gradle to v9 by @renovate[bot] in [#40](https://github.com/SyntaxDevTeam/PunisherX/pull/40)
+* Update gradle/actions action to v5 by @renovate[bot] in [#42](https://github.com/SyntaxDevTeam/PunisherX/pull/42)
 
 ### In testing phase (experimental – full functionality in a future version):
 - [x] Added GUI for managing players and punishments (kick, ban, mute, etc.
