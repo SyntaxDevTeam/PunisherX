@@ -55,7 +55,7 @@ class PunishmentCache(private val plugin: PunisherX) {
         saveSingleEntry(uuid, punishment)
     }
 
-    fun removePunishment(uuid: UUID, teleportPlayer: Boolean = true) {
+    fun removePunishment(uuid: UUID, teleportPlayer: Boolean = true, notify: Boolean = true) {
         val punishment = cache.getIfPresent(uuid) ?: run {
             removeSingleEntry(uuid)
             return
@@ -86,15 +86,17 @@ class PunishmentCache(private val plugin: PunisherX) {
                 }
             }
 
-            val bc = plugin.messageHandler.getSmartMessage("unjail", "broadcast", mapOf("player" to player.name))
-            plugin.server.onlinePlayers
-                .filter { it.hasPermission("punisherx.see.unjail") }
-                .forEach { p -> bc.forEach { msg -> p.sendMessage(msg) } }
-            plugin.messageHandler.getSmartMessage(
-                "unjail",
-                "success",
-                mapOf("player" to player.name)
-            ).forEach { msg -> player.sendMessage(msg) }
+            if (notify) {
+                val bc = plugin.messageHandler.getSmartMessage("unjail", "broadcast", mapOf("player" to player.name))
+                plugin.server.onlinePlayers
+                    .filter { it.hasPermission("punisherx.see.unjail") }
+                    .forEach { p -> bc.forEach { msg -> p.sendMessage(msg) } }
+                plugin.messageHandler.getSmartMessage(
+                    "unjail",
+                    "success",
+                    mapOf("player" to player.name)
+                ).forEach { msg -> player.sendMessage(msg) }
+            }
         }
     }
 

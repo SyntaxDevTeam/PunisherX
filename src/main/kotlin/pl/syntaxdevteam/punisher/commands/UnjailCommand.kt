@@ -45,7 +45,7 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         fun completeUnjail() {
-            plugin.cache.removePunishment(uuid, teleportPlayer = false)
+            plugin.cache.removePunishment(uuid, teleportPlayer = false, notify = false)
 
             val broadcastMessages =
                 plugin.messageHandler.getSmartMessage("unjail", "broadcast", mapOf("player" to playerName))
