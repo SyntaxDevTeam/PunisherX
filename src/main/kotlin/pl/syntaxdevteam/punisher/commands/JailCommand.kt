@@ -56,6 +56,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         val punishmentType = "JAIL"
         val start = System.currentTimeMillis()
         val end: Long? = if (gtime != null) start + plugin.timeHandler.parseTime(gtime) * 1000 else null
+        val previousLocation = targetPlayer?.location?.clone()
 
         val jailLocation = JailUtils.getJailLocation(plugin.config)
         if (jailLocation == null) {
@@ -69,7 +70,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         fun finalizePunishment() {
             plugin.databaseHandler.addPunishment(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
             plugin.databaseHandler.addPunishmentHistory(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
-            plugin.cache.addOrUpdatePunishment(uuid, end ?: -1)
+            plugin.cache.addOrUpdatePunishment(uuid, end ?: -1, previousLocation)
 
             targetPlayer?.sendMessage(
                 plugin.messageHandler.getMessage(

@@ -6,7 +6,6 @@ import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.GameMode
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.basic.JailUtils
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.common.TeleportUtils
 
@@ -38,16 +37,15 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         val player = Bukkit.getPlayer(uuid)
+        val releaseLocation = plugin.cache.getReleaseLocation(uuid)
 
-        val spawnLocation = JailUtils.getUnjailLocation(plugin.config)
-        if (player != null && spawnLocation == null) {
+        if (player != null && releaseLocation == null) {
             stack.sender.sendMessage(plugin.messageHandler.getMessage("setspawn", "set_error"))
             return
         }
 
         fun completeUnjail() {
-            plugin.cache.removePunishment(uuid)
-            plugin.databaseHandler.removePunishment(uuid.toString(), "JAIL")
+            plugin.cache.removePunishment(uuid, teleportPlayer = false)
 
             val broadcastMessages =
                 plugin.messageHandler.getSmartMessage("unjail", "broadcast", mapOf("player" to playerName))
@@ -65,8 +63,8 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
             ).forEach { stack.sender.sendMessage(it) }
         }
 
-        if (player != null && spawnLocation != null) {
-            TeleportUtils.teleportSafely(plugin, player, spawnLocation) { success ->
+        if (player != null && releaseLocation != null) {
+            TeleportUtils.teleportSafely(plugin, player, releaseLocation) { success ->
                 if (success) {
                     player.gameMode = GameMode.SURVIVAL
                     plugin.messageHandler.getSmartMessage(
