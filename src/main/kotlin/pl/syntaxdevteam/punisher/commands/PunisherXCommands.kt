@@ -10,6 +10,7 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
     private val mH = plugin.messageHandler
+    private var pendingMigration: Pair<DatabaseType, DatabaseType>? = null
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         val prefix = plugin.messageHandler.getPrefix()
@@ -65,8 +66,12 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             }
 
             args[0].equals("migrate", ignoreCase = true) -> {
+                val force = args.any { it.equals("--force", ignoreCase = true) }
                 val from = args.getOrNull(1)
-                val to = args.getOrNull(2)
+                val to = when {
+                    args.getOrNull(2)?.equals("--force", ignoreCase = true) == true -> args.getOrNull(3)
+                    else -> args.getOrNull(2)
+                }
                 if (from == null || to == null) {
                     stack.sender.sendMessage(mH.miniMessageFormat("$prefix <red>Usage: /prx migrate <from> <to></red>"))
                     return
@@ -77,7 +82,37 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
                     stack.sender.sendMessage(mH.miniMessageFormat("$prefix <red>Unknown database type.</red>"))
                     return
                 }
-                plugin.databaseHandler.migrateDatabase(fromType, toType)
+                if (!force) {
+                    val pending = pendingMigration
+                    if (pending == null || pending.first != fromType || pending.second != toType) {
+                        pendingMigration = fromType to toType
+                        stack.sender.sendMessage(
+                            mH.miniMessageFormat(
+                                "$prefix <yellow>Update the connection details for <gold>${toType.name.lowercase()}</gold> in config.yml, then rerun this command. " +
+                                        "Use <gold>--force</gold> to skip this confirmation."
+                            )
+                        )
+                        return
+                    }
+                }
+
+                pendingMigration = null
+                stack.sender.sendMessage(
+                    mH.miniMessageFormat("$prefix <yellow>Starting migration from <gold>${fromType.name.lowercase()}</gold> to <gold>${toType.name.lowercase()}</gold>...</yellow>")
+                )
+
+                val future = plugin.databaseHandler.migrateDatabase(fromType, toType)
+                future.whenComplete { result, throwable ->
+                    val response = when {
+                        throwable != null -> "$prefix <red>Failed to migrate database: ${throwable.message ?: "Unknown error"}</red>"
+                        result == null -> "$prefix <red>Migration finished with an unknown state.</red>"
+                        result.success -> "$prefix <green>${result.message}</green>"
+                        else -> "$prefix <red>${result.message}</red>"
+                    }
+                    plugin.server.scheduler.runTask(plugin, Runnable {
+                        stack.sender.sendMessage(mH.miniMessageFormat(response))
+                    })
+                }
             }
             /*
             args[0].equals("panel", ignoreCase = true) -> {
@@ -184,13 +219,33 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             }
             return baseSuggestions
         }
-        if (args.size in 2..3 && args[0].equals("migrate", ignoreCase = true)) {
-            //val types = DatabaseType.values().map { it.name.lowercase() }
+        if (args[0].equals("migrate", ignoreCase = true)) {
             val types = DatabaseType::class.java.enumConstants
                 ?.map { it.name.lowercase() }
                 ?: emptyList()
-            val current = args[args.size - 1]
-            return types.filter { it.startsWith(current.lowercase()) }
+            when (args.size) {
+                2 -> {
+                    val current = args[1]
+                    return types.filter { it.startsWith(current.lowercase()) }
+                }
+
+                3 -> {
+                    val current = args[2]
+                    return if (current.startsWith("--")) {
+                        listOf("--force").filter { it.startsWith(current.lowercase()) }
+                    } else {
+                        types.filter { it.startsWith(current.lowercase()) }
+                    }
+                }
+
+                4 -> {
+                    val current = args[3]
+                    if (args[2].equals("--force", ignoreCase = true)) {
+                        return emptyList()
+                    }
+                    return listOf("--force").filter { it.startsWith(current.lowercase()) }
+                }
+            }
         }
         return emptyList()
     }
