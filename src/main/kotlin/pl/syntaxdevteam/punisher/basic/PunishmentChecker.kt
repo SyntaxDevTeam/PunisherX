@@ -128,12 +128,13 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         try {
             val player = event.player
             val uuid = player.uniqueId.toString()
-            val command = event.message.split(" ")[0].lowercase(Locale.getDefault()).removePrefix("/")
+            val originalCommand = event.message.split(" ")[0]
+            val command = originalCommand.lowercase(Locale.getDefault()).removePrefix("/")
+            val punishments = plugin.databaseHandler.getPunishments(uuid)
 
             if (plugin.config.getBoolean("mute.pm")) {
                 val muteCommands = plugin.config.getStringList("mute.cmd")
                 if (muteCommands.contains(command)) {
-                    val punishments = plugin.databaseHandler.getPunishments(uuid)
                     punishments.forEach { punishment ->
                         if (punishment.type == "MUTE" && plugin.punishmentManager.isPunishmentActive(punishment)) {
                             val endTime = punishment.end
@@ -144,12 +145,53 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                             val muteMessage = plugin.messageHandler.getMessage("mute", "mute_message", mapOf("reason" to reason, "time" to duration))
 
                             player.sendMessage(muteMessage)
-                        } else {
+                        } else if (punishment.type == "MUTE") {
                             plugin.databaseHandler.removePunishment(uuid, "MUTE", true)
                             plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
                         }
                     }
                 }
+            }
+
+            var activeJailFound = false
+            punishments.forEach { punishment ->
+                if (punishment.type != "JAIL") {
+                    return@forEach
+                }
+
+                if (plugin.punishmentManager.isPunishmentActive(punishment)) {
+                    activeJailFound = true
+                } else {
+                    plugin.databaseHandler.removePunishment(uuid, "JAIL", true)
+                    plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
+                }
+            }
+
+            if (!activeJailFound) {
+                return
+            }
+
+            if (PermissionChecker.hasWithBypass(player, PermissionChecker.PermissionKey.BYPASS_JAIL)) {
+                return
+            }
+
+            val allowedCommands = plugin.config.getStringList("jail.allowed_commands")
+                .map { it.lowercase(Locale.getDefault()).removePrefix("/") }
+                .toSet()
+
+            val allowAllCommands = allowedCommands.contains("*")
+            val commandAliases = mutableSetOf(command)
+            if (":" in command) {
+                commandAliases.add(command.substringAfter(":"))
+            }
+
+            val isAllowed = allowAllCommands || commandAliases.any { it in allowedCommands }
+
+            if (!isAllowed) {
+                event.isCancelled = true
+                val message = plugin.messageHandler.getMessage("jail", "command_blocked_message")
+                player.sendMessage(message)
+                plugin.logger.debug("Blocked command '$originalCommand' for jailed player ${player.name}")
             }
         } catch (e: Exception) {
             plugin.logger.severe("Error in onPlayerCommand, report it urgently to the plugin author with the message: ${event.player.name}: ${e.message}")

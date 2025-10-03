@@ -30,6 +30,7 @@ jail:
   jail_message: "<red>Je bent opgesloten voor <b><reason></b> voor <b><time></b></red>"
   teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
   jail_info_message: "<red>Je probeert te spreken, maar niemand kan je horen vanuit de gevangenis</red>"
+  command_blocked_message: "<red>Je kunt geen commando's gebruiken terwijl je in de gevangenis zit.</red>"
   jail_restrict_message: "Het verlaten van het gevangenisgebied is verboden. Je bent teruggeteleporteerd naar de aangewezen locatie."
   broadcast: "<dark_gray>Speler <gray><player></gray> is opgesloten voor <gray><reason></gray> voor <gray><time></gray></dark_gray>"
   log: "<dark_gray>Opgesloten speler <gray><player></gray> <dark_gray>roept vanuit hun cel: <gray><message></gray>"

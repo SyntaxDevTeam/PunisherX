@@ -39,6 +39,7 @@ jail:
   jail_message: "<red>Você foi preso por <b><reason></b> durante <b><time></b></red>"
   teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
   mute_info_message: "<red>Você tenta falar, mas ninguém consegue ouvir da prisão...</red>"
+  command_blocked_message: "<red>Você não pode usar comandos enquanto estiver cumprindo sua pena na prisão.</red>"
   jail_restrict_message: "Sair da área da prisão é proibido. Você foi teleportado de volta para o local designado."
   broadcast: "<dark_gray>O jogador <gray><player></gray> foi preso por <gray><reason></gray> durante <gray><time></gray></dark_gray>"
   # Alternativamente, você pode usar este formato se quiser destacar mais a mensagem

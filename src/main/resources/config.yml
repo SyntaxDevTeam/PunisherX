@@ -79,6 +79,9 @@ jail:
     yaw: 0.0
     pitch: 0.0
   radius: 5
+  # Commands that jailed players are allowed to use (without the leading slash).
+  # Use "*" to allow all commands while jailed.
+  allowed_commands: []
 
 spawn:
   # Location of the spawn point after the player is unjailed.

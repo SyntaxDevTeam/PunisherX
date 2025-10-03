@@ -39,6 +39,7 @@ jail:
   jail_message: "<red>Du wurdest für <b><reason></b> für <b><time></b> ins Gefängnis gesteckt</red>"
   teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
   mute_info_message: "<red>Du versuchst zu sprechen, aber aus dem Gefängnis hört dich niemand...</red>"
+  command_blocked_message: "<red>Du kannst während deiner Gefängnisstrafe keine Befehle verwenden.</red>"
   jail_restrict_message: "Das Verlassen des Gefängnisbereichs ist verboten. Du wurdest zurück an den festgelegten Ort teleportiert."
   broadcast: "<dark_gray>Spieler <gray><player></gray> wurde für <gray><reason></gray> für <gray><time></gray> ins Gefängnis gesteckt</dark_gray>"
   # Alternativ kannst du folgendes Nachrichtenformat verwenden, wenn du die Nachricht deutlicher hervorheben möchtest

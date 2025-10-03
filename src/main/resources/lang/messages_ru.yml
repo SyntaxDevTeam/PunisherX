@@ -36,6 +36,7 @@ jail:
   jail_message: "<red>Вы были посажены в тюрьму за <b><reason></b> на <b><time></b></red>"
   teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
   mute_info_message: "<red>Вы пытаетесь говорить, но из тюрьмы вас никто не слышит</red>"
+  command_blocked_message: "<red>Вы не можете использовать команды, находясь в тюрьме.</red>"
   jail_restrict_message: "Запрещено покидать территорию тюрьмы. Вы были телепортированы обратно в назначенное место."
   broadcast: "<dark_gray>Игрок <gray><player></gray> был посажен в тюрьму за <gray><reason></gray> на <gray><time></gray></dark_gray>"
     # В качестве альтернативы вы можете использовать формат сообщения ниже, если хотите дополнительно выделить это сообщение
