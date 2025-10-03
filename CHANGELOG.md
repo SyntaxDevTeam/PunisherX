@@ -6,7 +6,7 @@
 - [x] **Added support for the latest version 1.21.9**
     * Added version compatibility management
     * Added appropriate checks and methods to maintain compatibility between Minecraft versions 1.20.6 and 1.21.9
-- [x] Updated placeholder formatting. Changed from `{}` to `<>`
+- [x] **Updated placeholder formatting in language files (messages_xx.yml)** Changed from `{}` to `<>`
     - Twice the messaging performance by using the built-in TagResolver for the MiniMessage format
     - **Attention!** Due to the use of the MiniMessage format for Placeholders, it is necessary to work with the previous version of the language files.
 
@@ -72,6 +72,10 @@
 - [x] Refactored UUIDManager usage to Paper/Bukkit
 - [x] HOTFIX: "Failed to decrypt data" error
 - [x] HOTFIX: `/prx checkupdates` command not working
+- [x] HOTFIX: Fixed teleportation logic in jail commands
+- [x] HOTFIX: Fixed teleportation after jail sentence
+- [x] Updated all dependencies and libraries to their latest versions
+- [x] Many minor and major code fixes to improve plugin performance.
 
 ### In testing phase (experimental – full functionality in a future version):
 - [x] Added GUI for managing players and punishments (kick, ban, mute, etc.
