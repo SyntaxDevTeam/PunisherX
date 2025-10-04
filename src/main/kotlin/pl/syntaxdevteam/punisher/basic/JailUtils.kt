@@ -45,6 +45,15 @@ object JailUtils {
     }
 
     fun getUnjailLocation(config: FileConfiguration): Location? {
+        if (config.getBoolean("spawn.use_external_set.enabled")) {
+            when (config.getString("spawn.use_external_set.set")?.lowercase()) {
+                "world" -> {
+                    val defaultWorld = Bukkit.getWorlds().firstOrNull() ?: return null
+                    return defaultWorld.spawnLocation.clone()
+                }
+            }
+        }
+
         val worldName = config.getString("spawn.location.world") ?: return null
         val world = Bukkit.getWorld(worldName) ?: return null
         val x = config.getDouble("spawn.location.x")
