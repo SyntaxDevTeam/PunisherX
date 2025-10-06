@@ -83,9 +83,9 @@ jail:
   # Use "*" to allow all commands while jailed.
   allowed_commands: []
 
-spawn:
+unjail:
   # Location of the spawn point after the player is unjailed.
-  location:
+  unjail_location:
     world: "world"
     x: 0.0
     y: 64.0
@@ -93,10 +93,14 @@ spawn:
     yaw: 0.0
     pitch: 0.0
   # You can also use the default spawn location set in the game or via an external plugin.
-  use_external_set:
-    enabled: false
-    # Available options: essx (EssentialsX or FoliEssentials), world (default world spawn point).
-    set: world
+  spawn_type_select:
+    # Available options:
+    # * "unjail" - location coordinates set in unjail_location (/setunjail)
+    # * "last_location" - last location before receiving the penalty
+    # * "bed" - last bed spawn location
+    # * "essx" - spawn location set in the EssentialsX or FoliEssentials plugin (/setspawn)
+    # * "world" - default world spawn point (/setworldspawn)
+    set: unjail
 
 # /********************************************/
 #    GUI settings
