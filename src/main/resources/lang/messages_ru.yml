@@ -23,9 +23,9 @@ setjail:
   set_error: "<red>Не удалось установить местоположение тюрьмы</red>"
   invalid_radius: "<red>Пожалуйста, укажите действительный радиус (число больше 0)</red>"
 
-# Сообщения команды /setspawn
-setspawn:
-  usage: "Правильное использование: <gold>/setspawn</gold>"
+# Сообщения команды /setunjail
+setunjail:
+  usage: "Правильное использование: <gold>/setunjail</gold>"
   set: "<green>Местоположение спавна установлено: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
   set_error: "<red>Не удалось установить местоположение спавна</red>"
 

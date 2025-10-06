@@ -26,9 +26,9 @@ setjail:
   set_error: "<red>Impossibile impostare la posizione della prigione.</red>"
   invalid_radius: "<red>Inserisci un raggio valido (numero maggiore di 0).</red>"
 
-# Messaggi del comando /setspawn
-setspawn:
-  usage: "Uso corretto: <gold>/setspawn</gold>"
+# Messaggi del comando /setunjail
+setunjail:
+  usage: "Uso corretto: <gold>/setunjail</gold>"
   set: "<green>Il punto di spawn è stato impostato: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
   set_error: "<red>Impossibile impostare il punto di spawn.</red>"
 

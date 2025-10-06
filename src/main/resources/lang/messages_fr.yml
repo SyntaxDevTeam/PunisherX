@@ -26,9 +26,9 @@ setjail:
   set_error: "<red>Impossible de définir la prison.</red>"
   invalid_radius: "<red>Veuillez entrer un rayon valide (nombre supérieur à 0).</red>"
 
-# Messages de la commande /setspawn
-setspawn:
-  usage: "Utilisation correcte : <gold>/setspawn</gold>"
+# Messages de la commande /setunjail
+setunjail:
+  usage: "Utilisation correcte : <gold>/setunjail</gold>"
   set: "<green>Le point de réapparition a été défini : <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
   set_error: "<red>Impossible de définir le point de réapparition.</red>"
 

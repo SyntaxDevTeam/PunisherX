@@ -25,9 +25,9 @@ setjail:
   set_error: "<red>Nie udało się ustawić lokalizacji więzienia.</red>"
   invalid_radius: "<red>Podaj prawidłowy promień (liczba większa od 0).</red>"
 
-# Wiadomości komendy /setspawn
-setspawn:
-  usage: "Poprawne użycie to: <gold>/setspawn</gold>"
+# Wiadomości komendy /setunjail
+setunjail:
+  usage: "Poprawne użycie to: <gold>/setunjail</gold>"
   set: "<green>Lokalizacja respawnu została ustawiona: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
   set_error: "<red>Nie udało się ustawić lokalizacji respawnu.</red>"
 

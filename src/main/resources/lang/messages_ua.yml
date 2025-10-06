@@ -26,9 +26,9 @@ setjail:
   set_error: "<red>Не вдалося встановити локацію в'язниці.</red>"
   invalid_radius: "<red>Вкажіть правильний радіус (число більше за 0).</red>"
 
-# Повідомлення команди /setspawn
-setspawn:
-  usage: "Правильне використання: <gold>/setspawn</gold>"
+# Повідомлення команди /setunjail
+setunjail:
+  usage: "Правильне використання: <gold>/setunjail</gold>"
   set: "<green>Точку відродження встановлено: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
   set_error: "<red>Не вдалося встановити точку відродження.</red>"
 

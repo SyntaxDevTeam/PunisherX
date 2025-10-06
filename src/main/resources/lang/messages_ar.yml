@@ -27,9 +27,9 @@ setjail:
   set_error: "<red>فشل في تعيين موقع السجن.</red>"
   invalid_radius: "<red>يرجى إدخال نصف قطر صالح (رقم أكبر من 0).</red>"
 
-# رسائل أمر /setspawn
-setspawn:
-  usage: "الاستخدام الصحيح: <gold>/setspawn</gold>"
+# رسائل أمر /setunjail
+setunjail:
+  usage: "الاستخدام الصحيح: <gold>/setunjail</gold>"
   set: "<green>تم تعيين موقع الاستنساخ إلى: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
   set_error: "<red>فشل في تعيين موقع الاستنساخ.</red>"
 

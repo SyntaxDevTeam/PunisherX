@@ -26,9 +26,9 @@ setjail:
   set_error: "<red>Gefängnisstandort konnte nicht gesetzt werden.</red>"
   invalid_radius: "<red>Bitte gib einen gültigen Radius an (Zahl größer als 0).</red>"
 
-# Nachrichten für den Befehl /setspawn
-setspawn:
-  usage: "Richtige Verwendung: <gold>/setspawn</gold>"
+# Nachrichten für den Befehl /setunjail
+setunjail:
+  usage: "Richtige Verwendung: <gold>/setunjail</gold>"
   set: "<green>Spawnpunkt gesetzt: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
   set_error: "<red>Spawnpunkt konnte nicht gesetzt werden.</red>"
 
