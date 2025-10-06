@@ -40,6 +40,13 @@ dependencies:
     VaultUnlocked:
       load: BEFORE
       required: false
+    Essentials:
+      load: BEFORE
+      required: false
+    EssentialsSpawn:
+      load: BEFORE
+      required: false
+
 
 commands:
   ban:

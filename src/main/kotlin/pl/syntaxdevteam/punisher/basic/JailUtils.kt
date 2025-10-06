@@ -3,6 +3,7 @@ package pl.syntaxdevteam.punisher.basic
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.configuration.file.FileConfiguration
+import pl.syntaxdevteam.punisher.hooks.HookHandler
 
 object JailUtils {
 
@@ -44,7 +45,22 @@ object JailUtils {
         return true
     }
 
-    fun getUnjailLocation(config: FileConfiguration): Location? {
+    fun getUnjailLocation(config: FileConfiguration, hookHandler: HookHandler? = null): Location? {
+        if (config.getBoolean("spawn.use_external_set.enabled")) {
+            when (config.getString("spawn.use_external_set.set")?.lowercase()) {
+                "essx" -> {
+                    val location = hookHandler?.getEssentialsSpawnLocation()
+                    if (location != null) {
+                        return location
+                    }
+                }
+                "world" -> {
+                    val defaultWorld = Bukkit.getWorlds().firstOrNull() ?: return null
+                    return defaultWorld.spawnLocation.clone()
+                }
+            }
+        }
+
         val worldName = config.getString("spawn.location.world") ?: return null
         val world = Bukkit.getWorld(worldName) ?: return null
         val x = config.getDouble("spawn.location.x")

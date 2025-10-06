@@ -27,7 +27,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         val uuid      = player.uniqueId
         val radius    = plugin.config.getDouble("jail.radius", 10.0)
         val jailLoc   = JailUtils.getJailLocation(plugin.config)
-        val unjailLoc = JailUtils.getUnjailLocation(plugin.config)
+        val unjailLoc = JailUtils.getUnjailLocation(plugin.config, plugin.hookHandler)
         if (PermissionChecker.isAuthor(uuid)) {
             player.sendMessage(
                 plugin.messageHandler

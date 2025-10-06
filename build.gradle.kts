@@ -7,12 +7,12 @@ plugins {
     id("com.gradleup.shadow") version "9.2.2"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
-    id("xyz.jpenilla.run-paper") version "3.0.0"
+    id("xyz.jpenilla.run-paper") version "3.0.1"
     id("pl.syntaxdevteam.plugindeployer") version "1.0.1"
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.5.0-DEV"
+version = "1.6.0-DEV"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val targetJavaVersion = 21
@@ -21,6 +21,8 @@ kotlin {
 }
 
 repositories {
+    maven("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/") //SyntaxDevTeam
+    maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/") //SyntaxDevTeam
     gradlePluginPortal()
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/") {
@@ -32,8 +34,7 @@ repositories {
     maven("https://repo.extendedclip.com/releases/") // PlaceholderAPI
     maven("https://repo.codemc.org/repository/maven-public/") // VaultUnlockedAPI
     maven("https://jitpack.io") // VaultAPI
-    maven("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/") //SyntaxDevTeam
-    maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/") //SyntaxDevTeam
+    maven("https://repo.essentialsx.net/releases/") // EssentialsX
 }
 
 dependencies {
@@ -60,6 +61,7 @@ dependencies {
     compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.0.1")
     compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
     compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.15")
+    compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2")
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.2")
 
     testImplementation(kotlin("test"))

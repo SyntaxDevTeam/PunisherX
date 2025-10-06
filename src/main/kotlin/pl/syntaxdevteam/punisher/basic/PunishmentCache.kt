@@ -70,7 +70,7 @@ class PunishmentCache(private val plugin: PunisherX) {
         if (player != null) {
             if (teleportPlayer) {
                 val targetLocation = punishment.returnLocation?.toLocation()
-                    ?: JailUtils.getUnjailLocation(plugin.config)
+                    ?: JailUtils.getUnjailLocation(plugin.config, plugin.hookHandler)
 
                 if (targetLocation != null) {
                     TeleportUtils.teleportSafely(plugin, player, targetLocation) { success ->
@@ -115,9 +115,10 @@ class PunishmentCache(private val plugin: PunisherX) {
             .filterValues { it.endTime > System.currentTimeMillis() || it.endTime == -1L }
             .mapValues { it.value.endTime }
 
+    //TODO: dodać możliwość wyłączenia ostatniej lokalizacji
     fun getReleaseLocation(uuid: UUID): Location? {
         val cached = cache.getIfPresent(uuid) ?: return null
-        return cached.returnLocation?.toLocation() ?: JailUtils.getUnjailLocation(plugin.config)
+        return cached.returnLocation?.toLocation() ?: JailUtils.getUnjailLocation(plugin.config, plugin.hookHandler)
     }
 
     private fun loadCacheIntoMemory() {

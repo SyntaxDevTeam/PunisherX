@@ -92,10 +92,10 @@ spawn:
     z: 0.0
     yaw: 0.0
     pitch: 0.0
-  # Experimental setting (may not work properly).
+  # You can also use the default spawn location set in the game or via an external plugin.
   use_external_set:
     enabled: false
-    # Available options: essx (EssentialsX), world (default world spawn point).
+    # Available options: essx (EssentialsX or FoliEssentials), world (default world spawn point).
     set: world
 
 # /********************************************/
@@ -126,7 +126,7 @@ gui:
 #    Internal settings
 # /********************************************/
 
-# Plugin language selection. Possible values: EN, PL, NL, ES, FR, DE, RU, UK, IT, PT.
+# Plugin language selection. Possible values: EN, PL, NL, ES, FR, DE, RU, UK, IT, PT, AR.
 # To add your own language file, please contact us on Discord: https://discord.gg/Zk6mxv7eMh
 language: "EN"
 
