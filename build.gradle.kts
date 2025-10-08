@@ -7,7 +7,7 @@ plugins {
     id("com.gradleup.shadow") version "9.2.2"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
-    id("xyz.jpenilla.run-paper") version "3.0.0"
+    id("xyz.jpenilla.run-paper") version "3.0.1"
     id("pl.syntaxdevteam.plugindeployer") version "1.0.1"
 }
 
@@ -42,16 +42,16 @@ dependencies {
     compileOnly("pl.syntaxdevteam:core:1.2.4-SNAPSHOT")
     //compileOnly("pl.syntaxdevteam.license:license-client:0.1.1")
     //implementation(files("libs/SyntaxCore-1.1.0-all.jar"))
-    compileOnly("pl.syntaxdevteam:cleanerx:1.5.2")
+    compileOnly("pl.syntaxdevteam:cleanerx:1.5.3")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.5")
     compileOnly("com.google.code.gson:gson:2.13.2")
-    compileOnly("net.kyori:adventure-text-serializer-legacy:4.24.0")
-    compileOnly("net.kyori:adventure-text-minimessage:4.24.0")
-    compileOnly("net.kyori:adventure-text-serializer-gson:4.24.0")
-    compileOnly("net.kyori:adventure-text-serializer-plain:4.24.0")
-    compileOnly("net.kyori:adventure-text-serializer-ansi:4.24.0")
-    compileOnly("net.kyori:adventure-nbt:4.24.0")
+    compileOnly("net.kyori:adventure-text-serializer-legacy:4.25.0")
+    compileOnly("net.kyori:adventure-text-minimessage:4.25.0")
+    compileOnly("net.kyori:adventure-text-serializer-gson:4.25.0")
+    compileOnly("net.kyori:adventure-text-serializer-plain:4.25.0")
+    compileOnly("net.kyori:adventure-text-serializer-ansi:4.25.0")
+    compileOnly("net.kyori:adventure-nbt:4.25.0")
     compileOnly("com.maxmind.geoip2:geoip2:4.4.0")
     compileOnly("org.apache.ant:ant:1.10.15")
     compileOnly("com.zaxxer:HikariCP:7.0.2")
