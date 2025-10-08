@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.5.0-DEV"
+version = "1.5.1"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val targetJavaVersion = 21
@@ -37,7 +37,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.9-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:core:1.2.4-SNAPSHOT")
     //compileOnly("pl.syntaxdevteam.license:license-client:0.1.1")
@@ -73,7 +73,7 @@ tasks {
         useJUnitPlatform()
     }
     runServer {
-        minecraftVersion("1.21.9")
+        minecraftVersion("1.21.10")
         runDirectory(file("run/paper"))
     }
     runPaper.folia.registerTask()
@@ -159,6 +159,6 @@ hangarPublish {
 }
 
 plugindeployer {
-    paper { dir = "/home/debian/poligon/1.21.9/Paper/plugins" }
-    folia { dir = "/home/debian/poligon/1.21.9/Folia/plugins" }
+    paper { dir = "/home/debian/poligon/1.21.10/Paper/plugins" }
+    folia { dir = "/home/debian/poligon/1.21.10/Folia/plugins" }
 }
