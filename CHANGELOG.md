@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.6.0-SNAPSHOT] - Unreleased
+### Changes:
+- [x] Dodano ustawienia dotyczące wyboru spawnu
+    * Zmieniono komende `/setspawn` na `/setunjail` by uniknąć konfliktu z EssentialX i FoliEssentials
+- [x] Added GUI for managing players and punishments (kick, ban, mute, etc.
+    - Asynchronous data downloads minimize latency.
+    - Ability to search for players by nickname.
+    - Ability to sort players (online, offline, banned, muted, etc.).
+- [x] The DatabaseHandler class has been adapted to use the latest version of the SyntaxCore 1.2.5-SNAPSHOT authoring library.
+    - Added support for asynchronous database operations to minimize server lag.
+    - Improved error handling and logging for better debugging and maintenance.
+    - Optimized database queries for better performance and efficiency.
+    - Added support MSSQL database type
+- [x] Added migrateDatabase method
+    * **(Highly experimental)** Added the ability to migrate from one database type to another `prx migrate <from> <to>`. Supported types: `sqlite`, `mysql`, `mariadb`, `postgresql`, `mssql`
+
+      Example:
+      ```LOG
+      /prx migrate sqlite mysql
+      ```
+## [1.5.1] - 2025-10-8
+
+### Changes:
+* Added support for 1.21.10
+* Libraries and dependencies updated to the latest versions.
+
+
 ## [1.5.0] - 2025-10-04
 
 ### Functional changes:
@@ -154,14 +181,14 @@ webhook:
 ```
 * Added PunisherXAPI version 1.0-Beta - more info in [Wiki](https://github.com/SyntaxDevTeam/PunisherX/wiki/API)
 * Added placeholders for mute, warn and jail penalty times
-  * From now on, the following placeholders are available:
-    * `%prx_mute_remaining_time%`
-    * `%prx_warn_remaining_time%`
-    * `%prx_jail_remaining_time%`
-    * `%prx_total_active_punishments%`
-    * `%prx_total_punishments%`
+    * From now on, the following placeholders are available:
+        * `%prx_mute_remaining_time%`
+        * `%prx_warn_remaining_time%`
+        * `%prx_jail_remaining_time%`
+        * `%prx_total_active_punishments%`
+        * `%prx_total_punishments%`
 
-  * Additionally, in the language file in the placeholders category, you can set any format in which they will be displayed.
+    * Additionally, in the language file in the placeholders category, you can set any format in which they will be displayed.
 
 For example:
 ```YAML
@@ -180,7 +207,7 @@ setjail:
   usage: "Correct usage is: <gold>/setjail <radius></gold>"
 ```
 * Teleporting the player on login when offline "jail" has expired
-  * Teleportation location to be set in config file
+    * Teleportation location to be set in config file
 * Added `/setspawn` command for more convenient respawn location setting after serving a prison sentence
 * Added information about the new version in the chat
 * All libraries, dependencies, and Kotlin and Gradle themselves have been updated to the latest versions
@@ -195,23 +222,23 @@ setjail:
 * Added helper methods for setting spawn location after prison sentence
 * Replacing ConcurrentHashMap with the efficient and optimal Caffeine cache library
 * Added centralized class to manage all permissions in the plugin - change of permission system
-  * From now on, the plugin switches to permissions according to the `plugin.type.type.parameter` standard, e.g. `punisherx.cmd.ban`
-  * Backward compatibility has been ensured with simultaneous information about the need to update permissions on your server
+    * From now on, the plugin switches to permissions according to the `plugin.type.type.parameter` standard, e.g. `punisherx.cmd.ban`
+    * Backward compatibility has been ensured with simultaneous information about the need to update permissions on your server
 * Added getSmartMessage method to handle multi-line messages for Broadcast
 
 For example::
 ```YAML
 jail:
   broadcast: "<dark_gray>Player <gray>{player}</gray> has been jailed for <gray>{reason}</gray> for <gray>{time}</gray></dark_gray>"
-  # Alternatively, you can use the message format below if you wish to further emphasize this message
-  # broadcast:
+    # Alternatively, you can use the message format below if you wish to further emphasize this message
+    # broadcast:
     #- "<dark_gray>*************** Your Server Name *************** </dark_gray>"
     #- ""
     #- "<red>   Player <white>{player}</white> has been locked up</red>"
     #- "   Reason: <white>{reason}</white>"
     #- "   Duration: <white>{time}</white>"
     #- ""
-    #- "<dark_gray>*************************************************** </dark_gray>"
+  #- "<dark_gray>*************************************************** </dark_gray>"
 ```
 
 ## [1.3.3-HOTFIX] - 2025-03-12
@@ -259,8 +286,8 @@ Update all dependency
 ## [1.3.0] - 2024-12-23
 ### Functional Changes:
 * New command: `/jail <player> (time) <reason>` - Allows administrators to jail a player in a specified location in the config.yml for a set duration.
-  * Utilized cache system for player checks (performance improvement)
-  * Minimized database connections (performance improvement)
+    * Utilized cache system for player checks (performance improvement)
+    * Minimized database connections (performance improvement)
 * New command: `/unjail <player>` - Counterpart to the `jail` command. Instantly releases a player from jail, teleporting them to "World Spawn".
 * New command: `/setjail radius <radius>` - Sets the jail area with a specified radius. Simply stand at the desired location and use the command to designate the jail area. This simplifies the process, avoiding tedious config settings.
 * Added `--force` argument for `ban`, `jail`, `mute` commands to provide additional security. Just add it at the end of the command, e.g., `/ban player reason --force`, to execute the command even on `OP` or with `bypass` permission in case of server abuse.
@@ -279,9 +306,9 @@ Update all dependency
 
 ### Technical Changes:
 * Significantly reduced cache memory usage required for the plugin while improving performance.
-  * Improved code structure for better performance and maintenance.
-  * Implemented DRY principle for all classes.
-  * Reduced the number of single-use variables to almost zero.
+    * Improved code structure for better performance and maintenance.
+    * Implemented DRY principle for all classes.
+    * Reduced the number of single-use variables to almost zero.
 * Updated dependency gradle to v8.12.
 
 
@@ -316,13 +343,13 @@ Update all dependency
 ## [1.2.0] - 2024-12-04
 ### Functional Changes:
 - Database support has been rewritten. Significant performance improvement!
-  - The following database types are now supported: MariaDB/MySQL, SQLite, H2, PostgreSQL 
+    - The following database types are now supported: MariaDB/MySQL, SQLite, H2, PostgreSQL
 - Added new command `/clearall <player>`
 - Added suggestions to command arguments
 - Updated comments in config file
 - Change the display style for some commands to be more user-friendly
 - Improved UUID reading class
-  - Added alternative API
+    - Added alternative API
 - Improved the logs to make them more understandable
 
 ### Fixes:
@@ -331,8 +358,8 @@ Update all dependency
 
 ### Additions:
 - Added logging of blocked player messages with Mute
-- Added appropriate messages in the language file. 
-  - **Very important! Remove your language file from the plugin folder in the lang directory or add the missing entry. You can find it here**
+- Added appropriate messages in the language file.
+    - **Very important! Remove your language file from the plugin folder in the lang directory or add the missing entry. You can find it here**
 
 ### Technical Changes:
 - Dependency management has been reorganized
