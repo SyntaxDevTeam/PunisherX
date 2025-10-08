@@ -38,12 +38,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.9-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:core:1.2.4-SNAPSHOT")
     //compileOnly("pl.syntaxdevteam.license:license-client:0.1.1")
     //implementation(files("libs/SyntaxCore-1.1.0-all.jar"))
-    compileOnly("pl.syntaxdevteam:cleanerx:1.5.2")
+    compileOnly("pl.syntaxdevteam:cleanerx:1.5.3")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.5")
     compileOnly("com.google.code.gson:gson:2.13.2")
@@ -75,7 +75,7 @@ tasks {
         useJUnitPlatform()
     }
     runServer {
-        minecraftVersion("1.21.9")
+        minecraftVersion("1.21.10")
         runDirectory(file("run/paper"))
     }
     runPaper.folia.registerTask()
@@ -161,6 +161,6 @@ hangarPublish {
 }
 
 plugindeployer {
-    paper { dir = "/home/debian/poligon/1.21.9/Paper/plugins" }
-    folia { dir = "/home/debian/poligon/1.21.9/Folia/plugins" }
+    paper { dir = "/home/debian/poligon/1.21.10/Paper/plugins" }
+    folia { dir = "/home/debian/poligon/1.21.10/Folia/plugins" }
 }
