@@ -201,6 +201,14 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
 
+        if (args.isEmpty()) {
+            val baseSuggestions = mutableListOf("help")
+            if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.PUNISHERX_COMMAND)) {
+                baseSuggestions.addAll(listOf("version", "reload", "export", "import", "migrate"))
+            }
+            return baseSuggestions
+        }
+
         if (args.size == 1) {
             val baseSuggestions = mutableListOf<String>()
             if ("help".startsWith(args[0], ignoreCase = true)) {
