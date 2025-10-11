@@ -40,7 +40,7 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
         val releaseLocation = plugin.cache.getReleaseLocation(uuid)
 
         if (player != null && releaseLocation == null) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("setspawn", "set_error"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("setunjail", "set_error"))
             return
         }
 

@@ -32,6 +32,7 @@ setunjail:
   set: "<green>Spawn location set to: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
   set_error: "<red>Failed to set the spawn location.</red>"
 
+
 # /jail command messages
 jail:
   jail: "<green>You jailed player <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green>"
@@ -360,7 +361,7 @@ GUI:
       reason: "<gray>Reason: <yellow><reason></yellow></gray>"
   Config:
     title: "<yellow>Configuration</yellow>"
-    setspawn: "<yellow>Set spawn</yellow>"
+    setunjail: "<yellow>Set unjail location</yellow>"
     setjail: "<yellow>Set jail</yellow>"
   Nav:
     next: "<gray>Next page</gray>"

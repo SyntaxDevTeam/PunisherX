@@ -149,7 +149,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             "  <gold>/jail <player> (time) <reason> <gray>- <white>Sends a player to jail.",
             "  <gold>/unjail <player> <gray>- <white>Releases a player from jail.",
             "  <gold>/setjail <radius> <gray>- <white>Setting up the jail location.",
-            "  <gold>/setspawn <gray>- <white>Sets the respawn location",
+            "  <gold>/setunjail <gray>- <white>Sets the unjail respawn location",
             "                             <white>after serving a prison sentence.",
             "  <gold>/change-reason <penalty_id> <new_reason> <gray>",
             "                - <white>Changes the reason for the penalty.",

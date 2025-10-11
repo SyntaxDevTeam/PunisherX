@@ -87,7 +87,7 @@ class PunishmentCache(private val plugin: PunisherX) {
                         }
                     }
                 } else {
-                    plugin.logger.debug("Brak zapisanej lokalizacji powrotu i /setspawn dla gracza ${player.name}")
+                    plugin.logger.debug("Brak zapisanej lokalizacji powrotu i /setunjail dla gracza ${player.name}")
                 }
             }
 

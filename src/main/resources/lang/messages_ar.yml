@@ -33,6 +33,7 @@ setunjail:
   set: "<green>تم تعيين موقع الاستنساخ إلى: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
   set_error: "<red>فشل في تعيين موقع الاستنساخ.</red>"
 
+
 # رسائل أمر /jail
 jail:
   jail: "<green>لقد سجنت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
@@ -370,7 +371,7 @@ GUI:
 
   Config:
     title: "<yellow>الإعدادات</yellow>"
-    setspawn: "<yellow>تعيين موقع الاستنساخ</yellow>"
+    setunjail: "<yellow>تعيين موقع العودة</yellow>"
     setjail: "<yellow>تعيين موقع السجن</yellow>"
 
   Nav:

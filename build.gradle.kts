@@ -161,6 +161,6 @@ hangarPublish {
 }
 
 plugindeployer {
-    paper { dir = "/home/debian/poligon/1.21.10/Paper/plugins" }
-    folia { dir = "/home/debian/poligon/1.21.10/Folia/plugins" }
+    paper { dir = "/home/debian/poligon/Paper/1.21.10/plugins" } //ostatnia wersja dla Paper
+    folia { dir = "/home/debian/poligon/Folia/1.21.8/plugins" } //ostatnia wersja dla Folia
 }

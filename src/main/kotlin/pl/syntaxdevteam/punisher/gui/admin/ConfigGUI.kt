@@ -16,7 +16,7 @@ class ConfigGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
         inventory.fillWithFiller()
 
-        inventory.setItem(20, createItem(Material.COMPASS, mH.getCleanMessage("GUI", "Config.setspawn")))
+        inventory.setItem(20, createItem(Material.COMPASS, mH.getCleanMessage("GUI", "Config.setunjail")))
         inventory.setItem(
             24,
             createItem(
@@ -34,7 +34,7 @@ class ConfigGUI(plugin: PunisherX) : BaseGUI(plugin) {
         when (event.rawSlot) {
             20 -> {
                 player.closeInventory()
-                player.performCommand("setspawn")
+                player.performCommand("setunjail")
             }
             24 -> {
                 player.closeInventory()

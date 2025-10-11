@@ -33,7 +33,7 @@ class SetSpawnCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.saveConfig()
             stack.sender.sendMessage(
                 plugin.messageHandler.getMessage(
-                    "setspawn", "set", mapOf(
+                    "setunjail", "set", mapOf(
                         "world" to world,
                         "locationx" to locationX,
                         "locationy" to locationY,
@@ -42,7 +42,7 @@ class SetSpawnCommand(private val plugin: PunisherX) : BasicCommand {
                 )
             )
         } else {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("setspawn", "set_error"))
+            stack.sender.sendMessage(plugin.messageHandler.getMessage("setunjail", "set_error"))
         }
     }
 

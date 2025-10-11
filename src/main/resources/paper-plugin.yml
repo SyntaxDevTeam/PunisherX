@@ -73,9 +73,9 @@ commands:
     description: Sets the jail area with a specified radius. Simply stand at the desired location and use the command to designate the jail area. This simplifies the process, avoiding tedious config settings.
     usage: /unban radius <radius>
     permission: punisherx.cmd.setjail
-  setspawn:
+  setunjail:
     description: Sets the respawn location after a jail sentence ends.
-    usage: /setspawn
+    usage: /setunjail
     permission: punisherx.manage.set_spawn
   mute:
     description: Mutes a player for a specified time with a reason.
