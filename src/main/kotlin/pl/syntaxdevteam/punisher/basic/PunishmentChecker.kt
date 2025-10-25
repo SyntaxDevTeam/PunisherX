@@ -31,7 +31,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         if (PermissionChecker.isAuthor(uuid)) {
             player.sendMessage(
                 plugin.messageHandler
-                    .formatMixedTextToMiniMessage(plugin.messageHandler.getPrefix() + " <green>Witaj, <b>WieszczY!</b> Ten serwer używa Twojego pluginu! :)",
+                .formatMixedTextToMiniMessage(plugin.messageHandler.getPrefix() + " <green>Witaj, <b>WieszczY!</b><newline>    Ten serwer używa ${plugin.pluginMeta.name} ${plugin.pluginMeta.version} :)",
                         TagResolver.empty())
             )
         }

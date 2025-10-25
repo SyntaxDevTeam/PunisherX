@@ -10,11 +10,12 @@ import org.bukkit.event.HandlerList
 import org.bukkit.plugin.ServicePriority
 import pl.syntaxdevteam.core.SyntaxCore
 import pl.syntaxdevteam.core.manager.PluginManagerX
-import pl.syntaxdevteam.core.messaging.MessageHandler
+import pl.syntaxdevteam.message.SyntaxMessages
 import pl.syntaxdevteam.core.logging.Logger
 import pl.syntaxdevteam.core.stats.StatsCollector
 import pl.syntaxdevteam.core.update.GitHubSource
 import pl.syntaxdevteam.core.update.ModrinthSource
+import pl.syntaxdevteam.message.MessageHandler
 import pl.syntaxdevteam.punisher.api.PunisherXApi
 import pl.syntaxdevteam.punisher.api.PunisherXApiImpl
 import pl.syntaxdevteam.punisher.basic.*

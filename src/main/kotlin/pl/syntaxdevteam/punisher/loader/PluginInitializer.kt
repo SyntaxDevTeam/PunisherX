@@ -3,6 +3,7 @@ package pl.syntaxdevteam.punisher.loader
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.scheduler.BukkitRunnable
 import pl.syntaxdevteam.core.SyntaxCore
+import pl.syntaxdevteam.message.SyntaxMessages
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.api.PunisherXApi
 import pl.syntaxdevteam.punisher.api.PunisherXApiImpl
@@ -80,7 +81,8 @@ class PluginInitializer(private val plugin: PunisherX) {
      * Initializes various handlers used by the plugin.
      */
     private fun setupHandlers() {
-        plugin.messageHandler = SyntaxCore.messages
+        SyntaxMessages.initialize(plugin)
+        plugin.messageHandler = SyntaxMessages.messages
         plugin.pluginsManager = SyntaxCore.pluginManagerx
         plugin.timeHandler = TimeHandler(plugin)
         plugin.punishmentManager = PunishmentManager()

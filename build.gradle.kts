@@ -7,7 +7,7 @@ plugins {
     id("com.gradleup.shadow") version "9.2.2"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
-    id("xyz.jpenilla.run-paper") version "3.0.1"
+    id("xyz.jpenilla.run-paper") version "3.0.2"
     id("pl.syntaxdevteam.plugindeployer") version "1.0.1"
 }
 
@@ -40,7 +40,8 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:core:1.2.4-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:core:1.2.5-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:messageHandler:1.0.1-SNAPSHOT")
     //compileOnly("pl.syntaxdevteam.license:license-client:0.1.1")
     //implementation(files("libs/SyntaxCore-1.1.0-all.jar"))
     compileOnly("pl.syntaxdevteam:cleanerx:1.5.3")
@@ -58,7 +59,7 @@ dependencies {
     compileOnly("com.zaxxer:HikariCP:7.0.2")
     compileOnly("net.luckperms:api:5.5")
     compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.0.1")
+    compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.1.0")
     compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
     compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.15")
     compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2")
