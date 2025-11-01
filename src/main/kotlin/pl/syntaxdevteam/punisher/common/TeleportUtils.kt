@@ -7,6 +7,7 @@ import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
+import kotlin.math.abs
 
 object TeleportUtils {
 
@@ -101,7 +102,10 @@ object TeleportUtils {
         val headBlock = feetBlock.getRelative(BlockFace.UP)
         val belowBlock = feetBlock.getRelative(BlockFace.DOWN)
 
-        if (!isPassable(feetBlock) || !isPassable(headBlock)) {
+        val yOffset = location.y - location.blockY
+        val allowSolidFeet = abs(yOffset) < 1.0E-3
+
+        if (!isSafeBodyBlock(feetBlock, allowSolidFeet) || !isSafeBodyBlock(headBlock, false)) {
             return false
         }
 
@@ -112,15 +116,22 @@ object TeleportUtils {
         return true
     }
 
-    private fun isPassable(block: Block): Boolean {
+    private fun isSafeBodyBlock(block: Block, allowSolid: Boolean): Boolean {
         val type = block.type
         if (type == Material.LAVA || type == Material.FIRE || type == Material.CACTUS ||
             type == Material.SWEET_BERRY_BUSH || type == Material.CAMPFIRE || type == Material.SOUL_CAMPFIRE ||
-            type == Material.MAGMA_BLOCK
+            type == Material.MAGMA_BLOCK || type == Material.WATER || type == Material.BUBBLE_COLUMN ||
+            type == Material.POWDER_SNOW
         ) {
             return false
         }
-        return block.isPassable || type == Material.AIR
+        if (block.isPassable || type == Material.AIR) {
+            return true
+        }
+        if (allowSolid && type.isSolid) {
+            return true
+        }
+        return false
     }
 
     private fun isSafeFloor(block: Block): Boolean {
@@ -128,7 +139,9 @@ object TeleportUtils {
         if (type == Material.AIR || !type.isSolid) {
             return false
         }
-        if (type == Material.LAVA || type == Material.FIRE) {
+        if (type == Material.LAVA || type == Material.FIRE || type == Material.WATER ||
+            type == Material.MAGMA_BLOCK || type == Material.CAMPFIRE || type == Material.SOUL_CAMPFIRE
+        ) {
             return false
         }
         return true
