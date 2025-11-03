@@ -29,7 +29,13 @@ class PunishTypeGUI(plugin: PunisherX) : BaseGUI(plugin) {
         inventory.setItem(10, createItem(Material.IRON_SWORD, mH.getCleanMessage("GUI", "PunishType.ban")))
         inventory.setItem(11, createItem(Material.REDSTONE_BLOCK, mH.getCleanMessage("GUI", "PunishType.banip")))
         inventory.setItem(12, createItem(Material.BLAZE_ROD, mH.getCleanMessage("GUI", "PunishType.kick")))
-        inventory.setItem(14, createItem(Material.IRON_BARS, mH.getCleanMessage("GUI", "PunishType.jail")))
+        inventory.setItem(
+            14,
+            createItem(
+                plugin.versionCompatibility.resolveMaterial("IRON_CHAIN", "IRON_BARS", "CHAIN"),
+                mH.getCleanMessage("GUI", "PunishType.jail")
+            )
+        )
         inventory.setItem(15, createItem(Material.BOOK, mH.getCleanMessage("GUI", "PunishType.mute")))
         inventory.setItem(16, createItem(Material.PAPER, mH.getCleanMessage("GUI", "PunishType.warn")))
 

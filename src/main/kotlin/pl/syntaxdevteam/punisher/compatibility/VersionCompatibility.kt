@@ -37,8 +37,19 @@ class VersionCompatibility(
                 untilVersion = parseVersion("1.21.8")
             ),
             MaterialVariant(
-                materialName = "IRON_BARS",
+                materialName = "IRON_CHAIN",
                 fromVersion = parseVersion("1.21.9")
+            )
+        ),
+        "IRON_CHAIN" to listOf(
+            MaterialVariant(
+                materialName = "IRON_CHAIN",
+                fromVersion = parseVersion("1.21.9")
+            ),
+            MaterialVariant(
+                materialName = "CHAIN",
+                fromVersion = parseVersion("1.16.0"),
+                untilVersion = parseVersion("1.21.8")
             )
         )
         // Additional materials can be added here as new runtime differences appear.

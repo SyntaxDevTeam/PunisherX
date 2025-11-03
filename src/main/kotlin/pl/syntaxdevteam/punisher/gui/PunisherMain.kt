@@ -43,7 +43,11 @@ class PunisherMain(plugin: PunisherX) : BaseGUI(plugin) {
         MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.adminOnline.title"), Material.COMMAND_BLOCK, 22) { player ->
             AdminListGUI(plugin).open(player)
         },
-        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PlayerAction.list"), Material.IRON_BARS, 29) { player ->
+        MenuEntry(
+            plugin.messageHandler.getCleanMessage("GUI", "PlayerAction.list"),
+            plugin.versionCompatibility.resolveMaterial("IRON_CHAIN", "IRON_BARS", "CHAIN"),
+            29
+        ) { player ->
             PunishedListGUI(plugin).open(player)
         },
         MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PlayerAction.config"), Material.COMPARATOR, 33) { player ->

@@ -15,7 +15,13 @@ class PunishedListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         val inventory = Bukkit.createInventory(null, 45, getTitle())
         inventory.fillWithFiller()
         inventory.setItem(20, createItem(Material.IRON_SWORD, mH.getCleanMessage("GUI", "PunishedList.banned")))
-        inventory.setItem(24, createItem(Material.IRON_BARS, mH.getCleanMessage("GUI", "PunishedList.jailed")))
+        inventory.setItem(
+            24,
+            createItem(
+                plugin.versionCompatibility.resolveMaterial("IRON_CHAIN", "IRON_BARS", "CHAIN"),
+                mH.getCleanMessage("GUI", "PunishedList.jailed")
+            )
+        )
         inventory.setItem(40, createNavItem(Material.BARRIER, mH.getCleanMessage("GUI", "Nav.back")))
         player.openInventory(inventory)
     }

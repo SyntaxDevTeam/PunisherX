@@ -20,7 +20,7 @@ class ConfigGUI(plugin: PunisherX) : BaseGUI(plugin) {
         inventory.setItem(
             24,
             createItem(
-                plugin.versionCompatibility.resolveMaterial("CHAIN", "IRON_BARS"),
+                plugin.versionCompatibility.resolveMaterial("IRON_CHAIN", "CHAIN", "IRON_BARS"),
                 mH.getCleanMessage("GUI", "Config.setjail")
             )
         )
