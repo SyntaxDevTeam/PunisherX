@@ -13,8 +13,8 @@ import pl.syntaxdevteam.punisher.loader.isBetween
  * closest available alternative for the current server runtime.
  */
 class VersionCompatibility(
-    private val versionChecker: VersionChecker,
-    private val parseVersion: (String) -> SemanticVersion = { SemanticVersion.parse(it) }
+    versionChecker: VersionChecker,
+    parseVersion: (String) -> SemanticVersion = { SemanticVersion.parse(it) }
 ) {
 
     private val currentVersion: SemanticVersion = versionChecker.getSemanticVersion()
@@ -85,12 +85,5 @@ class VersionCompatibility(
         throw IllegalArgumentException(
             "No compatible material found for $key on Minecraft $currentVersion (candidates: ${candidates.joinToString()})"
         )
-    }
-
-    /**
-     * Checks whether the provided [materialName] exists on the current server.
-     */
-    fun materialExists(materialName: String): Boolean {
-        return Material.matchMaterial(materialName) != null
     }
 }
