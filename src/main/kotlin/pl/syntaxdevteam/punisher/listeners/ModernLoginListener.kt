@@ -29,6 +29,13 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
     fun onPreLogin(event: AsyncPlayerPreLoginEvent) {
         cleanupDecisions()
 
+        if (event.loginResult != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
+            plugin.logger.debug(
+                "ModernLogin(pre): existing login result ${event.loginResult} for ${event.name} → keep as is"
+            )
+            return
+        }
+
         val playerName = event.name
 
         val ip = event.address.hostAddress
