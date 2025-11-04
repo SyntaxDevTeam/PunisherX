@@ -1,8 +1,19 @@
-### Config version 1.4.1
+### Config version 1.5.0
+
+# /********************************************/
+#    Global settings
+# /********************************************/
+
+# If your server is on a server network, such as Velocity,
+# set the mode name to associate any penalties issued with that specific server.
+# This means that a penalty received on a server like Survival will not be applied to games like SkyBlock, etc.
+# The default setting is "network" and means that the penalty received will apply to all servers on the network.
+server: "network"
 
 # /********************************************/
 #    Settings for connecting to the database
 # /********************************************/
+
 database:
   # Available options: mariadb, mysql, postgresql, sqlite, h2
   type: "sqlite"
