@@ -40,8 +40,7 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
 
         val ip = event.address.hostAddress
         if (ip.isNullOrBlank()) {
-            plugin.logger.debug("ModernLogin(pre): brak adresu IP dla $playerName → allow()")
-            event.allow()
+            plugin.logger.debug("ModernLogin(pre): brak adresu IP dla $playerName → leaving result ${event.loginResult}")
             return
         }
 
@@ -50,7 +49,6 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
             when (val action = evaluatePunishments(uuid, playerName, ip)) {
                 is LoginAction.Allow -> {
                     pendingDecisions.remove(playerName.lowercase(Locale.ROOT))
-                    event.allow()
                 }
 
                 is LoginAction.Deny -> {
@@ -62,7 +60,7 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
         } catch (ex: Exception) {
             plugin.logger.severe("Error during async login check for $playerName: ${ex.message}")
             ex.printStackTrace()
-            event.allow()
+            plugin.logger.debug("ModernLogin(pre): exception encountered → leaving result ${event.loginResult}")
         }
     }
 
@@ -70,16 +68,14 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
     fun onValidateLogin(event: PlayerConnectionValidateLoginEvent) {
         cleanupDecisions()
         val loginConn = event.connection as? PlayerLoginConnection ?: run {
-            plugin.logger.debug("ModernLogin: brak PlayerLoginConnection → allow()")
-            event.allow()
+            plugin.logger.debug("ModernLogin: brak PlayerLoginConnection → leaving existing decision")
             return
         }
 
 
         val profile: PlayerProfile? = loginConn.unsafeProfile ?: loginConn.authenticatedProfile
         if (profile?.name.isNullOrBlank()) {
-            plugin.logger.debug("ModernLogin: brak nazwy profilu → allow()")
-            event.allow()
+            plugin.logger.debug("ModernLogin: brak nazwy profilu → leaving existing decision")
             return
         }
 
@@ -92,7 +88,9 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
             return
         }
 
-        event.allow()
+        plugin.logger.debug(
+            "ModernLogin(validate): no cached decision for $playerName → leaving existing result"
+        )
     }
 
     private fun cleanupDecisions() {
