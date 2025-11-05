@@ -3,12 +3,12 @@ import org.gradle.api.publish.maven.MavenPublication
 
 
 plugins {
-    kotlin("jvm") version "2.2.20"
+    kotlin("jvm") version "2.2.21"
     id("com.gradleup.shadow") version "9.2.2"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
     id("xyz.jpenilla.run-paper") version "3.0.2"
-    id("pl.syntaxdevteam.plugindeployer") version "1.0.1"
+    id("pl.syntaxdevteam.plugindeployer") version "1.0.4"
 }
 
 group = "pl.syntaxdevteam.punisher"
@@ -42,7 +42,6 @@ dependencies {
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:core:1.2.5-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:messageHandler:1.0.1-SNAPSHOT")
-    //compileOnly("pl.syntaxdevteam.license:license-client:0.1.1")
     //implementation(files("libs/SyntaxCore-1.1.0-all.jar"))
     compileOnly("pl.syntaxdevteam:cleanerx:1.5.3")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
@@ -58,12 +57,12 @@ dependencies {
     compileOnly("org.apache.ant:ant:1.10.15")
     compileOnly("com.zaxxer:HikariCP:7.0.2")
     compileOnly("net.luckperms:api:5.5")
-    compileOnly("me.clip:placeholderapi:2.11.6")
+    compileOnly("me.clip:placeholderapi:2.11.7")
     compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.1.0")
     compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
     compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.15")
     compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2")
-    compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.2")
+    compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.3")
 
     testImplementation(kotlin("test"))
 }

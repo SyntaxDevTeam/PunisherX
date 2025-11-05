@@ -40,7 +40,7 @@ jobs:
         run: ./gradlew clean build
 
       - name: Upload JAR
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: PunisherX-latest-DEV.jar
           path: build/libs/*.jar
