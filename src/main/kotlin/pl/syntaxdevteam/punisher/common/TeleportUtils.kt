@@ -96,6 +96,55 @@ object TeleportUtils {
         }
     }
 
+    /**
+     * Finds the nearest safe [Location] to the provided [location]. The search scans
+     * a cubic area around the location in increasing distance order. If the
+     * provided location is already safe it will be returned unchanged. When no
+     * safe location can be found within the search range, `null` is returned.
+     */
+    fun findNearestSafeLocation(
+        location: Location,
+        horizontalRange: Int = 6,
+        verticalRange: Int = 4
+    ): Location? {
+        val base = location.clone()
+        if (isLocationSafe(base)) {
+            return base
+        }
+
+        val world = base.world ?: return null
+        val offsets = mutableListOf<Triple<Int, Int, Int>>()
+
+        for (dy in -verticalRange..verticalRange) {
+            for (dx in -horizontalRange..horizontalRange) {
+                for (dz in -horizontalRange..horizontalRange) {
+                    if (dx == 0 && dy == 0 && dz == 0) {
+                        continue
+                    }
+                    offsets.add(Triple(dx, dy, dz))
+                }
+            }
+        }
+
+        offsets.sortBy { (dx, dy, dz) -> dx * dx + dy * dy + dz * dz }
+
+        for ((dx, dy, dz) in offsets) {
+            val candidate = Location(
+                world,
+                base.x + dx,
+                base.y + dy,
+                base.z + dz,
+                base.yaw,
+                base.pitch
+            )
+            if (isLocationSafe(candidate)) {
+                return candidate
+            }
+        }
+
+        return null
+    }
+
     private fun isLocationSafe(location: Location): Boolean {
         val world = location.world ?: return false
         val feetBlock = world.getBlockAt(location)

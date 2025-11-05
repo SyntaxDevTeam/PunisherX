@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import org.bukkit.configuration.file.FileConfiguration
+import pl.syntaxdevteam.punisher.common.TeleportUtils
 import pl.syntaxdevteam.punisher.hooks.HookHandler
 import java.util.LinkedHashSet
 import java.util.Locale
@@ -86,7 +87,10 @@ object JailUtils {
             }
 
             if (resolved != null) {
-                return resolved
+                val safeLocation = TeleportUtils.findNearestSafeLocation(resolved)
+                if (safeLocation != null) {
+                    return safeLocation
+                }
             }
         }
 
