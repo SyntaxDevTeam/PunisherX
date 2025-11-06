@@ -1,12 +1,12 @@
 package pl.syntaxdevteam.punisher.basic
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class TimeHandlerTest {
     private val messageMap = mapOf(
@@ -26,12 +26,15 @@ class TimeHandlerTest {
         "error.no_data" to "no_data"
     )
 
-    private val provider = TimeHandler.MessageProvider { path, key ->
-        val messageKey = "$path.$key"
-        messageMap[messageKey] ?: error("Unexpected message key: $messageKey")
+    private fun createHandler(currentTime: () -> Long = { 0L }): TimeHandler {
+        return TimeHandler(
+            { path, key ->
+                val messageKey = "$path.$key"
+                messageMap[messageKey] ?: error("Unexpected message key: $messageKey")
+            },
+            currentTime
+        )
     }
-
-    private fun createHandler(currentTime: () -> Long = { 0L }) = TimeHandler(provider, currentTime)
 
     @Test
     fun `parseTime converts supported suffixes to seconds`() {

@@ -57,16 +57,16 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             meta.displayName(
                 mH.formatMixedTextToMiniMessage("<yellow>${target.name}</yellow>", TagResolver.empty())
             )
-            val loadMsg = mH.getCleanMessage("GUI", "PlayerList.loading")
+            val loadMsg = mH.stringMessageToStringNoPrefix("GUI", "PlayerList.loading")
             meta.lore(
                 listOf(
-                    mH.getLogMessage("GUI", "PlayerList.hover.uuid", mapOf("uuid" to loadMsg)),
-                    mH.getLogMessage("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loadMsg)),
-                    mH.getLogMessage("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to loadMsg)),
-                    mH.getLogMessage("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to loadMsg)),
-                    mH.getLogMessage("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to loadMsg)),
-                    mH.getLogMessage("GUI", "PlayerList.hover.punishments", mapOf("punishments" to loadMsg)),
-                    mH.getLogMessage("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishments", mapOf("punishments" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to loadMsg)),
                 )
             )
             head.itemMeta = meta
@@ -74,12 +74,12 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
             Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
                 val uuid = target.uniqueId
-                val onlineStr  = PlayerStatsService.getCurrentOnlineString(uuid) ?: mH.getCleanMessage("error", "no_data")
-                val totalStr   = PlayerStatsService.getTotalPlaytimeString(uuid) ?: mH.getCleanMessage("error", "no_data")
+                val onlineStr  = PlayerStatsService.getCurrentOnlineString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
+                val totalStr   = PlayerStatsService.getTotalPlaytimeString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
                 val punishStr  = plugin.databaseHandler.countPlayerAllPunishmentHistory(uuid).toString()
-                val playerIP   = plugin.playerIPManager.getPlayerIPByName(target.name) ?: mH.getCleanMessage("error", "no_data")
-                val punishments = plugin.databaseHandler.getActivePunishmentsString(uuid) ?: mH.getCleanMessage("error", "no_data")
-                val lastActive = PlayerStatsService.getLastActiveString(uuid) ?: mH.getCleanMessage("error", "no_data")
+                val playerIP   = plugin.playerIPManager.getPlayerIPByName(target.name) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
+                val punishments = plugin.databaseHandler.getActivePunishmentsString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
+                val lastActive = PlayerStatsService.getLastActiveString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
 
                 Bukkit.getScheduler().runTask(plugin, Runnable {
                     if (!holder.inv.viewers.contains(player)) return@Runnable
@@ -87,13 +87,13 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                     val im = item.itemMeta as SkullMeta
                     im.lore(
                         listOf(
-                            mH.getLogMessage("GUI", "PlayerList.hover.uuid", mapOf("uuid" to target.uniqueId.toString())),
-                            mH.getLogMessage("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to playerIP)),
-                            mH.getLogMessage("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to onlineStr)),
-                            mH.getLogMessage("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to totalStr)),
-                            mH.getLogMessage("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to lastActive)),
-                            mH.getLogMessage("GUI", "PlayerList.hover.punishments", mapOf("punishments" to punishments)),
-                            mH.getLogMessage("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to punishStr)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to target.uniqueId.toString())),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to playerIP)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to onlineStr)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to totalStr)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to lastActive)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishments", mapOf("punishments" to punishments)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to punishStr)),
                         )
                     )
                     item.itemMeta = im
@@ -103,13 +103,13 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         }
 
         if (currentPage > 0) {
-            inventory.setItem(36, createNavItem(Material.PAPER, mH.getCleanMessage("GUI", "Nav.previous")))
+            inventory.setItem(36, createNavItem(Material.PAPER, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")))
         }
 
-        inventory.setItem(40, createNavItem(Material.BARRIER, mH.getCleanMessage("GUI", "Nav.back")))
+        inventory.setItem(40, createNavItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")))
 
         if (currentPage < totalPages - 1) {
-            inventory.setItem(44, createNavItem(Material.BOOK, mH.getCleanMessage("GUI", "Nav.next")))
+            inventory.setItem(44, createNavItem(Material.BOOK, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")))
         }
 
         player.openInventory(inventory)
@@ -140,6 +140,6 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
     }
 
     override fun getTitle(): Component {
-        return mH.getLogMessage("GUI", "PunisherMain.playerOnline.title")
+        return mH.stringMessageToComponentNoPrefix("GUI", "PunisherMain.playerOnline.title")
     }
 }

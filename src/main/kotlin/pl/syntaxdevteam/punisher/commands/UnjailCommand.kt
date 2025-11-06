@@ -14,11 +14,11 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
 
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNJAIL)) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
         if (args.isEmpty()) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("unjail", "usage"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unjail", "usage"))
             return
         }
 
@@ -27,7 +27,7 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
 
         if (!plugin.cache.isPlayerInCache(uuid)) {
             stack.sender.sendMessage(
-                plugin.messageHandler.getMessage(
+                plugin.messageHandler.stringMessageToComponent(
                     "error",
                     "player_not_punished",
                     mapOf("player" to playerName)
@@ -40,7 +40,7 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
         val releaseLocation = plugin.cache.getReleaseLocation(uuid)
 
         if (player != null && releaseLocation == null) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("setunjail", "set_error"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("setunjail", "set_error"))
             return
         }
 
@@ -74,7 +74,7 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
                     plugin.logger.debug("<green>Player $playerName successfully unjailed.</green>")
                     completeUnjail()
                 } else {
-                    val failureMessage = plugin.messageHandler.getMessage(
+                    val failureMessage = plugin.messageHandler.stringMessageToComponent(
                         "unjail",
                         "teleport_failed",
                         mapOf("player" to playerName)

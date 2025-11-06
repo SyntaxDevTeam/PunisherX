@@ -17,7 +17,7 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
 
         if (args.isEmpty()) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("history", "usage"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("history", "usage"))
             return
         }
 
@@ -37,18 +37,18 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
 
             if (punishments.isEmpty()) {
                 stack.sender.sendMessage(
-                    plugin.messageHandler.getMessage(
+                    plugin.messageHandler.stringMessageToComponent(
                         "history",
                         "no_punishments",
                         mapOf("player" to player)
                     )
                 )
             } else {
-                val id = plugin.messageHandler.getCleanMessage("history", "id")
-                val types = plugin.messageHandler.getCleanMessage("history", "type")
-                val reasons = plugin.messageHandler.getCleanMessage("history", "reason")
-                val times = plugin.messageHandler.getCleanMessage("history", "time")
-                val title = plugin.messageHandler.getCleanMessage("history", "title")
+                val id = plugin.messageHandler.stringMessageToStringNoPrefix("history", "id")
+                val types = plugin.messageHandler.stringMessageToStringNoPrefix("history", "type")
+                val reasons = plugin.messageHandler.stringMessageToStringNoPrefix("history", "reason")
+                val times = plugin.messageHandler.stringMessageToStringNoPrefix("history", "time")
+                val title = plugin.messageHandler.stringMessageToStringNoPrefix("history", "title")
                 val playerIP = playerIPManager.getPlayerIPByName(player)
                 plugin.logger.debug("Player IP: $playerIP")
                 val geoLocation = playerIP?.let { ip ->
@@ -95,7 +95,7 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
                 stack.sender.sendMessage(navigation)
             }
         } else {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("history", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("history", "no_permission"))
         }
     }
 

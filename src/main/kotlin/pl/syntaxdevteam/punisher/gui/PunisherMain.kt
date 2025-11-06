@@ -33,24 +33,24 @@ class PunisherMain(plugin: PunisherX) : BaseGUI(plugin) {
      * Buttons displayed in the main menu.
      */
     private val menuEntries = listOf(
-        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.serwerInfo.title"), Material.PAPER, 4) { _ -> },
-        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOnline.title"), Material.PLAYER_HEAD, 10) { player ->
+        MenuEntry(plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.serwerInfo.title"), Material.PAPER, 4) { _ -> },
+        MenuEntry(plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.playerOnline.title"), Material.PLAYER_HEAD, 10) { player ->
             PlayerListGUI(plugin).open(player)
         },
-        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOffline.title"), Material.SKELETON_SKULL, 16) { player ->
+        MenuEntry(plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.playerOffline.title"), Material.SKELETON_SKULL, 16) { player ->
             OfflinePlayerListGUI(plugin).open(player)
         },
-        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.adminOnline.title"), Material.COMMAND_BLOCK, 22) { player ->
+        MenuEntry(plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.adminOnline.title"), Material.COMMAND_BLOCK, 22) { player ->
             AdminListGUI(plugin).open(player)
         },
         MenuEntry(
-            plugin.messageHandler.getCleanMessage("GUI", "PlayerAction.list"),
+            plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PlayerAction.list"),
             plugin.versionCompatibility.resolveMaterial("IRON_CHAIN", "IRON_BARS", "CHAIN"),
             29
         ) { player ->
             PunishedListGUI(plugin).open(player)
         },
-        MenuEntry(plugin.messageHandler.getCleanMessage("GUI", "PlayerAction.config"), Material.COMPARATOR, 33) { player ->
+        MenuEntry(plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PlayerAction.config"), Material.COMPARATOR, 33) { player ->
             ConfigGUI(plugin).open(player)
         },
     )
@@ -69,17 +69,17 @@ class PunisherMain(plugin: PunisherX) : BaseGUI(plugin) {
         menuEntries.forEach { entry ->
             val lore = when (entry.slot) {
                 4 -> listOf(
-                    plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.serwerInfo.serverName", mapOf("servername" to serverName)),
-                    plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.serwerInfo.daily", mapOf("daily" to daily)),
-                    plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.serwerInfo.tps", mapOf("time" to time, "tps" to tps)),
+                    plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.serwerInfo.serverName", mapOf("servername" to serverName)),
+                    plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.serwerInfo.daily", mapOf("daily" to daily)),
+                    plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.serwerInfo.tps", mapOf("time" to time, "tps" to tps)),
                 )
                 10 -> listOf(
-                    plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOnline.online", mapOf("onlineplayers" to onlinePlayers)),
-                    plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOnline.clickToView")
+                    plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.playerOnline.online", mapOf("onlineplayers" to onlinePlayers)),
+                    plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.playerOnline.clickToView")
                 )
                 16 -> listOf(
-                    plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOffline.total", mapOf("totalplayers" to totalPlayers)),
-                    plugin.messageHandler.getCleanMessage("GUI", "PunisherMain.playerOffline.clickToView")
+                    plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.playerOffline.total", mapOf("totalplayers" to totalPlayers)),
+                    plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.playerOffline.clickToView")
                 )
                 else -> emptyList()
             }
@@ -104,7 +104,7 @@ class PunisherMain(plugin: PunisherX) : BaseGUI(plugin) {
     }
 
     override fun getTitle(): Component {
-        return plugin.messageHandler.getLogMessage("GUI", "PunisherMain.title")
+        return plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunisherMain.title")
     }
 
     private fun getServerTPS(): String {

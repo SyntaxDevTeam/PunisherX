@@ -45,7 +45,7 @@ class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion()
         }
         val remainingTime = (punishData.end - System.currentTimeMillis())  / 1000
         return if (remainingTime > 0) {
-            plugin.messageHandler.getCleanMessage("placeholders", punishment) + plugin.timeHandler.formatTime(remainingTime.toString())
+            plugin.messageHandler.stringMessageToStringNoPrefix("placeholders", punishment) + plugin.timeHandler.formatTime(remainingTime.toString())
         } else {
             null
         }
@@ -55,8 +55,8 @@ class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion()
         val totalPunishments = plugin.databaseHandler.countAllPunishments()
         return if (totalPunishments > 0) {
         plugin.logger.debug("Total active punishments: $totalPunishments")
-        plugin.logger.debug("Formatting message for total active punishments: ${plugin.messageHandler.getCleanMessage("placeholders", "total_active_punishments")}")
-        plugin.messageHandler.getCleanMessage("placeholders", "total_active_punishments") + totalPunishments.toString()
+        plugin.logger.debug("Formatting message for total active punishments: ${plugin.messageHandler.stringMessageToStringNoPrefix("placeholders", "total_active_punishments")}")
+        plugin.messageHandler.stringMessageToStringNoPrefix("placeholders", "total_active_punishments") + totalPunishments.toString()
         } else {
             null
         }
@@ -67,8 +67,8 @@ class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion()
         val totalPunishmentHistory = plugin.databaseHandler.countAllPunishmentHistory()
         return if (totalPunishmentHistory > 0) {
             plugin.logger.debug("Total punishments: $totalPunishmentHistory")
-            plugin.logger.debug("Formatting message for total punishments: ${plugin.messageHandler.getCleanMessage("placeholders", "total_punishments")}")
-            plugin.messageHandler.getCleanMessage("placeholders", "total_punishments").let {
+            plugin.logger.debug("Formatting message for total punishments: ${plugin.messageHandler.stringMessageToStringNoPrefix("placeholders", "total_punishments")}")
+            plugin.messageHandler.stringMessageToStringNoPrefix("placeholders", "total_punishments").let {
                 it + totalPunishmentHistory.toString()
             }
         } else {

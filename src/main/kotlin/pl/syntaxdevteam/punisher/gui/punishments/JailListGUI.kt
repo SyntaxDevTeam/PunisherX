@@ -46,11 +46,11 @@ class JailListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         }
 
         if (page > 0) {
-            inventory.setItem(36, createNavItem(Material.PAPER, mH.getCleanMessage("GUI", "Nav.previous")))
+            inventory.setItem(36, createNavItem(Material.PAPER, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")))
         }
-        inventory.setItem(40, createNavItem(Material.BARRIER, mH.getCleanMessage("GUI", "Nav.back")))
+        inventory.setItem(40, createNavItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")))
         if (hasNext) {
-            inventory.setItem(44, createNavItem(Material.BOOK, mH.getCleanMessage("GUI", "Nav.next")))
+            inventory.setItem(44, createNavItem(Material.BOOK, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")))
         }
 
         player.openInventory(inventory)
@@ -64,17 +64,17 @@ class JailListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         meta.displayName(mH.formatMixedTextToMiniMessage("<yellow>${punishment.name}</yellow>", TagResolver.empty()))
         val formattedDate = dateFormat.format(Date(punishment.start))
         val remaining = if (punishment.end == -1L) {
-            mH.getCleanMessage("GUI", "JailList.permanent")
+            mH.stringMessageToStringNoPrefix("GUI", "JailList.permanent")
         } else {
             plugin.timeHandler.formatTime(((punishment.end - System.currentTimeMillis()) / 1000).toString())
         }
         meta.lore(
             listOf(
-                mH.getLogMessage("GUI", "JailList.hover.id", mapOf("id" to punishment.id.toString())),
-                mH.getLogMessage("GUI", "JailList.hover.date", mapOf("date" to formattedDate)),
-                mH.getLogMessage("GUI", "JailList.hover.remaining", mapOf("time" to remaining)),
-                mH.getLogMessage("GUI", "JailList.hover.operator", mapOf("operator" to punishment.operator)),
-                mH.getLogMessage("GUI", "JailList.hover.reason", mapOf("reason" to punishment.reason))
+                mH.stringMessageToComponentNoPrefix("GUI", "JailList.hover.id", mapOf("id" to punishment.id.toString())),
+                mH.stringMessageToComponentNoPrefix("GUI", "JailList.hover.date", mapOf("date" to formattedDate)),
+                mH.stringMessageToComponentNoPrefix("GUI", "JailList.hover.remaining", mapOf("time" to remaining)),
+                mH.stringMessageToComponentNoPrefix("GUI", "JailList.hover.operator", mapOf("operator" to punishment.operator)),
+                mH.stringMessageToComponentNoPrefix("GUI", "JailList.hover.reason", mapOf("reason" to punishment.reason))
             )
         )
         head.itemMeta = meta
@@ -94,6 +94,6 @@ class JailListGUI(plugin: PunisherX) : BaseGUI(plugin) {
     }
 
     override fun getTitle(): Component {
-        return mH.getLogMessage("GUI", "JailList.title")
+        return mH.stringMessageToComponentNoPrefix("GUI", "JailList.title")
     }
 }

@@ -30,14 +30,14 @@ class PlayerActionGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
         inventory.fillWithFiller()
 
-        inventory.setItem(11, createItem(Material.MACE, mH.getCleanMessage("GUI", "PlayerAction.punish")))
+        inventory.setItem(11, createItem(Material.MACE, mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.punish")))
 
-        inventory.setItem(13, createItem(Material.TOTEM_OF_UNDYING, mH.getCleanMessage("GUI", "PlayerAction.undo")))
-        inventory.setItem(15, createItem(Material.BOOK, mH.getCleanMessage("GUI", "PlayerAction.history")))
-        inventory.setItem(29, createItem(Material.PAPER, mH.getCleanMessage("GUI", "PlayerAction.active")))
-        inventory.setItem(31, createItem(Material.ENDER_PEARL, mH.getCleanMessage("GUI", "PlayerAction.teleport")))
-        inventory.setItem(33, createItem(Material.TNT, mH.getCleanMessage("GUI", "PlayerAction.delete")))
-        inventory.setItem(40, createNavItem(Material.BARRIER, mH.getCleanMessage("GUI", "Nav.back")))
+        inventory.setItem(13, createItem(Material.TOTEM_OF_UNDYING, mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.undo")))
+        inventory.setItem(15, createItem(Material.BOOK, mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.history")))
+        inventory.setItem(29, createItem(Material.PAPER, mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.active")))
+        inventory.setItem(31, createItem(Material.ENDER_PEARL, mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.teleport")))
+        inventory.setItem(33, createItem(Material.TNT, mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.delete")))
+        inventory.setItem(40, createNavItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")))
 
         player.openInventory(inventory)
     }
@@ -58,7 +58,7 @@ class PlayerActionGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 player.closeInventory()
                 val punishments = plugin.databaseHandler.getPunishments(target.uniqueId.toString())
                 if (punishments.isEmpty()) {
-                    player.sendMessage(mH.getMessage("error", "no_data"))
+                    player.sendMessage(mH.stringMessageToComponent("error", "no_data"))
                 } else {
                     punishments.forEach { punishment ->
                         val command = when (punishment.type) {
@@ -93,7 +93,7 @@ class PlayerActionGUI(plugin: PunisherX) : BaseGUI(plugin) {
                     if (loc != null) {
                         TeleportUtils.teleportSafely(plugin, player, loc)
                     } else {
-                        player.sendMessage(mH.getMessage("error", "no_data"))
+                        player.sendMessage(mH.stringMessageToComponent("error", "no_data"))
                     }
                 }
             }
@@ -103,6 +103,6 @@ class PlayerActionGUI(plugin: PunisherX) : BaseGUI(plugin) {
     }
 
     override fun getTitle(): Component {
-        return mH.getLogMessage("GUI", "PlayerAction.title")
+        return mH.stringMessageToComponentNoPrefix("GUI", "PlayerAction.title")
     }
 }

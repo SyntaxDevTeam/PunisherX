@@ -47,20 +47,20 @@ class DiscordWebhook(plugin: PunisherX) {
         }
 
         val fields = JsonArray().apply {
-            add(createField(mh.getCleanMessage("webhook", "player"), playerName, true))
-            add(createField(mh.getCleanMessage("webhook", "operator"), adminName, true))
-            add(createField(mh.getCleanMessage("webhook", "type"), type.uppercase(), true))
-            add(createField(mh.getCleanMessage("webhook", "reason"), reason, false))
-            add(createField(mh.getCleanMessage("webhook", "time"), formatDuration(duration), true))
+            add(createField(mh.stringMessageToStringNoPrefix("webhook", "player"), playerName, true))
+            add(createField(mh.stringMessageToStringNoPrefix("webhook", "operator"), adminName, true))
+            add(createField(mh.stringMessageToStringNoPrefix("webhook", "type"), type.uppercase(), true))
+            add(createField(mh.stringMessageToStringNoPrefix("webhook", "reason"), reason, false))
+            add(createField(mh.stringMessageToStringNoPrefix("webhook", "time"), formatDuration(duration), true))
         }
 
         val embed = JsonObject().apply {
-            addProperty("title", mh.getCleanMessage("webhook", "title"))
+            addProperty("title", mh.stringMessageToStringNoPrefix("webhook", "title"))
             addProperty("color", getColorForPunishmentType(type))
             addProperty("timestamp", Instant.now().toString())
             add("fields", fields)
             add("footer", JsonObject().apply {
-                addProperty("text", "${mh.getCleanMessage("webhook", "app_name")}${LocalDateTime.now().format(formatter)}")
+                addProperty("text", "${mh.stringMessageToStringNoPrefix("webhook", "app_name")}${LocalDateTime.now().format(formatter)}")
             })
         }
 

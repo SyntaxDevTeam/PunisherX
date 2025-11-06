@@ -47,6 +47,6 @@ class PunishTimeGUI(plugin: PunisherX) : BaseGUI(plugin) {
     }
 
     override fun getTitle(): Component {
-        return mH.getLogMessage("GUI", "PunishTime.title")
+        return mH.stringMessageToComponentNoPrefix("GUI", "PunishTime.title")
     }
 }

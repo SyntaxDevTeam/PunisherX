@@ -13,7 +13,7 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
         if(PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.MUTE)) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
-                    stack.sender.sendMessage(plugin.messageHandler.getMessage("mute", "usage"))
+                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("mute", "usage"))
                 } else {
                     val player = args[0]
                     val targetPlayer = Bukkit.getPlayer(player)
@@ -21,7 +21,7 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                     if (targetPlayer != null) {
                         if (!isForce && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_MUTE)) {
                             stack.sender.sendMessage(
-                                plugin.messageHandler.getMessage(
+                                plugin.messageHandler.stringMessageToComponent(
                                     "error",
                                     "bypass",
                                     mapOf("player" to player)
@@ -75,10 +75,10 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                     }
                 }
             } else {
-                stack.sender.sendMessage(plugin.messageHandler.getMessage("mute", "usage"))
+                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("mute", "usage"))
             }
         } else {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
         }
     }
 
@@ -89,7 +89,7 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
             2 -> generateTimeSuggestions()
-            3 -> plugin.messageHandler.getReasons("mute", "reasons")
+            3 -> plugin.messageHandler.getMessageStringList("mute", "reasons")
             else -> emptyList()
         }
     }

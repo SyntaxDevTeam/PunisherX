@@ -10,12 +10,12 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNBAN)) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
 
         if (args.isEmpty()) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("unban", "usage"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unban", "usage"))
             return
         }
 
@@ -36,7 +36,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
 
         val ips = plugin.playerIPManager.getPlayerIPsByName(playerOrIpOrUUID)
         if (ips.isEmpty()) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
             return
         }
 
@@ -47,7 +47,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
             if (unbanIP(stack, ip)) anyUnbanned = true
         }
         if (!anyUnbanned) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
         }
     }
 
@@ -56,7 +56,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
 
         if (punishments.isEmpty()) {
             plugin.logger.debug("Player $playerName ($uuid) has no ban")
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_punished", mapOf("player" to playerName)))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_punished", mapOf("player" to playerName)))
             return false
         }
 
@@ -87,7 +87,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
 
         if (punishments.isEmpty()) {
             plugin.logger.debug("No punishments found for IP $ip")
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "ip_not_found", mapOf("ip" to ip)))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "ip_not_found", mapOf("ip" to ip)))
             return false
         }
 

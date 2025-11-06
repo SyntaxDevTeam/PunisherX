@@ -27,8 +27,8 @@ class ConfirmDeleteGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
         inventory.fillWithFiller()
 
-        inventory.setItem(11, createItem(Material.GREEN_WOOL, mH.getCleanMessage("GUI", "PlayerAction.confirmDelete.confirm")))
-        inventory.setItem(15, createItem(Material.RED_WOOL, mH.getCleanMessage("GUI", "PlayerAction.confirmDelete.cancel")))
+        inventory.setItem(11, createItem(Material.GREEN_WOOL, mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.confirmDelete.confirm")))
+        inventory.setItem(15, createItem(Material.RED_WOOL, mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.confirmDelete.cancel")))
 
         player.openInventory(inventory)
     }
@@ -44,7 +44,7 @@ class ConfirmDeleteGUI(plugin: PunisherX) : BaseGUI(plugin) {
         when (event.rawSlot) {
             11 -> {
                 player.closeInventory()
-                target.player?.kick(mH.getLogMessage("GUI", "PlayerAction.deleteMessage"))
+                target.player?.kick(mH.stringMessageToComponentNoPrefix("GUI", "PlayerAction.deleteMessage"))
                 plugin.databaseHandler.deletePlayerData(target.uniqueId.toString())
                 plugin.playerIPManager.deletePlayerInfo(target.uniqueId)
             }
@@ -56,6 +56,6 @@ class ConfirmDeleteGUI(plugin: PunisherX) : BaseGUI(plugin) {
     }
 
     override fun getTitle(): Component {
-        return mH.getLogMessage("GUI", "PlayerAction.confirmDelete.title")
+        return mH.stringMessageToComponentNoPrefix("GUI", "PlayerAction.confirmDelete.title")
     }
 }

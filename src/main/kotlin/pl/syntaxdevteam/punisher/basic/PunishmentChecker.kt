@@ -98,12 +98,12 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                     val remainingTime = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(((endTime - System.currentTimeMillis()) / 1000).toString())
                     val reason = punishment.reason
                     val messageKey = if (punishment.type == "JAIL") "jail" else "mute"
-                    val infoMessage = plugin.messageHandler.getMessage(
+                    val infoMessage = plugin.messageHandler.stringMessageToComponent(
                         messageKey,
                         "mute_info_message",
                         mapOf("reason" to reason, "time" to remainingTime)
                     )
-                    val logMessage = plugin.messageHandler.getLogMessage(
+                    val logMessage = plugin.messageHandler.stringMessageToComponentNoPrefix(
                         messageKey,
                         "log",
                         mapOf("player" to playerName, "message" to plainMessage)
@@ -142,7 +142,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                             val duration = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(remainingTime.toString())
                             val reason = punishment.reason
                             event.isCancelled = true
-                            val muteMessage = plugin.messageHandler.getMessage("mute", "mute_message", mapOf("reason" to reason, "time" to duration))
+                            val muteMessage = plugin.messageHandler.stringMessageToComponent("mute", "mute_message", mapOf("reason" to reason, "time" to duration))
 
                             player.sendMessage(muteMessage)
                         } else if (punishment.type == "MUTE") {
@@ -189,7 +189,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
             if (!isAllowed) {
                 event.isCancelled = true
-                val message = plugin.messageHandler.getMessage("jail", "command_blocked_message")
+                val message = plugin.messageHandler.stringMessageToComponent("jail", "command_blocked_message")
                 player.sendMessage(message)
                 plugin.logger.debug("Blocked command '$originalCommand' for jailed player ${player.name}")
             }
@@ -228,7 +228,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
         TeleportUtils.teleportSafely(plugin, player, jailLocation) { success ->
             if (success) {
-                val message = plugin.messageHandler.getMessage("jail", "jail_restrict_message", emptyMap())
+                val message = plugin.messageHandler.stringMessageToComponent("jail", "jail_restrict_message", emptyMap())
                 player.sendMessage(message)
             } else {
                 plugin.logger.debug("<red>Failed to teleport player back to jail.</red>")

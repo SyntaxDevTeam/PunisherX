@@ -25,21 +25,21 @@ class GUIHandler(private val plugin: PunisherX) : Listener {
         val title = event.view.title()
 
         when (title) {
-            plugin.messageHandler.getLogMessage("GUI", "PunisherMain.title") -> PunisherMain(plugin).handleClick(event)
-            plugin.messageHandler.getLogMessage("GUI", "PunisherMain.playerOnline.title") -> PlayerListGUI(plugin).handleClick(event)
-            plugin.messageHandler.getLogMessage("GUI", "PunisherMain.adminOnline.title") -> AdminListGUI(plugin).handleClick(event)
-            plugin.messageHandler.getLogMessage("GUI", "PunisherMain.playerOffline.title") -> OfflinePlayerListGUI(
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunisherMain.title") -> PunisherMain(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunisherMain.playerOnline.title") -> PlayerListGUI(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunisherMain.adminOnline.title") -> AdminListGUI(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunisherMain.playerOffline.title") -> OfflinePlayerListGUI(
                 plugin
             ).handleClick(event)
-            plugin.messageHandler.getLogMessage("GUI", "PlayerAction.title") -> PlayerActionGUI(plugin).handleClick(event)
-            plugin.messageHandler.getLogMessage("GUI", "PlayerAction.confirmDelete.title") -> ConfirmDeleteGUI(plugin).handleClick(event)
-            plugin.messageHandler.getLogMessage("GUI", "PunishType.title") -> PunishTypeGUI(plugin).handleClick(event)
-            plugin.messageHandler.getLogMessage("GUI", "PunishTime.title") -> PunishTimeGUI(plugin).handleClick(event)
-            plugin.messageHandler.getLogMessage("GUI", "PunishReason.title") -> PunishReasonGUI(plugin).handleClick(event)
-            plugin.messageHandler.getLogMessage("GUI", "PunishedList.title") -> PunishedListGUI(plugin).handleClick(event)
-            plugin.messageHandler.getLogMessage("GUI", "BanList.title") -> BanListGUI(plugin).handleClick(event)
-            plugin.messageHandler.getLogMessage("GUI", "JailList.title") -> JailListGUI(plugin).handleClick(event)
-            plugin.messageHandler.getLogMessage("GUI", "Config.title") -> ConfigGUI(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PlayerAction.title") -> PlayerActionGUI(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PlayerAction.confirmDelete.title") -> ConfirmDeleteGUI(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunishType.title") -> PunishTypeGUI(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunishTime.title") -> PunishTimeGUI(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunishReason.title") -> PunishReasonGUI(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunishedList.title") -> PunishedListGUI(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "BanList.title") -> BanListGUI(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "JailList.title") -> JailListGUI(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "Config.title") -> ConfigGUI(plugin).handleClick(event)
         }
     }
 }

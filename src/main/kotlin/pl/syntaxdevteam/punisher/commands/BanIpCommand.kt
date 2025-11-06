@@ -20,11 +20,11 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BANIP)) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
         if (args.size < 2) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("banip", "usage"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("banip", "usage"))
             return
         }
 
@@ -37,7 +37,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         if (playerIPs.isEmpty()) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("banip", "not_found"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("banip", "not_found"))
             return
         }
 
@@ -50,7 +50,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
         val targetPlayer: Player? = targetUUID?.let { Bukkit.getPlayer(it) }
 
         if (targetPlayer != null && !isForce && PermissionChecker.hasWithLegacy(targetPlayer, PermissionChecker.PermissionKey.BYPASS_BANIP)) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "bypass", mapOf("player" to rawTarget)))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "bypass", mapOf("player" to rawTarget)))
             return
         }
 
@@ -77,7 +77,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
                 "BANIP", start, end ?: -1)
         }
         clp.logCommand(stack.sender.name, "BANIP", rawTarget, reason)
-        if (dbError) stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "db_error"))
+        if (dbError) stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
 
         if (targetPlayer != null) {
             val lines = plugin.messageHandler.getSmartMessage(
@@ -108,7 +108,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
             2 -> generateTimeSuggestions()
-            3 -> plugin.messageHandler.getReasons("banip", "reasons")
+            3 -> plugin.messageHandler.getMessageStringList("banip", "reasons")
             else -> emptyList()
         }
     }
