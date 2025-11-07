@@ -19,8 +19,8 @@ class SyntaxLoader : PluginLoader {
         resolveLibraries().map { DefaultArtifact(it) }
             .forEach { artifact -> resolver.addDependency(Dependency(artifact, null)) }
 
-        resolver.addRepository(RemoteRepository.Builder("syntaxdevteam", "default", "https://nexus.syntaxdevteam.pl/repository/maven-snapshots/").build())
-        resolver.addRepository(RemoteRepository.Builder("syntaxdevteam", "default", "https://nexus.syntaxdevteam.pl/repository/maven-releases/").build())
+        resolver.addRepository(RemoteRepository.Builder("syntaxdevteam-snapshots", "default", "https://nexus.syntaxdevteam.pl/repository/maven-snapshots/").build())
+        resolver.addRepository(RemoteRepository.Builder("syntaxdevteam-releases", "default", "https://nexus.syntaxdevteam.pl/repository/maven-releases/").build())
         resolver.addRepository(RemoteRepository.Builder("paper", "default", "https://repo.papermc.io/repository/maven-public/").build())
         resolver.addRepository(RemoteRepository.Builder("central-mirror", "default", "https://repo.papermc.io/repository/maven-central/").build())
         resolver.addRepository(RemoteRepository.Builder("jitpack", "default", "https://jitpack.io/").build())
