@@ -49,17 +49,13 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
                 val reasons = plugin.messageHandler.stringMessageToStringNoPrefix("history", "reason")
                 val times = plugin.messageHandler.stringMessageToStringNoPrefix("history", "time")
                 val title = plugin.messageHandler.stringMessageToStringNoPrefix("history", "title")
-                val playerIP = playerIPManager.getPlayerIPByName(player)
-                plugin.logger.debug("Player IP: $playerIP")
-                val geoLocation = playerIP?.let { ip ->
-                    val country = playerIPManager.geoIPHandler.getCountry(ip)
-                    val city = playerIPManager.geoIPHandler.getCity(ip)
-                    plugin.logger.debug("Country: $country, City: $city")
-                    "$city, $country"
-                } ?: "Unknown location"
+                val playerInfo = playerIPManager.getPlayerInfoByName(player)
+                plugin.logger.debug("Player info: $playerInfo")
+                val playerIP = playerInfo?.playerIP
+                val geoLocation = playerInfo?.geoLocation?.takeIf { it.isNotBlank() } ?: "Unknown location"
                 plugin.logger.debug("GeoLocation: $geoLocation")
                 val fullGeoLocation = when (stack.sender.hasPermission("punisherx.view_ip")) {
-                    true -> "$playerIP ($geoLocation)"
+                    true -> playerIP?.let { "$it ($geoLocation)" } ?: geoLocation
                     else -> geoLocation
                 }
                 val gamer = if (stack.sender.name == "CONSOLE") {
