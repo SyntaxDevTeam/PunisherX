@@ -32,7 +32,6 @@ class PluginInitializer(private val plugin: PunisherX) {
     fun onEnable() {
         setUpLogger()
         setupConfig()
-
         setupDatabase()
         setupHandlers()
         registerEvents()
