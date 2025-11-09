@@ -209,7 +209,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun getPlayerCacheLines(): List<String> {
         return try {
-            query("SELECT data FROM playercache") { rs -> rs.getString("data") }
+            query("SELECT data FROM playercache ORDER BY id ASC") { rs -> rs.getString("data") }
         } catch (e: Exception) {
             logger.err("Failed to load player cache lines. ${e.message}")
             emptyList()
