@@ -51,17 +51,13 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
                     val reasons = plugin.messageHandler.stringMessageToStringNoPrefix("check", "reason")
                     val times = plugin.messageHandler.stringMessageToStringNoPrefix("check", "time")
                     val title = plugin.messageHandler.stringMessageToStringNoPrefix("check", "title")
-                    val playerIP = playerIPManager.getPlayerIPByName(player)
-                    plugin.logger.debug("Player IP: $playerIP")
-                    val geoLocation = playerIP?.let { ip ->
-                        val country = playerIPManager.geoIPHandler.getCountry(ip)
-                        val city = playerIPManager.geoIPHandler.getCity(ip)
-                        plugin.logger.debug("Country: $country, City: $city")
-                        "$city, $country"
-                    } ?: "Unknown location"
+                    val playerInfo = playerIPManager.getPlayerInfoByName(player)
+                    plugin.logger.debug("Player info: $playerInfo")
+                    val playerIP = playerInfo?.playerIP
+                    val geoLocation = playerInfo?.geoLocation?.takeIf { it.isNotBlank() } ?: "Unknown location"
                     plugin.logger.debug("GeoLocation: $geoLocation")
                     val fullGeoLocation = when (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.VIEW_IP)) {
-                        true -> "$playerIP ($geoLocation)"
+                        true -> playerIP?.let { "$it ($geoLocation)" } ?: geoLocation
                         else -> geoLocation
                     }
                     val gamer = if (stack.sender.name == "CONSOLE") {

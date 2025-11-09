@@ -117,10 +117,16 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
 
     fun getPlayerIPByName(playerName: String): String? {
         plugin.logger.debug("Fetching IP for player: $playerName")
-        val info = searchCache(playerName, "", "")
-        val ip = info?.playerIP
+        val ip = getPlayerInfoByName(playerName)?.playerIP
         plugin.logger.debug("Found IP for player $playerName: $ip")
         return ip
+    }
+
+    fun getPlayerInfoByName(playerName: String): PlayerInfo? {
+        plugin.logger.debug("Fetching cached info for player: $playerName")
+        val info = searchCache(playerName, "", "")
+        plugin.logger.debug("Found cached info for $playerName: $info")
+        return info
     }
 
     fun getPlayerIPByUUID(playerUUID: String): String? {
@@ -162,7 +168,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         plugin.logger.debug("Searching cache")
         val lines = readLines()
         plugin.logger.debug("Number of lines in cache: ${lines.size}")
-        for (line in lines) {
+        for (line in lines.asReversed()) {
             val decryptedLine = decrypt(line)
             plugin.logger.debug("Decrypted line: $decryptedLine")
             val info = parsePlayerInfo(decryptedLine)
