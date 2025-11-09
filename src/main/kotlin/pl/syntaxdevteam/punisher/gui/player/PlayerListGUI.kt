@@ -23,28 +23,29 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
     /**
      * Inventory holder used to store the current page of the GUI.
      */
-    private class Holder(var page: Int) : InventoryHolder {
+    private class Holder(var page: Int, val players: List<Player>) : InventoryHolder {
         lateinit var inv: Inventory
         override fun getInventory(): Inventory = inv
     }
 
     override fun open(player: Player) {
-        open(player, 0)
+        val online = ArrayList(plugin.server.onlinePlayers)
+        online.sortBy { it.name.lowercase() }
+        open(player, 0, online)
     }
 
     /**
      * Opens the player list GUI for the given page.
      */
-    private fun open(player: Player, page: Int) {
-        val online = plugin.server.onlinePlayers.toList()
-        val playersPerPage = 27 // 3 rows of heads
+    private fun open(player: Player, page: Int, online: List<Player>) {
+        val playersPerPage = 27
         val totalPages = if (online.isEmpty()) 1 else (online.size - 1) / playersPerPage + 1
         val currentPage = page.coerceIn(0, totalPages - 1)
 
         val startIndex = currentPage * playersPerPage
         val playersPage = online.drop(startIndex).take(playersPerPage)
 
-        val holder = Holder(currentPage)
+        val holder = Holder(currentPage, online)
         val inventory = Bukkit.createInventory(holder, 45, getTitle())
         holder.inv = inventory
 
@@ -54,19 +55,17 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             val head = ItemStack(Material.PLAYER_HEAD)
             val meta = head.itemMeta as SkullMeta
             meta.owningPlayer = target
-            meta.displayName(
-                mH.formatMixedTextToMiniMessage("<yellow>${target.name}</yellow>", TagResolver.empty())
-            )
-            val loadMsg = mH.stringMessageToStringNoPrefix("GUI", "PlayerList.loading")
+            meta.displayName(mH.formatMixedTextToMiniMessage("<yellow>${target.name}</yellow>", TagResolver.empty()))
+            val loading = mH.stringMessageToStringNoPrefix("GUI", "PlayerList.loading")
             meta.lore(
                 listOf(
-                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to loadMsg)),
-                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loadMsg)),
-                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to loadMsg)),
-                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to loadMsg)),
-                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to loadMsg)),
-                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishments", mapOf("punishments" to loadMsg)),
-                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to loading)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loading)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to loading)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to loading)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to loading)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishments", mapOf("punishments" to loading)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to loading))
                 )
             )
             head.itemMeta = meta
@@ -74,10 +73,10 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
             Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
                 val uuid = target.uniqueId
-                val onlineStr  = PlayerStatsService.getCurrentOnlineString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
-                val totalStr   = PlayerStatsService.getTotalPlaytimeString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
-                val punishStr  = plugin.databaseHandler.countPlayerAllPunishmentHistory(uuid).toString()
-                val playerIP   = plugin.playerIPManager.getPlayerIPByName(target.name) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
+                val onlineStr = PlayerStatsService.getCurrentOnlineString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
+                val totalStr = PlayerStatsService.getTotalPlaytimeString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
+                val punishStr = plugin.databaseHandler.countPlayerAllPunishmentHistory(uuid).toString()
+                val playerIP = plugin.playerIPManager.getPlayerIPByName(target.name) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
                 val punishments = plugin.databaseHandler.getActivePunishmentsString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
                 val lastActive = PlayerStatsService.getLastActiveString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
 
@@ -93,7 +92,7 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to totalStr)),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to lastActive)),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishments", mapOf("punishments" to punishments)),
-                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to punishStr)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to punishStr))
                         )
                     )
                     item.itemMeta = im
@@ -102,15 +101,13 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             })
         }
 
-        if (currentPage > 0) {
+        if (currentPage > 0)
             inventory.setItem(36, createNavItem(Material.PAPER, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")))
-        }
 
         inventory.setItem(40, createNavItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")))
 
-        if (currentPage < totalPages - 1) {
+        if (currentPage < totalPages - 1)
             inventory.setItem(44, createNavItem(Material.BOOK, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")))
-        }
 
         player.openInventory(inventory)
     }
@@ -120,22 +117,23 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         val holder = event.view.topInventory.holder as? Holder ?: return
         val player = event.whoClicked as? Player ?: return
 
-        val online = plugin.server.onlinePlayers.toList()
+        val players = holder.players
         val playersPerPage = 27
-        val totalPages = if (online.isEmpty()) 1 else (online.size - 1) / playersPerPage + 1
         val slot = event.rawSlot
+
         if (slot in 0 until playersPerPage) {
             val index = holder.page * playersPerPage + slot
-            if (index < online.size) {
-                val target = online[index]
-                PlayerActionGUI(plugin).open(player, target)
-            }
+            if (index < players.size) PlayerActionGUI(plugin).open(player, players[index])
             return
         }
+
         when (slot) {
-            36 -> if (holder.page > 0) open(player, holder.page - 1)
+            36 -> if (holder.page > 0) open(player, holder.page - 1, players)
             40 -> PunisherMain(plugin).open(player)
-            44 -> if (holder.page < totalPages - 1) open(player, holder.page + 1)
+            44 -> {
+                val totalPages = if (players.isEmpty()) 1 else (players.size - 1) / playersPerPage + 1
+                if (holder.page < totalPages - 1) open(player, holder.page + 1, players)
+            }
         }
     }
 
