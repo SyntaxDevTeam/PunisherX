@@ -19,6 +19,7 @@ import pl.syntaxdevteam.message.MessageHandler
 import pl.syntaxdevteam.punisher.api.PunisherXApi
 import pl.syntaxdevteam.punisher.api.PunisherXApiImpl
 import pl.syntaxdevteam.punisher.basic.*
+import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigHandler
@@ -60,6 +61,7 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var playerIPManager: PlayerIPManager
     lateinit var versionChecker: VersionChecker
     lateinit var versionCompatibility: VersionCompatibility
+    lateinit var actionExecutor: PunishmentActionExecutor
 
 
     /**
@@ -149,6 +151,7 @@ class PunisherX : JavaPlugin(), Listener {
         )
 
         discordWebhook = DiscordWebhook(this)
+        actionExecutor = PunishmentActionExecutor(this)
         HandlerList.unregisterAll(playerJoinListener)
         HandlerList.unregisterAll(punishmentChecker)
         geoIPHandler = GeoIPHandler(this)

@@ -1,4 +1,4 @@
-### Config version 1.5.0
+### Config version 1.5.1
 
 # /********************************************/
 #    Global settings
@@ -37,15 +37,19 @@ playerCache:
 kick:
   history: false
 
-# Settings for actions triggered by a certain number of warnings.
-warn:
-  actions:
-    3:  "kick {player} You have received your 3rd warning."
-    4:  "ban {player} 30m You have received your 4th warning."
-    5:  "ban {player} 5h You have received your 5th warning."
-    6:  "ban {player} 7d You have received your 6th warning."
-    7:  "ban {player} 30d You have received your {warn_no}th warning."
-    10: "ban {player} You have received your 10th warning."
+# Settings for actions triggered by punishments. Each entry can be a single command or a list of commands.
+actions:
+  kicked:
+    - "eco take {player} 1000"
+    - "plot delete {player}"
+  warn:
+    count:
+      3:  "kick {player} You have received your 3rd warning."
+      4:  "ban {player} 30m You have received your 4th warning."
+      5:  "ban {player} 5h You have received your 5th warning."
+      6:  "ban {player} 7d You have received your 6th warning."
+      7:  "ban {player} 30d You have received your {warn_no}th warning."
+      10: "ban {player} You have received your 10th warning."
 
 # Settings for "mute" command
 mute:

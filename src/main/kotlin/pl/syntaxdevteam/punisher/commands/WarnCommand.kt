@@ -82,7 +82,7 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                     if (isForce) {
                         plugin.logger.warning("Force-warned by ${stack.sender.name} on $player")
                     }
-                    executeWarnAction(player, warnCount)
+                    plugin.actionExecutor.executeWarnCountActions(player, warnCount)
                 }
             } else {
                 stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("warn", "usage"))
@@ -115,19 +115,4 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
         return suggestions
     }
 
-    private fun executeWarnAction(player: String, warnCount: Int) {
-        val warnActions = plugin.config.getConfigurationSection("warn.actions")?.getKeys(false)
-        warnActions?.forEach { key ->
-            val warnThreshold = key.toIntOrNull()
-            if (warnThreshold != null && warnCount == warnThreshold) {
-                val command = plugin.config.getString("warn.actions.$key")
-                if (command != null) {
-                    val formattedCommand = command.replace("{player}", player).replace("{warn_no}", warnCount.toString())
-                    val filtredCommand = formattedCommand.replace (" --force", "" )
-                    plugin.server.dispatchCommand(plugin.server.consoleSender, formattedCommand)
-                    plugin.logger.debug("Executed command for $player: $filtredCommand")
-                }
-            }
-        }
-    }
 }

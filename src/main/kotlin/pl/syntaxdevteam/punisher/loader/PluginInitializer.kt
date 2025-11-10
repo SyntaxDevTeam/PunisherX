@@ -14,6 +14,7 @@ import pl.syntaxdevteam.punisher.basic.TimeHandler
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigHandler
+import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.gui.interfaces.GUIHandler
@@ -94,6 +95,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.punishmentChecker = PunishmentChecker(plugin)
         plugin.versionChecker = VersionChecker(plugin)
         plugin.versionCompatibility = VersionCompatibility(plugin.versionChecker)
+        plugin.actionExecutor = PunishmentActionExecutor(plugin)
         checkLegacyPlaceholders()
     }
 
