@@ -35,7 +35,6 @@ repositories {
     maven("https://repo.codemc.org/repository/maven-public/") // VaultUnlockedAPI
     maven("https://jitpack.io") // VaultAPI
     maven("https://repo.essentialsx.net/releases/") // EssentialsX
-    maven("https://storehouse.okaeri.eu/repository/maven-public/") // Okaeri Configs
 }
 
 dependencies {
@@ -64,7 +63,6 @@ dependencies {
     compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.15")
     compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2")
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.3")
-    implementation("eu.okaeri:okaeri-configs-yaml-bukkit:6.0.0-beta.3")
 
     testImplementation(kotlin("test"))
 }

@@ -25,7 +25,6 @@ class SyntaxLoader : PluginLoader {
         resolver.addRepository(RemoteRepository.Builder("central-mirror", "default", "https://repo.papermc.io/repository/maven-central/").build())
         resolver.addRepository(RemoteRepository.Builder("jitpack", "default", "https://jitpack.io/").build())
         resolver.addRepository(RemoteRepository.Builder("codemc-snapshots", "default", "https://repo.codemc.io/repository/maven-snapshots/").build())
-        //resolver.addRepository(RemoteRepository.Builder("okaeri-releases", "default", "https://storehouse.okaeri.eu/repository/maven-public/").build())
         pluginClasspath.addLibrary(resolver)
     }
 

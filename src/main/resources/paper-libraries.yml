@@ -18,5 +18,3 @@ libraries:
   - com.github.ben-manes.caffeine:caffeine:3.2.3
   - pl.syntaxdevteam:core:1.2.5-SNAPSHOT
   - pl.syntaxdevteam:messageHandler:1.0.3
-  #- eu.okaeri:okaeri-configs-yaml-bukkit:6.0.0-beta.3
-  #- pl.syntaxdevteam:syntaxConfigs:1.0.0-SNAPSHOT
