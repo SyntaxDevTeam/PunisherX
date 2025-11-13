@@ -13,7 +13,8 @@ import pl.syntaxdevteam.punisher.basic.PunishmentManager
 import pl.syntaxdevteam.punisher.basic.TimeHandler
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
-import pl.syntaxdevteam.punisher.common.ConfigHandler
+//import pl.syntaxdevteam.punisher.common.ConfigHandler
+import pl.syntaxdevteam.punisher.common.ConfigManager
 import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
@@ -29,6 +30,9 @@ import java.io.File
 import java.util.Locale
 
 class PluginInitializer(private val plugin: PunisherX) {
+
+    lateinit var cfg: ConfigManager
+        private set
 
     fun onEnable() {
         setUpLogger()
@@ -54,9 +58,18 @@ class PluginInitializer(private val plugin: PunisherX) {
      * Sets up the plugin configuration.
      */
     private fun setupConfig() {
-        plugin.saveDefaultConfig()
-        plugin.configHandler = ConfigHandler(plugin)
-        plugin.configHandler.verifyAndUpdateConfig()
+        cfg = ConfigManager(plugin)
+        cfg.load()
+
+        val dbType = cfg.config.getString("database.type", "sqlite")!!.lowercase()
+        plugin.logger.debug("DB type: $dbType")
+        val serverScope = cfg.config.getString("server", "network")
+        plugin.logger.debug("Server scope: $serverScope")
+        //cfg.reload()
+/*
+        //plugin.saveDefaultConfig()
+        //plugin.configHandler = ConfigHandler(plugin)
+        //plugin.configHandler.verifyAndUpdateConfig()*/
     }
 
     /**

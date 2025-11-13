@@ -63,6 +63,7 @@ dependencies {
     compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.15")
     compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2")
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.3")
+    compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
 
     testImplementation(kotlin("test"))
 }

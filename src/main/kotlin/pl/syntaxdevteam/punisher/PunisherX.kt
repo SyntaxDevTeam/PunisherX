@@ -23,6 +23,7 @@ import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigHandler
+import pl.syntaxdevteam.punisher.common.ConfigManager
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.databases.*
 import pl.syntaxdevteam.punisher.players.*
@@ -63,6 +64,9 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var versionCompatibility: VersionCompatibility
     lateinit var actionExecutor: PunishmentActionExecutor
 
+    lateinit var cfg: ConfigManager
+        private set
+
 
     /**
      * Called when the plugin is enabled.
@@ -84,6 +88,7 @@ class PunisherX : JavaPlugin(), Listener {
      * Reloads the configuration and reinitializes the database connection.
      */
     fun onReload() {
+        cfg.reload()
         reloadMyConfig()
     }
 
