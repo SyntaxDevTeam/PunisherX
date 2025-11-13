@@ -33,7 +33,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         type = dbType,
         host = plugin.config.getString("database.sql.host") ?: "localhost",
         port = plugin.config.getInt("database.sql.port").takeIf { it != 0 } ?: 3306,
-        database = plugin.config.getString("database.sql.dbname") ?: plugin.name,
+        database = resolveDatabaseName(),
         username = plugin.config.getString("database.sql.username") ?: "ROOT",
         password = plugin.config.getString("database.sql.password") ?: "U5eV3ryStr0ngP4ssw0rd"
     )
@@ -42,6 +42,18 @@ class DatabaseHandler(private val plugin: PunisherX) {
     /** Opens connection pool. */
     fun openConnection() {
         db.connect()
+    }
+
+    private fun resolveDatabaseName(): String {
+        val configuredName = plugin.config.getString("database.sql.dbname") ?: plugin.name
+
+        return when (dbType) {
+            DatabaseType.H2, DatabaseType.SQLITE -> {
+                val dataFolder = plugin.dataFolder.apply { mkdirs() }
+                File(dataFolder, configuredName).absolutePath
+            }
+            else -> configuredName
+        }
     }
 
     /** Closes the datasource. */
