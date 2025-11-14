@@ -27,9 +27,9 @@ class ConfigManager(private val plugin: PunisherX) {
         if (!plugin.dataFolder.exists()) plugin.dataFolder.mkdirs()
 
         val defaultsStream = plugin.getResource(FILE_NAME)
-            ?: error("Brak $FILE_NAME w resources (wzorzec 1.5.0 z komentarzami wymagany).")
+            ?: error("Missing $FILE_NAME in resources (template 1.5.0 with comments required).")
 
-        plugin.logger.debug("[Config] Ładowanie $FILE_NAME (round-trip, auto-update)…")
+        plugin.logger.debug("[Config] Loading $FILE_NAME (round-trip, auto-update)…")
         rawUserDoc = if (dataFile.exists()) {
             YamlDocument.create(
                 dataFile,
@@ -45,9 +45,9 @@ class ConfigManager(private val plugin: PunisherX) {
             val bak = File(dataFile.parentFile, "$FILE_NAME.$sourceVersion.bak")
             try {
                 Files.copy(dataFile.toPath(), bak.toPath(), StandardCopyOption.REPLACE_EXISTING)
-                plugin.logger.debug("[Config] Backup przed migracją: ${bak.name}")
+                plugin.logger.debug("[Config] Backup before migration: ${bak.name}")
             } catch (t: Throwable) {
-                plugin.logger.warning("[Config] Nie udało się wykonać backupu: ${t.message}")
+                plugin.logger.warning("[Config] Failed to create backup: ${t.message}")
             }
         }
 
@@ -60,7 +60,7 @@ class ConfigManager(private val plugin: PunisherX) {
         )
 
         if (!config.contains(VERSION_KEY)) {
-            plugin.logger.debug("[Config] Nie znaleziono $VERSION_KEY – traktuję jako 1.4.1")
+            plugin.logger.debug("[Config] config-version not found – treating as 1.4.1")
             config.set(VERSION_KEY, V_141)
         }
 
@@ -68,7 +68,7 @@ class ConfigManager(private val plugin: PunisherX) {
 
         config.set(VERSION_KEY, V_150)
         config.save()
-        plugin.logger.success("[Config] Gotowe. Aktualna wersja: ${config.getInt(VERSION_KEY)}")
+        plugin.logger.success("[Config] Done. Current version: ${config.getInt(VERSION_KEY)}")
     }
 
     fun reload() {
@@ -91,7 +91,7 @@ class ConfigManager(private val plugin: PunisherX) {
     private fun migrateFrom(sourceVersion: Int) {
         if (sourceVersion >= V_150) return
         if (sourceVersion <= V_141) {
-            plugin.logger.debug("[Config] Migracja $sourceVersion -> $V_150 …")
+            plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_150 …")
             migrate141to150()
         }
         //if (sourceVersion < 160) migrate150to160()
@@ -115,7 +115,7 @@ class ConfigManager(private val plugin: PunisherX) {
                 config.set("$dst.$keyStr", e.value)
             }
 
-            plugin.logger.debug("[Config] warn/actions -> $dst (wartości z serwera nadpisały domyślne)")
+            plugin.logger.debug("[Config] warn/actions → $dst (server values overwrote defaults)")
         }
 
         if (config.contains("warn.actions")) {
@@ -125,7 +125,7 @@ class ConfigManager(private val plugin: PunisherX) {
         val oldSpawnLoc = readSectionMapRaw(rawUserDoc, "spawn.location")
         if (oldSpawnLoc != null && oldSpawnLoc.isNotEmpty()) {
             config.set("unjail.unjail_location", oldSpawnLoc)
-            plugin.logger.debug("[Config] spawn.location -> unjail.unjail_location (serwer)")
+            plugin.logger.debug("[Config] spawn.location → unjail.unjail_location (server)")
         }
 
         val hadUseExternal =
@@ -143,17 +143,19 @@ class ConfigManager(private val plugin: PunisherX) {
                 else if (sr == "world") "world"
                 else "world"
             }
-            config.set("unjail.spawn_type_select.set", mapped) // twardy nadpis
-            plugin.logger.debug("[Config] spawn.use_external_set -> unjail.spawn_type_select.set = $mapped (serwer)")
+            config.set("unjail.spawn_type_select.set", mapped)
+            plugin.logger.debug("[Config] spawn.use_external_set → unjail.spawn_type_select.set = $mapped (server)")
         }
 
         if (config.contains("spawn.location")) config.set("spawn.location", null)
         if (config.contains("spawn.use_external_set")) config.set("spawn.use_external_set", null)
+
         val spawn = readSectionMap("spawn")
         if (spawn != null && spawn.isEmpty()) config.set("spawn", null)
+
         if (!config.contains("server")) {
             config.set("server", "network")
-            plugin.logger.debug("[Config] ustawiono server = \"network\" (domyślnie)")
+            plugin.logger.debug("[Config] server = \"network\" set (default)")
         }
     }
 
