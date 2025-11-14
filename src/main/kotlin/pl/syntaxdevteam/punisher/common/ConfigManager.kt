@@ -1,6 +1,7 @@
 package pl.syntaxdevteam.punisher.common
 
 import dev.dejvokep.boostedyaml.YamlDocument
+import dev.dejvokep.boostedyaml.block.implementation.Section
 import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings
 import dev.dejvokep.boostedyaml.settings.general.GeneralSettings
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings
@@ -39,6 +40,17 @@ class ConfigManager(private val plugin: PunisherX) {
         } else null
 
         val sourceVersion = detectSourceVersion(rawUserDoc)
+
+        if (sourceVersion < V_150 && dataFile.exists()) {
+            val bak = File(dataFile.parentFile, "$FILE_NAME.$sourceVersion.bak")
+            try {
+                Files.copy(dataFile.toPath(), bak.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                plugin.logger.debug("[Config] Backup przed migracją: ${bak.name}")
+            } catch (t: Throwable) {
+                plugin.logger.warning("[Config] Nie udało się wykonać backupu: ${t.message}")
+            }
+        }
+
         config = YamlDocument.create(
             dataFile,
             defaultsStream,
@@ -50,16 +62,6 @@ class ConfigManager(private val plugin: PunisherX) {
         if (!config.contains(VERSION_KEY)) {
             plugin.logger.debug("[Config] Nie znaleziono $VERSION_KEY – traktuję jako 1.4.1")
             config.set(VERSION_KEY, V_141)
-        }
-
-        if (sourceVersion < V_150 && dataFile.exists()) {
-            val bak = File(dataFile.parentFile, "$FILE_NAME.$sourceVersion.bak")
-            try {
-                Files.copy(dataFile.toPath(), bak.toPath(), StandardCopyOption.REPLACE_EXISTING)
-                plugin.logger.debug("[Config] Backup przed migracją: ${bak.name}")
-            } catch (t: Throwable) {
-                plugin.logger.warning("[Config] Nie udało się wykonać backupu: ${t.message}")
-            }
         }
 
         migrateFrom(sourceVersion)
@@ -95,13 +97,6 @@ class ConfigManager(private val plugin: PunisherX) {
         //if (sourceVersion < 160) migrate150to160()
     }
 
-    /**
-     * 1.4.1 -> 1.5.0:
-     * - warn.actions -> actions.warn.count  (SERWER > defaults)
-     * - spawn.location -> unjail.unjail_location (SERWER > defaults)
-     * - spawn.use_external_set.{enabled,set} -> unjail.spawn_type_select.set (SERWER > defaults)
-     * - server (jeśli brak KIEDYKOLWIEK) -> "network"
-     */
     private fun migrate141to150() {
 
         var oldWarn = readSectionMapRaw(rawUserDoc, "warn.actions")
@@ -112,16 +107,14 @@ class ConfigManager(private val plugin: PunisherX) {
 
         if (oldWarn != null && oldWarn.isNotEmpty()) {
             val dst = "actions.warn.count"
-            val result = LinkedHashMap<String, Any?>()
 
             val it = oldWarn.entries.iterator()
             while (it.hasNext()) {
                 val e = it.next()
                 val keyStr = e.key
-                result[keyStr] = e.value
+                config.set("$dst.$keyStr", e.value)
             }
 
-            config.set(dst, result)
             plugin.logger.debug("[Config] warn/actions -> $dst (wartości z serwera nadpisały domyślne)")
         }
 
@@ -169,31 +162,49 @@ class ConfigManager(private val plugin: PunisherX) {
     private fun readSectionMap(path: String): Map<String, Any?>? {
         val raw = config.get(path) ?: return null
         if (raw is Map<*, *>) {
-            val result = LinkedHashMap<String, Any?>()
-            val it = raw.entries.iterator()
-            while (it.hasNext()) {
-                val e = it.next()
-                val k = e.key ?: continue
-                result[k.toString()] = e.value
-            }
-            return result
+            return raw.asLinkedStringMap()
         }
-        return null
+        if (raw is Section) {
+            return raw.asLinkedStringMap()
+        }
+        val section = config.getOptionalSection(path).orElse(null)
+        return section?.asLinkedStringMap()
     }
 
     private fun readSectionMapRaw(doc: YamlDocument?, path: String): Map<String, Any?>? {
         if (doc == null) return null
+        val section = doc.getOptionalSection(path).orElse(null)
+        if (section != null) {
+            return section.asLinkedStringMap()
+        }
         val raw = doc.get(path) ?: return null
         if (raw is Map<*, *>) {
-            val out = LinkedHashMap<String, Any?>()
-            val it = raw.entries.iterator()
-            while (it.hasNext()) {
-                val e = it.next()
-                val k = e.key ?: continue
-                out[k.toString()] = e.value
-            }
-            return out
+            return raw.asLinkedStringMap()
+        }
+        if (raw is Section) {
+            return raw.asLinkedStringMap()
         }
         return null
+    }
+
+    private fun Section.asLinkedStringMap(): Map<String, Any?> {
+        val out = LinkedHashMap<String, Any?>()
+        for (key in this.keys) {
+            if (key == null) continue
+            val keyStr = key.toString()
+            out[keyStr] = this.get(keyStr)
+        }
+        return out
+    }
+
+    private fun Map<*, *>.asLinkedStringMap(): Map<String, Any?> {
+        val out = LinkedHashMap<String, Any?>()
+        val it = this.entries.iterator()
+        while (it.hasNext()) {
+            val e = it.next()
+            val k = e.key ?: continue
+            out[k.toString()] = e.value
+        }
+        return out
     }
 }

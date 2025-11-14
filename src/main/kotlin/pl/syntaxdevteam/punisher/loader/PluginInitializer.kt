@@ -60,11 +60,6 @@ class PluginInitializer(private val plugin: PunisherX) {
     private fun setupConfig() {
         cfg = ConfigManager(plugin)
         cfg.load()
-
-        val dbType = cfg.config.getString("database.type", "sqlite")!!.lowercase()
-        plugin.logger.debug("DB type: $dbType")
-        val serverScope = cfg.config.getString("server", "network")
-        plugin.logger.debug("Server scope: $serverScope")
         //cfg.reload()
 /*
         //plugin.saveDefaultConfig()
