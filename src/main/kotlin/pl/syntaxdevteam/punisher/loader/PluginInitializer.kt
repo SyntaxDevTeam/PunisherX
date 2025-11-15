@@ -60,6 +60,7 @@ class PluginInitializer(private val plugin: PunisherX) {
     private fun setupConfig() {
         cfg = ConfigManager(plugin)
         cfg.load()
+        plugin.cfg = cfg
         //cfg.reload()
 /*
         //plugin.saveDefaultConfig()

@@ -65,7 +65,6 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var actionExecutor: PunishmentActionExecutor
 
     lateinit var cfg: ConfigManager
-        private set
 
 
     /**
