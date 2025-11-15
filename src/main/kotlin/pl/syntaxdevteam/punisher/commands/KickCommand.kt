@@ -162,7 +162,7 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
             return emptyList()
         }
         return when (args.size) {
-            1 -> listOf("all") + plugin.server.onlinePlayers.map { it.name }
+            0, 1 -> listOf("all") + plugin.server.onlinePlayers.map { it.name }
             2 -> plugin.messageHandler.getMessageStringList("kick", "reasons")
             else -> emptyList()
         }
