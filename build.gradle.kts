@@ -61,7 +61,9 @@ dependencies {
     compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.1.0")
     compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
     compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.15")
-    compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2")
+    compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2"){
+        isTransitive = false
+    }
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.3")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
 
