@@ -31,7 +31,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         if (PermissionChecker.isAuthor(uuid)) {
             player.sendMessage(
                 plugin.messageHandler
-                .formatMixedTextToMiniMessage(plugin.messageHandler.getPrefix() + " <green>Witaj, <b>WieszczY!</b><newline>    Ten serwer używa ${plugin.pluginMeta.name} ${plugin.pluginMeta.version} :)",
+                .formatMixedTextToMiniMessage(plugin.messageHandler.getPrefix() + " <green>Witaj, <b>$name</b><newline>    Ten serwer używa ${plugin.pluginMeta.name} ${plugin.pluginMeta.version} ❤",
                         TagResolver.empty())
             )
         }
@@ -142,7 +142,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                             val duration = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(remainingTime.toString())
                             val reason = punishment.reason
                             event.isCancelled = true
-                            val muteMessage = plugin.messageHandler.stringMessageToComponent("mute", "mute_message", mapOf("reason" to reason, "time" to duration))
+                            val muteMessage = plugin.messageHandler.stringMessageToComponent("mute", "mute_info_message", mapOf("reason" to reason, "time" to duration))
 
                             player.sendMessage(muteMessage)
                         } else if (punishment.type == "MUTE") {
