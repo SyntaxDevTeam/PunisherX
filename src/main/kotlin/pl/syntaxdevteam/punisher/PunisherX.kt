@@ -10,7 +10,6 @@ import org.bukkit.event.HandlerList
 import org.bukkit.plugin.ServicePriority
 import pl.syntaxdevteam.core.SyntaxCore
 import pl.syntaxdevteam.core.manager.PluginManagerX
-import pl.syntaxdevteam.message.SyntaxMessages
 import pl.syntaxdevteam.core.logging.Logger
 import pl.syntaxdevteam.core.stats.StatsCollector
 import pl.syntaxdevteam.core.update.GitHubSource
@@ -99,15 +98,6 @@ class PunisherX : JavaPlugin(), Listener {
         databaseHandler.closeConnection()
         AsyncChatEvent.getHandlerList().unregister(this as Plugin)
         pluginInitializer.onDisable()
-    }
-
-    /**
-     * Retrieves the plugin file.
-     *
-     * @return The plugin file.
-     */
-    fun getPluginFile(): File {
-        return this.file
     }
 
     fun resolvePlayerUuid(identifier: String): UUID {
