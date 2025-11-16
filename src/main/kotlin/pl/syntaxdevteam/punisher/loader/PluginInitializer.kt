@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.loader
 
+import org.bukkit.Bukkit
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.scheduler.BukkitRunnable
 import pl.syntaxdevteam.core.SyntaxCore
@@ -16,6 +17,7 @@ import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 //import pl.syntaxdevteam.punisher.common.ConfigHandler
 import pl.syntaxdevteam.punisher.common.ConfigManager
 import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
+import pl.syntaxdevteam.punisher.common.ServerEnvironment
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.gui.interfaces.GUIHandler
@@ -73,7 +75,7 @@ class PluginInitializer(private val plugin: PunisherX) {
      */
     private fun setupDatabase() {
         plugin.databaseHandler = DatabaseHandler(plugin)
-        if (plugin.server.name.contains("Folia")) {
+        if (ServerEnvironment.isFoliaBased()) {
             plugin.logger.debug("Detected Folia server, using sync database connection handling.")
             plugin.databaseHandler.openConnection()
             plugin.databaseHandler.createTables()
@@ -180,7 +182,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.logger.warning(warnMsg)
 
         val delay = 20L * 10L
-        if (plugin.server.name.contains("Folia", ignoreCase = true)) {
+        if (ServerEnvironment.isFoliaBased()) {
             plugin.server.globalRegionScheduler.runAtFixedRate(plugin, { task ->
                 try {
                     val content = langFile.readText(Charsets.UTF_8)
