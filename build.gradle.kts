@@ -31,6 +31,7 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/") {
         name = "sonatype"
     }
+    maven("https://repo.menthamc.org/repository/maven-public/")
     maven("https://repo.extendedclip.com/releases/") // PlaceholderAPI
     maven("https://repo.codemc.org/repository/maven-public/") // VaultUnlockedAPI
     maven("https://jitpack.io") // VaultAPI
@@ -40,6 +41,7 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
+    //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:core:1.2.5-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:messageHandler:1.0.3")
     //implementation(files("libs/SyntaxCore-1.1.0-all.jar"))

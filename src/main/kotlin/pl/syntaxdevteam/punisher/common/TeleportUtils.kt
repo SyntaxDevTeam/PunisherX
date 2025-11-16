@@ -7,6 +7,7 @@ import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
+import pl.syntaxdevteam.punisher.common.ServerEnvironment
 import kotlin.math.abs
 
 object TeleportUtils {
@@ -21,10 +22,10 @@ object TeleportUtils {
      * the current server implementation.
      */
     fun runAsync(plugin: Plugin, task: Runnable) {
-        if (isFolia()) {
-            Bukkit.getServer().globalRegionScheduler.execute(plugin, task)
+        if (ServerEnvironment.isFoliaBased()) {
+            plugin.server.globalRegionScheduler.execute(plugin, task)
         } else {
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, task)
+            plugin.server.scheduler.runTaskAsynchronously(plugin, task)
         }
     }
 
@@ -33,12 +34,12 @@ object TeleportUtils {
      * appropriate scheduler for the current server implementation.
      */
     fun runSync(plugin: Plugin, task: Runnable) {
-        if (isFolia()) {
-            Bukkit.getServer().globalRegionScheduler.execute(plugin) {
+        if (ServerEnvironment.isFoliaBased()) {
+            plugin.server.globalRegionScheduler.execute(plugin) {
                 task.run()
             }
         } else {
-            Bukkit.getScheduler().runTask(plugin, task)
+            plugin.server.scheduler.runTask(plugin, task)
         }
     }
 
@@ -47,10 +48,10 @@ object TeleportUtils {
      * appropriate scheduler for the current server implementation.
      */
     fun runSyncLater(plugin: Plugin, delayTicks: Long, task: Runnable) {
-        if (isFolia()) {
-            Bukkit.getServer().globalRegionScheduler.runDelayed(plugin, { task.run() }, delayTicks)
+        if (ServerEnvironment.isFoliaBased()) {
+            plugin.server.globalRegionScheduler.runDelayed(plugin, { task.run() }, delayTicks)
         } else {
-            Bukkit.getScheduler().runTaskLater(plugin, task, delayTicks)
+            plugin.server.scheduler.runTaskLater(plugin, task, delayTicks)
         }
     }
 
@@ -61,18 +62,18 @@ object TeleportUtils {
      */
     fun teleportSafely(plugin: Plugin, player: Player, location: Location, callback: (Boolean) -> Unit = {}) {
         val target = location.clone()
-        if (isFolia()) {
-            Bukkit.getServer().regionScheduler.execute(plugin, target) {
+        if (ServerEnvironment.isFoliaBased()) {
+            plugin.server.regionScheduler.execute(plugin, target) {
                 if (!target.chunk.isLoaded) {
                     target.chunk.load()
                 }
                 if (!isLocationSafe(target)) {
-                    Bukkit.getServer().globalRegionScheduler.execute(plugin) {
+                    plugin.server.globalRegionScheduler.execute(plugin) {
                         callback(false)
                     }
                     return@execute
                 }
-                Bukkit.getServer().globalRegionScheduler.execute(plugin) {
+                plugin.server.globalRegionScheduler.execute(plugin) {
                     player.teleportAsync(target).thenAccept { result ->
                         callback(result)
                     }.exceptionally {

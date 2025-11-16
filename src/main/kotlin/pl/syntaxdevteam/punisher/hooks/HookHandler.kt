@@ -54,7 +54,7 @@ class HookHandler(private val plugin: PunisherX) {
                 plugin.logger.debug("Hooked into LuckPerms!")
             }
         } else {
-            plugin.logger.warning("LuckPerms plugin not found on server!")
+            plugin.logger.debug("LuckPerms plugin not found on server!")
         }
     }
 
@@ -74,7 +74,7 @@ class HookHandler(private val plugin: PunisherX) {
                 plugin.logger.debug("Hooked into Vault!")
             }
         } else {
-            plugin.logger.warning("Vault plugin not found on server!")
+            plugin.logger.debug("Vault plugin not found on server!")
         }
     }
 
@@ -94,7 +94,7 @@ class HookHandler(private val plugin: PunisherX) {
                 plugin.logger.debug("Hooked into VaultUnlocked!")
             }
         } else {
-            plugin.logger.warning("VaultUnlocked plugin not found on server!")
+            plugin.logger.debug("VaultUnlocked plugin not found on server!")
         }
     }
 
