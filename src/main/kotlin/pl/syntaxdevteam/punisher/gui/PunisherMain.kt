@@ -45,7 +45,7 @@ class PunisherMain(plugin: PunisherX) : BaseGUI(plugin) {
         },
         MenuEntry(
             plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PlayerAction.list"),
-            plugin.versionCompatibility.resolveMaterial("IRON_CHAIN", "IRON_BARS", "CHAIN"),
+            plugin.guiMaterialResolver.resolveMaterial("IRON_CHAIN", "IRON_BARS", "CHAIN"),
             29
         ) { player ->
             PunishedListGUI(plugin).open(player)

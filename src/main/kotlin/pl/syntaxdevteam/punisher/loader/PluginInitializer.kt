@@ -20,6 +20,7 @@ import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import pl.syntaxdevteam.punisher.common.ServerEnvironment
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
+import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
 import pl.syntaxdevteam.punisher.gui.interfaces.GUIHandler
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
@@ -110,6 +111,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.punishmentChecker = PunishmentChecker(plugin)
         plugin.versionChecker = VersionChecker(plugin)
         plugin.versionCompatibility = VersionCompatibility(plugin.versionChecker)
+        plugin.guiMaterialResolver = GuiMaterialResolver(plugin.versionChecker.getSemanticVersion())
         plugin.actionExecutor = PunishmentActionExecutor(plugin)
         checkLegacyPlaceholders()
     }

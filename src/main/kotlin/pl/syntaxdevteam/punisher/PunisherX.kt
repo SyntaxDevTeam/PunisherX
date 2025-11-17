@@ -29,6 +29,7 @@ import pl.syntaxdevteam.punisher.databases.*
 import pl.syntaxdevteam.punisher.players.*
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
+import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
 import pl.syntaxdevteam.punisher.loader.PluginInitializer
 import pl.syntaxdevteam.punisher.loader.VersionChecker
 import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
@@ -64,6 +65,7 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var playerIPManager: PlayerIPManager
     lateinit var versionChecker: VersionChecker
     lateinit var versionCompatibility: VersionCompatibility
+    lateinit var guiMaterialResolver: GuiMaterialResolver
     lateinit var actionExecutor: PunishmentActionExecutor
     lateinit var schedulerAdapter: SchedulerAdapter
     lateinit var safeTeleportService: SafeTeleportService
