@@ -8,7 +8,6 @@ import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.common.TeleportUtils
 import java.io.File
 import java.io.IOException
 import java.util.UUID
@@ -74,11 +73,12 @@ class PunishmentCache(private val plugin: PunisherX) {
                     plugin.config,
                     plugin.hookHandler,
                     cachedLocation,
-                    player
+                    player,
+                    plugin.safeTeleportService
                 )
 
                 if (targetLocation != null) {
-                    TeleportUtils.teleportSafely(plugin, player, targetLocation) { success ->
+                    plugin.safeTeleportService.teleportSafely(player, targetLocation) { success ->
                         if (success) {
                             player.gameMode = GameMode.SURVIVAL
                             plugin.logger.debug("Przeniesiono gracza ${player.name} po zakończeniu kary na ${targetLocation}")
@@ -124,7 +124,13 @@ class PunishmentCache(private val plugin: PunisherX) {
         val cached = cache.getIfPresent(uuid)
         val storedLocation = cached?.returnLocation?.toLocation()
         val offlinePlayer = runCatching { Bukkit.getOfflinePlayer(uuid) }.getOrNull()
-        return JailUtils.getUnjailLocation(plugin.config, plugin.hookHandler, storedLocation, offlinePlayer)
+        return JailUtils.getUnjailLocation(
+            plugin.config,
+            plugin.hookHandler,
+            storedLocation,
+            offlinePlayer,
+            plugin.safeTeleportService
+        )
     }
 
     private fun loadCacheIntoMemory() {

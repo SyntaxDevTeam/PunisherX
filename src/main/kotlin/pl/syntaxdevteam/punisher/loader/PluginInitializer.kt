@@ -28,6 +28,8 @@ import pl.syntaxdevteam.punisher.listeners.ModernLoginListener
 import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
 import pl.syntaxdevteam.punisher.placeholders.PlaceholderHandler
 import pl.syntaxdevteam.punisher.players.*
+import pl.syntaxdevteam.punisher.platform.BukkitSchedulerAdapter
+import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import java.io.File
 import java.util.Locale
 
@@ -97,6 +99,8 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.pluginsManager = SyntaxCore.pluginManagerx
         plugin.timeHandler = TimeHandler(plugin)
         plugin.punishmentManager = PunishmentManager()
+        plugin.schedulerAdapter = BukkitSchedulerAdapter(plugin)
+        plugin.safeTeleportService = SafeTeleportService(plugin, plugin.schedulerAdapter)
         plugin.geoIPHandler = GeoIPHandler(plugin)
         plugin.cache = PunishmentCache(plugin)
         plugin.punisherXApi = PunisherXApiImpl(plugin.databaseHandler)

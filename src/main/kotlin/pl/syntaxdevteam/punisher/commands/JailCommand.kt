@@ -9,7 +9,6 @@ import org.bukkit.GameMode
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.basic.JailUtils
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
-import pl.syntaxdevteam.punisher.common.TeleportUtils
 
 class JailCommand(private val plugin: PunisherX) : BasicCommand {
 
@@ -99,7 +98,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         if (targetPlayer != null) {
-            TeleportUtils.teleportSafely(plugin, targetPlayer, jailLocation) { success ->
+            plugin.safeTeleportService.teleportSafely(targetPlayer, jailLocation) { success ->
                 if (success) {
                     targetPlayer.gameMode = GameMode.ADVENTURE
                     plugin.logger.debug("<green>Player successfully teleported to jail.</green>")

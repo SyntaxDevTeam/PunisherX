@@ -9,7 +9,6 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.common.TeleportUtils
 import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
 import pl.syntaxdevteam.punisher.gui.player.OfflinePlayerListGUI
 import pl.syntaxdevteam.punisher.gui.player.PlayerListGUI
@@ -87,11 +86,11 @@ class PlayerActionGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 player.closeInventory()
                 val online = target.player
                 if (online != null) {
-                    TeleportUtils.teleportSafely(plugin, player, online.location)
+                    plugin.safeTeleportService.teleportSafely(player, online.location)
                 } else {
                     val loc = PlayerStatsService.getLastLocation(target.uniqueId)
                     if (loc != null) {
-                        TeleportUtils.teleportSafely(plugin, player, loc)
+                        plugin.safeTeleportService.teleportSafely(player, loc)
                     } else {
                         player.sendMessage(mH.stringMessageToComponent("error", "no_data"))
                     }

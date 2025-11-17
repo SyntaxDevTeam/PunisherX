@@ -32,6 +32,8 @@ import pl.syntaxdevteam.punisher.hooks.HookHandler
 import pl.syntaxdevteam.punisher.loader.PluginInitializer
 import pl.syntaxdevteam.punisher.loader.VersionChecker
 import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
+import pl.syntaxdevteam.punisher.platform.SchedulerAdapter
+import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import java.io.File
 import java.util.*
 
@@ -63,6 +65,8 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var versionChecker: VersionChecker
     lateinit var versionCompatibility: VersionCompatibility
     lateinit var actionExecutor: PunishmentActionExecutor
+    lateinit var schedulerAdapter: SchedulerAdapter
+    lateinit var safeTeleportService: SafeTeleportService
 
     lateinit var cfg: ConfigManager
 
