@@ -38,6 +38,8 @@ repositories {
     maven("https://repo.essentialsx.net/releases/") // EssentialsX
 }
 
+val mockitoAgent by configurations.creating
+
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
@@ -71,9 +73,12 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
-    testImplementation("org.mockito:mockito-core:5.14.2")
+    testImplementation("org.mockito:mockito-core:5.2.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.3.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.14.9") {
+        isTransitive = false
+    }
 }
 
 tasks {
@@ -82,6 +87,7 @@ tasks {
     }
     test {
         useJUnitPlatform()
+        jvmArgs("-javaagent:${mockitoAgent.singleFile}")
     }
     runServer {
         minecraftVersion("1.21.10")
