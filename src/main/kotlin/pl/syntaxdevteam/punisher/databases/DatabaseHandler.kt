@@ -5,6 +5,7 @@ import pl.syntaxdevteam.core.database.*
 import pl.syntaxdevteam.punisher.PunisherX
 import java.io.File
 import java.io.IOException
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.UUID
@@ -78,6 +79,20 @@ class DatabaseHandler(private val plugin: PunisherX) {
         else -> "INT AUTO_INCREMENT PRIMARY KEY"
     }
 
+    private fun reportReasonDefinition(): String = when (dbType) {
+        DatabaseType.MYSQL, DatabaseType.MARIADB, DatabaseType.POSTGRESQL, DatabaseType.SQLITE, DatabaseType.H2 ->
+            "TEXT"
+
+        else -> "NVARCHAR(MAX)"
+    }
+
+    private fun reportFiledAtDefinition(): String = when (dbType) {
+        DatabaseType.SQLITE -> "DATETIME DEFAULT CURRENT_TIMESTAMP"
+        DatabaseType.POSTGRESQL, DatabaseType.H2 -> "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        DatabaseType.MYSQL, DatabaseType.MARIADB -> "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        else -> "DATETIME2 DEFAULT SYSDATETIME()"
+    }
+
     /** Creates required plugin tables if missing. */
     fun createTables() {
         val punishmentSchema = TableSchema(
@@ -107,6 +122,18 @@ class DatabaseHandler(private val plugin: PunisherX) {
             )
         )
         db.createTable(playerCacheSchema)
+
+        val reportsSchema = TableSchema(
+            "reports",
+            listOf(
+                Column("id", idDefinition()),
+                Column("player", "VARCHAR(36)"),
+                Column("suspect", "VARCHAR(36)"),
+                Column("reason", reportReasonDefinition()),
+                Column("filedAt", reportFiledAtDefinition())
+            )
+        )
+        db.createTable(reportsSchema)
     }
 
     // ---------------------------------------------------------------------
@@ -196,6 +223,84 @@ class DatabaseHandler(private val plugin: PunisherX) {
             execute("DELETE FROM punishmenthistory WHERE uuid = ?", uuid)
         } catch (e: Exception) {
             logger.err("Failed to delete player data. ${e.message}")
+        }
+    }
+
+    fun addReport(player: UUID, suspect: UUID, reason: String): Boolean {
+        return try {
+            execute(
+                """
+                INSERT INTO reports (player, suspect, reason)
+                VALUES (?, ?, ?)
+                """.trimIndent(),
+                player.toString(),
+                suspect.toString(),
+                reason
+            )
+            true
+        } catch (e: Exception) {
+            logger.err("Failed to add report from $player against $suspect. ${e.message}")
+            false
+        }
+    }
+
+    fun deleteReport(id: Int): Boolean {
+        return try {
+            execute("DELETE FROM reports WHERE id = ?", id)
+            true
+        } catch (e: Exception) {
+            logger.err("Failed to delete report with ID $id. ${e.message}")
+            false
+        }
+    }
+
+    fun getReports(limit: Int? = null, offset: Int? = null): List<ReportData> {
+        val supportsPagination = dbType in setOf(
+            DatabaseType.MYSQL,
+            DatabaseType.MARIADB,
+            DatabaseType.POSTGRESQL,
+            DatabaseType.SQLITE
+        )
+
+        var sql = "SELECT id, player, suspect, reason, filedAt FROM reports ORDER BY filedAt DESC, id DESC"
+        val params = mutableListOf<Any>()
+
+        if (supportsPagination && limit != null) {
+            sql += " LIMIT ?"
+            params.add(limit)
+            if (offset != null) {
+                sql += " OFFSET ?"
+                params.add(offset)
+            }
+        } else if (!supportsPagination && (limit != null || offset != null)) {
+            logger.warning("Pagination not supported for reports on database type $dbType. Returning full result set.")
+        }
+
+        return try {
+            query(sql, *params.toTypedArray()) { rs ->
+                val id = rs.getInt("id")
+                val playerId = runCatching { UUID.fromString(rs.getString("player")) }.getOrElse {
+                    logger.warning("Skipping report $id due to invalid reporter UUID: ${rs.getString("player")}")
+                    return@query null
+                }
+                val suspectId = runCatching { UUID.fromString(rs.getString("suspect")) }.getOrElse {
+                    logger.warning("Skipping report $id due to invalid suspect UUID: ${rs.getString("suspect")}")
+                    return@query null
+                }
+
+                val filedAt = rs.getTimestamp("filedAt")?.toInstant() ?: Instant.EPOCH
+
+                ReportData(
+                    id = id,
+                    player = playerId,
+                    suspect = suspectId,
+                    reason = rs.getString("reason"),
+                    filedAt = filedAt
+                )
+            }.filterNotNull()
+        } catch (e: Exception) {
+            logger.err("Failed to fetch reports. ${e.message}")
+            emptyList()
         }
     }
 
