@@ -41,6 +41,17 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build
 
+      - name: Zapisz raport Gradle Actions
+        run: |
+          mkdir -p build/reports/gradle-actions
+          cp /home/runner/work/_temp/.gradle-actions/build-results/__run_2-1763443771700.json \
+             build/reports/gradle-actions/build-results.json
+
+      - name: Upload build results
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-build-results
+          path: build/reports/gradle-actions/build-results.json
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
