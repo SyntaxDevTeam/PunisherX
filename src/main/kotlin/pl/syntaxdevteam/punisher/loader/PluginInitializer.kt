@@ -1,6 +1,5 @@
 package pl.syntaxdevteam.punisher.loader
 
-import org.bukkit.Bukkit
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.scheduler.BukkitRunnable
 import pl.syntaxdevteam.core.SyntaxCore
@@ -14,7 +13,6 @@ import pl.syntaxdevteam.punisher.basic.PunishmentManager
 import pl.syntaxdevteam.punisher.basic.TimeHandler
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
-//import pl.syntaxdevteam.punisher.common.ConfigHandler
 import pl.syntaxdevteam.punisher.common.ConfigManager
 import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import pl.syntaxdevteam.punisher.common.ServerEnvironment
@@ -35,9 +33,6 @@ import java.io.File
 import java.util.Locale
 
 class PluginInitializer(private val plugin: PunisherX) {
-
-    lateinit var cfg: ConfigManager
-        private set
 
     fun onEnable() {
         setUpLogger()
@@ -62,15 +57,9 @@ class PluginInitializer(private val plugin: PunisherX) {
     /**
      * Sets up the plugin configuration.
      */
-    private fun setupConfig() {
-        cfg = ConfigManager(plugin)
-        cfg.load()
-        plugin.cfg = cfg
-        //cfg.reload()
-/*
-        //plugin.saveDefaultConfig()
-        //plugin.configHandler = ConfigHandler(plugin)
-        //plugin.configHandler.verifyAndUpdateConfig()*/
+    fun setupConfig() {
+        plugin.cfg = ConfigManager(plugin)
+        plugin.cfg.load()
     }
 
     /**
@@ -78,15 +67,16 @@ class PluginInitializer(private val plugin: PunisherX) {
      */
     private fun setupDatabase() {
         plugin.databaseHandler = DatabaseHandler(plugin)
-        if (ServerEnvironment.isFoliaBased()) {
-            plugin.logger.debug("Detected Folia server, using sync database connection handling.")
+        val databaseSetupTask = Runnable {
             plugin.databaseHandler.openConnection()
             plugin.databaseHandler.createTables()
-        }else{
-            plugin.server.scheduler.runTaskAsynchronously(plugin, Runnable {
-                plugin.databaseHandler.openConnection()
-                plugin.databaseHandler.createTables()
-            })
+        }
+
+        if (ServerEnvironment.isFoliaBased()) {
+            plugin.logger.debug("Detected Folia server, using async database connection handling.")
+            plugin.server.globalRegionScheduler.execute(plugin, databaseSetupTask)
+        } else {
+            plugin.server.scheduler.runTaskAsynchronously(plugin, databaseSetupTask)
         }
 
     }

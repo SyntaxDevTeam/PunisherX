@@ -69,7 +69,6 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var actionExecutor: PunishmentActionExecutor
     lateinit var schedulerAdapter: SchedulerAdapter
     lateinit var safeTeleportService: SafeTeleportService
-
     lateinit var cfg: ConfigManager
 
 
@@ -93,7 +92,6 @@ class PunisherX : JavaPlugin(), Listener {
      * Reloads the configuration and reinitializes the database connection.
      */
     fun onReload() {
-        cfg.reload()
         reloadMyConfig()
     }
 
@@ -127,19 +125,20 @@ class PunisherX : JavaPlugin(), Listener {
         }
 
         saveDefaultConfig()
+        pluginInitializer.setupConfig()
+        cfg.reload()
         reloadConfig()
-        configHandler = ConfigHandler(this)
-        configHandler.verifyAndUpdateConfig()
 
         databaseHandler = DatabaseHandler(this)
-        if (ServerEnvironment.isFoliaBased()) {
+        val databaseSetupTask = Runnable {
             databaseHandler.openConnection()
             databaseHandler.createTables()
+        }
+
+        if (ServerEnvironment.isFoliaBased()) {
+            server.globalRegionScheduler.execute(this, databaseSetupTask)
         } else {
-            server.scheduler.runTaskAsynchronously(this, Runnable {
-                databaseHandler.openConnection()
-                databaseHandler.createTables()
-            })
+            server.scheduler.runTaskAsynchronously(this, databaseSetupTask)
         }
 
         server.servicesManager.unregister(punisherXApi)
