@@ -1,10 +1,10 @@
 package pl.syntaxdevteam.punisher.players
 
-import pl.syntaxdevteam.punisher.PunisherX
 import com.maxmind.geoip2.DatabaseReader
 import com.maxmind.geoip2.exception.AddressNotFoundException
 import org.apache.tools.tar.TarEntry
 import org.apache.tools.tar.TarInputStream
+import pl.syntaxdevteam.punisher.PunisherX
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -12,7 +12,9 @@ import java.net.HttpURLConnection
 import java.net.InetAddress
 import java.net.URI
 import java.net.UnknownHostException
+import java.util.concurrent.CompletableFuture
 import java.util.zip.GZIPInputStream
+import kotlin.jvm.Volatile
 
 class GeoIPHandler(private val plugin: PunisherX) {
 
@@ -21,24 +23,41 @@ class GeoIPHandler(private val plugin: PunisherX) {
 
     private val cityDatabaseFile = File(pluginFolder, "GeoLite2-City.mmdb")
 
+    @Volatile
+    private var databaseReader: DatabaseReader? = null
+
+    private val initializationFuture = CompletableFuture<Unit>()
+
     init {
         val folder = File(pluginFolder)
         if (!folder.exists()) {
             folder.mkdirs()
         }
-        try {
+        plugin.schedulerAdapter.runAsync(Runnable {
+            try {
+                prepareDatabase()
+                initializationFuture.complete(Unit)
+            } catch (e: Exception) {
+                plugin.logger.severe("Failed to prepare GeoIP database: ${e.message}")
+                initializationFuture.completeExceptionally(e)
+            }
+        })
+    }
+
+    private fun prepareDatabase() {
+        if (!cityDatabaseFile.exists()) {
             downloadAndExtractDatabase()
-        } catch (e: IOException) {
-            plugin.logger.severe("Failed to download GeoIP database: ${e.message}")
         }
+        if (!cityDatabaseFile.exists()) {
+            plugin.logger.severe("GeoIP database file is missing after initialization.")
+            return
+        }
+        databaseReader = DatabaseReader.Builder(cityDatabaseFile).build()
     }
 
     private fun downloadAndExtractDatabase() {
 
-        if (cityDatabaseFile.exists()) {
-            plugin.logger.info("GeoIP database already exists. Skipping download.")
-            return
-        }
+        if (cityDatabaseFile.exists()) return
 
         val cityUri = URI("https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=$licenseKey&suffix=tar.gz")
 
@@ -88,12 +107,11 @@ class GeoIPHandler(private val plugin: PunisherX) {
     }
 
     fun getCountry(ip: String): String? {
-        if (!cityDatabaseFile.exists()) return "Unknown country"
+        if (!initializationFuture.isDone) return "Unknown country"
+        val reader = databaseReader ?: return "Unknown country"
         return try {
-            DatabaseReader.Builder(cityDatabaseFile).build().use { reader ->
-                val response = reader.city(InetAddress.getByName(ip))
-                response.country.name
-            }
+            val response = reader.city(InetAddress.getByName(ip))
+            response.country.name
         } catch (e: AddressNotFoundException) {
             "Unknown country"
         } catch (e: Exception) {
@@ -106,17 +124,16 @@ class GeoIPHandler(private val plugin: PunisherX) {
     }
 
     fun getCity(ip: String): String? {
-        if (!cityDatabaseFile.exists()) return "Unknown city"
+        if (!initializationFuture.isDone) return "Unknown city"
+        val reader = databaseReader ?: return "Unknown city"
         return try {
-            DatabaseReader.Builder(cityDatabaseFile).build().use { reader ->
-                val response = reader.city(InetAddress.getByName(ip))
-                response.city.name
-            }
+            val response = reader.city(InetAddress.getByName(ip))
+            response.city.name
         } catch (e: AddressNotFoundException) {
             "Unknown city"
         } catch (e: Exception) {
-        plugin.logger.severe("Failed to get city for IP $ip: ${e.message} [Exception]")
-        "Unknown city"
+            plugin.logger.severe("Failed to get city for IP $ip: ${e.message} [Exception]")
+            "Unknown city"
         } catch (e: UnknownHostException) {
             plugin.logger.severe("Failed to get city for IP $ip: ${e.message} [UnknownHostException]")
             "Unknown city"
