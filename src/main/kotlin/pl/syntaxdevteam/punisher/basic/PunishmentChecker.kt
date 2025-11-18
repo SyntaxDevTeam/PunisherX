@@ -39,37 +39,48 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                         TagResolver.empty())
             )
         }
-        val punishments = plugin.databaseHandler.getPunishments(uuid.toString())
-        val isJailed = punishments.any { it.type == "JAIL" && plugin.punishmentManager.isPunishmentActive(it) }
-
-        if (jailLoc == null || unjailLoc == null) {
+        val locationsConfigured = jailLoc != null && unjailLoc != null
+        if (!locationsConfigured) {
             plugin.logger.warning("Jail lub unjail location niezdefiniowane!")
         } else {
+            plugin.schedulerAdapter.runAsync {
+                val punishments = plugin.databaseHandler.getPunishments(uuid.toString())
+                val isJailed = punishments.any { it.type == "JAIL" && plugin.punishmentManager.isPunishmentActive(it) }
 
-            val (targetLoc, targetMode) = when {
-                isJailed -> {
-                    jailLoc   to GameMode.ADVENTURE
-                }
-                isPlayerInJail(player.location, jailLoc, radius) -> {
-                    unjailLoc to GameMode.SURVIVAL
-                }
-                else -> {
-                    return
+                plugin.schedulerAdapter.runSync {
+                    if (!player.isOnline) {
+                        plugin.logger.debug("Pomijam teleportację ${player.name}, gracz jest offline")
+                        return@runSync
+                    }
+
+                    val (targetLoc, targetMode) = when {
+                        isJailed -> {
+                            jailLoc to GameMode.ADVENTURE
+                        }
+                        isPlayerInJail(player.location, jailLoc, radius) -> {
+                            unjailLoc to GameMode.SURVIVAL
+                        }
+                        else -> {
+                            return@runSync
+                        }
+                    }
+
+                    if (targetLoc.world == null) {
+                        plugin.logger.warning("Brak świata dla $targetLoc")
+                        return@runSync
+                    }
+
+                    plugin.safeTeleportService.teleportSafely(player, targetLoc) { success ->
+                        if (success) {
+                            player.gameMode = targetMode
+                            plugin.logger.debug("Player ${player.name} teleported to $targetLoc and set to $targetMode")
+                        } else {
+                            plugin.logger.debug("<red>Failed to teleport ${player.name} to $targetLoc.</red>")
+                        }
+                    }
+                    plugin.logger.debug("Scheduling teleport of $name to $targetLoc with gamemode $targetMode (jailed=$isJailed)")
                 }
             }
-            if (targetLoc.world == null) {
-                plugin.logger.warning("Brak świata dla $targetLoc")
-                return
-            }
-            plugin.safeTeleportService.teleportSafely(player, targetLoc) { success ->
-                if (success) {
-                    player.gameMode = targetMode
-                    plugin.logger.debug("Player ${player.name} teleported to $targetLoc and set to $targetMode")
-                } else {
-                    plugin.logger.debug("<red>Failed to teleport ${player.name} to $targetLoc.</red>")
-                }
-            }
-            plugin.logger.debug("Scheduling teleport of $name to $targetLoc with gamemode $targetMode (jailed=$isJailed)")
         }
 
         if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.SEE_UPDATE)) {
