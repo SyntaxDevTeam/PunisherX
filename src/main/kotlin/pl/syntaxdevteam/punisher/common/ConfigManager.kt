@@ -83,7 +83,9 @@ class ConfigManager(private val plugin: PunisherX) {
         val raw = doc.get(VERSION_KEY) ?: return V_141
         return when (raw) {
             is Number -> raw.toInt()
-            is String -> raw.toIntOrNull() ?: V_141
+            is String -> raw.toIntOrNull()
+                ?: raw.filter(Char::isDigit).toIntOrNull()
+                ?: V_141
             else -> V_141
         }
     }

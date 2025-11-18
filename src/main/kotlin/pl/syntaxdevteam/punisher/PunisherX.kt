@@ -126,7 +126,6 @@ class PunisherX : JavaPlugin(), Listener {
 
         saveDefaultConfig()
         pluginInitializer.setupConfig()
-        cfg.reload()
         reloadConfig()
 
         databaseHandler = DatabaseHandler(this)
