@@ -44,8 +44,8 @@ jobs:
       - name: Zapisz raport Gradle Actions
         run: |
           mkdir -p build/reports/gradle-actions
-          cp /home/runner/work/_temp/.gradle-actions/build-results/__run_2-1763443771700.json \
-             build/reports/gradle-actions/build-results.json
+          latest_report=$(ls /home/runner/work/_temp/.gradle-actions/build-results/__run_* | tail -n 1)
+          cp "$latest_report" build/reports/gradle-actions/build-results.json
 
       - name: Upload build results
         uses: actions/upload-artifact@v4
