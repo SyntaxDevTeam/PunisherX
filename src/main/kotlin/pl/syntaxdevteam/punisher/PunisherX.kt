@@ -21,7 +21,6 @@ import pl.syntaxdevteam.punisher.basic.*
 import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
-import pl.syntaxdevteam.punisher.common.ConfigHandler
 import pl.syntaxdevteam.punisher.common.ConfigManager
 import pl.syntaxdevteam.punisher.common.ServerEnvironment
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
@@ -45,7 +44,6 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var messageHandler: MessageHandler
     lateinit var pluginsManager: PluginManagerX
 
-    lateinit var configHandler: ConfigHandler
     lateinit var pluginConfig: FileConfiguration
     lateinit var statsCollector: StatsCollector
 

@@ -141,9 +141,11 @@ class ConfigManager(private val plugin: PunisherX) {
                 "unjail"
             } else {
                 val sr = setRaw?.trim()?.lowercase() ?: ""
-                if (sr == "essx") "essx"
-                else if (sr == "world") "world"
-                else "world"
+                when (sr) {
+                    "essx" -> "essx"
+                    "world" -> "world"
+                    else -> "world"
+                }
             }
             config.set("unjail.spawn_type_select.set", mapped)
             plugin.logger.debug("[Config] spawn.use_external_set → unjail.spawn_type_select.set = $mapped (server)")
