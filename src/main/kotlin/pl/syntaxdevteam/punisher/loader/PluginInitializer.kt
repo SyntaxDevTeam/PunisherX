@@ -15,7 +15,7 @@ import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigManager
 import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
-import pl.syntaxdevteam.punisher.common.ServerEnvironment
+import pl.syntaxdevteam.core.platform.ServerEnvironment
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
@@ -58,6 +58,9 @@ class PluginInitializer(private val plugin: PunisherX) {
      * Sets up the plugin configuration.
      */
     fun setupConfig() {
+        // val confFile = File(plugin.dataFolder, "config.yml")
+        //        val version = plugin.config.getInt("config-version")
+        //        plugin.cfg = ConfigManager(plugin, plugin.logger, confFile.toString(), version.toString(), 141, 150, true)
         plugin.cfg = ConfigManager(plugin)
         plugin.cfg.load()
     }
@@ -75,7 +78,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         if (ServerEnvironment.isFoliaBased()) {
             plugin.logger.debug("Detected Folia server, using async database connection handling.")
             plugin.server.globalRegionScheduler.execute(plugin, databaseSetupTask)
-        } else {
+        } else if (ServerEnvironment.isPaperBased()) {
             plugin.server.scheduler.runTaskAsynchronously(plugin, databaseSetupTask)
         }
 
@@ -91,7 +94,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.timeHandler = TimeHandler(plugin)
         plugin.punishmentManager = PunishmentManager()
         plugin.schedulerAdapter = BukkitSchedulerAdapter(plugin)
-        plugin.safeTeleportService = SafeTeleportService(plugin, plugin.schedulerAdapter)
+        plugin.safeTeleportService = SafeTeleportService(plugin.schedulerAdapter)
         plugin.geoIPHandler = GeoIPHandler(plugin)
         plugin.cache = PunishmentCache(plugin)
         plugin.punisherXApi = PunisherXApiImpl(plugin.databaseHandler)

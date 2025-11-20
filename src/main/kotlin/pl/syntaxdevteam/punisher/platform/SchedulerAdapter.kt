@@ -2,7 +2,7 @@ package pl.syntaxdevteam.punisher.platform
 
 import org.bukkit.Location
 import org.bukkit.plugin.Plugin
-import pl.syntaxdevteam.punisher.common.ServerEnvironment
+import pl.syntaxdevteam.core.platform.ServerEnvironment
 
 interface SchedulerAdapter {
     fun runAsync(task: Runnable)
@@ -13,7 +13,7 @@ interface SchedulerAdapter {
 
 class BukkitSchedulerAdapter(
     private val plugin: Plugin,
-    private val foliaBasedOverride: Boolean? = null
+    foliaBasedOverride: Boolean? = null
 ) : SchedulerAdapter {
 
     private val foliaBased: Boolean = foliaBasedOverride ?: ServerEnvironment.isFoliaBased()

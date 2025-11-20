@@ -22,7 +22,7 @@ import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigManager
-import pl.syntaxdevteam.punisher.common.ServerEnvironment
+import pl.syntaxdevteam.core.platform.ServerEnvironment
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.databases.*
 import pl.syntaxdevteam.punisher.players.*

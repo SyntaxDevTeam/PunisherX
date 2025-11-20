@@ -24,7 +24,6 @@ class SafeTeleportServiceTest {
         val base = Location(world, 0.0, 64.0, 0.0)
 
         val service = SafeTeleportService(
-            plugin,
             ImmediateSchedulerAdapter(),
             foliaBasedOverride = false,
             safetyEvaluator = { location ->

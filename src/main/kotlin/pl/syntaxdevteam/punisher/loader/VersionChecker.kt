@@ -2,7 +2,7 @@ package pl.syntaxdevteam.punisher.loader
 
 import org.bukkit.Bukkit
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.common.ServerEnvironment
+import pl.syntaxdevteam.core.platform.ServerEnvironment
 
 class VersionChecker(private val plugin: PunisherX) {
 

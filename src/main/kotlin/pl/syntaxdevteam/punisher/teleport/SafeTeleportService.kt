@@ -5,15 +5,13 @@ import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
-import org.bukkit.plugin.Plugin
-import pl.syntaxdevteam.punisher.common.ServerEnvironment
+import pl.syntaxdevteam.core.platform.ServerEnvironment
 import pl.syntaxdevteam.punisher.platform.SchedulerAdapter
 import kotlin.math.abs
 
 class SafeTeleportService(
-    private val plugin: Plugin,
     private val scheduler: SchedulerAdapter,
-    private val foliaBasedOverride: Boolean? = null,
+    foliaBasedOverride: Boolean? = null,
     private val safetyEvaluator: (Location) -> Boolean = Companion::isLocationSafe,
     private val chunkLoader: (Location) -> Unit = { location ->
         if (!location.chunk.isLoaded) {
