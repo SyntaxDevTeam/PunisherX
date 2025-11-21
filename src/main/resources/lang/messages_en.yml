@@ -12,12 +12,20 @@ error:
   no_permission: "<red>You do not have permission to use this command.</red>"
   player_not_found: "<gold>No player found with the nickname <player>.</gold>"
   player_not_punished: "<gold>Player <player> does not have such a punishment.</gold>"
+  cannot-report-self: "<red>You cannot report yourself!</red>"
   ip_not_found: "<gold>No player found with IP <ip>.</gold>"
   no_data: "<red>No data to display.</red>"
   db_error: "An error occurred while adding the punishment to the database. Using fallback method. Check console!"
   console: "<red>Only a player can use this command.</red>"
   reload: "<red>An error occurred while reloading the configuration:</red>"
   bypass: "<red><b>WARNING!</b> Player <gold><player></gold> cannot be punished due to their permissions (OP or bypass).</red><newline><dark_gray>Maybe there is a way around this...</dark_gray>"
+
+# /report <player> command messages
+reports:
+  usage: "Correct usage: <gold>/report <player>"
+  cannot-report-self: "<red>You cannot report your self!"
+  report-sent: "<green>Your report against <gold><target></gold> for <gray><reason></gray> has been submitted!</green>"
+  admin-notify: "<red>[Report]</red> <gold><reporter></gold> reported <yellow><target></yellow> for <gray><reason></gray>"
 
 # /setjail command messages
 setjail:
@@ -363,6 +371,20 @@ GUI:
     title: "<yellow>Configuration</yellow>"
     setunjail: "<yellow>Set unjail location</yellow>"
     setjail: "<yellow>Set jail</yellow>"
+  Report:
+    menu:
+      title: "<yellow>Select report target</yellow>"
+      online: "<green>Online players</green>"
+      offline: "<red>Offline (last hour)</red>"
+    player:
+      title: "<yellow>Select player to report</yellow>"
+    offline:
+      title: "<yellow>Offline players (last hour)</yellow>"
+    reason:
+      title: "<yellow>Select report reason</yellow>"
+    lore:
+      clickToReport: "<gray>Click to report</gray>"
+      clickToChoose: "<gray>Click to choose</gray>"
   Nav:
     next: "<gray>Next page</gray>"
     previous: "<gray>Previous page</gray>"
