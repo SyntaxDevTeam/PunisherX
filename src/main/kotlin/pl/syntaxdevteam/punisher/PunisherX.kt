@@ -10,7 +10,6 @@ import org.bukkit.event.HandlerList
 import org.bukkit.plugin.ServicePriority
 import pl.syntaxdevteam.core.SyntaxCore
 import pl.syntaxdevteam.core.manager.PluginManagerX
-import pl.syntaxdevteam.message.SyntaxMessages
 import pl.syntaxdevteam.core.logging.Logger
 import pl.syntaxdevteam.core.stats.StatsCollector
 import pl.syntaxdevteam.core.update.GitHubSource
@@ -19,17 +18,23 @@ import pl.syntaxdevteam.message.MessageHandler
 import pl.syntaxdevteam.punisher.api.PunisherXApi
 import pl.syntaxdevteam.punisher.api.PunisherXApiImpl
 import pl.syntaxdevteam.punisher.basic.*
+import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigHandler
+import pl.syntaxdevteam.punisher.common.ConfigManager
+import pl.syntaxdevteam.punisher.common.ServerEnvironment
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.databases.*
 import pl.syntaxdevteam.punisher.players.*
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
+import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
 import pl.syntaxdevteam.punisher.loader.PluginInitializer
 import pl.syntaxdevteam.punisher.loader.VersionChecker
 import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
+import pl.syntaxdevteam.punisher.platform.SchedulerAdapter
+import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import java.io.File
 import java.util.*
 
@@ -60,6 +65,12 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var playerIPManager: PlayerIPManager
     lateinit var versionChecker: VersionChecker
     lateinit var versionCompatibility: VersionCompatibility
+    lateinit var guiMaterialResolver: GuiMaterialResolver
+    lateinit var actionExecutor: PunishmentActionExecutor
+    lateinit var schedulerAdapter: SchedulerAdapter
+    lateinit var safeTeleportService: SafeTeleportService
+
+    lateinit var cfg: ConfigManager
 
 
     /**
@@ -82,6 +93,7 @@ class PunisherX : JavaPlugin(), Listener {
      * Reloads the configuration and reinitializes the database connection.
      */
     fun onReload() {
+        cfg.reload()
         reloadMyConfig()
     }
 
@@ -93,15 +105,6 @@ class PunisherX : JavaPlugin(), Listener {
         databaseHandler.closeConnection()
         AsyncChatEvent.getHandlerList().unregister(this as Plugin)
         pluginInitializer.onDisable()
-    }
-
-    /**
-     * Retrieves the plugin file.
-     *
-     * @return The plugin file.
-     */
-    fun getPluginFile(): File {
-        return this.file
     }
 
     fun resolvePlayerUuid(identifier: String): UUID {
@@ -129,7 +132,7 @@ class PunisherX : JavaPlugin(), Listener {
         configHandler.verifyAndUpdateConfig()
 
         databaseHandler = DatabaseHandler(this)
-        if (server.name.contains("Folia")) {
+        if (ServerEnvironment.isFoliaBased()) {
             databaseHandler.openConnection()
             databaseHandler.createTables()
         } else {
@@ -149,6 +152,7 @@ class PunisherX : JavaPlugin(), Listener {
         )
 
         discordWebhook = DiscordWebhook(this)
+        actionExecutor = PunishmentActionExecutor(this)
         HandlerList.unregisterAll(playerJoinListener)
         HandlerList.unregisterAll(punishmentChecker)
         geoIPHandler = GeoIPHandler(this)

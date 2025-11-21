@@ -31,15 +31,19 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/") {
         name = "sonatype"
     }
+    maven("https://repo.menthamc.org/repository/maven-public/")
     maven("https://repo.extendedclip.com/releases/") // PlaceholderAPI
     maven("https://repo.codemc.org/repository/maven-public/") // VaultUnlockedAPI
     maven("https://jitpack.io") // VaultAPI
     maven("https://repo.essentialsx.net/releases/") // EssentialsX
 }
 
+val mockitoAgent by configurations.creating
+
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
+    //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:core:1.2.5-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:messageHandler:1.0.3")
     //implementation(files("libs/SyntaxCore-1.1.0-all.jar"))
@@ -61,10 +65,20 @@ dependencies {
     compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.1.0")
     compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
     compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.15")
-    compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2")
+    compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2"){
+        isTransitive = false
+    }
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.3")
+    compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
 
     testImplementation(kotlin("test"))
+    testImplementation("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
+    testImplementation("org.mockito:mockito-core:5.2.0")
+    testImplementation("org.mockito:mockito-inline:5.2.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.14.9") {
+        isTransitive = false
+    }
 }
 
 tasks {
@@ -73,6 +87,7 @@ tasks {
     }
     test {
         useJUnitPlatform()
+        jvmArgs("-javaagent:${mockitoAgent.singleFile}")
     }
     runServer {
         minecraftVersion("1.21.10")

@@ -4,8 +4,8 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import org.bukkit.configuration.file.FileConfiguration
-import pl.syntaxdevteam.punisher.common.TeleportUtils
 import pl.syntaxdevteam.punisher.hooks.HookHandler
+import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import java.util.LinkedHashSet
 import java.util.Locale
 
@@ -69,7 +69,8 @@ object JailUtils {
         config: FileConfiguration,
         hookHandler: HookHandler? = null,
         lastLocation: Location? = null,
-        player: OfflinePlayer? = null
+        player: OfflinePlayer? = null,
+        safeTeleportService: SafeTeleportService
     ): Location? {
         val orderedSources = LinkedHashSet<UnjailLocationSource>().apply {
             addAll(getSpawnTypeSelection(config))
@@ -87,7 +88,7 @@ object JailUtils {
             }
 
             if (resolved != null) {
-                val safeLocation = TeleportUtils.findNearestSafeLocation(resolved)
+                val safeLocation = safeTeleportService.findNearestSafeLocation(resolved)
                 if (safeLocation != null) {
                     return safeLocation
                 }

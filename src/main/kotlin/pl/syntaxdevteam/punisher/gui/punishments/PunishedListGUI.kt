@@ -18,7 +18,7 @@ class PunishedListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         inventory.setItem(
             24,
             createItem(
-                plugin.versionCompatibility.resolveMaterial("IRON_CHAIN", "IRON_BARS", "CHAIN"),
+                plugin.guiMaterialResolver.resolveMaterial("IRON_CHAIN", "IRON_BARS", "CHAIN"),
                 mH.stringMessageToStringNoPrefix("GUI", "PunishedList.jailed")
             )
         )

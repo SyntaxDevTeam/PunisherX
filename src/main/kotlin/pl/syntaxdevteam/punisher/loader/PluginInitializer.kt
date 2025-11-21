@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.loader
 
+import org.bukkit.Bukkit
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.scheduler.BukkitRunnable
 import pl.syntaxdevteam.core.SyntaxCore
@@ -13,9 +14,13 @@ import pl.syntaxdevteam.punisher.basic.PunishmentManager
 import pl.syntaxdevteam.punisher.basic.TimeHandler
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
-import pl.syntaxdevteam.punisher.common.ConfigHandler
+//import pl.syntaxdevteam.punisher.common.ConfigHandler
+import pl.syntaxdevteam.punisher.common.ConfigManager
+import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
+import pl.syntaxdevteam.punisher.common.ServerEnvironment
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
+import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
 import pl.syntaxdevteam.punisher.gui.interfaces.GUIHandler
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
@@ -24,15 +29,19 @@ import pl.syntaxdevteam.punisher.listeners.ModernLoginListener
 import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
 import pl.syntaxdevteam.punisher.placeholders.PlaceholderHandler
 import pl.syntaxdevteam.punisher.players.*
+import pl.syntaxdevteam.punisher.platform.BukkitSchedulerAdapter
+import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import java.io.File
 import java.util.Locale
 
 class PluginInitializer(private val plugin: PunisherX) {
 
+    lateinit var cfg: ConfigManager
+        private set
+
     fun onEnable() {
         setUpLogger()
         setupConfig()
-
         setupDatabase()
         setupHandlers()
         registerEvents()
@@ -54,9 +63,14 @@ class PluginInitializer(private val plugin: PunisherX) {
      * Sets up the plugin configuration.
      */
     private fun setupConfig() {
-        plugin.saveDefaultConfig()
-        plugin.configHandler = ConfigHandler(plugin)
-        plugin.configHandler.verifyAndUpdateConfig()
+        cfg = ConfigManager(plugin)
+        cfg.load()
+        plugin.cfg = cfg
+        //cfg.reload()
+/*
+        //plugin.saveDefaultConfig()
+        //plugin.configHandler = ConfigHandler(plugin)
+        //plugin.configHandler.verifyAndUpdateConfig()*/
     }
 
     /**
@@ -64,7 +78,7 @@ class PluginInitializer(private val plugin: PunisherX) {
      */
     private fun setupDatabase() {
         plugin.databaseHandler = DatabaseHandler(plugin)
-        if (plugin.server.name.contains("Folia")) {
+        if (ServerEnvironment.isFoliaBased()) {
             plugin.logger.debug("Detected Folia server, using sync database connection handling.")
             plugin.databaseHandler.openConnection()
             plugin.databaseHandler.createTables()
@@ -86,6 +100,8 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.pluginsManager = SyntaxCore.pluginManagerx
         plugin.timeHandler = TimeHandler(plugin)
         plugin.punishmentManager = PunishmentManager()
+        plugin.schedulerAdapter = BukkitSchedulerAdapter(plugin)
+        plugin.safeTeleportService = SafeTeleportService(plugin, plugin.schedulerAdapter)
         plugin.geoIPHandler = GeoIPHandler(plugin)
         plugin.cache = PunishmentCache(plugin)
         plugin.punisherXApi = PunisherXApiImpl(plugin.databaseHandler)
@@ -95,6 +111,8 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.punishmentChecker = PunishmentChecker(plugin)
         plugin.versionChecker = VersionChecker(plugin)
         plugin.versionCompatibility = VersionCompatibility(plugin.versionChecker)
+        plugin.guiMaterialResolver = GuiMaterialResolver(plugin.versionChecker.getSemanticVersion())
+        plugin.actionExecutor = PunishmentActionExecutor(plugin)
         checkLegacyPlaceholders()
     }
 
@@ -170,7 +188,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.logger.warning(warnMsg)
 
         val delay = 20L * 10L
-        if (plugin.server.name.contains("Folia", ignoreCase = true)) {
+        if (ServerEnvironment.isFoliaBased()) {
             plugin.server.globalRegionScheduler.runAtFixedRate(plugin, { task ->
                 try {
                     val content = langFile.readText(Charsets.UTF_8)

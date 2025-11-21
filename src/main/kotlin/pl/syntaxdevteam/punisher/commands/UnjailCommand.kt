@@ -7,7 +7,6 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.GameMode
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
-import pl.syntaxdevteam.punisher.common.TeleportUtils
 
 class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
 
@@ -64,7 +63,7 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         if (player != null && releaseLocation != null) {
-            TeleportUtils.teleportSafely(plugin, player, releaseLocation) { success ->
+            plugin.safeTeleportService.teleportSafely(player, releaseLocation) { success ->
                 if (success) {
                     player.gameMode = GameMode.SURVIVAL
                     plugin.messageHandler.getSmartMessage(

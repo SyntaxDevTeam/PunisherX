@@ -14,7 +14,6 @@ import org.bukkit.event.player.PlayerMoveEvent
 import pl.syntaxdevteam.core.SyntaxCore
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
-import pl.syntaxdevteam.punisher.common.TeleportUtils
 import java.util.*
 
 class PunishmentChecker(private val plugin: PunisherX) : Listener {
@@ -27,11 +26,16 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         val uuid      = player.uniqueId
         val radius    = plugin.config.getDouble("jail.radius", 10.0)
         val jailLoc   = JailUtils.getJailLocation(plugin.config)
-        val unjailLoc = JailUtils.getUnjailLocation(plugin.config, plugin.hookHandler, player = player)
+        val unjailLoc = JailUtils.getUnjailLocation(
+            plugin.config,
+            plugin.hookHandler,
+            player = player,
+            safeTeleportService = plugin.safeTeleportService
+        )
         if (PermissionChecker.isAuthor(uuid)) {
             player.sendMessage(
                 plugin.messageHandler
-                .formatMixedTextToMiniMessage(plugin.messageHandler.getPrefix() + " <green>Witaj, <b>WieszczY!</b><newline>    Ten serwer używa ${plugin.pluginMeta.name} ${plugin.pluginMeta.version} :)",
+                .formatMixedTextToMiniMessage(plugin.messageHandler.getPrefix() + " <green>Witaj, <b>$name</b><newline>    Ten serwer używa ${plugin.pluginMeta.name} ${plugin.pluginMeta.version} ❤",
                         TagResolver.empty())
             )
         }
@@ -57,7 +61,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                 plugin.logger.warning("Brak świata dla $targetLoc")
                 return
             }
-            TeleportUtils.teleportSafely(plugin, player, targetLoc) { success ->
+            plugin.safeTeleportService.teleportSafely(player, targetLoc) { success ->
                 if (success) {
                     player.gameMode = targetMode
                     plugin.logger.debug("Player ${player.name} teleported to $targetLoc and set to $targetMode")
@@ -142,7 +146,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                             val duration = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(remainingTime.toString())
                             val reason = punishment.reason
                             event.isCancelled = true
-                            val muteMessage = plugin.messageHandler.stringMessageToComponent("mute", "mute_message", mapOf("reason" to reason, "time" to duration))
+                            val muteMessage = plugin.messageHandler.stringMessageToComponent("mute", "mute_info_message", mapOf("reason" to reason, "time" to duration))
 
                             player.sendMessage(muteMessage)
                         } else if (punishment.type == "MUTE") {
@@ -226,7 +230,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             return
         }
 
-        TeleportUtils.teleportSafely(plugin, player, jailLocation) { success ->
+        plugin.safeTeleportService.teleportSafely(player, jailLocation) { success ->
             if (success) {
                 val message = plugin.messageHandler.stringMessageToComponent("jail", "jail_restrict_message", emptyMap())
                 player.sendMessage(message)
