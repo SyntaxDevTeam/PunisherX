@@ -52,8 +52,7 @@ class PunishmentActionExecutor(private val plugin: PunisherX) {
             is String -> listOf(value)
             is Collection<*> -> value.filterIsInstance<String>()
             is ConfigurationSection -> value.getKeys(false).flatMap { nestedKey ->
-                val nestedValue = value.get(nestedKey)
-                when (nestedValue) {
+                when (val nestedValue = value.get(nestedKey)) {
                     is String -> listOf(nestedValue)
                     is Collection<*> -> nestedValue.filterIsInstance<String>()
                     else -> emptyList()
