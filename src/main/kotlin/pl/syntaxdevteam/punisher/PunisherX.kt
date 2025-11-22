@@ -79,7 +79,7 @@ class PunisherX : JavaPlugin(), Listener {
             GitHubSource("SyntaxDevTeam/PunisherX"),
             ModrinthSource("VCNRcwC2")
         )
-        SyntaxCore.init(this)
+        SyntaxCore.init(this, versionType = "paper")
         pluginInitializer = PluginInitializer(this)
         pluginInitializer.onEnable()
         versionChecker.checkAndLog()
