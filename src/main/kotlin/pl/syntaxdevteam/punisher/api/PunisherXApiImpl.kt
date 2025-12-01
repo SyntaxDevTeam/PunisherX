@@ -58,4 +58,16 @@ class PunisherXApiImpl(private val databaseHandler: DatabaseHandler) : PunisherX
             databaseHandler.getJailedPlayers(limit, offset)
         }
     }
+
+    override fun isMuted(uuid: String): CompletableFuture<Boolean> {
+        return CompletableFuture.supplyAsync {
+            databaseHandler.getPunishments(uuid).any { it.type.equals("MUTE", ignoreCase = true) }
+        }
+    }
+
+    override fun isJailed(uuid: String): CompletableFuture<Boolean> {
+        return CompletableFuture.supplyAsync {
+            databaseHandler.getPunishments(uuid).any { it.type.equals("JAIL", ignoreCase = true) }
+        }
+    }
 }
