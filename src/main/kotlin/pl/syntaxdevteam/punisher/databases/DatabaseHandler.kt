@@ -134,6 +134,20 @@ class DatabaseHandler(private val plugin: PunisherX) {
             )
         )
         db.createTable(reportsSchema)
+
+        val bridgeQueueSchema = TableSchema(
+            "bridge_events",
+            listOf(
+                Column("id", idDefinition()),
+                Column("action", "VARCHAR(16) NOT NULL"),
+                Column("target", "VARCHAR(64) NOT NULL"),
+                Column("reason", "TEXT"),
+                Column("endTime", "BIGINT NOT NULL"),
+                Column("processed", "TINYINT DEFAULT 0"),
+                Column("processedAt", "BIGINT")
+            )
+        )
+        db.createTable(bridgeQueueSchema)
     }
 
     // ---------------------------------------------------------------------
@@ -168,6 +182,23 @@ class DatabaseHandler(private val plugin: PunisherX) {
         } catch (e: Exception) {
             logger.err("Failed to add punishment for player $name. ${e.message}")
             false
+        }
+    }
+
+    fun enqueueBridgeEvent(action: String, target: String, reason: String, end: Long) {
+        runCatching {
+            execute(
+                """
+                INSERT INTO bridge_events (action, target, reason, endTime, processed)
+                VALUES (?, ?, ?, ?, 0)
+                """.trimIndent(),
+                action.uppercase(),
+                target,
+                reason,
+                end
+            )
+        }.onFailure { exception ->
+            logger.err("Failed to enqueue bridge event for $action on $target: ${exception.message}")
         }
     }
 

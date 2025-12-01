@@ -29,6 +29,8 @@ class ProxyBridgeMessenger(private val plugin: PunisherX) {
     }
 
     private fun dispatch(action: String, target: String, reason: String, end: Long) {
+        plugin.databaseHandler.enqueueBridgeEvent(action, target, reason, end)
+
         val output = ByteStreams.newDataOutput()
         output.writeUTF(action)
         output.writeUTF(target)

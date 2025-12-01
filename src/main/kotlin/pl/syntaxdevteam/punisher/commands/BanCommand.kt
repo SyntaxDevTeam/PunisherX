@@ -30,7 +30,7 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "bypass", mapOf("player" to player)))
                             return
                         }
-                    }/*
+                    }/* TODO: Pamiętać o odkomentowaniu tego po testach.
                     if(PermissionChecker.isAuthor(uuid)){
                         stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("<red>You can't punish the plugin author</red>",
                             TagResolver.empty()))
