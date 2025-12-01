@@ -29,6 +29,8 @@ import pl.syntaxdevteam.punisher.placeholders.PlaceholderHandler
 import pl.syntaxdevteam.punisher.players.*
 import pl.syntaxdevteam.punisher.platform.BukkitSchedulerAdapter
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
+import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
+import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
 import java.io.File
 import java.util.Locale
 
@@ -45,6 +47,7 @@ class PluginInitializer(private val plugin: PunisherX) {
     }
 
     fun onDisable() {
+        runCatching { plugin.onlinePunishmentWatcher.stop() }
         plugin.databaseHandler.closeConnection()
         plugin.logger.err(plugin.pluginMeta.name + " " + plugin.pluginMeta.version + " has been disabled ☹️")
     }
@@ -106,6 +109,8 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.versionCompatibility = VersionCompatibility(plugin.versionChecker)
         plugin.guiMaterialResolver = GuiMaterialResolver(plugin.versionChecker.getSemanticVersion())
         plugin.actionExecutor = PunishmentActionExecutor(plugin)
+        plugin.proxyBridgeMessenger = ProxyBridgeMessenger(plugin).also { it.registerChannel() }
+        plugin.onlinePunishmentWatcher = OnlinePunishmentWatcher(plugin).also { it.start() }
         checkLegacyPlaceholders()
     }
 

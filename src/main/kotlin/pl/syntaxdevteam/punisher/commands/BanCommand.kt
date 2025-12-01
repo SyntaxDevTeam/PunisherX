@@ -30,12 +30,12 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "bypass", mapOf("player" to player)))
                             return
                         }
-                    }
+                    }/*
                     if(PermissionChecker.isAuthor(uuid)){
                         stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("<red>You can't punish the plugin author</red>",
                             TagResolver.empty()))
                         return
-                    }
+                    }*/
                     var gtime: String?
                     var reason: String
                     try {
@@ -50,8 +50,9 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                     val punishmentType = "BAN"
                     val start = System.currentTimeMillis()
                     val end: Long? = if (gtime != null) (System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
+                    val normalizedEnd = end ?: -1
 
-                    val success = plugin.databaseHandler.addPunishment(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    val success = plugin.databaseHandler.addPunishment(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, normalizedEnd)
                     if (!success) {
                         plugin.logger.err("Failed to add ban to database for player $player. Using fallback method.")
                         stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
@@ -61,7 +62,8 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                         banList.addBan(playerProfile, reason, banEndDate, stack.sender.name)
                     }
                     clp.logCommand(stack.sender.name, punishmentType, player, reason)
-                    plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, normalizedEnd)
+                    plugin.proxyBridgeMessenger.notifyBan(uuid, reason, normalizedEnd)
 
                     if (targetPlayer != null) {
                         val kickMessages = plugin.messageHandler.getSmartMessage(

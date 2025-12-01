@@ -1,0 +1,5 @@
+name: PunisherXBridge
+main: pl.syntaxdevteam.punisher.bridge.proxy.PunisherXBridgePlugin
+version: "${version}"
+author: SyntaxDevTeam
+depend: []

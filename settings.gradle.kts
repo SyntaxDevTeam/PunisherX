@@ -1,4 +1,5 @@
 rootProject.name = "PunisherX"
+include("bungee-bridge")
 pluginManagement {
     repositories {
         // Twoje repozytoria z pluginami:

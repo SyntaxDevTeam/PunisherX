@@ -65,16 +65,18 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
         val end = durationSec?.let { start + it * 1000 }
 
         var dbError = false
-        playerIPs.forEach { ip ->
+        val normalizedEnd = end ?: -1
+        playerIPs.distinct().forEach { ip ->
             val success = plugin.databaseHandler.addPunishment(rawTarget, ip, reason, stack.sender.name,
-                "BANIP", start, end ?: -1)
+                "BANIP", start, normalizedEnd)
             if (!success) {
                 plugin.logger.err("DB error ban-ip $ip")
                 dbError = true
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban-ip $ip")
             }
             plugin.databaseHandler.addPunishmentHistory(rawTarget, ip, reason, stack.sender.name,
-                "BANIP", start, end ?: -1)
+                "BANIP", start, normalizedEnd)
+            plugin.proxyBridgeMessenger.notifyIpBan(ip, reason, normalizedEnd)
         }
         clp.logCommand(stack.sender.name, "BANIP", rawTarget, reason)
         if (dbError) stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
