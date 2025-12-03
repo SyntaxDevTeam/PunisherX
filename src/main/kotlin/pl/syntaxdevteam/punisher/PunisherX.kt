@@ -57,6 +57,7 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var geoIPHandler: GeoIPHandler
     lateinit var punishmentManager: PunishmentManager
     lateinit var cache: PunishmentCache
+    lateinit var punishmentActionBarNotifier: PunishmentActionBarNotifier
     lateinit var punisherXApi: PunisherXApi
     lateinit var hookHandler: HookHandler
     lateinit var discordWebhook: DiscordWebhook
@@ -121,6 +122,7 @@ class PunisherX : JavaPlugin(), Listener {
      */
     private fun reloadMyConfig() {
         databaseHandler.closeConnection()
+        runCatching { punishmentActionBarNotifier.stop() }
         try {
             messageHandler.reloadMessages()
         } catch (e: Exception) {
@@ -159,6 +161,7 @@ class PunisherX : JavaPlugin(), Listener {
         geoIPHandler = GeoIPHandler(this)
         playerIPManager = PlayerIPManager(this, geoIPHandler)
         punishmentChecker = PunishmentChecker(this)
+        punishmentActionBarNotifier = PunishmentActionBarNotifier(this).also { it.start() }
         playerJoinListener = PlayerJoinListener(playerIPManager, punishmentChecker)
         server.pluginManager.registerEvents(playerJoinListener, this)
         server.pluginManager.registerEvents(punishmentChecker, this)

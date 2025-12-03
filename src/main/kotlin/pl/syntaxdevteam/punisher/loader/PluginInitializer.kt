@@ -7,6 +7,7 @@ import pl.syntaxdevteam.message.SyntaxMessages
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.api.PunisherXApi
 import pl.syntaxdevteam.punisher.api.PunisherXApiImpl
+import pl.syntaxdevteam.punisher.basic.PunishmentActionBarNotifier
 import pl.syntaxdevteam.punisher.basic.PunishmentCache
 import pl.syntaxdevteam.punisher.basic.PunishmentChecker
 import pl.syntaxdevteam.punisher.basic.PunishmentManager
@@ -48,6 +49,7 @@ class PluginInitializer(private val plugin: PunisherX) {
 
     fun onDisable() {
         runCatching { plugin.onlinePunishmentWatcher.stop() }
+        runCatching { plugin.punishmentActionBarNotifier.stop() }
         plugin.databaseHandler.closeConnection()
         plugin.logger.err(plugin.pluginMeta.name + " " + plugin.pluginMeta.version + " has been disabled ☹️")
     }
@@ -100,6 +102,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.safeTeleportService = SafeTeleportService(plugin.schedulerAdapter)
         plugin.geoIPHandler = GeoIPHandler(plugin)
         plugin.cache = PunishmentCache(plugin)
+        plugin.punishmentActionBarNotifier = PunishmentActionBarNotifier(plugin).also { it.start() }
         plugin.punisherXApi = PunisherXApiImpl(plugin.databaseHandler)
         plugin.hookHandler = HookHandler(plugin)
         plugin.discordWebhook = DiscordWebhook(plugin)
