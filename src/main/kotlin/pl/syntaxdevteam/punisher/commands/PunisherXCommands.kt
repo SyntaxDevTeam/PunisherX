@@ -4,9 +4,18 @@ import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventOwner
 import org.jetbrains.annotations.NotNull
+import java.lang.management.ManagementFactory
+import java.net.HttpURLConnection
+import java.net.URI
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.core.database.DatabaseType
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+
+private data class ConnectivityCheckResult(
+    val ok: Boolean,
+    val message: String,
+    val durationMs: Long
+)
 
 class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
     private val mH = plugin.messageHandler
@@ -63,6 +72,10 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
 
             args[0].equals("import", ignoreCase = true) -> {
                 plugin.databaseHandler.importDatabase()
+            }
+
+            args[0].equals("diagnostics", ignoreCase = true) || args[0].equals("diag", ignoreCase = true) -> {
+                runDiagnostics(stack)
             }
 
             args[0].equals("migrate", ignoreCase = true) -> {
@@ -128,11 +141,82 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
         }
     }
 
+    private fun runDiagnostics(stack: CommandSourceStack) {
+        val sender = stack.sender
+        val prefix = plugin.messageHandler.getPrefix()
+        val pluginMeta = (plugin as LifecycleEventOwner).pluginMeta
+        val server = plugin.server
+        val javaVersion = System.getProperty("java.version")
+        val osName = System.getProperty("os.name")
+        val osArch = System.getProperty("os.arch")
+        val osVersion = System.getProperty("os.version")
+        sender.sendMessage(mH.miniMessageFormat("$prefix <yellow>Running diagnostics, please wait...</yellow>"))
+
+        plugin.server.scheduler.runTaskAsynchronously(plugin, Runnable {
+            val databaseCheck = plugin.databaseHandler.runHealthCheck()
+            val externalConnectivity = checkExternalConnectivity()
+            val runtime = Runtime.getRuntime()
+            val usedMemoryMb = (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024)
+            val maxMemoryMb = runtime.maxMemory() / (1024 * 1024)
+            val uptime = ManagementFactory.getRuntimeMXBean().uptime
+            val safeDatabaseMessage = databaseCheck.message.replace('<', '[').replace('>', ']')
+            val safeNetworkMessage = externalConnectivity.message.replace('<', '[').replace('>', ']')
+            val report = listOf(
+                " ",
+                "<gray>-+-----------------------------------------------",
+                " <gray>| <gold>${pluginMeta.name} diagnostics</gold>",
+                "<gray>-+-----------------------------------------------",
+                " <gray>| <white>Plugin version: <gold>${pluginMeta.version}</gold>",
+                " <gray>| <white>Server brand: <gold>${server.name}</gold> <gray>${server.version}</gray>",
+                " <gray>| <white>Java: <gold>$javaVersion</gold>",
+                " <gray>| <white>OS: <gold>$osName $osVersion ($osArch)</gold>",
+                " <gray>| <white>Uptime: <gold>${uptime / 1000}s</gold>",
+                " <gray>| <white>Memory: <gold>${usedMemoryMb}MB</gold> / <gray>${maxMemoryMb}MB max</gray>",
+                " <gray>| <white>Database: <gold>${plugin.databaseHandler.databaseType().name.lowercase()}</gold> - " +
+                        (if (databaseCheck.ok) "<green>OK</green>" else "<red>FAILED</red>") +
+                        " <gray>${databaseCheck.durationMs}ms</gray>",
+                " <gray>| <white>DB details: <gray>$safeDatabaseMessage</gray>",
+                " <gray>| <white>External connectivity: " +
+                        (if (externalConnectivity.ok) "<green>OK</green>" else "<red>FAILED</red>") +
+                        " <gray>${externalConnectivity.durationMs}ms</gray>",
+                " <gray>| <white>Network details: <gray>$safeNetworkMessage</gray>",
+                " <gray>| <white>Data folder: <gray>${plugin.dataFolder.absolutePath}</gray>",
+                " <gray>| <white>Share this output with support if an issue occurs.",
+                "<gray>-+-----------------------------------------------",
+                " "
+            ).joinToString("\n")
+
+            plugin.server.scheduler.runTask(plugin, Runnable {
+                sender.sendMessage(mH.miniMessageFormat(report))
+            })
+        })
+    }
+
+    private fun checkExternalConnectivity(): ConnectivityCheckResult {
+        val target = URI.create("https://example.com").toURL()
+        val start = System.currentTimeMillis()
+        return try {
+            val connection = (target.openConnection() as HttpURLConnection).apply {
+                requestMethod = "HEAD"
+                connectTimeout = 3000
+                readTimeout = 3000
+            }
+            val code = connection.responseCode
+            val duration = System.currentTimeMillis() - start
+            connection.disconnect()
+            ConnectivityCheckResult(true, "example.com responded with HTTP $code", duration)
+        } catch (exception: Exception) {
+            val duration = System.currentTimeMillis() - start
+            ConnectivityCheckResult(false, exception.message ?: "Unknown network error", duration)
+        }
+    }
+
     private fun sendHelp(stack: CommandSourceStack, page: Int) {
         val commands = listOf(
             "  <gold>/prx help <gray>- <white>Displays this prompt.", // zmienione /punisherx → /prx
             "  <gold>/prx version <gray>- <white>Shows plugin info.",
             "  <gold>/prx reload <gray>- <white>Reloads the configuration file.",
+            "  <gold>/prx diag <gray>- <white>Runs diagnostics and prints results.",
             "  <gold>/kick <player> <reason> <gray>- <white>Kicks a player from the server",
             "  <gold>/warn <player> (time) <reason> <gray>- <white>Warns a player.",
             "  <gold>/unwarn <player> <gray>- <white>Removes a player's warning.",
@@ -204,7 +288,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
         if (args.isEmpty()) {
             val baseSuggestions = mutableListOf("help")
             if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.PUNISHERX_COMMAND)) {
-                baseSuggestions.addAll(listOf("version", "reload", "export", "import", "migrate"))
+                baseSuggestions.addAll(listOf("version", "reload", "export", "import", "diag", "migrate"))
             }
             return baseSuggestions
         }
@@ -216,7 +300,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             }
 
             if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.PUNISHERX_COMMAND)) {
-                listOf("version", "reload", "export", "import").forEach { cmd ->
+                listOf("version", "reload", "export", "import", "diag", "diagnostics").forEach { cmd ->
                     if (cmd.startsWith(args[0], ignoreCase = true)) {
                         baseSuggestions.add(cmd)
                     }

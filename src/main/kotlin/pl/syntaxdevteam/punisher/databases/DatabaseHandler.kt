@@ -12,6 +12,13 @@ import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 
+data class DatabaseHealthCheckResult(
+    val type: DatabaseType,
+    val ok: Boolean,
+    val message: String,
+    val durationMs: Long
+)
+
 /**
  * Database access layer backed by SyntaxCore's [DatabaseManager].
  *
@@ -43,6 +50,20 @@ class DatabaseHandler(private val plugin: PunisherX) {
     /** Opens connection pool. */
     fun openConnection() {
         db.connect()
+    }
+
+    fun databaseType(): DatabaseType = dbType
+
+    fun runHealthCheck(): DatabaseHealthCheckResult {
+        val start = System.currentTimeMillis()
+        return try {
+            db.query("SELECT 1") { resultSet -> resultSet.getString(1) }
+            val duration = System.currentTimeMillis() - start
+            DatabaseHealthCheckResult(dbType, true, "Connection and simple query succeeded.", duration)
+        } catch (exception: Exception) {
+            val duration = System.currentTimeMillis() - start
+            DatabaseHealthCheckResult(dbType, false, exception.message ?: "Unknown database error", duration)
+        }
     }
 
     private fun resolveDatabaseName(): String {

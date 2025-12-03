@@ -84,6 +84,14 @@ mute:
     - "ehelpop"
     - "p msg"
 
+# Action bar countdown for active punishments.
+notifications:
+  punishment_bar:
+    # Enable the bottom-bar countdown for active jail or mute punishments.
+    enabled: true
+    # How often (in ticks) the counter should update. 20 ticks = 1 second.
+    period_ticks: 20
+
 # Settings for the prison location and its radius.
 jail:
   location:
