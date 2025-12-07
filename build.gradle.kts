@@ -72,7 +72,7 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
-    testImplementation("org.mockito:mockito-core:5.2.0")
+    testImplementation("org.mockito:mockito-core:5.20.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
     mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.2") {
