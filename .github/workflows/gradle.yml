@@ -16,7 +16,7 @@ jobs:
       AES_KEY: ${{ secrets.AES_KEY }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -65,7 +65,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
