@@ -2,27 +2,29 @@
 ![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/SyntaxDevTeam/PunisherX/latest/main) [![Hangar Downloads](https://img.shields.io/hangar/dt/PunisherX?style=flat)](https://hangar.papermc.io/SyntaxDevTeam/PunisherX)
 # Proudly Introducing PunisherX
 
-PunisherX is a comprehensive punishment system offering commands like `kick`, `warn`, `mute`, `jail`, `ban`, and `ban-ip` — with both temporary and permanent options.  
+PunisherX is a comprehensive punishment system offering commands like `kick`, `warn`, `mute`, `jail`, `ban`, and `ban-ip` — with both temporary and permanent options.
 With support commands like `/check`, `/history`, and `/banlist`, administrators can quickly review a player's current punishment status or browse a full list of banned users.
 
-Designed for speed and convenience, PunisherX includes customizable templates for punishment reasons, allowing quick and consistent enforcement.  
-It also offers a complete message file for full translation and customization, supporting **MiniMessage**, Legacy, and plain Minecraft formatting.  
-A detailed configuration file and support for various database types (MySQL/MariaDB, PostgreSQL for multi-server sync, and SQLite/H2 for high-performance standalone use) make it flexible and production-ready.
+Designed for speed and convenience, PunisherX includes customizable templates for punishment reasons, allowing quick and consistent enforcement.
+It also offers a complete message file for full translation and customization, supporting **MiniMessage**, Legacy, and plain Minecraft formatting.
+A detailed configuration file, an automatic migration system that preserves custom settings, and support for various database types (MySQL/MariaDB, PostgreSQL for multi-server sync, and SQLite/H2 for high-performance standalone use) make it flexible and production-ready.
 
 ## ✅ Key Features
-* [x] Built specifically for Paper 1.20.6-1.21.8, and compatible forks.
-* [x] Actively maintained with up-to-date APIs and full backward compatibility.
-* [x] Language file with full **MiniMessage** and Legacy formatting support.
+* [x] Built for Paper 1.20.6–1.21.11 and compatible forks, including improved Folia support.
+* [x] Actively maintained with up-to-date APIs and backward compatibility.
+* [x] Language files with full **MiniMessage** and Legacy formatting support, plus new translations.
 * [x] Support for Discord webhook integration.
 * [x] PlaceholderAPI support for dynamic placeholders.
 * [x] Easy database export/import/migrate via simple commands.
-* [x] Extensive configuration file for flexible customization.  
-  → Check the default settings [here](https://github.com/SyntaxDevTeam/PunisherX/blob/main/src/main/resources/config.yml)
+* [x] Extensive configuration with automatic versioned migration that preserves admin changes.
+* [x] Flexible unjail behavior with five spawn modes and a dedicated `/setunjail` command to avoid conflicts.
+* [x] Action-bar countdowns for active punishments and configurable post-punishment actions, including warning escalation.
 * [x] Update notification system with optional auto-update support.
-* [x] IP geolocation lookup support with a free MaxMind license key.
+* [x] IP geolocation lookup support with async processing and a free MaxMind license key.
 * [x] Fallback ban system in case of database access issues.
 * [x] One-command full punishment clearance for any player.
-* [x] Full JAIL support via command or configuration.
+* [x] Full jail support via command or configuration.
+* [x] Sync-Bridge modules for BungeeCord and Velocity.
 * [x] Requires Java 21 or higher.
 
 If you have questions or need help, feel free to join our [Discord](https://discord.gg/Zk6mxv7eMh)
