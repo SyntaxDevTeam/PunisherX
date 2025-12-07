@@ -1,26 +1,106 @@
 # Changelog
 
-## [1.6.0-SNAPSHOT] - Unreleased
-### Changes:
-- [x] Dodano ustawienia dotyczące wyboru spawnu
-    * Zmieniono komende `/setspawn` na `/setunjail` by uniknąć konfliktu z EssentialX i FoliEssentials
-- [x] Added GUI for managing players and punishments (kick, ban, mute, etc.
-    - Asynchronous data downloads minimize latency.
-    - Ability to search for players by nickname.
-    - Ability to sort players (online, offline, banned, muted, etc.).
-- [x] The DatabaseHandler class has been adapted to use the latest version of the SyntaxCore 1.2.5-SNAPSHOT authoring library.
-    - Added support for asynchronous database operations to minimize server lag.
-    - Improved error handling and logging for better debugging and maintenance.
-    - Optimized database queries for better performance and efficiency.
-    - Added support MSSQL database type
-- [x] Added migrateDatabase method
-    * **(Highly experimental)** Added the ability to migrate from one database type to another `prx migrate <from> <to>`. Supported types: `sqlite`, `mysql`, `mariadb`, `postgresql`, `mssql`
-
-      Example:
-      ```LOG
-      /prx migrate sqlite mysql
+## [1.6.0-SNAPSHOT] - 2025-12-08
+### Functional changes:
+- [x] Added full support for Minecraft 1.21.11.
+- [x] Extended configuration for releasing players after a sentence.
+    * `/setspawn` was replaced with `/setunjail` to avoid conflicts with EssentialsX, FoliEssentials, and similar plugins.
+    * `config.yml` now lets you choose one of five spawn modes:
+      1. `unjail` – coordinates defined in `unjail_location` (via `/setunjail`).
+      2. `last_location` – the player position before receiving the punishment.
+      3. `bed` – the player's last bed.
+      4. `essx` – spawn point from EssentialsX/FoliEssentials (`/setspawn`).
+      5. `world` – the default world spawn (`/setworldspawn`).
+    * New configuration layout:
+      ```YAML
+      unjail:
+          unjail_location:
+              world: "world"
+              x: 0.0
+              y: 64.0
+              z: 0.0
+              yaw: 0.0
+              pitch: 0.0
+          spawn_type_select:
+              set: unjail
       ```
-## [1.5.2] - 2025-11-07      
+- [x] Expanded automatic actions that can run when a punishment ends.
+  - `/warn` now executes commands based on the warning count:
+    ```YAML
+    actions:
+      kicked:
+      - "eco take {player} 1000"
+      mute:
+      - "eco take {player} 500"
+      warn:
+        count:
+          3:  "kick {player} You have received your 3rd warning."
+          4:  "ban {player} 30m You have received your 4th warning."
+          5:  "ban {player} 5h You have received your 5th warning."
+          6:  "ban {player} 7d You have received your 6th warning."
+          7:  "ban {player} 30d You have received your {warn_no}th warning."
+          10: "ban {player} You have received your 10th warning."
+    ```
+- [x] Added an action-bar countdown for active punishments (mute/jail) with configurable settings:
+    ```YAML
+    notifications:
+      punishment_bar:
+        # Show the countdown in the action bar.
+        enabled: true
+        # Update frequency (20 ticks = 1 second).
+        period_ticks: 20
+    ```
+- [x] Protected `ModernLoginListener.onPreLogin` from overwriting whitelist decisions.
+- [x] Improved compatibility with Folia forks.
+- [x] Added a new language file translated by Not QauT (https://github.com/vQauT).
+- [x] Moved heavy operations off the main thread:
+  - GeoIP lookups are now async.
+  - `PunishmentChecker` performs async queries.
+  - Folia reload runs in an async task.
+- [x] Added new API methods.
+- [x] Added Sync-Bridge modules for both BungeeCord and Velocity.
+- [x] Introduced a diagnostic command.
+- [x] Version 1.6.0 debuts an automatic `config.yml` migration system:
+  - The plugin checks the config version on startup and upgrades it if needed.
+  - Custom administrator values are preserved.
+  - Missing options are added with defaults, and deprecated ones are removed.
+  - **Note:** a backup of the original config is created automatically before any change.
+
+### Technical changes:
+- [x] `DatabaseHandler` now targets SyntaxCore 1.2.5-SNAPSHOT.
+  - Supports asynchronous database operations.
+  - Improved error handling and logging.
+  - Optimized queries to reduce overhead.
+  - Added MSSQL support.
+- [x] Added a server-type detection utility.
+- [x] Migrated to the standalone `pl.syntaxdevteam:messageHandler` component.
+- [x] Centralized the warning system into a dedicated class.
+- [x] Implemented shared platform components and a safe teleport service.
+- [x] Extracted material logic into its own class.
+- [x] Punishment commands now rely on placeholders and execute configured actions.
+- [x] Libraries and dependencies updated to the latest versions.
+
+### Bug fixes:
+- [x] **HOTFIX:** fixed argument suggestions for all commands.
+- [x] **HOTFIX:** corrected the usage message for `/setunjail`.
+- [x] **HOTFIX:** resolved teleport logic issues and unsafe destination handling.
+- [x] **HOTFIX:** removed a critical `/whitelist` issue (duplicate `event.allow()` in `ModernLoginListener`).
+- [x] **HOTFIX:** repaired H2 database connections.
+- [x] **HOTFIX:** fixed a bug that removed a mute too early.
+- [x] Eliminated an occasional unknown registry key error.
+- [x] Fixed sporadic plugin library loading problems.
+- [x] Removed duplicate entries for online/offline players in the GUI.
+- [x] Corrected IP and geolocation displays.
+- [x] Solved Folia vs. Paper API dependency conflicts.
+- [x] Fixed `UninitializedPropertyAccessException` during reload.
+
+### Experimental (testing phase):
+- [x] Added a graphical interface for managing punishments (kick, ban, mute, etc.).
+    - Data is loaded asynchronously to avoid GUI-induced lag.
+    - Includes a player nickname search.
+    - Supports sorting by online/offline/punishment status.
+
+## [1.5.2] - 2025-11-07
 ### Changes:
 * HOTFIX: Fixed critical error loading plugin libraries
 * HOTFIX: Fixed a major whitelist conflict bug
@@ -230,8 +310,8 @@ setjail:
 * Added helper methods for setting spawn location after prison sentence
 * Replacing ConcurrentHashMap with the efficient and optimal Caffeine cache library
 * Added centralized class to manage all permissions in the plugin - change of permission system
-  * From now on, the plugin switches to permissions according to the `plugin.type.type.parameter` standard, e.g. `punisherx.cmd.ban`
-  * Backward compatibility has been ensured with simultaneous information about the need to update permissions on your server
+    * From now on, the plugin switches to permissions according to the `plugin.type.type.parameter` standard, e.g. `punisherx.cmd.ban`
+    * Backward compatibility has been ensured with simultaneous information about the need to update permissions on your server
 * Added getSmartMessage method to handle multi-line messages for Broadcast
 
 For example::
