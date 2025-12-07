@@ -8,7 +8,7 @@ plugins {
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
     id("xyz.jpenilla.run-paper") version "3.0.2"
-    id("pl.syntaxdevteam.plugindeployer") version "1.0.2"
+    id("pl.syntaxdevteam.plugindeployer") version "1.0.4"
 }
 
 group = "pl.syntaxdevteam.punisher"
