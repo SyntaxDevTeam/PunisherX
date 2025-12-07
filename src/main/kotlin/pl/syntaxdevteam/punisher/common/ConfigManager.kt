@@ -80,21 +80,19 @@ class ConfigManager(private val plugin: PunisherX) {
     // ================= VERSIONS AND MIGRATIONS =================
 
     private fun detectSourceVersion(doc: YamlDocument?): Int {
-        if (doc == null) return V_141
-        val raw = doc.get(VERSION_KEY) ?: return V_141
-        return when (raw) {
-            is Number -> raw.toInt()
-            is String -> raw.toIntOrNull()
-                ?: raw.filter(Char::isDigit).toIntOrNull()
-                ?: V_141
-            else -> V_141
-        }
+        val fromKey = doc?.get(VERSION_KEY)?.let { parseVersionValue(it) }
+        if (fromKey != null) return fromKey
+
+        val guessed = guessVersionFromComment()
+        if (guessed != null) return guessed
+
+        return if (doc == null) V_160 else V_141
     }
 
     private fun migrateFrom(sourceVersion: Int) {
         if (sourceVersion >= V_160) return
 
-        if (sourceVersion <= 104) {
+        if (sourceVersion <= V_104) {
             plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_104 …")
             migrate104to160()
         }
@@ -105,7 +103,46 @@ class ConfigManager(private val plugin: PunisherX) {
     }
 
     private fun migrate104to160() {
-        // TODO: implement when needed
+        val oldWarn = readSectionMapRaw(rawUserDoc, "WarnActions")
+        if (oldWarn != null && oldWarn.isNotEmpty()) {
+            val dst = "actions.warn.count"
+            val it = oldWarn.entries.iterator()
+            while (it.hasNext()) {
+                val e = it.next()
+                val keyStr = e.key
+                config.set("$dst.$keyStr", e.value)
+            }
+            config.set("WarnActions", null)
+            plugin.logger.debug("[Config] WarnActions → $dst (server values overwrote defaults)")
+        }
+
+        if (rawUserDoc?.contains("mute_pm") == true) {
+            val mutePm = rawUserDoc?.getBoolean("mute_pm") ?: false
+            config.set("mute.pm", mutePm)
+            plugin.logger.debug("[Config] mute_pm → mute.pm = $mutePm (server)")
+            config.set("mute_pm", null)
+        }
+
+        val muteCmdRaw = rawUserDoc?.get("mute_cmd")
+        if (muteCmdRaw is List<*>) {
+            config.set("mute.cmd", muteCmdRaw)
+            plugin.logger.debug("[Config] mute_cmd → mute.cmd (server values overwrote defaults)")
+            config.set("mute_cmd", null)
+        }
+
+        val checkForUpdates = rawUserDoc?.getBoolean("checkForUpdates")
+        if (checkForUpdates != null) {
+            config.set("update.check-for-updates", checkForUpdates)
+            plugin.logger.debug("[Config] checkForUpdates → update.check-for-updates = $checkForUpdates (server)")
+            config.set("checkForUpdates", null)
+        }
+
+        val autoDownloadUpdates = rawUserDoc?.getBoolean("autoDownloadUpdates")
+        if (autoDownloadUpdates != null) {
+            config.set("update.auto-download", autoDownloadUpdates)
+            plugin.logger.debug("[Config] autoDownloadUpdates → update.auto-download = $autoDownloadUpdates (server)")
+            config.set("autoDownloadUpdates", null)
+        }
     }
 
     private fun migrate141to160() {
@@ -173,6 +210,28 @@ class ConfigManager(private val plugin: PunisherX) {
     }
 
     // ================= HELPERS =================
+
+    private fun parseVersionValue(raw: Any?): Int? {
+        return when (raw) {
+            is Number -> raw.toInt()
+            is String -> raw.toIntOrNull() ?: raw.filter(Char::isDigit).toIntOrNull()
+            else -> null
+        }
+    }
+
+    private fun guessVersionFromComment(): Int? {
+        if (!dataFile.exists()) return null
+        return try {
+            dataFile.useLines { lines ->
+                val firstMeaningful = lines.firstOrNull { it.isNotBlank() } ?: return@useLines null
+                val match = Regex("(\\d+\\.(?:\\d+\\.)*\\d+)").find(firstMeaningful)
+                val number = match?.value?.filter(Char::isDigit) ?: return@useLines null
+                number.toIntOrNull()
+            }
+        } catch (_: Throwable) {
+            null
+        }
+    }
 
     private fun readSectionMap(path: String): Map<String, Any?>? {
         val raw = config.get(path) ?: return null
