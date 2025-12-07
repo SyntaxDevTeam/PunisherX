@@ -18,6 +18,7 @@ import pl.syntaxdevteam.punisher.PunisherX
  *
  * @property plugin The instance of the FormatterX plugin, used for logging messages and accessing other plugin functionalities.
  */
+@Suppress("unused")
 class HookHandler(private val plugin: PunisherX) {
 
 
