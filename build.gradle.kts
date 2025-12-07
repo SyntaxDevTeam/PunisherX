@@ -75,7 +75,7 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.2.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
-    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.14.9") {
+    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.2") {
         isTransitive = false
     }
 }
