@@ -1,4 +1,4 @@
-config-version: 150
+config-version: 160
 
 # /********************************************/
 #    Global settings
@@ -41,7 +41,8 @@ kick:
 actions:
   kicked:
     - "eco take {player} 1000"
-    - "plot delete {player}"
+  mute:
+    - "eco take {player} 500"
   warn:
     count:
       3:  "kick {player} You have received your 3rd warning."

@@ -16,7 +16,7 @@ class ConfigManager(private val plugin: PunisherX) {
         private const val FILE_NAME = "config.yml"
         private const val VERSION_KEY = "config-version"
         private const val V_141 = 141
-        private const val V_150 = 150
+        private const val V_160 = 160
     }
 
     lateinit var config: YamlDocument
@@ -27,7 +27,7 @@ class ConfigManager(private val plugin: PunisherX) {
         if (!plugin.dataFolder.exists()) plugin.dataFolder.mkdirs()
 
         val defaultsStream = plugin.getResource(FILE_NAME)
-            ?: error("Missing $FILE_NAME in resources (template 1.5.0 with comments required).")
+            ?: error("Missing $FILE_NAME in resources (template 1.6.0 with comments required).")
 
         plugin.logger.debug("[Config] Loading $FILE_NAME (round-trip, auto-update)…")
         rawUserDoc = if (dataFile.exists()) {
@@ -41,7 +41,7 @@ class ConfigManager(private val plugin: PunisherX) {
 
         val sourceVersion = detectSourceVersion(rawUserDoc)
 
-        if (sourceVersion < V_150 && dataFile.exists()) {
+        if (sourceVersion < V_160 && dataFile.exists()) {
             val bak = File(dataFile.parentFile, "$FILE_NAME.$sourceVersion.bak")
             try {
                 Files.copy(dataFile.toPath(), bak.toPath(), StandardCopyOption.REPLACE_EXISTING)
@@ -66,7 +66,7 @@ class ConfigManager(private val plugin: PunisherX) {
 
         migrateFrom(sourceVersion)
 
-        config.set(VERSION_KEY, V_150)
+        config.set(VERSION_KEY, V_160)
         config.save()
         plugin.logger.success("[Config] Done. Current version: ${config.getInt(VERSION_KEY)}")
     }
@@ -91,15 +91,14 @@ class ConfigManager(private val plugin: PunisherX) {
     }
 
     private fun migrateFrom(sourceVersion: Int) {
-        if (sourceVersion >= V_150) return
+        if (sourceVersion >= V_160) return
         if (sourceVersion <= V_141) {
-            plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_150 …")
-            migrate141to150()
+            plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_160 …")
+            migrate141to160()
         }
-        //if (sourceVersion < 160) migrate150to160()
     }
 
-    private fun migrate141to150() {
+    private fun migrate141to160() {
 
         var oldWarn = readSectionMapRaw(rawUserDoc, "warn.actions")
 
