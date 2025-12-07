@@ -11,7 +11,7 @@ libraries:
   - net.kyori:adventure-text-serializer-ansi:4.25.0
   - net.kyori:adventure-nbt:4.25.0
   # Additional libraries
-  - com.maxmind.geoip2:geoip2:4.4.0
+  - com.maxmind.geoip2:geoip2:5.0.1
   - org.apache.ant:ant:1.10.15
   # Database libraries
   - com.zaxxer:HikariCP:7.0.2
