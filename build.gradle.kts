@@ -56,7 +56,7 @@ dependencies {
     compileOnly("net.kyori:adventure-text-serializer-plain:4.25.0")
     compileOnly("net.kyori:adventure-text-serializer-ansi:4.25.0")
     compileOnly("net.kyori:adventure-nbt:4.25.0")
-    compileOnly("com.maxmind.geoip2:geoip2:4.4.0")
+    compileOnly("com.maxmind.geoip2:geoip2:5.0.1")
     compileOnly("org.apache.ant:ant:1.10.15")
     compileOnly("com.zaxxer:HikariCP:7.0.2")
     compileOnly("net.luckperms:api:5.5")
