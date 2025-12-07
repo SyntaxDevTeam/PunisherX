@@ -1,5 +1,5 @@
 [![Build Plugin](https://github.com/SyntaxDevTeam/PunisherX/actions/workflows/gradle.yml/badge.svg?branch=main)](https://github.com/SyntaxDevTeam/PunisherX/actions/workflows/gradle.yml) ![GitHub issues](https://img.shields.io/github/issues/SyntaxDevTeam/PunisherX) ![GitHub last commit](https://img.shields.io/github/last-commit/SyntaxDevTeam/PunisherX) ![GitHub Release Date](https://img.shields.io/github/release-date/SyntaxDevTeam/PunisherX)
-![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/SyntaxDevTeam/PunisherX/latest/main) ![Hangar Downloads](https://img.shields.io/hangar/dt/PunisherX?style=flat)
+![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/SyntaxDevTeam/PunisherX/latest/main) [![Hangar Downloads](https://img.shields.io/hangar/dt/PunisherX?style=flat)](https://hangar.papermc.io/SyntaxDevTeam/PunisherX)
 # Proudly Introducing PunisherX
 
 PunisherX is a comprehensive punishment system offering commands like `kick`, `warn`, `mute`, `jail`, `ban`, and `ban-ip` — with both temporary and permanent options.  
