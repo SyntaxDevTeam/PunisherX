@@ -15,7 +15,8 @@ class ConfigManager(private val plugin: PunisherX) {
     companion object {
         private const val FILE_NAME = "config.yml"
         private const val VERSION_KEY = "config-version"
-        private const val V_150 = 150
+        private const val V_104 = 104
+        private const val V_141 = 141
         private const val V_160 = 160
     }
 
@@ -60,8 +61,8 @@ class ConfigManager(private val plugin: PunisherX) {
         )
 
         if (!config.contains(VERSION_KEY)) {
-            plugin.logger.debug("[Config] config-version not found – treating as 1.5.0")
-            config.set(VERSION_KEY, V_150)
+            plugin.logger.debug("[Config] config-version not found – treating as 1.4.1")
+            config.set(VERSION_KEY, V_141)
         }
 
         migrateFrom(sourceVersion)
@@ -79,23 +80,32 @@ class ConfigManager(private val plugin: PunisherX) {
     // ================= VERSIONS AND MIGRATIONS =================
 
     private fun detectSourceVersion(doc: YamlDocument?): Int {
-        if (doc == null) return V_150
-        val raw = doc.get(VERSION_KEY) ?: return V_150
+        if (doc == null) return V_141
+        val raw = doc.get(VERSION_KEY) ?: return V_141
         return when (raw) {
             is Number -> raw.toInt()
             is String -> raw.toIntOrNull()
                 ?: raw.filter(Char::isDigit).toIntOrNull()
-                ?: V_150
-            else -> V_150
+                ?: V_141
+            else -> V_141
         }
     }
 
     private fun migrateFrom(sourceVersion: Int) {
         if (sourceVersion >= V_160) return
-        if (sourceVersion <= V_150) {
+
+        if (sourceVersion <= 104) {
+            plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_104 …")
+            migrate104to160()
+        }
+        if (sourceVersion <= V_141) {
             plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_160 …")
             migrate141to160()
         }
+    }
+
+    private fun migrate104to160() {
+        // TODO: implement when needed
     }
 
     private fun migrate141to160() {
