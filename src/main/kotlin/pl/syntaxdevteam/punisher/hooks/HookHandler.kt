@@ -33,11 +33,12 @@ class HookHandler(private val plugin: PunisherX) {
      */
     init {
         checkPlaceholderAPI()
-        checkLuckPerms()
-        checkVault()
+        //checkLuckPerms()
+        //checkVault()
+        /*
         if (chat == null || permission == null) {
             checkVaultUnlocked()
-        }
+        }*/
         checkEssentialsX()
     }
 
