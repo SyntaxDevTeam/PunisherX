@@ -10,25 +10,32 @@ import org.bukkit.event.HandlerList
 import org.bukkit.plugin.ServicePriority
 import pl.syntaxdevteam.core.SyntaxCore
 import pl.syntaxdevteam.core.manager.PluginManagerX
-import pl.syntaxdevteam.core.messaging.MessageHandler
 import pl.syntaxdevteam.core.logging.Logger
 import pl.syntaxdevteam.core.stats.StatsCollector
 import pl.syntaxdevteam.core.update.GitHubSource
 import pl.syntaxdevteam.core.update.ModrinthSource
+import pl.syntaxdevteam.message.MessageHandler
 import pl.syntaxdevteam.punisher.api.PunisherXApi
 import pl.syntaxdevteam.punisher.api.PunisherXApiImpl
 import pl.syntaxdevteam.punisher.basic.*
+import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
-import pl.syntaxdevteam.punisher.common.ConfigHandler
+import pl.syntaxdevteam.punisher.common.ConfigManager
+import pl.syntaxdevteam.core.platform.ServerEnvironment
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.databases.*
 import pl.syntaxdevteam.punisher.players.*
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
+import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
 import pl.syntaxdevteam.punisher.loader.PluginInitializer
 import pl.syntaxdevteam.punisher.loader.VersionChecker
 import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
+import pl.syntaxdevteam.punisher.platform.SchedulerAdapter
+import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
+import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
+import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import java.io.File
 import java.util.*
 
@@ -39,7 +46,6 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var messageHandler: MessageHandler
     lateinit var pluginsManager: PluginManagerX
 
-    lateinit var configHandler: ConfigHandler
     lateinit var pluginConfig: FileConfiguration
     lateinit var statsCollector: StatsCollector
 
@@ -51,6 +57,7 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var geoIPHandler: GeoIPHandler
     lateinit var punishmentManager: PunishmentManager
     lateinit var cache: PunishmentCache
+    lateinit var punishmentActionBarNotifier: PunishmentActionBarNotifier
     lateinit var punisherXApi: PunisherXApi
     lateinit var hookHandler: HookHandler
     lateinit var discordWebhook: DiscordWebhook
@@ -59,6 +66,13 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var playerIPManager: PlayerIPManager
     lateinit var versionChecker: VersionChecker
     lateinit var versionCompatibility: VersionCompatibility
+    lateinit var guiMaterialResolver: GuiMaterialResolver
+    lateinit var actionExecutor: PunishmentActionExecutor
+    lateinit var schedulerAdapter: SchedulerAdapter
+    lateinit var safeTeleportService: SafeTeleportService
+    lateinit var cfg: ConfigManager
+    lateinit var proxyBridgeMessenger: ProxyBridgeMessenger
+    lateinit var onlinePunishmentWatcher: OnlinePunishmentWatcher
 
 
     /**
@@ -70,7 +84,7 @@ class PunisherX : JavaPlugin(), Listener {
             GitHubSource("SyntaxDevTeam/PunisherX"),
             ModrinthSource("VCNRcwC2")
         )
-        SyntaxCore.init(this)
+        SyntaxCore.init(this, versionType = "paper")
         pluginInitializer = PluginInitializer(this)
         pluginInitializer.onEnable()
         versionChecker.checkAndLog()
@@ -92,15 +106,7 @@ class PunisherX : JavaPlugin(), Listener {
         databaseHandler.closeConnection()
         AsyncChatEvent.getHandlerList().unregister(this as Plugin)
         pluginInitializer.onDisable()
-    }
-
-    /**
-     * Retrieves the plugin file.
-     *
-     * @return The plugin file.
-     */
-    fun getPluginFile(): File {
-        return this.file
+        runCatching { proxyBridgeMessenger.unregisterChannel() }
     }
 
     fun resolvePlayerUuid(identifier: String): UUID {
@@ -116,26 +122,27 @@ class PunisherX : JavaPlugin(), Listener {
      */
     private fun reloadMyConfig() {
         databaseHandler.closeConnection()
+        runCatching { punishmentActionBarNotifier.stop() }
         try {
             messageHandler.reloadMessages()
         } catch (e: Exception) {
-            logger.err("${messageHandler.getMessage("error", "reload")} ${e.message}")
+            logger.err("${messageHandler.stringMessageToComponent("error", "reload")} ${e.message}")
         }
 
         saveDefaultConfig()
+        pluginInitializer.setupConfig()
         reloadConfig()
-        configHandler = ConfigHandler(this)
-        configHandler.verifyAndUpdateConfig()
 
         databaseHandler = DatabaseHandler(this)
-        if (server.name.contains("Folia")) {
+        val databaseSetupTask = Runnable {
             databaseHandler.openConnection()
             databaseHandler.createTables()
+        }
+
+        if (ServerEnvironment.isFoliaBased()) {
+            server.globalRegionScheduler.execute(this, databaseSetupTask)
         } else {
-            server.scheduler.runTaskAsynchronously(this, Runnable {
-                databaseHandler.openConnection()
-                databaseHandler.createTables()
-            })
+            server.scheduler.runTaskAsynchronously(this, databaseSetupTask)
         }
 
         server.servicesManager.unregister(punisherXApi)
@@ -148,11 +155,13 @@ class PunisherX : JavaPlugin(), Listener {
         )
 
         discordWebhook = DiscordWebhook(this)
+        actionExecutor = PunishmentActionExecutor(this)
         HandlerList.unregisterAll(playerJoinListener)
         HandlerList.unregisterAll(punishmentChecker)
         geoIPHandler = GeoIPHandler(this)
         playerIPManager = PlayerIPManager(this, geoIPHandler)
         punishmentChecker = PunishmentChecker(this)
+        punishmentActionBarNotifier = PunishmentActionBarNotifier(this).also { it.start() }
         playerJoinListener = PlayerJoinListener(playerIPManager, punishmentChecker)
         server.pluginManager.registerEvents(playerJoinListener, this)
         server.pluginManager.registerEvents(punishmentChecker, this)

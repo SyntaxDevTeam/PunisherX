@@ -13,14 +13,14 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.WARN)) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
-                    stack.sender.sendMessage(plugin.messageHandler.getMessage("warn", "usage"))
+                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("warn", "usage"))
                 } else {
                     val player = args[0]
                     val uuid = plugin.resolvePlayerUuid(player)
                     val targetPlayer = Bukkit.getPlayer(uuid)
                     val isForce = args.contains("--force")
                     if (!isForce && targetPlayer != null && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_WARN)) {
-                        stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "bypass", mapOf("player" to player)))
+                        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "bypass", mapOf("player" to player)))
                         return
                     }
                     var gtime: String?
@@ -82,13 +82,13 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                     if (isForce) {
                         plugin.logger.warning("Force-warned by ${stack.sender.name} on $player")
                     }
-                    executeWarnAction(player, warnCount)
+                    plugin.actionExecutor.executeWarnCountActions(player, warnCount)
                 }
             } else {
-                stack.sender.sendMessage(plugin.messageHandler.getMessage("warn", "usage"))
+                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("warn", "usage"))
             }
         } else {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
         }
     }
 
@@ -99,7 +99,7 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
             2 -> generateTimeSuggestions()
-            3 -> plugin.messageHandler.getReasons("warn", "reasons")
+            3 -> plugin.messageHandler.getMessageStringList("warn", "reasons")
             else -> emptyList()
         }
     }
@@ -115,19 +115,4 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
         return suggestions
     }
 
-    private fun executeWarnAction(player: String, warnCount: Int) {
-        val warnActions = plugin.config.getConfigurationSection("warn.actions")?.getKeys(false)
-        warnActions?.forEach { key ->
-            val warnThreshold = key.toIntOrNull()
-            if (warnThreshold != null && warnCount == warnThreshold) {
-                val command = plugin.config.getString("warn.actions.$key")
-                if (command != null) {
-                    val formattedCommand = command.replace("{player}", player).replace("{warn_no}", warnCount.toString())
-                    val filtredCommand = formattedCommand.replace (" --force", "" )
-                    plugin.server.dispatchCommand(plugin.server.consoleSender, formattedCommand)
-                    plugin.logger.debug("Executed command for $player: $filtredCommand")
-                }
-            }
-        }
-    }
 }

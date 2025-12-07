@@ -1,8 +1,19 @@
-### Config version 1.4.1
+config-version: 160
+
+# /********************************************/
+#    Global settings
+# /********************************************/
+
+# If your server is on a server network, such as Velocity,
+# set the mode name to associate any penalties issued with that specific server.
+# This means that a penalty received on a server like Survival will not be applied to games like SkyBlock, etc.
+# The default setting is "network" and means that the penalty received will apply to all servers on the network.
+server: "network"
 
 # /********************************************/
 #    Settings for connecting to the database
 # /********************************************/
+
 database:
   # Available options: mariadb, mysql, postgresql, sqlite, h2
   type: "sqlite"
@@ -26,15 +37,20 @@ playerCache:
 kick:
   history: false
 
-# Settings for actions triggered by a certain number of warnings.
-warn:
-  actions:
-    3:  "kick {player} You have received your 3rd warning."
-    4:  "ban {player} 30m You have received your 4th warning."
-    5:  "ban {player} 5h You have received your 5th warning."
-    6:  "ban {player} 7d You have received your 6th warning."
-    7:  "ban {player} 30d You have received your {warn_no}th warning."
-    10: "ban {player} You have received your 10th warning."
+# Settings for actions triggered by punishments. Each entry can be a single command or a list of commands.
+actions:
+  kicked:
+    - "eco take {player} 1000"
+  mute:
+    - "eco take {player} 500"
+  warn:
+    count:
+      3:  "kick {player} You have received your 3rd warning."
+      4:  "ban {player} 30m You have received your 4th warning."
+      5:  "ban {player} 5h You have received your 5th warning."
+      6:  "ban {player} 7d You have received your 6th warning."
+      7:  "ban {player} 30d You have received your {warn_no}th warning."
+      10: "ban {player} You have received your 10th warning."
 
 # Settings for "mute" command
 mute:
@@ -69,6 +85,14 @@ mute:
     - "ehelpop"
     - "p msg"
 
+# Action bar countdown for active punishments.
+notifications:
+  punishment_bar:
+    # Enable the bottom-bar countdown for active jail or mute punishments.
+    enabled: true
+    # How often (in ticks) the counter should update. 20 ticks = 1 second.
+    period_ticks: 20
+
 # Settings for the prison location and its radius.
 jail:
   location:
@@ -83,20 +107,24 @@ jail:
   # Use "*" to allow all commands while jailed.
   allowed_commands: []
 
-spawn:
+unjail:
   # Location of the spawn point after the player is unjailed.
-  location:
+  unjail_location:
     world: "world"
     x: 0.0
     y: 64.0
     z: 0.0
     yaw: 0.0
     pitch: 0.0
-  # Experimental setting (may not work properly).
-  use_external_set:
-    enabled: false
-    # Available options: essx (EssentialsX), world (default world spawn point).
-    set: world
+  # You can also use the default spawn location set in the game or via an external plugin.
+  spawn_type_select:
+    # Available options:
+    # * "unjail" - location coordinates set in unjail_location (/setunjail)
+    # * "last_location" - last location before receiving the penalty
+    # * "bed" - last bed spawn location
+    # * "essx" - spawn location set in the EssentialsX or FoliEssentials plugin (/setspawn)
+    # * "world" - default world spawn point (/setworldspawn)
+    set: unjail
 
 # /********************************************/
 #    GUI settings
@@ -126,7 +154,7 @@ gui:
 #    Internal settings
 # /********************************************/
 
-# Plugin language selection. Possible values: EN, PL, NL, ES, FR, DE, RU, UK, IT, PT.
+# Plugin language selection. Possible values: EN, PL, NL, ES, FR, DE, RU, UK, IT, PT, AR.
 # To add your own language file, please contact us on Discord: https://discord.gg/Zk6mxv7eMh
 language: "EN"
 
@@ -146,7 +174,7 @@ aliases:
   unban:    "ub"
   clearall: "ca"
   setjail:  "sjail"
-  setspawn: "sspawn"
+  setunjail: "sunjail"
   panel:    "px"
 
 geoDatabase:

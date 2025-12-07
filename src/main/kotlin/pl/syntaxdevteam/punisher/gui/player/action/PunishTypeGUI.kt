@@ -26,12 +26,18 @@ class PunishTypeGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
         inventory.fillWithFiller()
 
-        inventory.setItem(10, createItem(Material.IRON_SWORD, mH.getCleanMessage("GUI", "PunishType.ban")))
-        inventory.setItem(11, createItem(Material.REDSTONE_BLOCK, mH.getCleanMessage("GUI", "PunishType.banip")))
-        inventory.setItem(12, createItem(Material.BLAZE_ROD, mH.getCleanMessage("GUI", "PunishType.kick")))
-        inventory.setItem(14, createItem(Material.IRON_BARS, mH.getCleanMessage("GUI", "PunishType.jail")))
-        inventory.setItem(15, createItem(Material.BOOK, mH.getCleanMessage("GUI", "PunishType.mute")))
-        inventory.setItem(16, createItem(Material.PAPER, mH.getCleanMessage("GUI", "PunishType.warn")))
+        inventory.setItem(10, createItem(Material.IRON_SWORD, mH.stringMessageToStringNoPrefix("GUI", "PunishType.ban")))
+        inventory.setItem(11, createItem(Material.REDSTONE_BLOCK, mH.stringMessageToStringNoPrefix("GUI", "PunishType.banip")))
+        inventory.setItem(12, createItem(Material.BLAZE_ROD, mH.stringMessageToStringNoPrefix("GUI", "PunishType.kick")))
+        inventory.setItem(
+            14,
+            createItem(
+                plugin.guiMaterialResolver.resolveMaterial("IRON_CHAIN", "IRON_BARS", "CHAIN"),
+                mH.stringMessageToStringNoPrefix("GUI", "PunishType.jail")
+            )
+        )
+        inventory.setItem(15, createItem(Material.BOOK, mH.stringMessageToStringNoPrefix("GUI", "PunishType.mute")))
+        inventory.setItem(16, createItem(Material.PAPER, mH.stringMessageToStringNoPrefix("GUI", "PunishType.warn")))
 
         player.openInventory(inventory)
     }
@@ -43,8 +49,8 @@ class PunishTypeGUI(plugin: PunisherX) : BaseGUI(plugin) {
         val holder = event.view.topInventory.holder as? Holder ?: return
         val player = event.whoClicked as? Player ?: return
         val target = Bukkit.getOfflinePlayer(holder.target)
-        val reasonKick = mH.getSimpleMessage("kick", "no_reasons")
-        val reasonBan = mH.getSimpleMessage("banip", "no_reasons")
+        val reasonKick = mH.stringMessageToString("kick", "no_reasons")
+        val reasonBan = mH.stringMessageToString("banip", "no_reasons")
         val force = plugin.config.getBoolean("gui.punish.use_force", false)
         when (event.rawSlot) {
             10 -> PunishTimeGUI(plugin).open(player, target, "ban")
@@ -78,6 +84,6 @@ class PunishTypeGUI(plugin: PunisherX) : BaseGUI(plugin) {
     }
 
     override fun getTitle(): Component {
-        return mH.getLogMessage("GUI", "PunishType.title")
+        return mH.stringMessageToComponentNoPrefix("GUI", "PunishType.title")
     }
 }

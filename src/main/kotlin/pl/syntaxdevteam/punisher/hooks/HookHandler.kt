@@ -1,11 +1,13 @@
 package pl.syntaxdevteam.punisher.hooks
 
+import com.earth2me.essentials.spawn.IEssentialsSpawn
 import net.luckperms.api.LuckPerms
 import net.luckperms.api.cacheddata.CachedMetaData
 import net.luckperms.api.model.user.User
 import net.milkbowl.vault.chat.Chat
 import net.milkbowl.vault.permission.Permission
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
 
@@ -16,12 +18,14 @@ import pl.syntaxdevteam.punisher.PunisherX
  *
  * @property plugin The instance of the FormatterX plugin, used for logging messages and accessing other plugin functionalities.
  */
+@Suppress("unused")
 class HookHandler(private val plugin: PunisherX) {
 
 
     private var luckPerms: LuckPerms? = null
     private var chat: Chat? = null
     private var permission: Permission? = null
+    private var essentialsSpawn: IEssentialsSpawn? = null
 
     /**
      * Initializes the HookHandler by checking if the required services are available on the server.
@@ -30,11 +34,13 @@ class HookHandler(private val plugin: PunisherX) {
      */
     init {
         checkPlaceholderAPI()
-        checkLuckPerms()
-        checkVault()
+        //checkLuckPerms()
+        //checkVault()
+        /*
         if (chat == null || permission == null) {
             checkVaultUnlocked()
-        }
+        }*/
+        checkEssentialsX()
     }
 
     /**
@@ -50,7 +56,7 @@ class HookHandler(private val plugin: PunisherX) {
                 plugin.logger.debug("Hooked into LuckPerms!")
             }
         } else {
-            plugin.logger.warning("LuckPerms plugin not found on server!")
+            plugin.logger.debug("LuckPerms plugin not found on server!")
         }
     }
 
@@ -70,7 +76,7 @@ class HookHandler(private val plugin: PunisherX) {
                 plugin.logger.debug("Hooked into Vault!")
             }
         } else {
-            plugin.logger.warning("Vault plugin not found on server!")
+            plugin.logger.debug("Vault plugin not found on server!")
         }
     }
 
@@ -90,7 +96,23 @@ class HookHandler(private val plugin: PunisherX) {
                 plugin.logger.debug("Hooked into VaultUnlocked!")
             }
         } else {
-            plugin.logger.warning("VaultUnlocked plugin not found on server!")
+            plugin.logger.debug("VaultUnlocked plugin not found on server!")
+        }
+    }
+
+    private fun checkEssentialsX() {
+        val pluginManager = Bukkit.getPluginManager()
+        if (!pluginManager.isPluginEnabled("Essentials")) {
+            plugin.logger.warning("EssentialsX plugin not found on server!")
+            return
+        }
+
+        val spawnPlugin = pluginManager.getPlugin("EssentialsSpawn")
+        if (spawnPlugin is IEssentialsSpawn && spawnPlugin.isEnabled) {
+            essentialsSpawn = spawnPlugin
+            plugin.logger.debug("Hooked into EssentialsX Spawn!")
+        } else {
+            plugin.logger.warning("EssentialsX Spawn plugin not found or not enabled on server!")
         }
     }
 
@@ -194,5 +216,17 @@ class HookHandler(private val plugin: PunisherX) {
      */
     fun getAllLuckPermsMetData(player: Player): CachedMetaData? {
         return luckPerms?.getPlayerAdapter(Player::class.java)?.getMetaData(player)
+    }
+
+    fun getEssentialsSpawnLocation(group: String = "default"): Location? {
+        val spawn = essentialsSpawn
+        if (spawn == null) {
+            plugin.logger.warning("EssentialsX Spawn hook is not available while attempting to fetch spawn location.")
+            return null
+        }
+
+        return runCatching { spawn.getSpawn(group)?.clone() }.onFailure {
+            plugin.logger.warning("Failed to obtain EssentialsX spawn location: ${it.message}")
+        }.getOrNull()
     }
 }

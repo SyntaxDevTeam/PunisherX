@@ -14,12 +14,12 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         val history: Boolean = plugin.config.getBoolean("kick.history", false)
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.KICK)) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
 
         if (args.isEmpty()) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("kick", "usage"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("kick", "usage"))
             return
         }
 
@@ -28,6 +28,7 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
         val reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
         val punishmentType = "KICK"
         val start = System.currentTimeMillis()
+        val placeholders = mapOf("reason" to reason)
 
         if (targetArg.equals("all", ignoreCase = true)) {
             Bukkit.getOnlinePlayers().forEach { target ->
@@ -36,15 +37,16 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                 val uuid = target.uniqueId
                 if (!isForce && PermissionChecker.hasWithBypass(target, PermissionChecker.PermissionKey.BYPASS_KICK)) {
                     stack.sender.sendMessage(
-                        plugin.messageHandler.getMessage(
+                        plugin.messageHandler.stringMessageToComponent(
                             "error", "bypass", mapOf("player" to target.name)
                         )
                     )
                     return@forEach
                 }
-
+                val prefix = plugin.messageHandler.getPrefix()
                 if (PermissionChecker.isAuthor(uuid)) {
-                    // Skip plugin author
+                    stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("$prefix <red>You can't punish the plugin author</red>",
+                        TagResolver.empty()))
                     return@forEach
                 }
 
@@ -76,6 +78,8 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                     "kick",
                     mapOf("player" to target.name, "reason" to reason)
                 ).forEach { stack.sender.sendMessage(it) }
+
+                plugin.actionExecutor.executeAction("kicked", target.name, placeholders)
             }
 
             val broadcastMessages = plugin.messageHandler.getSmartMessage(
@@ -98,7 +102,7 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
         if (targetPlayer != null) {
             if (!isForce && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_KICK)) {
                 stack.sender.sendMessage(
-                    plugin.messageHandler.getMessage(
+                    plugin.messageHandler.stringMessageToComponent(
                         "error", "bypass", mapOf("player" to targetArg)
                     )
                 )
@@ -145,6 +149,8 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
             mapOf("player" to targetArg, "reason" to reason)
         ).forEach { stack.sender.sendMessage(it) }
 
+        plugin.actionExecutor.executeAction("kicked", targetArg, placeholders)
+
         val broadcastMessages = plugin.messageHandler.getSmartMessage(
             "kick",
             "broadcast",
@@ -162,8 +168,8 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
             return emptyList()
         }
         return when (args.size) {
-            1 -> listOf("all") + plugin.server.onlinePlayers.map { it.name }
-            2 -> plugin.messageHandler.getReasons("kick", "reasons")
+            0, 1 -> listOf("all") + plugin.server.onlinePlayers.map { it.name }
+            2 -> plugin.messageHandler.getMessageStringList("kick", "reasons")
             else -> emptyList()
         }
     }

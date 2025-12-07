@@ -1,6 +1,34 @@
 # Changelog
 
-## [1.5.1] - 2025-10-8
+## [1.6.0-SNAPSHOT] - Unreleased
+### Changes:
+- [x] Dodano ustawienia dotyczące wyboru spawnu
+    * Zmieniono komende `/setspawn` na `/setunjail` by uniknąć konfliktu z EssentialX i FoliEssentials
+- [x] Added GUI for managing players and punishments (kick, ban, mute, etc.
+    - Asynchronous data downloads minimize latency.
+    - Ability to search for players by nickname.
+    - Ability to sort players (online, offline, banned, muted, etc.).
+- [x] The DatabaseHandler class has been adapted to use the latest version of the SyntaxCore 1.2.5-SNAPSHOT authoring library.
+    - Added support for asynchronous database operations to minimize server lag.
+    - Improved error handling and logging for better debugging and maintenance.
+    - Optimized database queries for better performance and efficiency.
+    - Added support MSSQL database type
+- [x] Added migrateDatabase method
+    * **(Highly experimental)** Added the ability to migrate from one database type to another `prx migrate <from> <to>`. Supported types: `sqlite`, `mysql`, `mariadb`, `postgresql`, `mssql`
+
+      Example:
+      ```LOG
+      /prx migrate sqlite mysql
+      ```
+## [1.5.2] - 2025-11-07      
+### Changes:
+* HOTFIX: Fixed critical error loading plugin libraries
+* HOTFIX: Fixed a major whitelist conflict bug
+    * Added additional security measures in ModernLoginListener.onPreLogin in case of overriding whitelist decisions
+* Fixed logic errors for teleportation
+    * Corrections have been made for further development for 1.6.0
+
+## [1.5.1] - 2025-10-09
 
 ### Changes:
 * Added support for 1.21.10
@@ -202,8 +230,8 @@ setjail:
 * Added helper methods for setting spawn location after prison sentence
 * Replacing ConcurrentHashMap with the efficient and optimal Caffeine cache library
 * Added centralized class to manage all permissions in the plugin - change of permission system
-    * From now on, the plugin switches to permissions according to the `plugin.type.type.parameter` standard, e.g. `punisherx.cmd.ban`
-    * Backward compatibility has been ensured with simultaneous information about the need to update permissions on your server
+  * From now on, the plugin switches to permissions according to the `plugin.type.type.parameter` standard, e.g. `punisherx.cmd.ban`
+  * Backward compatibility has been ensured with simultaneous information about the need to update permissions on your server
 * Added getSmartMessage method to handle multi-line messages for Broadcast
 
 For example::

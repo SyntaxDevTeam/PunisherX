@@ -4,7 +4,9 @@ import pl.syntaxdevteam.punisher.PunisherX
 import org.bukkit.event.player.PlayerJoinEvent
 import java.io.File
 import java.security.Key
-import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
@@ -22,7 +24,8 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
 
     private val cacheFile = File(plugin.dataFolder, "cache")
     private val secretKey: Key = generateKey()
-    private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        .withZone(ZoneId.systemDefault())
 
     private val useDatabase = plugin.config.getString("playerCache.storage")
         ?.equals("database", ignoreCase = true) == true
@@ -42,11 +45,13 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         val playerUUID = player.uniqueId.toString()
         val playerIP = player.address?.address?.hostAddress
 
-        if (playerIP != null) {
+        if (playerIP == null) return
+
+        plugin.schedulerAdapter.runAsync(Runnable {
             val country = geoIPHandler.getCountry(playerIP)
             val city = geoIPHandler.getCity(playerIP)
             val geoLocation = "$city, $country"
-            val lastUpdated = dateFormat.format(Date())
+            val lastUpdated = dateFormatter.format(Instant.now())
 
             if (getPlayerInfo(playerName, playerUUID, playerIP) == null) {
                 savePlayerInfo(playerName, playerUUID, playerIP, geoLocation, lastUpdated)
@@ -54,7 +59,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
             } else {
                 plugin.logger.debug("Player info already exists -> playerName: $playerName, playerUUID: $playerUUID, playerIP: $playerIP, geoLocation: $geoLocation, lastUpdated: $lastUpdated")
             }
-        }
+        })
     }
 
     private fun getPlayerInfo(playerName: String, playerUUID: String, playerIP: String): PlayerInfo? {
@@ -117,10 +122,16 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
 
     fun getPlayerIPByName(playerName: String): String? {
         plugin.logger.debug("Fetching IP for player: $playerName")
-        val info = searchCache(playerName, "", "")
-        val ip = info?.playerIP
+        val ip = getPlayerInfoByName(playerName)?.playerIP
         plugin.logger.debug("Found IP for player $playerName: $ip")
         return ip
+    }
+
+    fun getPlayerInfoByName(playerName: String): PlayerInfo? {
+        plugin.logger.debug("Fetching cached info for player: $playerName")
+        val info = searchCache(playerName, "", "")
+        plugin.logger.debug("Found cached info for $playerName: $info")
+        return info
     }
 
     fun getPlayerIPByUUID(playerUUID: String): String? {
@@ -162,7 +173,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         plugin.logger.debug("Searching cache")
         val lines = readLines()
         plugin.logger.debug("Number of lines in cache: ${lines.size}")
-        for (line in lines) {
+        for (line in lines.asReversed()) {
             val decryptedLine = decrypt(line)
             plugin.logger.debug("Decrypted line: $decryptedLine")
             val info = parsePlayerInfo(decryptedLine)

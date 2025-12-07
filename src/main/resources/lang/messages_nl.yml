@@ -4,7 +4,7 @@
 # Je kunt MiniMessage en Legacy (Minecraft) opmaak gebruiken.
 # Voorbeelden van hoe je MiniMessage gebruikt: https://docs.advntr.dev/minimessage/format.html
 # Meng geen formaten in één bericht. Als je Legacy gebruikt, voeg dan geen MiniMessage-opmaak toe, anders wordt alleen de laatste gebruikt.
-
+# TODO: Uzupełnić braki wpisów dla setunjail
 prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>"
 
 # Foutmeldingen
@@ -15,6 +15,12 @@ error:
   player_not_punished: "<gold>Speler <player> heeft geen dergelijke straf.</gold>"
   reload: "<red>Er is een fout opgetreden tijdens het herladen van de configuratie:</red> "
   bypass: "<red><b>WAARSCHUWING!</b> Speler <gold><player><gold/> <red>kan niet worden gestraft vanwege hun rechten (OP of bypass).</red><dark_gray>Dit kan misschien worden omzeild...</dark_gray>"
+
+# /setunjail commando berichten
+setunjail:
+  usage: "Correct gebruik is: <gold>/setunjail</gold>"
+  set: "<green>Respawnlocatie is ingesteld: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
+  set_error: "<red>Kan respawnlocatie niet instellen.</red>"
 
 # /setjail commando berichten
 setjail:

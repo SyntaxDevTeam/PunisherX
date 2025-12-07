@@ -3,18 +3,23 @@ package pl.syntaxdevteam.punisher.loader
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.scheduler.BukkitRunnable
 import pl.syntaxdevteam.core.SyntaxCore
+import pl.syntaxdevteam.message.SyntaxMessages
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.api.PunisherXApi
 import pl.syntaxdevteam.punisher.api.PunisherXApiImpl
+import pl.syntaxdevteam.punisher.basic.PunishmentActionBarNotifier
 import pl.syntaxdevteam.punisher.basic.PunishmentCache
 import pl.syntaxdevteam.punisher.basic.PunishmentChecker
 import pl.syntaxdevteam.punisher.basic.PunishmentManager
 import pl.syntaxdevteam.punisher.basic.TimeHandler
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
-import pl.syntaxdevteam.punisher.common.ConfigHandler
+import pl.syntaxdevteam.punisher.common.ConfigManager
+import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
+import pl.syntaxdevteam.core.platform.ServerEnvironment
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
+import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
 import pl.syntaxdevteam.punisher.gui.interfaces.GUIHandler
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
@@ -23,6 +28,10 @@ import pl.syntaxdevteam.punisher.listeners.ModernLoginListener
 import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
 import pl.syntaxdevteam.punisher.placeholders.PlaceholderHandler
 import pl.syntaxdevteam.punisher.players.*
+import pl.syntaxdevteam.punisher.platform.BukkitSchedulerAdapter
+import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
+import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
+import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
 import java.io.File
 import java.util.Locale
 
@@ -31,7 +40,6 @@ class PluginInitializer(private val plugin: PunisherX) {
     fun onEnable() {
         setUpLogger()
         setupConfig()
-
         setupDatabase()
         setupHandlers()
         registerEvents()
@@ -40,6 +48,8 @@ class PluginInitializer(private val plugin: PunisherX) {
     }
 
     fun onDisable() {
+        runCatching { plugin.onlinePunishmentWatcher.stop() }
+        runCatching { plugin.punishmentActionBarNotifier.stop() }
         plugin.databaseHandler.closeConnection()
         plugin.logger.err(plugin.pluginMeta.name + " " + plugin.pluginMeta.version + " has been disabled ☹️")
     }
@@ -52,10 +62,12 @@ class PluginInitializer(private val plugin: PunisherX) {
     /**
      * Sets up the plugin configuration.
      */
-    private fun setupConfig() {
-        plugin.saveDefaultConfig()
-        plugin.configHandler = ConfigHandler(plugin)
-        plugin.configHandler.verifyAndUpdateConfig()
+    fun setupConfig() {
+        // val confFile = File(plugin.dataFolder, "config.yml")
+        //        val version = plugin.config.getInt("config-version")
+        //        plugin.cfg = ConfigManager(plugin, plugin.logger, confFile.toString(), version.toString(), 141, 150, true)
+        plugin.cfg = ConfigManager(plugin)
+        plugin.cfg.load()
     }
 
     /**
@@ -63,29 +75,34 @@ class PluginInitializer(private val plugin: PunisherX) {
      */
     private fun setupDatabase() {
         plugin.databaseHandler = DatabaseHandler(plugin)
-        if (plugin.server.name.contains("Folia")) {
-            plugin.logger.debug("Detected Folia server, using sync database connection handling.")
+        val databaseSetupTask = Runnable {
             plugin.databaseHandler.openConnection()
             plugin.databaseHandler.createTables()
-        }else{
-            plugin.server.scheduler.runTaskAsynchronously(plugin, Runnable {
-                plugin.databaseHandler.openConnection()
-                plugin.databaseHandler.createTables()
-            })
         }
-
+        plugin.logger.debug("Detected server: ${ServerEnvironment.platformName}")
+        if (ServerEnvironment.isFoliaBased()) {
+            plugin.logger.debug("Detected Folia server, using async database connection handling.")
+            plugin.server.globalRegionScheduler.execute(plugin, databaseSetupTask)
+        } else if (ServerEnvironment.isPaperBased()) {
+            plugin.logger.debug("Detected Paper server, using async database connection handling.")
+            plugin.server.scheduler.runTaskAsynchronously(plugin, databaseSetupTask)
+        }
     }
 
     /**
      * Initializes various handlers used by the plugin.
      */
     private fun setupHandlers() {
-        plugin.messageHandler = SyntaxCore.messages
+        SyntaxMessages.initialize(plugin)
+        plugin.messageHandler = SyntaxMessages.messages
         plugin.pluginsManager = SyntaxCore.pluginManagerx
         plugin.timeHandler = TimeHandler(plugin)
         plugin.punishmentManager = PunishmentManager()
+        plugin.schedulerAdapter = BukkitSchedulerAdapter(plugin)
+        plugin.safeTeleportService = SafeTeleportService(plugin.schedulerAdapter)
         plugin.geoIPHandler = GeoIPHandler(plugin)
         plugin.cache = PunishmentCache(plugin)
+        plugin.punishmentActionBarNotifier = PunishmentActionBarNotifier(plugin).also { it.start() }
         plugin.punisherXApi = PunisherXApiImpl(plugin.databaseHandler)
         plugin.hookHandler = HookHandler(plugin)
         plugin.discordWebhook = DiscordWebhook(plugin)
@@ -93,6 +110,10 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.punishmentChecker = PunishmentChecker(plugin)
         plugin.versionChecker = VersionChecker(plugin)
         plugin.versionCompatibility = VersionCompatibility(plugin.versionChecker)
+        plugin.guiMaterialResolver = GuiMaterialResolver(plugin.versionChecker.getSemanticVersion())
+        plugin.actionExecutor = PunishmentActionExecutor(plugin)
+        plugin.proxyBridgeMessenger = ProxyBridgeMessenger(plugin).also { it.registerChannel() }
+        plugin.onlinePunishmentWatcher = OnlinePunishmentWatcher(plugin).also { it.start() }
         checkLegacyPlaceholders()
     }
 
@@ -168,7 +189,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.logger.warning(warnMsg)
 
         val delay = 20L * 10L
-        if (plugin.server.name.contains("Folia", ignoreCase = true)) {
+        if (ServerEnvironment.isFoliaBased()) {
             plugin.server.globalRegionScheduler.runAtFixedRate(plugin, { task ->
                 try {
                     val content = langFile.readText(Charsets.UTF_8)

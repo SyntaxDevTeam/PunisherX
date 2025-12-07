@@ -26,9 +26,9 @@ setjail:
   set_error: "<red>No se pudo establecer la ubicación de la cárcel.</red>"
   invalid_radius: "<red>Introduce un radio válido (número mayor que 0).</red>"
 
-# Mensajes del comando /setspawn
-setspawn:
-  usage: "Uso correcto: <gold>/setspawn</gold>"
+# Mensajes del comando /setunjail
+setunjail:
+  usage: "Uso correcto: <gold>/setunjail</gold>"
   set: "<green>Punto de aparición establecido en: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
   set_error: "<red>No se pudo establecer el punto de aparición.</red>"
 

@@ -25,8 +25,6 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
     private val decisionTtl = Duration.ofSeconds(30).toMillis()
     private val pendingDecisions: MutableMap<String, PendingDecision> = ConcurrentHashMap()
 
-    // Run at HIGHEST so we still observe whitelist decisions (which adjust the result earlier)
-    // while retaining the ability to change the outcome when PunisherX needs to.
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPreLogin(event: AsyncPlayerPreLoginEvent) {
         cleanupDecisions()
@@ -66,7 +64,6 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
         }
     }
 
-    // Same rationale here: respect upstream kicks while still letting PunisherX disconnect if needed.
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onValidateLogin(event: PlayerConnectionValidateLoginEvent) {
         cleanupDecisions()

@@ -1,12 +1,23 @@
 package pl.syntaxdevteam.punisher.databases
 
+import org.bukkit.configuration.file.YamlConfiguration
 import pl.syntaxdevteam.core.database.*
 import pl.syntaxdevteam.punisher.PunisherX
 import java.io.File
 import java.io.IOException
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.UUID
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.atomic.AtomicBoolean
+
+data class DatabaseHealthCheckResult(
+    val type: DatabaseType,
+    val ok: Boolean,
+    val message: String,
+    val durationMs: Long
+)
 
 /**
  * Database access layer backed by SyntaxCore's [DatabaseManager].
@@ -30,14 +41,41 @@ class DatabaseHandler(private val plugin: PunisherX) {
         type = dbType,
         host = plugin.config.getString("database.sql.host") ?: "localhost",
         port = plugin.config.getInt("database.sql.port").takeIf { it != 0 } ?: 3306,
-        database = plugin.config.getString("database.sql.dbname") ?: plugin.name,
+        database = resolveDatabaseName(),
         username = plugin.config.getString("database.sql.username") ?: "ROOT",
         password = plugin.config.getString("database.sql.password") ?: "U5eV3ryStr0ngP4ssw0rd"
     )
     private val db = DatabaseManager(config, logger)
+    private val migrationInProgress = AtomicBoolean(false)
     /** Opens connection pool. */
     fun openConnection() {
         db.connect()
+    }
+
+    fun databaseType(): DatabaseType = dbType
+
+    fun runHealthCheck(): DatabaseHealthCheckResult {
+        val start = System.currentTimeMillis()
+        return try {
+            db.query("SELECT 1") { resultSet -> resultSet.getString(1) }
+            val duration = System.currentTimeMillis() - start
+            DatabaseHealthCheckResult(dbType, true, "Connection and simple query succeeded.", duration)
+        } catch (exception: Exception) {
+            val duration = System.currentTimeMillis() - start
+            DatabaseHealthCheckResult(dbType, false, exception.message ?: "Unknown database error", duration)
+        }
+    }
+
+    private fun resolveDatabaseName(): String {
+        val configuredName = plugin.config.getString("database.sql.dbname") ?: plugin.name
+
+        return when (dbType) {
+            DatabaseType.H2, DatabaseType.SQLITE -> {
+                val dataFolder = plugin.dataFolder.apply { mkdirs() }
+                File(dataFolder, configuredName).absolutePath
+            }
+            else -> configuredName
+        }
     }
 
     /** Closes the datasource. */
@@ -60,6 +98,20 @@ class DatabaseHandler(private val plugin: PunisherX) {
         DatabaseType.SQLITE -> "INTEGER PRIMARY KEY AUTOINCREMENT"
         DatabaseType.POSTGRESQL -> "SERIAL PRIMARY KEY"
         else -> "INT AUTO_INCREMENT PRIMARY KEY"
+    }
+
+    private fun reportReasonDefinition(): String = when (dbType) {
+        DatabaseType.MYSQL, DatabaseType.MARIADB, DatabaseType.POSTGRESQL, DatabaseType.SQLITE, DatabaseType.H2 ->
+            "TEXT"
+
+        else -> "NVARCHAR(MAX)"
+    }
+
+    private fun reportFiledAtDefinition(): String = when (dbType) {
+        DatabaseType.SQLITE -> "DATETIME DEFAULT CURRENT_TIMESTAMP"
+        DatabaseType.POSTGRESQL, DatabaseType.H2 -> "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        DatabaseType.MYSQL, DatabaseType.MARIADB -> "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        else -> "DATETIME2 DEFAULT SYSDATETIME()"
     }
 
     /** Creates required plugin tables if missing. */
@@ -91,6 +143,32 @@ class DatabaseHandler(private val plugin: PunisherX) {
             )
         )
         db.createTable(playerCacheSchema)
+
+        val reportsSchema = TableSchema(
+            "reports",
+            listOf(
+                Column("id", idDefinition()),
+                Column("player", "VARCHAR(36)"),
+                Column("suspect", "VARCHAR(36)"),
+                Column("reason", reportReasonDefinition()),
+                Column("filedAt", reportFiledAtDefinition())
+            )
+        )
+        db.createTable(reportsSchema)
+
+        val bridgeQueueSchema = TableSchema(
+            "bridge_events",
+            listOf(
+                Column("id", idDefinition()),
+                Column("action", "VARCHAR(16) NOT NULL"),
+                Column("target", "VARCHAR(64) NOT NULL"),
+                Column("reason", "TEXT"),
+                Column("endTime", "BIGINT NOT NULL"),
+                Column("processed", "TINYINT DEFAULT 0"),
+                Column("processedAt", "BIGINT")
+            )
+        )
+        db.createTable(bridgeQueueSchema)
     }
 
     // ---------------------------------------------------------------------
@@ -125,6 +203,23 @@ class DatabaseHandler(private val plugin: PunisherX) {
         } catch (e: Exception) {
             logger.err("Failed to add punishment for player $name. ${e.message}")
             false
+        }
+    }
+
+    fun enqueueBridgeEvent(action: String, target: String, reason: String, end: Long) {
+        runCatching {
+            execute(
+                """
+                INSERT INTO bridge_events (action, target, reason, endTime, processed)
+                VALUES (?, ?, ?, ?, 0)
+                """.trimIndent(),
+                action.uppercase(),
+                target,
+                reason,
+                end
+            )
+        }.onFailure { exception ->
+            logger.err("Failed to enqueue bridge event for $action on $target: ${exception.message}")
         }
     }
 
@@ -183,6 +278,84 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
+    fun addReport(player: UUID, suspect: UUID, reason: String): Boolean {
+        return try {
+            execute(
+                """
+                INSERT INTO reports (player, suspect, reason)
+                VALUES (?, ?, ?)
+                """.trimIndent(),
+                player.toString(),
+                suspect.toString(),
+                reason
+            )
+            true
+        } catch (e: Exception) {
+            logger.err("Failed to add report from $player against $suspect. ${e.message}")
+            false
+        }
+    }
+
+    fun deleteReport(id: Int): Boolean {
+        return try {
+            execute("DELETE FROM reports WHERE id = ?", id)
+            true
+        } catch (e: Exception) {
+            logger.err("Failed to delete report with ID $id. ${e.message}")
+            false
+        }
+    }
+
+    fun getReports(limit: Int? = null, offset: Int? = null): List<ReportData> {
+        val supportsPagination = dbType in setOf(
+            DatabaseType.MYSQL,
+            DatabaseType.MARIADB,
+            DatabaseType.POSTGRESQL,
+            DatabaseType.SQLITE
+        )
+
+        var sql = "SELECT id, player, suspect, reason, filedAt FROM reports ORDER BY filedAt DESC, id DESC"
+        val params = mutableListOf<Any>()
+
+        if (supportsPagination && limit != null) {
+            sql += " LIMIT ?"
+            params.add(limit)
+            if (offset != null) {
+                sql += " OFFSET ?"
+                params.add(offset)
+            }
+        } else if (!supportsPagination && (limit != null || offset != null)) {
+            logger.warning("Pagination not supported for reports on database type $dbType. Returning full result set.")
+        }
+
+        return try {
+            query(sql, *params.toTypedArray()) { rs ->
+                val id = rs.getInt("id")
+                val playerId = runCatching { UUID.fromString(rs.getString("player")) }.getOrElse {
+                    logger.warning("Skipping report $id due to invalid reporter UUID: ${rs.getString("player")}")
+                    return@query null
+                }
+                val suspectId = runCatching { UUID.fromString(rs.getString("suspect")) }.getOrElse {
+                    logger.warning("Skipping report $id due to invalid suspect UUID: ${rs.getString("suspect")}")
+                    return@query null
+                }
+
+                val filedAt = rs.getTimestamp("filedAt")?.toInstant() ?: Instant.EPOCH
+
+                ReportData(
+                    id = id,
+                    player = playerId,
+                    suspect = suspectId,
+                    reason = rs.getString("reason"),
+                    filedAt = filedAt
+                )
+            }.filterNotNull()
+        } catch (e: Exception) {
+            logger.err("Failed to fetch reports. ${e.message}")
+            emptyList()
+        }
+    }
+
     fun updatePunishmentReason(id: Int, newReason: String): Boolean {
         return try {
             execute("UPDATE punishmentHistory SET reason = ? WHERE id = ?", newReason, id)
@@ -205,7 +378,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun getPlayerCacheLines(): List<String> {
         return try {
-            query("SELECT data FROM playercache") { rs -> rs.getString("data") }
+            query("SELECT data FROM playercache ORDER BY id ASC") { rs -> rs.getString("data") }
         } catch (e: Exception) {
             logger.err("Failed to load player cache lines. ${e.message}")
             emptyList()
@@ -582,88 +755,131 @@ class DatabaseHandler(private val plugin: PunisherX) {
             logger.err("Failed to import database. ${e.message}")
         }
     }
+    data class MigrationResult(val success: Boolean, val message: String)
 
-
-    fun migrateDatabase(from: DatabaseType, to: DatabaseType) {
-        if (from != dbType) {
-            logger.err("Migration aborted: configured database type is $dbType but received $from")
-            return
+    fun migrateDatabase(from: DatabaseType, to: DatabaseType): CompletableFuture<MigrationResult> {
+        val future = CompletableFuture<MigrationResult>()
+        if (!migrationInProgress.compareAndSet(false, true)) {
+            future.complete(MigrationResult(false, "Another migration task is already running."))
+            return future
         }
 
-        exportDatabase()
-        val backupFile = File(plugin.dataFolder, "dump/backup.sql")
-        if (!backupFile.exists()) {
-            logger.err("Backup file not found. Migration aborted.")
-            return
-        }
-
-        val targetConfig = DatabaseConfig(
-            type = to,
-            host = plugin.config.getString("database.sql.host") ?: "localhost",
-            port = plugin.config.getInt("database.sql.port").takeIf { it != 0 } ?: 3306,
-            database = plugin.config.getString("database.sql.dbname") ?: plugin.name,
-            username = plugin.config.getString("database.sql.username") ?: "ROOT",
-            password = plugin.config.getString("database.sql.password") ?: "U5eV3ryStr0ngP4ssw0rd"
-        )
-
-        val targetDb = DatabaseManager(targetConfig, logger)
-        try {
-            targetDb.connect()
-
-            val idDef = when (to) {
-                DatabaseType.SQLITE -> "INTEGER PRIMARY KEY AUTOINCREMENT"
-                DatabaseType.POSTGRESQL -> "SERIAL PRIMARY KEY"
-                else -> "INT AUTO_INCREMENT PRIMARY KEY"
-            }
-            val tables = listOf("punishments", "punishmenthistory")
-            tables.forEach { table ->
-                try {
-                    targetDb.execute("DROP TABLE IF EXISTS $table")
-                } catch (dropError: Exception) {
-                    logger.warning("Unable to drop table '$table' before migration: ${dropError.message}")
+        plugin.server.scheduler.runTaskAsynchronously(plugin, Runnable {
+            try {
+                if (from != dbType) {
+                    val message = "Migration aborted: configured database type is $dbType but received $from"
+                    logger.err(message)
+                    future.complete(MigrationResult(false, message))
+                    return@Runnable
                 }
-            }
 
-            val punishmentSchema = TableSchema(
-                "punishments",
-                listOf(
-                    Column("id", idDef),
-                    Column("name", "VARCHAR(32)"),
-                    Column("uuid", "VARCHAR(36)"),
-                    Column("reason", "VARCHAR(255)"),
-                    Column("operator", "VARCHAR(16)"),
-                    Column("punishmentType", "VARCHAR(16)"),
-                    Column("start", "BIGINT"),
-                    Column("endTime", "BIGINT")
+                exportDatabase()
+                val backupFile = File(plugin.dataFolder, "dump/backup.sql")
+                if (!backupFile.exists()) {
+                    val message = "Backup file not found. Migration aborted."
+                    logger.err(message)
+                    future.complete(MigrationResult(false, message))
+                    return@Runnable
+                }
+
+                val configFile = File(plugin.dataFolder, "config.yml")
+                val yaml = YamlConfiguration.loadConfiguration(configFile)
+                val targetConfig = DatabaseConfig(
+                    type = to,
+                    host = yaml.getString("database.sql.host") ?: "localhost",
+                    port = yaml.getInt("database.sql.port").takeIf { it != 0 } ?: 3306,
+                    database = yaml.getString("database.sql.dbname") ?: plugin.name,
+                    username = yaml.getString("database.sql.username") ?: "ROOT",
+                    password = yaml.getString("database.sql.password") ?: "U5eV3ryStr0ngP4ssw0rd"
                 )
-            )
-            val historySchema = punishmentSchema.copy(name = "punishmenthistory")
-            targetDb.createTable(punishmentSchema)
-            targetDb.createTable(historySchema)
 
-            val lines = backupFile.readLines()
-            val sql = StringBuilder()
-            for (line in lines) {
-                val trimmedLine = line.trim()
-                if (trimmedLine.isEmpty() || trimmedLine.startsWith("--")) {
-                    continue
-                }
+                val targetDb = DatabaseManager(targetConfig, logger)
+                try {
+                    targetDb.connect()
 
-                sql.append(line)
-                if (trimmedLine.endsWith(";")) {
-                    val statement = sql.toString().trim()
-                    if (statement.isNotEmpty()) {
-                        targetDb.execute(statement)
+                    val idDef = when (to) {
+                        DatabaseType.SQLITE -> "INTEGER PRIMARY KEY AUTOINCREMENT"
+                        DatabaseType.POSTGRESQL -> "SERIAL PRIMARY KEY"
+                        else -> "INT AUTO_INCREMENT PRIMARY KEY"
                     }
-                    sql.setLength(0)
-                }
-            }
+                    val tables = listOf("punishments", "punishmenthistory")
+                    tables.forEach { table ->
+                        try {
+                            targetDb.execute("DROP TABLE IF EXISTS $table")
+                        } catch (dropError: Exception) {
+                            logger.warning("Unable to drop table '$table' before migration: ${dropError.message}")
+                        }
+                    }
 
-            logger.success("Database migrated from $from to $to")
-        } catch (e: Exception) {
-            logger.err("Failed to migrate database. ${e.message}")
-        } finally {
-            targetDb.close()
-        }
+                    val punishmentSchema = TableSchema(
+                        "punishments",
+                        listOf(
+                            Column("id", idDef),
+                            Column("name", "VARCHAR(32)"),
+                            Column("uuid", "VARCHAR(36)"),
+                            Column("reason", "VARCHAR(255)"),
+                            Column("operator", "VARCHAR(16)"),
+                            Column("punishmentType", "VARCHAR(16)"),
+                            Column("start", "BIGINT"),
+                            Column("endTime", "BIGINT")
+                        )
+                    )
+                    val historySchema = punishmentSchema.copy(name = "punishmenthistory")
+                    targetDb.createTable(punishmentSchema)
+                    targetDb.createTable(historySchema)
+
+                    val lines = backupFile.readLines()
+                    val sql = StringBuilder()
+                    for (line in lines) {
+                        val trimmedLine = line.trim()
+                        if (trimmedLine.isEmpty() || trimmedLine.startsWith("--")) {
+                            continue
+                        }
+
+                        sql.append(line)
+                        if (trimmedLine.endsWith(";")) {
+                            val statement = sql.toString().trim()
+                            if (statement.isNotEmpty()) {
+                                targetDb.execute(statement)
+                            }
+                            sql.setLength(0)
+                        }
+                    }
+
+                    val configuredType = yaml.getString("database.type")?.uppercase()
+                    if (configuredType != to.name) {
+                        yaml.set("database.type", to.name.lowercase())
+                        yaml.save(configFile)
+                    }
+
+                    logger.success("Database migrated from $from to $to")
+                    future.complete(MigrationResult(true, "Database migrated from ${from.name.lowercase()} to ${to.name.lowercase()}"))
+
+                    plugin.server.scheduler.runTask(plugin, Runnable {
+                        plugin.onReload()
+                    })
+                } catch (e: Exception) {
+                    val message = "Failed to migrate database. ${e.message}"
+                    logger.err(message)
+                    future.complete(MigrationResult(false, message))
+                    return@Runnable
+                } finally {
+                    try {
+                        targetDb.close()
+                    } catch (closeError: Exception) {
+                        logger.warning("Failed to close target database: ${closeError.message}")
+                    }
+                }
+            } catch (e: Exception) {
+                val message = "Failed to migrate database. ${e.message}"
+                logger.err(message)
+                future.complete(MigrationResult(false, message))
+                return@Runnable
+            } finally {
+                migrationInProgress.set(false)
+            }
+        })
+
+        return future
     }
 }

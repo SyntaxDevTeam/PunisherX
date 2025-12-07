@@ -15,7 +15,7 @@ class BanListCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN_LIST)) {
-            stack.sender.sendMessage(mh.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(mh.stringMessageToComponent("error", "no_permission"))
             return
         }
 
@@ -39,14 +39,14 @@ class BanListCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         if (punishments.isEmpty()) {
-            stack.sender.sendMessage(mh.getMessage("banlist", "no_punishments"))
-            plugin.logger.success(mh.getSimpleMessage("banlist", "no_punishments"))
+            stack.sender.sendMessage(mh.stringMessageToComponent("banlist", "no_punishments"))
+            plugin.logger.success(mh.stringMessageToString("banlist", "no_punishments"))
             return
         }
 
-        val title = mh.getLogMessage("banlist", "title")
-        val topHeader = mh.getLogMessage("banlist", "top_header")
-        val tableHeader = mh.getLogMessage("banlist", "table_header")
+        val title = mh.stringMessageToComponentNoPrefix("banlist", "title")
+        val topHeader = mh.stringMessageToComponentNoPrefix("banlist", "top_header")
+        val tableHeader = mh.stringMessageToComponentNoPrefix("banlist", "table_header")
         val br = mh.miniMessageFormat("<blue> </blue>")
         val hr = mh.miniMessageFormat("<blue>|</blue>")
 
@@ -59,7 +59,7 @@ class BanListCommand(private val plugin: PunisherX) : BasicCommand {
         punishments.forEach { punishment ->
             val formattedDate = dateFormat.format(Date(punishment.start))
 
-            val punishmentMessage = mh.getLogMessage("banlist", "ban_list", mapOf(
+            val punishmentMessage = mh.stringMessageToComponentNoPrefix("banlist", "ban_list", mapOf(
                 "uuid" to punishment.uuid,
                 "id" to punishment.id.toString(),
                 "player" to punishment.name,

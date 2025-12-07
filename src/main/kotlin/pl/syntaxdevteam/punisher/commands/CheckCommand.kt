@@ -13,14 +13,14 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
 
         if (args.isEmpty()) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("check", "usage"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("check", "usage"))
             return
         }
         val player = args[0]
 
         if (player.equals(stack.sender.name, ignoreCase = true) || PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.CHECK)) {
             if (args.size < 2) {
-                stack.sender.sendMessage(plugin.messageHandler.getMessage("check", "usage"))
+                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("check", "usage"))
             } else {
                 val type = args[1]
                 val uuid = plugin.resolvePlayerUuid(player)
@@ -36,32 +36,28 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
                     "mute" -> punishments.filter { it.type == "MUTE" }
                     "warn" -> punishments.filter { it.type == "WARN" }
                     else -> {
-                        stack.sender.sendMessage(plugin.messageHandler.getMessage("check", "invalid_type"))
+                        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("check", "invalid_type"))
                         return
                     }
                 }
 
                 if (filteredPunishments.isEmpty()) {
                     stack.sender.sendMessage(
-                        plugin.messageHandler.getMessage("check", "no_punishments", mapOf("player" to player))
+                        plugin.messageHandler.stringMessageToComponent("check", "no_punishments", mapOf("player" to player))
                     )
                 } else {
-                    val id = plugin.messageHandler.getCleanMessage("check", "id")
-                    val types = plugin.messageHandler.getCleanMessage("check", "type")
-                    val reasons = plugin.messageHandler.getCleanMessage("check", "reason")
-                    val times = plugin.messageHandler.getCleanMessage("check", "time")
-                    val title = plugin.messageHandler.getCleanMessage("check", "title")
-                    val playerIP = playerIPManager.getPlayerIPByName(player)
-                    plugin.logger.debug("Player IP: $playerIP")
-                    val geoLocation = playerIP?.let { ip ->
-                        val country = playerIPManager.geoIPHandler.getCountry(ip)
-                        val city = playerIPManager.geoIPHandler.getCity(ip)
-                        plugin.logger.debug("Country: $country, City: $city")
-                        "$city, $country"
-                    } ?: "Unknown location"
+                    val id = plugin.messageHandler.stringMessageToStringNoPrefix("check", "id")
+                    val types = plugin.messageHandler.stringMessageToStringNoPrefix("check", "type")
+                    val reasons = plugin.messageHandler.stringMessageToStringNoPrefix("check", "reason")
+                    val times = plugin.messageHandler.stringMessageToStringNoPrefix("check", "time")
+                    val title = plugin.messageHandler.stringMessageToStringNoPrefix("check", "title")
+                    val playerInfo = playerIPManager.getPlayerInfoByName(player)
+                    plugin.logger.debug("Player info: $playerInfo")
+                    val playerIP = playerInfo?.playerIP
+                    val geoLocation = playerInfo?.geoLocation?.takeIf { it.isNotBlank() } ?: "Unknown location"
                     plugin.logger.debug("GeoLocation: $geoLocation")
                     val fullGeoLocation = when (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.VIEW_IP)) {
-                        true -> "$playerIP ($geoLocation)"
+                        true -> playerIP?.let { "$it ($geoLocation)" } ?: geoLocation
                         else -> geoLocation
                     }
                     val gamer = if (stack.sender.name == "CONSOLE") {
@@ -95,7 +91,7 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
                 }
             }
         } else {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
         }
     }
 

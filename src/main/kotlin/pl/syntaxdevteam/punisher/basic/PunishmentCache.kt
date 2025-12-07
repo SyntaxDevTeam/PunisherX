@@ -8,7 +8,6 @@ import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.common.TeleportUtils
 import java.io.File
 import java.io.IOException
 import java.util.UUID
@@ -69,11 +68,17 @@ class PunishmentCache(private val plugin: PunisherX) {
         val player = Bukkit.getPlayer(uuid)
         if (player != null) {
             if (teleportPlayer) {
-                val targetLocation = punishment.returnLocation?.toLocation()
-                    ?: JailUtils.getUnjailLocation(plugin.config)
+                val cachedLocation = punishment.returnLocation?.toLocation()
+                val targetLocation = JailUtils.getUnjailLocation(
+                    plugin.config,
+                    plugin.hookHandler,
+                    cachedLocation,
+                    player,
+                    plugin.safeTeleportService
+                )
 
                 if (targetLocation != null) {
-                    TeleportUtils.teleportSafely(plugin, player, targetLocation) { success ->
+                    plugin.safeTeleportService.teleportSafely(player, targetLocation) { success ->
                         if (success) {
                             player.gameMode = GameMode.SURVIVAL
                             plugin.logger.debug("Przeniesiono gracza ${player.name} po zakończeniu kary na ${targetLocation}")
@@ -82,7 +87,7 @@ class PunishmentCache(private val plugin: PunisherX) {
                         }
                     }
                 } else {
-                    plugin.logger.debug("Brak zapisanej lokalizacji powrotu i /setspawn dla gracza ${player.name}")
+                    plugin.logger.debug("Brak zapisanej lokalizacji powrotu i /setunjail dla gracza ${player.name}")
                 }
             }
 
@@ -116,8 +121,16 @@ class PunishmentCache(private val plugin: PunisherX) {
             .mapValues { it.value.endTime }
 
     fun getReleaseLocation(uuid: UUID): Location? {
-        val cached = cache.getIfPresent(uuid) ?: return null
-        return cached.returnLocation?.toLocation() ?: JailUtils.getUnjailLocation(plugin.config)
+        val cached = cache.getIfPresent(uuid)
+        val storedLocation = cached?.returnLocation?.toLocation()
+        val offlinePlayer = runCatching { Bukkit.getOfflinePlayer(uuid) }.getOrNull()
+        return JailUtils.getUnjailLocation(
+            plugin.config,
+            plugin.hookHandler,
+            storedLocation,
+            offlinePlayer,
+            plugin.safeTeleportService
+        )
     }
 
     private fun loadCacheIntoMemory() {

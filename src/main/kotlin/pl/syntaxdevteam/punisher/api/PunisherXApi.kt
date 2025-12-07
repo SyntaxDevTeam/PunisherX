@@ -61,11 +61,27 @@ package pl.syntaxdevteam.punisher.api
      fun getHistoryBannedPlayers(limit: Int, offset: Int): CompletableFuture<List<PunishmentData>>
 
      /**
-      * Retrieves a list of jailed players.
-      *
-      * @param limit The maximum number of records to return.
-      * @param offset The number of records to skip.
-      * @return A CompletableFuture containing a list of PunishmentData records for jailed players.
-      */
-     fun getJailedPlayers(limit: Int, offset: Int): CompletableFuture<List<PunishmentData>>
- }
+     * Retrieves a list of jailed players.
+     *
+     * @param limit The maximum number of records to return.
+     * @param offset The number of records to skip.
+     * @return A CompletableFuture containing a list of PunishmentData records for jailed players.
+     */
+    fun getJailedPlayers(limit: Int, offset: Int): CompletableFuture<List<PunishmentData>>
+
+    /**
+     * Checks whether the player currently has an active mute.
+     *
+     * @param uuid The UUID of the player.
+     * @return A CompletableFuture resolving to true when the player is muted, false otherwise.
+     */
+    fun isMuted(uuid: String): CompletableFuture<Boolean>
+
+    /**
+     * Checks whether the player is currently jailed.
+     *
+     * @param uuid The UUID of the player.
+     * @return A CompletableFuture resolving to true when the player is jailed, false otherwise.
+     */
+    fun isJailed(uuid: String): CompletableFuture<Boolean>
+}

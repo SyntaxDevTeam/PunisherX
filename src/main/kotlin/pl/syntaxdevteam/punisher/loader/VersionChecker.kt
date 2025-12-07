@@ -2,6 +2,7 @@ package pl.syntaxdevteam.punisher.loader
 
 import org.bukkit.Bukkit
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.core.platform.ServerEnvironment
 
 class VersionChecker(private val plugin: PunisherX) {
 
@@ -19,7 +20,8 @@ class VersionChecker(private val plugin: PunisherX) {
             "1.21.7",
             "1.21.8",
             "1.21.9",
-            "1.21.10"
+            "1.21.10",
+            "1.21.11"
         )
     }
 
@@ -35,7 +37,8 @@ class VersionChecker(private val plugin: PunisherX) {
     fun checkAndLog(): Boolean {
         val version = getServerVersion()
         return if (isSupported()) {
-            plugin.logger.success("The server is running on a supported version $version.")
+            val platformVersion = ServerEnvironment.describeWithVersion(version)
+            plugin.logger.success("The server is running on a supported version $platformVersion.")
             true
         } else {
             plugin.logger.warning("Warning! Unsupported version $version – use with caution!")

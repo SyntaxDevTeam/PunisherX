@@ -41,10 +41,12 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
     private fun open(player: Player, page: Int, sort: SortMode) {
         val records = plugin.playerIPManager.getAllDecryptedRecords()
-        val players = records.mapNotNull { info ->
-            val uuid = UUID.fromString(info.playerUUID)
-            if (Bukkit.getPlayer(uuid) != null) null else info
-        }
+        val players = records
+            .mapNotNull { info ->
+                val uuid = UUID.fromString(info.playerUUID)
+                if (Bukkit.getPlayer(uuid) != null) null else info
+            }
+            .distinctBy { it.playerUUID }
 
         val sorted = when (sort) {
             SortMode.NAME_ASC -> players.sortedBy { it.playerName.lowercase() }
@@ -72,16 +74,16 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             val profile: PlayerProfile = Bukkit.createProfile(uuid, info.playerName)
             meta.playerProfile = profile
             meta.displayName(mH.formatMixedTextToMiniMessage("<yellow>${info.playerName}</yellow>", TagResolver.empty()))
-            val loadMsg = mH.getCleanMessage("GUI", "OfflineList.loading")
+            val loadMsg = mH.stringMessageToStringNoPrefix("GUI", "OfflineList.loading")
             meta.lore(
                 listOf(
-                    mH.getLogMessage("GUI", "OfflineList.hover.uuid", mapOf("uuid" to loadMsg)),
-                    mH.getLogMessage("GUI", "OfflineList.hover.ip", mapOf("ip" to loadMsg)),
-                    mH.getLogMessage("GUI", "OfflineList.hover.geo", mapOf("geo" to loadMsg)),
-                    mH.getLogMessage("GUI", "OfflineList.hover.lastSeen", mapOf("lastseen" to loadMsg)),
-                    mH.getLogMessage("GUI", "OfflineList.hover.lastLocation", mapOf("lastlocation" to loadMsg)),
-                    mH.getLogMessage("GUI", "OfflineList.hover.logout", mapOf("logout" to loadMsg)),
-                    mH.getLogMessage("GUI", "OfflineList.hover.offlineTime", mapOf("offlinetime" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.uuid", mapOf("uuid" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.ip", mapOf("ip" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.geo", mapOf("geo" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.lastSeen", mapOf("lastseen" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.lastLocation", mapOf("lastlocation" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.logout", mapOf("logout" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.offlineTime", mapOf("offlinetime" to loadMsg))
                 )
             )
             head.itemMeta = meta
@@ -99,7 +101,7 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 val ipLine = ipHistory.joinToString(", ")
                 val geo = info.geoLocation
                 val lastLocation = PlayerStatsService.getLastLocationString(uuid)
-                    ?: mH.getCleanMessage("error", "no_data")
+                    ?: mH.stringMessageToStringNoPrefix("error", "no_data")
                 val punishments = plugin.databaseHandler
                     .getPunishmentHistory(info.playerUUID, limit = 3, offset = 0)
                 val punishmentLines = punishments.map { "${it.type}: ${it.reason}" }
@@ -108,20 +110,20 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                     val item = inventory.getItem(index) ?: return@Runnable
                     val im = item.itemMeta as SkullMeta
                     val loreLines = mutableListOf(
-                        mH.getLogMessage("GUI", "OfflineList.hover.uuid", mapOf("uuid" to info.playerUUID)),
-                        mH.getLogMessage("GUI", "OfflineList.hover.ip", mapOf("ip" to ipLine)),
-                        mH.getLogMessage("GUI", "OfflineList.hover.geo", mapOf("geo" to geo)),
-                        mH.getLogMessage("GUI", "OfflineList.hover.lastSeen", mapOf("lastseen" to lastSeenDate)),
-                        mH.getLogMessage("GUI", "OfflineList.hover.lastLocation", mapOf("lastlocation" to lastLocation)),
-                        mH.getLogMessage("GUI", "OfflineList.hover.logout", mapOf("logout" to lastSeenDate)),
-                        mH.getLogMessage("GUI", "OfflineList.hover.offlineTime", mapOf("offlinetime" to offlineTime)),
+                        mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.uuid", mapOf("uuid" to info.playerUUID)),
+                        mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.ip", mapOf("ip" to ipLine)),
+                        mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.geo", mapOf("geo" to geo)),
+                        mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.lastSeen", mapOf("lastseen" to lastSeenDate)),
+                        mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.lastLocation", mapOf("lastlocation" to lastLocation)),
+                        mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.logout", mapOf("logout" to lastSeenDate)),
+                        mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.offlineTime", mapOf("offlinetime" to offlineTime))
                     )
                     if (punishmentLines.isEmpty()) {
-                        loreLines.add(mH.getLogMessage("GUI", "OfflineList.hover.noPunishments"))
+                        loreLines.add(mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.noPunishments"))
                     } else {
                         punishmentLines.forEach { line ->
                             loreLines.add(
-                                mH.getLogMessage(
+                                mH.stringMessageToComponentNoPrefix(
                                     "GUI",
                                     "OfflineList.hover.punishment",
                                     mapOf("punishment" to line)
@@ -136,13 +138,13 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             })
         }
 
-        if (currentPage > 0) {
-            inventory.setItem(36, createNavItem(Material.PAPER, mH.getCleanMessage("GUI", "Nav.previous")))
-        }
-        inventory.setItem(40, createNavItem(Material.BARRIER, mH.getCleanMessage("GUI", "Nav.back")))
-        if (currentPage < totalPages - 1) {
-            inventory.setItem(44, createNavItem(Material.BOOK, mH.getCleanMessage("GUI", "Nav.next")))
-        }
+        if (currentPage > 0)
+            inventory.setItem(36, createNavItem(Material.PAPER, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")))
+
+        inventory.setItem(40, createNavItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")))
+
+        if (currentPage < totalPages - 1)
+            inventory.setItem(44, createNavItem(Material.BOOK, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")))
 
         val sortNameKey = when (sort) {
             SortMode.NAME_ASC -> "nameAsc"
@@ -150,7 +152,7 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             SortMode.LAST_SEEN_DESC -> "lastSeenDesc"
             SortMode.LAST_SEEN_ASC -> "lastSeenAsc"
         }
-        inventory.setItem(38, createNavItem(Material.COMPASS, mH.getCleanMessage("GUI", "OfflineList.sort.$sortNameKey")))
+        inventory.setItem(38, createNavItem(Material.COMPASS, mH.stringMessageToStringNoPrefix("GUI", "OfflineList.sort.$sortNameKey")))
 
         player.openInventory(inventory)
     }
@@ -161,17 +163,20 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         val player = event.whoClicked as? Player ?: return
 
         val records = plugin.playerIPManager.getAllDecryptedRecords()
-        val players = records.mapNotNull { info ->
-            val uuid = UUID.fromString(info.playerUUID)
-            if (Bukkit.getPlayer(uuid) != null) null else info
-        }.let { list ->
-            when (holder.sort) {
-                SortMode.NAME_ASC -> list.sortedBy { it.playerName.lowercase() }
-                SortMode.NAME_DESC -> list.sortedByDescending { it.playerName.lowercase() }
-                SortMode.LAST_SEEN_DESC -> list.sortedByDescending { plugin.timeHandler.parseDate(it.lastUpdated) ?: 0L }
-                SortMode.LAST_SEEN_ASC -> list.sortedBy { plugin.timeHandler.parseDate(it.lastUpdated) ?: Long.MAX_VALUE }
+        val players = records
+            .mapNotNull { info ->
+                val uuid = UUID.fromString(info.playerUUID)
+                if (Bukkit.getPlayer(uuid) != null) null else info
             }
-        }
+            .distinctBy { it.playerUUID }
+            .let { list ->
+                when (holder.sort) {
+                    SortMode.NAME_ASC -> list.sortedBy { it.playerName.lowercase() }
+                    SortMode.NAME_DESC -> list.sortedByDescending { it.playerName.lowercase() }
+                    SortMode.LAST_SEEN_DESC -> list.sortedByDescending { plugin.timeHandler.parseDate(it.lastUpdated) ?: 0L }
+                    SortMode.LAST_SEEN_ASC -> list.sortedBy { plugin.timeHandler.parseDate(it.lastUpdated) ?: Long.MAX_VALUE }
+                }
+            }
 
         val playersPerPage = 27
         val slot = event.rawSlot
@@ -184,6 +189,7 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             }
             return
         }
+
         when (slot) {
             36 -> if (holder.page > 0) open(player, holder.page - 1, holder.sort)
             38 -> open(player, 0, holder.sort.next())
@@ -193,6 +199,6 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
     }
 
     override fun getTitle(): Component {
-        return mH.getLogMessage("GUI", "PunisherMain.playerOffline.title")
+        return mH.stringMessageToComponentNoPrefix("GUI", "PunisherMain.playerOffline.title")
     }
 }

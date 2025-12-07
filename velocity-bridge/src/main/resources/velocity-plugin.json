@@ -1,0 +1,9 @@
+{
+  "id": "punisherxbridge",
+  "name": "PunisherXBridge",
+  "version": "${version}",
+  "description": "PunisherX bridge for Velocity",
+  "authors": ["SyntaxDevTeam"],
+  "dependencies": [],
+  "main": "pl.syntaxdevteam.punisher.bridge.velocity.PunisherXVelocityBridge"
+}

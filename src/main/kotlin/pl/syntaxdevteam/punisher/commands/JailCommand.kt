@@ -9,18 +9,17 @@ import org.bukkit.GameMode
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.basic.JailUtils
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
-import pl.syntaxdevteam.punisher.common.TeleportUtils
 
 class JailCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
 
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.JAIL)) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
         if (args.isEmpty() || args.size < 2) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("jail", "usage"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("jail", "usage"))
             return
         }
 
@@ -31,11 +30,12 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
 
         if (targetPlayer != null && !isForce && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_JAIL)) {
             stack.sender.sendMessage(
-                plugin.messageHandler.getMessage("error", "bypass", mapOf("player" to playerName))
+                plugin.messageHandler.stringMessageToComponent("error", "bypass", mapOf("player" to playerName))
             )
             return
         }
         val prefix = plugin.messageHandler.getPrefix()
+
         if(PermissionChecker.isAuthor(uuid)){
             stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("$prefix <red>You can't punish the plugin author</red>",
                 TagResolver.empty()))
@@ -72,16 +72,18 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.databaseHandler.addPunishmentHistory(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
             plugin.cache.addOrUpdatePunishment(uuid, end ?: -1, previousLocation)
 
+            val placeholders = mapOf("reason" to reason, "time" to formattedTime)
+
             targetPlayer?.sendMessage(
-                plugin.messageHandler.getMessage(
+                plugin.messageHandler.stringMessageToComponent(
                     "jail", "jail_message",
-                    mapOf("reason" to reason, "time" to formattedTime)
+                    placeholders
                 )
             )
 
             val broadcastMessages = plugin.messageHandler.getSmartMessage(
                 "jail", "broadcast",
-                mapOf("player" to playerName, "reason" to reason, "time" to formattedTime)
+                mapOf("player" to playerName) + placeholders
             )
             plugin.server.onlinePlayers.forEach { onlinePlayer ->
                 if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_JAIL)) {
@@ -94,12 +96,13 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.messageHandler.getSmartMessage(
                 "jail",
                 "jail",
-                mapOf("player" to playerName, "reason" to reason, "time" to formattedTime)
+                mapOf("player" to playerName) + placeholders
             ).forEach { stack.sender.sendMessage(it) }
+            plugin.actionExecutor.executeAction("jailed", playerName, placeholders)
         }
 
         if (targetPlayer != null) {
-            TeleportUtils.teleportSafely(plugin, targetPlayer, jailLocation) { success ->
+            plugin.safeTeleportService.teleportSafely(targetPlayer, jailLocation) { success ->
                 if (success) {
                     targetPlayer.gameMode = GameMode.ADVENTURE
                     plugin.logger.debug("<green>Player successfully teleported to jail.</green>")
@@ -107,7 +110,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
                     finalizePunishment()
                 } else {
                     stack.sender.sendMessage(
-                        plugin.messageHandler.getMessage(
+                        plugin.messageHandler.stringMessageToComponent(
                             "jail",
                             "teleport_failed",
                             mapOf("player" to playerName)
@@ -128,7 +131,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
             2 -> generateTimeSuggestions()
-            3 -> plugin.messageHandler.getReasons("jail", "reasons")
+            3 -> plugin.messageHandler.getMessageStringList("jail", "reasons")
             else -> emptyList()
         }
     }

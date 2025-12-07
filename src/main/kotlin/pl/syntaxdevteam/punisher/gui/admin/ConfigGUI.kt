@@ -16,15 +16,15 @@ class ConfigGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
         inventory.fillWithFiller()
 
-        inventory.setItem(20, createItem(Material.COMPASS, mH.getCleanMessage("GUI", "Config.setspawn")))
+        inventory.setItem(20, createItem(Material.COMPASS, mH.stringMessageToStringNoPrefix("GUI", "Config.setunjail")))
         inventory.setItem(
             24,
             createItem(
-                plugin.versionCompatibility.resolveMaterial("CHAIN", "IRON_BARS"),
-                mH.getCleanMessage("GUI", "Config.setjail")
+                plugin.guiMaterialResolver.resolveMaterial("IRON_CHAIN", "CHAIN", "IRON_BARS"),
+                mH.stringMessageToStringNoPrefix("GUI", "Config.setjail")
             )
         )
-        inventory.setItem(40, createNavItem(Material.BARRIER, mH.getCleanMessage("GUI", "Nav.back")))
+        inventory.setItem(40, createNavItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")))
         player.openInventory(inventory)
     }
 
@@ -34,7 +34,7 @@ class ConfigGUI(plugin: PunisherX) : BaseGUI(plugin) {
         when (event.rawSlot) {
             20 -> {
                 player.closeInventory()
-                player.performCommand("setspawn")
+                player.performCommand("setunjail")
             }
             24 -> {
                 player.closeInventory()
@@ -45,6 +45,6 @@ class ConfigGUI(plugin: PunisherX) : BaseGUI(plugin) {
     }
 
     override fun getTitle(): Component {
-        return mH.getLogMessage("GUI", "Config.title")
+        return mH.stringMessageToComponentNoPrefix("GUI", "Config.title")
     }
 }

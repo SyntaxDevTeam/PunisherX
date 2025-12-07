@@ -16,7 +16,7 @@ import java.util.Locale
 class PlaceholderFixCommand(private val plugin: PunisherX) : BasicCommand {
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.PUNISHERX_COMMAND)) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
 

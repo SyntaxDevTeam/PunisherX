@@ -1,0 +1,418 @@
+# Author: Not QauT (https://github.com/vQauT)
+# Ver. 1.0.0
+# تنسيق النصوص:
+# يمكنك استخدام MiniMessage أو Legacy (Minecraft) للتنسيق.
+# أمثلة على استخدام MiniMessage: https://docs.advntr.dev/minimessage/format.html
+# لا تخلط بين التنسيقين في نفس الرسالة. إذا استخدمت Legacy فلا تُدرج تنسيق MiniMessage، وإلا سيتم استخدام الأخير فقط.
+
+prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>"
+
+# رسائل الأخطاء
+error:
+  no_permission: "<red>ليس لديك صلاحية لاستخدام هذا الأمر.</red>"
+  player_not_found: "<gold>لم يتم العثور على أي لاعب بالاسم <player>.</gold>"
+  player_not_punished: "<gold>اللاعب <player> لا يملك أي عقوبة بهذا النوع.</gold>"
+  ip_not_found: "<gold>لم يتم العثور على لاعب يملك عنوان IP <ip>.</gold>"
+  no_data: "<red>لا توجد بيانات للعرض.</red>"
+  db_error: "حدث خطأ أثناء إضافة العقوبة إلى قاعدة البيانات. يتم استخدام طريقة بديلة. تحقق من وحدة التحكم!"
+  console: "<red>هذا الأمر يمكن استخدامه من قبل اللاعبين فقط.</red>"
+  reload: "<red>حدث خطأ أثناء إعادة تحميل الإعدادات:</red>"
+  bypass: "<red><b>تحذير!</b> لا يمكن معاقبة اللاعب <gold><player></gold> بسبب صلاحياته (OP أو تجاوز).</red><newline><dark_gray>ربما هناك طريقة لتجاوز هذا...</dark_gray>"
+
+# /setjail command messages
+# رسائل أمر /setjail
+setjail:
+  usage: "الاستخدام الصحيح: <gold>/setjail <radius>"
+  set: "<green>تم تحديد موقع السجن إلى: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>] بنصف قطر <gold><radius></gold>"
+  set_error: "<red>فشل في تعيين موقع السجن.</red>"
+  invalid_radius: "<red>يرجى إدخال نصف قطر صالح (رقم أكبر من 0).</red>"
+
+# رسائل أمر /setunjail
+setunjail:
+  usage: "الاستخدام الصحيح: <gold>/setunjail</gold>"
+  set: "<green>تم تعيين موقع الاستنساخ إلى: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
+  set_error: "<red>فشل في تعيين موقع الاستنساخ.</red>"
+
+
+# رسائل أمر /jail
+jail:
+  jail: "<green>لقد سجنت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
+  usage: "الاستخدام الصحيح: <gold>/jail <player_name> (المدة) <السبب>"
+  jail_message: "<red>لقد تم سجنك بسبب <b><reason></b> لمدة <b><time></b></red>"
+  teleport_failed: "<red>تم إلغاء النقل: موقع السجن المحدد غير آمن.</red>"
+  mute_info_message: "<red>تحاول التحدث، ولكن لا أحد يسمعك من داخل السجن...</red>"
+  command_blocked_message: "<red>لا يمكنك استخدام الأوامر أثناء قضائك لعقوبة السجن.</red>"
+  jail_restrict_message: "مغادرة منطقة السجن غير مسموح بها. تم إعادتك إلى موقعك المحدد."
+  broadcast: "<dark_gray>تم سجن اللاعب <gray><player></gray> بسبب <gray><reason></gray> لمدة <gray><time></gray></dark_gray>"
+  # بدلاً من ذلك، يمكنك استخدام تنسيق الرسالة التالي إذا كنت تريد إبراز هذه الرسالة أكثر
+  # broadcast:
+  #   - "<dark_gray>*************** اسم الخادم الخاص بك *************** </dark_gray>"
+  #   - ""
+  #   - "<red>   اللاعب <white><player></white> تم سجنه</red>"
+  #   - "   السبب: <white><reason></white>"
+  #   - "   المدة: <white><time></white>"
+  #   - ""
+  #   - "<dark_gray>*************************************************** </dark_gray>"
+  log: "<dark_gray>اللاعب المسجون <gray><player></gray> قال من زنزانته: <gray><message></gray></dark_gray>"
+  no_reasons: "بدون سبب"
+  reasons:
+    - "الإعلان"
+    - "الإزعاج (سبام)"
+    - "إهانة لاعب"
+    - "ألفاظ مسيئة"
+
+# رسائل أمر /unjail
+unjail:
+  unjail: "<green>لقد أفرجت عن اللاعب <gold><player></gold> من السجن</green>"
+  usage: "الاستخدام الصحيح: <gold>/unjail <player_name>"
+  unjail_message: "<green>انتهت فترة سجنك! لا تُضِع هذه الفرصة!</green>"
+  teleport_failed: "<red>تم إلغاء النقل: موقع الاستنساخ المحدد غير آمن.</red>"
+  success: "<green>تم الإفراج عن اللاعب <gold><player></gold> بنجاح من السجن.</green>"
+  broadcast: "تم الإفراج عن اللاعب <gold><player></gold> من السجن. احذروا..."
+
+# رسائل أمر /ban
+ban:
+  ban: "<green>لقد حظرت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
+  usage: "الاستخدام الصحيح: <gold>/ban <player_name> (المدة) <السبب>"
+  kick_message:
+    - "اسم الخادم"
+    - "PunisherX &8» &7لقد تم حظرك من الخادم"
+    - "&7"
+    - "&7"
+    - "&cالسبب &8» &7<reason>"
+    - "&cالمدة &8» &7<time>"
+    - "&7"
+    - "&8يمكنك تقديم استئناف عبر:"
+    - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
+  broadcast:
+    "<dark_gray>تم حظر اللاعب <gray><player></gray> بسبب <gray><reason></gray> لمدة <gray><time></gray></dark_gray>"
+    # بدلاً من ذلك، يمكنك استخدام تنسيق الرسالة التالي إذا كنت تريد إبراز هذه الرسالة أكثر
+    # broadcast:
+    #- "<dark_gray>*************** اسم الخادم الخاص بك *************** </dark_gray>"
+    #- ""
+    #- "<red>   اللاعب <white><player></white> تم حظره</red>"
+    #- "   السبب: <white><reason></white>"
+    #- "   المدة: <white><time></white>"
+    #- ""
+  #- "<dark_gray>*************************************************** </dark_gray>"
+  no_reasons: "بدون سبب"
+  reasons: # Add your own reasons that will be suggested when executing the command
+    - "غش"
+    - "تخريب"
+    - "إزعاج"
+    - "ألفاظ مسيئة"
+
+# رسائل أمر /banip
+banip:
+  ban: "<green>لقد حظرت عنوان IP الخاص باللاعب بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
+  usage: "الاستخدام الصحيح: <gold>/banip <player|ip> (المدة) <السبب>"
+  kick_message:
+    - "اسم الخادم"
+    - "PunisherX &8» &7تم حظر عنوان IP الخاص بك!"
+    - "&7"
+    - "&7"
+    - "&cالسبب &8» &7<reason>"
+    - "&cالمدة &8» &7<time>"
+    - "&7"
+    - "&8يمكنك تقديم استئناف عبر:"
+    - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.pl/discord"
+  broadcast: "<dark_gray>تم حظر اللاعب <gray><player></gray> بسبب <gray><reason></gray> لمدة <gray><time></gray></dark_gray>"
+  no_reasons: "بدون سبب"
+  reasons:
+    - "حساب بديل"
+    - "تخريب"
+    - "إزعاج"
+    - "ألفاظ مسيئة"
+
+# رسائل أمر /unban
+unban:
+  unban: "<green>تم إلغاء حظر اللاعب <gold><player></gold></green>"
+  usage: "الاستخدام الصحيح: <gold>/unban <player_name>"
+  broadcast: "<dark_gray>تم إلغاء حظر اللاعب <gray><player></gray></dark_gray>"
+
+# /mute command messages
+mute:
+  mute: "<green>لقد كمّمت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
+  usage: "الاستخدام الصحيح: <gold>/mute <player_name> (المدة) <السبب>"
+  mute_message: "<red>لقد تم كمّك بسبب <b><reason></b> لمدة <b><time></b></red>"
+  mute_info_message: "<red>تحاول التحدث، ولكنك لا تزال مكمومًا لمدة <time>.</red>"
+  broadcast:
+    "<dark_gray>تم كمّ اللاعب <gray><player></gray> بسبب <gray><reason></gray> لمدة <gray><time></gray></dark_gray>"
+    # بدلاً من ذلك، يمكنك استخدام تنسيق الرسالة التالي إذا كنت تريد إبراز هذه الرسالة أكثر
+    # broadcast:
+    #- "<dark_gray>*************** اسم الخادم الخاص بك *************** </dark_gray>"
+    #- ""
+    #- "<red>   اللاعب <white><player></white> تم كتمه</red>"
+    #- "   السبب: <white><reason></white>"
+    #- "   المدة: <white><time></white>"
+    #- ""
+  #- "<dark_gray>*************************************************** </dark_gray>"
+  log: "<dark_gray>اللاعب المكموم <gray><player></gray> أرسل رسالة: <gray><message></gray></dark_gray>"
+  no_reasons: "بدون سبب"
+  reasons:
+    - "الإعلان"
+    - "الإزعاج"
+    - "إهانة لاعب"
+    - "ألفاظ مسيئة"
+
+# رسائل أمر /unmute
+unmute:
+  unmute: "<green>لقد أزلت الكمامة عن اللاعب <gold><player></gold></green>"
+  usage: "الاستخدام الصحيح: <gold>/unmute <player_name>"
+  unmute_message: "<green>لقد تمت إزالة الكمامة عنك!</green>"
+
+# رسائل أمر /warn
+warn:
+  warn: "<green>لقد حذّرت (<warn_no> مرة) اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
+  usage: "الاستخدام الصحيح: <gold>/warn <player_name> (المدة) <السبب>"
+  warn_message: "<red>لقد تلقيت تحذيرًا رقم <b><warn_no></b>!</red>"
+  broadcast: "<dark_gray>اللاعب <gray><player></gray> تلقى تحذيرًا بسبب <gray><reason></gray> لمدة <gray><time></gray></dark_gray>"
+  # بدلاً من ذلك، يمكنك استخدام تنسيق الرسالة التالي إذا كنت تريد إبراز هذه الرسالة أكثر
+  # broadcast:
+  #   - "<dark_gray>*************** اسم الخادم الخاص بك *************** </dark_gray>"
+  #   - ""
+  #   - "<red>   اللاعب <white><player></white> تلقى <warn_no> تحذير</red>"
+  #   - "   السبب: <white><reason></white>"
+  #   - "   المدة: <white><time></white>"
+  #   - ""
+  #   - "<dark_gray>*************************************************** </dark_gray>"
+  no_reasons: "بدون سبب"
+  reasons:
+    - "الإعلان"
+    - "الإزعاج"
+    - "إهانة لاعب"
+    - "ألفاظ مسيئة"
+
+# رسائل أمر /unwarn
+unwarn:
+  unwarn: "<green>لقد أزلت تحذيرًا من اللاعب <gold><player></gold></green>"
+  usage: "الاستخدام الصحيح: <gold>/unwarn <player_name>"
+
+# رسائل أمر /kick
+kick:
+  kick: "<green>لقد طردت اللاعب <gold><player></gold> بسبب <gold><reason></gold></green>"
+  usage: "الاستخدام الصحيح: <gold>/kick <player_name> <السبب>"
+  kick_message:
+    - "اسم الخادم"
+    - "PunisherX &8» &7لقد تم طردك من الخادم"
+    - "&7"
+    - "&7"
+    - "&cالسبب &8» &7<reason>"
+    - "&7"
+    - "&7"
+    - "&8يمكنك تقديم استئناف عبر:"
+    - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
+  broadcast:
+    "<dark_gray>تم طرد اللاعب <gray><player></gray> بسبب <gray><reason></gray></dark_gray>"
+    # بدلاً من ذلك، يمكنك استخدام تنسيق الرسالة التالي إذا كنت تريد إبراز هذه الرسالة أكثر
+    # broadcast:
+    #- "<dark_gray>*************** اسم الخادم الخاص بك *************** </dark_gray>"
+    #- ""
+    #- "<red>   اللاعب <white><player></white> تم طرده</red>"
+    #- "   السبب: <white><reason></white>"
+    #- ""
+  #- "<dark_gray>*************************************************** </dark_gray>"
+  no_reasons: "بدون سبب"
+  reasons:
+    - "فيضان"
+    - "إزعاج"
+    - "ألفاظ مسيئة"
+
+# رسائل أمر /check
+check:
+  usage: "الاستخدام الصحيح: <gold>/check <player_name> <all|ban|jail|mute|warn>"
+  invalid_type: "<red>نوع العقوبة غير صالح. استخدم: all, ban, jail, mute, warn.</red>"
+  no_punishments: "<dark_green>اللاعب <gold><player></gold> لا يملك أي عقوبات فعّالة.</dark_green>"
+  title: "<dark_gray>العقوبات الفعّالة للاعب</dark_gray>"
+  id: "<dark_gray>المعرف</dark_gray>"
+  type: "<dark_gray>النوع</dark_gray>"
+  reason: "<dark_gray>السبب</dark_gray>"
+  time: "<dark_gray>المدة المتبقية</dark_gray>"
+
+# رسائل أمر /history
+history:
+  usage: "الاستخدام الصحيح: <gold>/history <player_name>"
+  no_punishments: "<dark_green>اللاعب <gold><player></gold> لا يملك أي عقوبات.</dark_green>"
+  title: "<dark_gray>سجل العقوبات للاعب</dark_gray>"
+  id: "<dark_gray>المعرف</dark_gray>"
+  type: "<dark_gray>النوع</dark_gray>"
+  reason: "<dark_gray>السبب</dark_gray>"
+  time: "<dark_gray>المدة</dark_gray>"
+
+# رسائل أمر /banlist
+banlist:
+  usage: "الاستخدام الصحيح: <gold>/banlist"
+  no_punishments: "<dark_green>قائمة الحظر فارغة.</dark_green>"
+  title: "<blue>|   <gray>قائمة اللاعبين المحظورين:</gray></blue>"
+  top_header: "<blue>--------------------------------------------------</blue>"
+  table_header: "<blue>|    الاسم المستعار     |        النوع        |        متى</blue>"
+  ban_list: "<blue>|   <hover:show_text:'<white>UUID:</white> <gold><uuid></gold>'><white><player></white></hover>   |   <hover:show_text:'<white>ID:</white> <gold>#<id><newline><white>المشرف:</white> <gold><operator></gold><newline><white>السبب:</white> <gold><reason></gold>'><white><type></white></hover>   |   <white><time></white></blue>"
+
+# رسائل أمر /change-reason
+change-reason:
+  usage: "الاستخدام الصحيح: <gold>/change-reason <punishment_ID> <new_reason>"
+  invalid_id: "<red>معرف العقوبة غير صالح</red>"
+  success: '<green>تم تغيير سبب العقوبة ذات المعرف <gold><id></gold> إلى "<gold><reason></gold>".</green>'
+  failure: "<red>فشل تحديث السبب للعقوبة ذات المعرف <gold><id></gold>.</red>"
+
+# رسائل أمر /clearall
+clear:
+  usage: "الاستخدام الصحيح: <gold>/clearall <player_name>"
+  clearall: "<green>تم مسح جميع العقوبات الفعّالة عن اللاعب <gold><player></gold>.</green>"
+  clear_message: "<green>تمت إزالة جميع عقوباتك الفعّالة!</green> <gray>هممم... هل لديك اتفاق سري مع الطاقم؟</gray>"
+
+# رسائل واجهة GUI
+GUI:
+  PunisherMain:
+    title: "<dark_gray>القائمة الرئيسية لـ PunisherX</dark_gray>"
+    serwerInfo:
+      title: "<gold>معلومات الخادم</gold>"
+      serverName: "<gray>اسم الخادم: <green><servername></green></gray>"
+      daily: "<gray>العقوبات اليوم: <yellow><daily></yellow></gray>"
+      tps: "<gray>مدة تشغيل الخادم: <green><time></green> (<green><tps></green>)</gray>"
+    playerOnline:
+      title: "<green>قائمة اللاعبين المتصلين</green>"
+      online: "<gray>عدد المتصلين: <green><onlineplayers></green></gray>"
+      clickToView: "<gray><b>اضغط لعرض قائمة اللاعبين</b></gray>"
+    playerOffline:
+      title: "<gray>قائمة اللاعبين غير المتصلين</gray>"
+      total: "<gray>إجمالي اللاعبين: <green><totalplayers></green></gray>"
+      clickToView: "<gray><b>اضغط لعرض قائمة غير المتصلين</b></gray>"
+    adminOnline:
+      title: "<red>قائمة الطاقم المتصل</red>"
+    compare:
+      title: "<blue>مقارنة اللاعبين</blue>"
+  PlayerList:
+    loading: "<gray>جاري تحميل البيانات...</gray>"
+    hover:
+      uuid: "<gray>UUID: <yellow><uuid></yellow></gray>"
+      playerIP: "<gray>عنوان IP الحالي: <yellow><playerip></yellow></gray>"
+      onlineStr: "<gray>مدة الاتصال: <green><onlinestr></green></gray>"
+      totalStr: "<gray>المدة الإجمالية: <green><totalstr></green></gray>"
+      lastActive: "<gray>آخر ظهور: <yellow><lastactive></yellow></gray>"
+      punishments: "<gray>العقوبة الحالية: <yellow><punishments></yellow></gray>"
+      punishStr: "<gray>إجمالي العقوبات: <yellow><punishstr></yellow></gray>"
+
+  OfflineList:
+    loading: "<gray>جاري تحميل البيانات...</gray>"
+    sort:
+      nameAsc: "<gray>الفرز: <green>الاسم A-Z</green></gray>"
+      nameDesc: "<gray>الفرز: <green>الاسم Z-A</green></gray>"
+      lastSeenDesc: "<gray>الفرز: <green>آخر ظهور ↓</green></gray>"
+      lastSeenAsc: "<gray>الفرز: <green>آخر ظهور ↑</green></gray>"
+    hover:
+      uuid: "<gray>UUID: <yellow><uuid></yellow></gray>"
+      ip: "<gray>IP: <yellow><ip></yellow></gray>"
+      geo: "<gray>الموقع الجغرافي: <yellow><geo></yellow></gray>"
+      lastSeen: "<gray>آخر ظهور: <yellow><lastseen></yellow></gray>"
+      lastLocation: "<gray>آخر موقع: <yellow><lastlocation></yellow></gray>"
+      logout: "<gray>تسجيل الخروج عند: <yellow><logout></yellow></gray>"
+      offlineTime: "<gray>مدة عدم الاتصال: <yellow><offlinetime></yellow></gray>"
+      punishment: "<gray>العقوبة: <yellow><punishment></yellow></gray>"
+      noPunishments: "<gray>لا يوجد سجل عقوبات</gray>"
+
+  PlayerAction:
+    title: "<yellow>قائمة اللاعب</yellow>"
+    punish: "<yellow>معاقبة</yellow>"
+    kick: "<yellow>طرد</yellow>"
+    banip: "<yellow>حظر IP</yellow>"
+    teleport: "<yellow>انتقال</yellow>"
+    undo: "<yellow>إلغاء العقوبة</yellow>"
+    history: "<yellow>سجل العقوبات</yellow>"
+    active: "<yellow>العقوبات الفعالة</yellow>"
+    list: "<yellow>قائمة المعاقَبين</yellow>"
+    config: "<yellow>الإعدادات</yellow>"
+    delete: "<yellow>مسح بيانات الحساب</yellow>"
+    deleteMessage: "<red>تم مسح بيانات حسابك</red>"
+    confirmDelete:
+      title: "<red>تأكيد مسح بيانات الحساب</red>"
+      confirm: "<green>تأكيد</green>"
+      cancel: "<red>إلغاء</red>"
+
+  PunishType:
+    title: "<yellow>اختر نوع العقوبة</yellow>"
+    ban: "<yellow>حظر</yellow>"
+    jail: "<yellow>سجن</yellow>"
+    mute: "<yellow>كمّ</yellow>"
+    warn: "<yellow>تحذير</yellow>"
+    banip: "<yellow>حظر IP</yellow>"
+    kick: "<yellow>طرد</yellow>"
+
+  PunishTime:
+    title: "<yellow>اختر المدة</yellow>"
+
+  PunishReason:
+    title: "<yellow>اختر السبب</yellow>"
+
+  PunishedList:
+    title: "<yellow>اللاعبون المعاقَبون</yellow>"
+    banned: "<yellow>اللاعبون المحظورون</yellow>"
+    jailed: "<yellow>اللاعبون المسجونون</yellow>"
+
+  BanList:
+    title: "<yellow>قائمة الحظر</yellow>"
+    permanent: "دائم"
+    hover:
+      id: "<gray>المعرف: <yellow><id></yellow></gray>"
+      date: "<gray>التاريخ: <yellow><date></yellow></gray>"
+      remaining: "<gray>الوقت المتبقي: <yellow><time></yellow></gray>"
+      operator: "<gray>المشرف: <yellow><operator></yellow></gray>"
+      reason: "<gray>السبب: <yellow><reason></yellow></gray>"
+
+  JailList:
+    title: "<yellow>قائمة السجن</yellow>"
+    permanent: "دائم"
+    hover:
+      id: "<gray>المعرف: <yellow><id></yellow></gray>"
+      date: "<gray>التاريخ: <yellow><date></yellow></gray>"
+      remaining: "<gray>الوقت المتبقي: <yellow><time></yellow></gray>"
+      operator: "<gray>المشرف: <yellow><operator></yellow></gray>"
+      reason: "<gray>السبب: <yellow><reason></yellow></gray>"
+
+  Config:
+    title: "<yellow>الإعدادات</yellow>"
+    setunjail: "<yellow>تعيين موقع العودة</yellow>"
+    setjail: "<yellow>تعيين موقع السجن</yellow>"
+
+  Nav:
+    next: "<gray>الصفحة التالية</gray>"
+    previous: "<gray>الصفحة السابقة</gray>"
+    back: "<gray>العودة إلى القائمة السابقة</gray>"
+
+# رسائل Discord Webhook
+webhook:
+  title: "عقوبة جديدة على الخادم"
+  player: "اللاعب"
+  operator: "المشرف"
+  reason: "السبب"
+  type: "نوع العقوبة"
+  time: "وقت الانتهاء"
+  app_name: "PunisherX • "
+
+# رسائل PlaceholderAPI
+placeholders:
+  mute_remaining_time: "<gray>مكموم حتى: <gold>"
+  warn_remaining_time: "<gray>التحذير صالح حتى: <gold>"
+  jail_remaining_time: "<gray>في السجن حتى: <gold>"
+  total_punishments: "<gray>إجمالي العقوبات: <gold>"
+  total_active_punishments: "<gray>إجمالي العقوبات الفعالة: <gold>"
+
+# تنسيق الوقت
+formatTime:
+  undefined: "غير محدد"
+  minute:
+    one: "دقيقة"
+    few: "دقائق"
+    many: "دقائق"
+  second:
+    one: "ثانية"
+    few: "ثوانٍ"
+    many: "ثوانٍ"
+  hour:
+    one: "ساعة"
+    few: "ساعات"
+    many: "ساعات"
+  day:
+    one: "يوم"
+    few: "أيام"
+    many: "أيام"

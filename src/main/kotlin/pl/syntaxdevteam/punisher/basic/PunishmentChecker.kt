@@ -14,7 +14,6 @@ import org.bukkit.event.player.PlayerMoveEvent
 import pl.syntaxdevteam.core.SyntaxCore
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
-import pl.syntaxdevteam.punisher.common.TeleportUtils
 import java.util.*
 
 class PunishmentChecker(private val plugin: PunisherX) : Listener {
@@ -27,45 +26,61 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         val uuid      = player.uniqueId
         val radius    = plugin.config.getDouble("jail.radius", 10.0)
         val jailLoc   = JailUtils.getJailLocation(plugin.config)
-        val unjailLoc = JailUtils.getUnjailLocation(plugin.config)
+        val unjailLoc = JailUtils.getUnjailLocation(
+            plugin.config,
+            plugin.hookHandler,
+            player = player,
+            safeTeleportService = plugin.safeTeleportService
+        )
         if (PermissionChecker.isAuthor(uuid)) {
             player.sendMessage(
                 plugin.messageHandler
-                    .formatMixedTextToMiniMessage(plugin.messageHandler.getPrefix() + " <green>Witaj, <b>WieszczY!</b> Ten serwer używa Twojego pluginu! :)",
+                .formatMixedTextToMiniMessage(plugin.messageHandler.getPrefix() + " <green>Witaj, <b>$name</b><newline>    Ten serwer używa ${plugin.pluginMeta.name} ${plugin.pluginMeta.version} ❤",
                         TagResolver.empty())
             )
         }
-        val punishments = plugin.databaseHandler.getPunishments(uuid.toString())
-        val isJailed = punishments.any { it.type == "JAIL" && plugin.punishmentManager.isPunishmentActive(it) }
-
-        if (jailLoc == null || unjailLoc == null) {
+        val locationsConfigured = jailLoc != null && unjailLoc != null
+        if (!locationsConfigured) {
             plugin.logger.warning("Jail lub unjail location niezdefiniowane!")
         } else {
+            plugin.schedulerAdapter.runAsync {
+                val punishments = plugin.databaseHandler.getPunishments(uuid.toString())
+                val isJailed = punishments.any { it.type == "JAIL" && plugin.punishmentManager.isPunishmentActive(it) }
 
-            val (targetLoc, targetMode) = when {
-                isJailed -> {
-                    jailLoc   to GameMode.ADVENTURE
-                }
-                isPlayerInJail(player.location, jailLoc, radius) -> {
-                    unjailLoc to GameMode.SURVIVAL
-                }
-                else -> {
-                    return
+                plugin.schedulerAdapter.runSync {
+                    if (!player.isOnline) {
+                        plugin.logger.debug("Pomijam teleportację ${player.name}, gracz jest offline")
+                        return@runSync
+                    }
+
+                    val (targetLoc, targetMode) = when {
+                        isJailed -> {
+                            jailLoc to GameMode.ADVENTURE
+                        }
+                        isPlayerInJail(player.location, jailLoc, radius) -> {
+                            unjailLoc to GameMode.SURVIVAL
+                        }
+                        else -> {
+                            return@runSync
+                        }
+                    }
+
+                    if (targetLoc.world == null) {
+                        plugin.logger.warning("Brak świata dla $targetLoc")
+                        return@runSync
+                    }
+
+                    plugin.safeTeleportService.teleportSafely(player, targetLoc) { success ->
+                        if (success) {
+                            player.gameMode = targetMode
+                            plugin.logger.debug("Player ${player.name} teleported to $targetLoc and set to $targetMode")
+                        } else {
+                            plugin.logger.debug("<red>Failed to teleport ${player.name} to $targetLoc.</red>")
+                        }
+                    }
+                    plugin.logger.debug("Scheduling teleport of $name to $targetLoc with gamemode $targetMode (jailed=$isJailed)")
                 }
             }
-            if (targetLoc.world == null) {
-                plugin.logger.warning("Brak świata dla $targetLoc")
-                return
-            }
-            TeleportUtils.teleportSafely(plugin, player, targetLoc) { success ->
-                if (success) {
-                    player.gameMode = targetMode
-                    plugin.logger.debug("Player ${player.name} teleported to $targetLoc and set to $targetMode")
-                } else {
-                    plugin.logger.debug("<red>Failed to teleport ${player.name} to $targetLoc.</red>")
-                }
-            }
-            plugin.logger.debug("Scheduling teleport of $name to $targetLoc with gamemode $targetMode (jailed=$isJailed)")
         }
 
         if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.SEE_UPDATE)) {
@@ -92,18 +107,22 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             }
 
             for (punishment in punishments) {
-                if ((punishment.type == "MUTE" || punishment.type == "JAIL") && plugin.punishmentManager.isPunishmentActive(punishment)) {
+                if (punishment.type != "MUTE" && punishment.type != "JAIL") {
+                    continue
+                }
+
+                if (plugin.punishmentManager.isPunishmentActive(punishment)) {
                     event.isCancelled = true
                     val endTime = punishment.end
                     val remainingTime = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(((endTime - System.currentTimeMillis()) / 1000).toString())
                     val reason = punishment.reason
                     val messageKey = if (punishment.type == "JAIL") "jail" else "mute"
-                    val infoMessage = plugin.messageHandler.getMessage(
+                    val infoMessage = plugin.messageHandler.stringMessageToComponent(
                         messageKey,
                         "mute_info_message",
                         mapOf("reason" to reason, "time" to remainingTime)
                     )
-                    val logMessage = plugin.messageHandler.getLogMessage(
+                    val logMessage = plugin.messageHandler.stringMessageToComponentNoPrefix(
                         messageKey,
                         "log",
                         mapOf("player" to playerName, "message" to plainMessage)
@@ -112,10 +131,10 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                     plugin.logger.clearLog(logMessage)
                     player.sendMessage(infoMessage)
                     return
-                } else {
-                    plugin.databaseHandler.removePunishment(uuid, "MUTE", true)
-                    plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
                 }
+
+                plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
+                plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
             }
         } catch (e: Exception) {
             plugin.logger.severe("Error in onPlayerChat, report it urgently to the plugin author: ${e.message}")
@@ -142,7 +161,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                             val duration = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(remainingTime.toString())
                             val reason = punishment.reason
                             event.isCancelled = true
-                            val muteMessage = plugin.messageHandler.getMessage("mute", "mute_message", mapOf("reason" to reason, "time" to duration))
+                            val muteMessage = plugin.messageHandler.stringMessageToComponent("mute", "mute_info_message", mapOf("reason" to reason, "time" to duration))
 
                             player.sendMessage(muteMessage)
                         } else if (punishment.type == "MUTE") {
@@ -189,7 +208,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
             if (!isAllowed) {
                 event.isCancelled = true
-                val message = plugin.messageHandler.getMessage("jail", "command_blocked_message")
+                val message = plugin.messageHandler.stringMessageToComponent("jail", "command_blocked_message")
                 player.sendMessage(message)
                 plugin.logger.debug("Blocked command '$originalCommand' for jailed player ${player.name}")
             }
@@ -226,9 +245,9 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             return
         }
 
-        TeleportUtils.teleportSafely(plugin, player, jailLocation) { success ->
+        plugin.safeTeleportService.teleportSafely(player, jailLocation) { success ->
             if (success) {
-                val message = plugin.messageHandler.getMessage("jail", "jail_restrict_message", emptyMap())
+                val message = plugin.messageHandler.stringMessageToComponent("jail", "jail_restrict_message", emptyMap())
                 player.sendMessage(message)
             } else {
                 plugin.logger.debug("<red>Failed to teleport player back to jail.</red>")

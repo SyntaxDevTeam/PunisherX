@@ -60,16 +60,16 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             meta.displayName(
                 mH.formatMixedTextToMiniMessage("<yellow>${target.name}</yellow>", TagResolver.empty())
             )
-            val loadMsg = mH.getCleanMessage("GUI", "PlayerList.loading")
+            val loadMsg = mH.stringMessageToStringNoPrefix("GUI", "PlayerList.loading")
             meta.lore(
                 listOf(
-                    mH.getLogMessage("GUI", "PlayerList.hover.uuid", mapOf("uuid" to loadMsg)),
-                    mH.getLogMessage("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loadMsg)),
-                    mH.getLogMessage("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to loadMsg)),
-                    mH.getLogMessage("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to loadMsg)),
-                    mH.getLogMessage("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to loadMsg)),
-                    mH.getLogMessage("GUI", "PlayerList.hover.punishments", mapOf("punishments" to loadMsg)),
-                    mH.getLogMessage("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishments", mapOf("punishments" to loadMsg)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to loadMsg)),
                 )
             )
             head.itemMeta = meta
@@ -81,8 +81,8 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 val totalStr   = PlayerStatsService.getTotalPlaytimeString(uuid) ?: "Brak danych"
                 val punishStr  = plugin.databaseHandler.countPlayerAllPunishmentHistory(uuid).toString()
                 val playerIP   = plugin.playerIPManager.getPlayerIPByName(target.name) ?: "Brak danych"
-                val punishments = plugin.databaseHandler.getActivePunishmentsString(uuid) ?: mH.getCleanMessage("error", "no_data")
-                val lastActive = PlayerStatsService.getLastActiveString(uuid) ?: mH.getCleanMessage("error", "no_data")
+                val punishments = plugin.databaseHandler.getActivePunishmentsString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
+                val lastActive = PlayerStatsService.getLastActiveString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
 
                 Bukkit.getScheduler().runTask(plugin, Runnable {
                     if (!holder.inv.viewers.contains(player)) return@Runnable
@@ -90,13 +90,13 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                     val im = item.itemMeta as SkullMeta
                     im.lore(
                         listOf(
-                            mH.getLogMessage("GUI", "PlayerList.hover.uuid", mapOf("uuid" to target.uniqueId.toString())),
-                            mH.getLogMessage("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to playerIP)),
-                            mH.getLogMessage("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to onlineStr)),
-                            mH.getLogMessage("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to totalStr)),
-                            mH.getLogMessage("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to lastActive)),
-                            mH.getLogMessage("GUI", "PlayerList.hover.punishments", mapOf("punishments" to punishments)),
-                            mH.getLogMessage("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to punishStr)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to target.uniqueId.toString())),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to playerIP)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to onlineStr)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to totalStr)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to lastActive)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishments", mapOf("punishments" to punishments)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to punishStr)),
                         )
                     )
                     item.itemMeta = im
@@ -138,6 +138,6 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
     }
 
     override fun getTitle(): Component {
-        return mH.getLogMessage("GUI", "PunisherMain.adminOnline.title")
+        return mH.stringMessageToComponentNoPrefix("GUI", "PunisherMain.adminOnline.title")
     }
 }

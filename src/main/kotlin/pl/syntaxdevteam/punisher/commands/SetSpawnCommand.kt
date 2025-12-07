@@ -12,12 +12,12 @@ class SetSpawnCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (stack.sender !is Player) {
-            stack.sender.sendMessage(plugin.messageHandler.getLogMessage("error", "console"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponentNoPrefix("error", "console"))
             return
         }
 
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.MANAGE_SET_SPAWN)) {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
 
@@ -32,8 +32,8 @@ class SetSpawnCommand(private val plugin: PunisherX) : BasicCommand {
         if (JailUtils.setUnjailLocation(plugin.config, location)) {
             plugin.saveConfig()
             stack.sender.sendMessage(
-                plugin.messageHandler.getMessage(
-                    "setspawn", "set", mapOf(
+                plugin.messageHandler.stringMessageToComponent(
+                    "setunjail", "set", mapOf(
                         "world" to world,
                         "locationx" to locationX,
                         "locationy" to locationY,
@@ -42,7 +42,7 @@ class SetSpawnCommand(private val plugin: PunisherX) : BasicCommand {
                 )
             )
         } else {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("setspawn", "set_error"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("setunjail", "set_error"))
         }
     }
 

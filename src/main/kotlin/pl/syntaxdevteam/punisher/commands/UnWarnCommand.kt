@@ -17,16 +17,16 @@ class UnWarnCommand(private val plugin: PunisherX) : BasicCommand {
                 val warnPunishments = punishments.filter { it.type == "WARN" }
                 if (warnPunishments.isNotEmpty()) {
                     plugin.databaseHandler.removePunishment(uuid, "WARN")
-                    stack.sender.sendMessage(plugin.messageHandler.getMessage("unwarn", "unwarn", mapOf("player" to player)))
+                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unwarn", "unwarn", mapOf("player" to player)))
                     plugin.logger.info("Player $player ($uuid) has been unwarned")
                 } else {
-                    stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "player_not_found", mapOf("player" to player)))
+                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_found", mapOf("player" to player)))
                 }
             } else {
-                stack.sender.sendMessage(plugin.messageHandler.getMessage("unwarn", "usage"))
+                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unwarn", "usage"))
             }
         } else {
-            stack.sender.sendMessage(plugin.messageHandler.getMessage("error", "no_permission"))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
         }
     }
 
