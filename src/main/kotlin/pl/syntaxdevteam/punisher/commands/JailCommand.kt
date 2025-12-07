@@ -35,6 +35,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
         val prefix = plugin.messageHandler.getPrefix()
+
         if(PermissionChecker.isAuthor(uuid)){
             stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("$prefix <red>You can't punish the plugin author</red>",
                 TagResolver.empty()))
@@ -71,16 +72,18 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.databaseHandler.addPunishmentHistory(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
             plugin.cache.addOrUpdatePunishment(uuid, end ?: -1, previousLocation)
 
+            val placeholders = mapOf("reason" to reason, "time" to formattedTime)
+
             targetPlayer?.sendMessage(
                 plugin.messageHandler.stringMessageToComponent(
                     "jail", "jail_message",
-                    mapOf("reason" to reason, "time" to formattedTime)
+                    placeholders
                 )
             )
 
             val broadcastMessages = plugin.messageHandler.getSmartMessage(
                 "jail", "broadcast",
-                mapOf("player" to playerName, "reason" to reason, "time" to formattedTime)
+                mapOf("player" to playerName) + placeholders
             )
             plugin.server.onlinePlayers.forEach { onlinePlayer ->
                 if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_JAIL)) {
@@ -93,8 +96,9 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.messageHandler.getSmartMessage(
                 "jail",
                 "jail",
-                mapOf("player" to playerName, "reason" to reason, "time" to formattedTime)
+                mapOf("player" to playerName) + placeholders
             ).forEach { stack.sender.sendMessage(it) }
+            plugin.actionExecutor.executeAction("jailed", playerName, placeholders)
         }
 
         if (targetPlayer != null) {

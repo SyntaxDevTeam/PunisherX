@@ -30,12 +30,12 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "bypass", mapOf("player" to player)))
                             return
                         }
-                    }/* TODO: Pamiętać o odkomentowaniu tego po testach.
+                    }
                     if(PermissionChecker.isAuthor(uuid)){
                         stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("<red>You can't punish the plugin author</red>",
                             TagResolver.empty()))
                         return
-                    }*/
+                    }
                     var gtime: String?
                     var reason: String
                     try {
@@ -79,16 +79,22 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                         targetPlayer.kick(kickMessage.build())
                     }
 
+                    val placeholders = mapOf(
+                        "reason" to reason,
+                        "time" to plugin.timeHandler.formatTime(gtime)
+                    )
                     plugin.messageHandler.getSmartMessage(
                         "ban",
                         "ban",
-                        mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
+                        mapOf("player" to player) + placeholders
                     ).forEach { stack.sender.sendMessage(it) }
+
+                    plugin.actionExecutor.executeAction("banned", player, placeholders)
 
                     val broadcastMessages = plugin.messageHandler.getSmartMessage(
                         "ban",
                         "broadcast",
-                        mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
+                        mapOf("player" to player) + placeholders
                     )
 
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->

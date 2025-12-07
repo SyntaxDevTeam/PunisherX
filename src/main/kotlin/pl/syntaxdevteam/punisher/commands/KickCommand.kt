@@ -28,6 +28,7 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
         val reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
         val punishmentType = "KICK"
         val start = System.currentTimeMillis()
+        val placeholders = mapOf("reason" to reason)
 
         if (targetArg.equals("all", ignoreCase = true)) {
             Bukkit.getOnlinePlayers().forEach { target ->
@@ -42,9 +43,10 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                     )
                     return@forEach
                 }
-
+                val prefix = plugin.messageHandler.getPrefix()
                 if (PermissionChecker.isAuthor(uuid)) {
-                    // Skip plugin author
+                    stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("$prefix <red>You can't punish the plugin author</red>",
+                        TagResolver.empty()))
                     return@forEach
                 }
 
@@ -76,6 +78,8 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                     "kick",
                     mapOf("player" to target.name, "reason" to reason)
                 ).forEach { stack.sender.sendMessage(it) }
+
+                plugin.actionExecutor.executeAction("kicked", target.name, placeholders)
             }
 
             val broadcastMessages = plugin.messageHandler.getSmartMessage(
@@ -144,6 +148,8 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
             "kick",
             mapOf("player" to targetArg, "reason" to reason)
         ).forEach { stack.sender.sendMessage(it) }
+
+        plugin.actionExecutor.executeAction("kicked", targetArg, placeholders)
 
         val broadcastMessages = plugin.messageHandler.getSmartMessage(
             "kick",

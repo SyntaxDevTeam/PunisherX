@@ -92,12 +92,18 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
             targetPlayer.kick(builder.build())
         }
 
+        val placeholders = mapOf(
+            "reason" to reason,
+            "time" to plugin.timeHandler.formatTime(timeArg)
+        )
         val msgLines = plugin.messageHandler.getSmartMessage(
             "banip",
             "ban",
-            mapOf("player" to rawTarget, "reason" to reason, "time" to plugin.timeHandler.formatTime(timeArg))
+            mapOf("player" to rawTarget) + placeholders
         )
         msgLines.forEach { stack.sender.sendMessage(it) }
+
+        plugin.actionExecutor.executeAction("ip_banned", rawTarget, placeholders)
 
         plugin.server.onlinePlayers.filter { PermissionChecker.hasWithSee(it, PermissionChecker.PermissionKey.SEE_BANIP) }
             .forEach { player -> msgLines.forEach { player.sendMessage(it) } }
