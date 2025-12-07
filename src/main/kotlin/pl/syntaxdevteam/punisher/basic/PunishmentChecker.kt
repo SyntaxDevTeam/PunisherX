@@ -107,7 +107,11 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             }
 
             for (punishment in punishments) {
-                if ((punishment.type == "MUTE" || punishment.type == "JAIL") && plugin.punishmentManager.isPunishmentActive(punishment)) {
+                if (punishment.type != "MUTE" && punishment.type != "JAIL") {
+                    continue
+                }
+
+                if (plugin.punishmentManager.isPunishmentActive(punishment)) {
                     event.isCancelled = true
                     val endTime = punishment.end
                     val remainingTime = if (endTime == -1L) "permanent" else plugin.timeHandler.formatTime(((endTime - System.currentTimeMillis()) / 1000).toString())
@@ -127,10 +131,10 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                     plugin.logger.clearLog(logMessage)
                     player.sendMessage(infoMessage)
                     return
-                } else {
-                    plugin.databaseHandler.removePunishment(uuid, "MUTE", true)
-                    plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
                 }
+
+                plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
+                plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
             }
         } catch (e: Exception) {
             plugin.logger.severe("Error in onPlayerChat, report it urgently to the plugin author: ${e.message}")
