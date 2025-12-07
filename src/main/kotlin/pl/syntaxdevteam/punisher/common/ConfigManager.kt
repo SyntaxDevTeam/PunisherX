@@ -112,7 +112,7 @@ class ConfigManager(private val plugin: PunisherX) {
                 val keyStr = e.key
                 config.set("$dst.$keyStr", e.value)
             }
-            config.set("WarnActions", null)
+            config.remove("WarnActions")
             plugin.logger.debug("[Config] WarnActions → $dst (server values overwrote defaults)")
         }
 
@@ -120,28 +120,28 @@ class ConfigManager(private val plugin: PunisherX) {
             val mutePm = rawUserDoc?.getBoolean("mute_pm") ?: false
             config.set("mute.pm", mutePm)
             plugin.logger.debug("[Config] mute_pm → mute.pm = $mutePm (server)")
-            config.set("mute_pm", null)
+            config.remove("mute_pm")
         }
 
         val muteCmdRaw = rawUserDoc?.get("mute_cmd")
         if (muteCmdRaw is List<*>) {
             config.set("mute.cmd", muteCmdRaw)
             plugin.logger.debug("[Config] mute_cmd → mute.cmd (server values overwrote defaults)")
-            config.set("mute_cmd", null)
+            config.remove("mute_cmd")
         }
 
         val checkForUpdates = rawUserDoc?.getBoolean("checkForUpdates")
         if (checkForUpdates != null) {
             config.set("update.check-for-updates", checkForUpdates)
             plugin.logger.debug("[Config] checkForUpdates → update.check-for-updates = $checkForUpdates (server)")
-            config.set("checkForUpdates", null)
+            config.remove("checkForUpdates")
         }
 
         val autoDownloadUpdates = rawUserDoc?.getBoolean("autoDownloadUpdates")
         if (autoDownloadUpdates != null) {
             config.set("update.auto-download", autoDownloadUpdates)
             plugin.logger.debug("[Config] autoDownloadUpdates → update.auto-download = $autoDownloadUpdates (server)")
-            config.set("autoDownloadUpdates", null)
+            config.remove("autoDownloadUpdates")
         }
     }
 
