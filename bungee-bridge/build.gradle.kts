@@ -20,7 +20,7 @@ dependencies {
 
 configurations.configureEach {
     resolutionStrategy.dependencySubstitution {
-        substitute(module("net.md-5:brigadier")).using(module("com.mojang:brigadier:1.0.18"))
+        substitute(module("net.md-5:brigadier")).using(module("com.mojang:brigadier:1.0.500"))
     }
 }
 
