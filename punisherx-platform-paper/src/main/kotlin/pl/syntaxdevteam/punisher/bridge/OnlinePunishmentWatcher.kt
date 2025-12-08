@@ -6,7 +6,7 @@ import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
 import pl.syntaxdevteam.core.platform.ServerEnvironment
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.databases.PunishmentData
+import pl.syntaxdevteam.punisher.api.model.PunishmentData
 import java.util.concurrent.TimeUnit
 
 class OnlinePunishmentWatcher(private val plugin: PunisherX) {

@@ -11,7 +11,7 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.databases.PunishmentData
+import pl.syntaxdevteam.punisher.api.model.PunishmentData
 import pl.syntaxdevteam.punisher.gui.punishments.PunishedListGUI
 import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
 import java.text.SimpleDateFormat

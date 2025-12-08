@@ -32,7 +32,7 @@ import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
 import pl.syntaxdevteam.punisher.loader.PluginInitializer
 import pl.syntaxdevteam.punisher.loader.VersionChecker
 import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
-import pl.syntaxdevteam.punisher.platform.SchedulerAdapter
+import pl.syntaxdevteam.punisher.core.platform.SchedulerAdapter
 import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
 import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService

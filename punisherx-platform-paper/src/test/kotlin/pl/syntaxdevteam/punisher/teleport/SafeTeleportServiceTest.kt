@@ -10,11 +10,11 @@ import kotlin.test.assertNotNull
 
 class SafeTeleportServiceTest {
 
-    private class ImmediateSchedulerAdapter : pl.syntaxdevteam.punisher.platform.SchedulerAdapter {
+    private class ImmediateSchedulerAdapter : pl.syntaxdevteam.punisher.core.platform.SchedulerAdapter {
         override fun runAsync(task: Runnable) = task.run()
         override fun runSync(task: Runnable) = task.run()
         override fun runSyncLater(delayTicks: Long, task: Runnable) = task.run()
-        override fun runRegionally(location: Location, task: Runnable) = task.run()
+        override fun runRegionally(anchor: Any, task: Runnable) = task.run()
     }
 
     @Test

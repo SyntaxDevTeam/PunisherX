@@ -1,26 +1,26 @@
 package pl.syntaxdevteam.punisher.api
 
-import pl.syntaxdevteam.punisher.databases.DatabaseHandler
-import pl.syntaxdevteam.punisher.databases.PunishmentData
+import pl.syntaxdevteam.punisher.api.model.PunishmentData
+import pl.syntaxdevteam.punisher.core.punishment.PunishmentRepository
 import java.util.concurrent.CompletableFuture
 
-class PunisherXApiImpl(private val databaseHandler: DatabaseHandler) : PunisherXApi {
+class PunisherXApiImpl(private val punishmentRepository: PunishmentRepository) : PunisherXApi {
 
     override fun getLastTenPunishmentHistory(uuid: String): CompletableFuture<List<PunishmentData>> {
         return CompletableFuture.supplyAsync {
-            databaseHandler.getPunishmentHistory(uuid, limit = 10)
+            punishmentRepository.getPunishmentHistory(uuid, limit = 10)
         }
     }
 
     override fun getLastTenActivePunishments(uuid: String): CompletableFuture<List<PunishmentData>> {
         return CompletableFuture.supplyAsync {
-            databaseHandler.getPunishments(uuid, limit = 10)
+            punishmentRepository.getPunishments(uuid, limit = 10)
         }
     }
 
     override fun getActivePunishments(uuid: String, type: String?): CompletableFuture<List<PunishmentData>> {
         return CompletableFuture.supplyAsync {
-            val allPunishments = databaseHandler.getPunishments(uuid)
+            val allPunishments = punishmentRepository.getPunishments(uuid)
             if (type == null || type.equals("ALL", ignoreCase = true)) {
                 allPunishments
             } else {
@@ -31,7 +31,7 @@ class PunisherXApiImpl(private val databaseHandler: DatabaseHandler) : PunisherX
 
     override fun getPunishmentHistory(uuid: String, type: String?): CompletableFuture<List<PunishmentData>> {
         return CompletableFuture.supplyAsync {
-            val allPunishmentHistory = databaseHandler.getPunishmentHistory(uuid)
+            val allPunishmentHistory = punishmentRepository.getPunishmentHistory(uuid)
             if (type == null || type.equals("ALL", ignoreCase = true)) {
                 allPunishmentHistory
             } else {
@@ -43,31 +43,31 @@ class PunisherXApiImpl(private val databaseHandler: DatabaseHandler) : PunisherX
 
     override fun getBannedPlayers(limit: Int, offset: Int): CompletableFuture<List<PunishmentData>> {
         return CompletableFuture.supplyAsync {
-            databaseHandler.getBannedPlayers(limit, offset)
+            punishmentRepository.getBannedPlayers(limit, offset)
         }
     }
 
     override fun getHistoryBannedPlayers(limit: Int, offset: Int): CompletableFuture<List<PunishmentData>> {
         return CompletableFuture.supplyAsync {
-            databaseHandler.getHistoryBannedPlayers(limit, offset)
+            punishmentRepository.getHistoryBannedPlayers(limit, offset)
         }
     }
 
     override fun getJailedPlayers(limit: Int, offset: Int): CompletableFuture<List<PunishmentData>> {
         return CompletableFuture.supplyAsync {
-            databaseHandler.getJailedPlayers(limit, offset)
+            punishmentRepository.getJailedPlayers(limit, offset)
         }
     }
 
     override fun isMuted(uuid: String): CompletableFuture<Boolean> {
         return CompletableFuture.supplyAsync {
-            databaseHandler.getPunishments(uuid).any { it.type.equals("MUTE", ignoreCase = true) }
+            punishmentRepository.getPunishments(uuid).any { it.type.equals("MUTE", ignoreCase = true) }
         }
     }
 
     override fun isJailed(uuid: String): CompletableFuture<Boolean> {
         return CompletableFuture.supplyAsync {
-            databaseHandler.getPunishments(uuid).any { it.type.equals("JAIL", ignoreCase = true) }
-        }
+            punishmentRepository.getPunishments(uuid).any { it.type.equals("JAIL", ignoreCase = true) }
     }
+}
 }

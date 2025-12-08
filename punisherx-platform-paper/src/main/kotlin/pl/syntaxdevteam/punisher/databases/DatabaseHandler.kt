@@ -3,6 +3,8 @@ package pl.syntaxdevteam.punisher.databases
 import org.bukkit.configuration.file.YamlConfiguration
 import pl.syntaxdevteam.core.database.*
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.api.model.PunishmentData
+import pl.syntaxdevteam.punisher.core.punishment.PunishmentRepository
 import java.io.File
 import java.io.IOException
 import java.time.Instant
@@ -28,7 +30,7 @@ data class DatabaseHealthCheckResult(
  * helpers.  By delegating to [DatabaseManager] the plugin gains out of the box
  * support for multiple database engines while keeping the code much simpler.
  */
-class DatabaseHandler(private val plugin: PunisherX) {
+open class DatabaseHandler(private val plugin: PunisherX) : PunishmentRepository {
     private val logger = plugin.logger
 
 
@@ -398,7 +400,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
     // Query helpers
     // ---------------------------------------------------------------------
 
-    fun getPunishments(uuid: String, limit: Int? = null, offset: Int? = null): List<PunishmentData> {
+    override fun getPunishments(uuid: String, limit: Int?, offset: Int?): List<PunishmentData> {
         val supportsOrderAndLimit = dbType in setOf(
             DatabaseType.MYSQL,
             DatabaseType.MARIADB,
@@ -443,7 +445,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return punishments.joinToString(", ") { it.type }
     }
 
-    fun getPunishmentsByIP(ip: String): List<PunishmentData> {
+    override fun getPunishmentsByIP(ip: String): List<PunishmentData> {
         return try {
             val rows = query(
                 "SELECT * FROM punishments WHERE uuid = ?",
@@ -467,7 +469,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    fun getPunishmentHistory(uuid: String, limit: Int? = null, offset: Int? = null): MutableList<PunishmentData> {
+    override fun getPunishmentHistory(uuid: String, limit: Int?, offset: Int?): List<PunishmentData> {
         val supportsOrderAndLimit = dbType in setOf(
             DatabaseType.MYSQL,
             DatabaseType.MARIADB,
@@ -502,7 +504,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    fun getBannedPlayers(limit: Int, offset: Int): MutableList<PunishmentData> {
+    override fun getBannedPlayers(limit: Int, offset: Int): List<PunishmentData> {
         val supportsOrderAndLimit = dbType in setOf(
             DatabaseType.MYSQL,
             DatabaseType.MARIADB,
@@ -537,7 +539,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    fun getHistoryBannedPlayers(limit: Int, offset: Int): MutableList<PunishmentData> {
+    override fun getHistoryBannedPlayers(limit: Int, offset: Int): List<PunishmentData> {
         val supportsOrderAndLimit = dbType in setOf(
             DatabaseType.MYSQL,
             DatabaseType.MARIADB,
@@ -572,7 +574,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    fun getJailedPlayers(limit: Int, offset: Int): MutableList<PunishmentData> {
+    override fun getJailedPlayers(limit: Int, offset: Int): List<PunishmentData> {
         val supportsOrderAndLimit = dbType in setOf(
             DatabaseType.MYSQL,
             DatabaseType.MARIADB,
@@ -671,7 +673,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    fun getLastTenPunishments(uuid: String): List<PunishmentData> {
+    override fun getLastTenPunishments(uuid: String): List<PunishmentData> {
         return try {
             query(
                 "SELECT * FROM punishmenthistory WHERE uuid = ? ORDER BY start DESC LIMIT 10",

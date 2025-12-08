@@ -7,7 +7,7 @@ import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
 import pl.syntaxdevteam.core.platform.ServerEnvironment
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.databases.PunishmentData
+import pl.syntaxdevteam.punisher.api.model.PunishmentData
 
 class PunishmentActionBarNotifier(private val plugin: PunisherX) {
 

@@ -7,6 +7,7 @@ import pl.syntaxdevteam.message.SyntaxMessages
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.api.PunisherXApi
 import pl.syntaxdevteam.punisher.api.PunisherXApiImpl
+import pl.syntaxdevteam.punisher.api.PunisherXApiProvider
 import pl.syntaxdevteam.punisher.basic.PunishmentActionBarNotifier
 import pl.syntaxdevteam.punisher.basic.PunishmentCache
 import pl.syntaxdevteam.punisher.basic.PunishmentChecker
@@ -104,6 +105,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.cache = PunishmentCache(plugin)
         plugin.punishmentActionBarNotifier = PunishmentActionBarNotifier(plugin).also { it.start() }
         plugin.punisherXApi = PunisherXApiImpl(plugin.databaseHandler)
+        PunisherXApiProvider.set(plugin.punisherXApi)
         plugin.hookHandler = HookHandler(plugin)
         plugin.discordWebhook = DiscordWebhook(plugin)
         plugin.playerIPManager = PlayerIPManager(plugin, plugin.geoIPHandler)

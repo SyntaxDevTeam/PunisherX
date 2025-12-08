@@ -3,13 +3,7 @@ package pl.syntaxdevteam.punisher.platform
 import org.bukkit.Location
 import org.bukkit.plugin.Plugin
 import pl.syntaxdevteam.core.platform.ServerEnvironment
-
-interface SchedulerAdapter {
-    fun runAsync(task: Runnable)
-    fun runSync(task: Runnable)
-    fun runSyncLater(delayTicks: Long, task: Runnable)
-    fun runRegionally(location: Location, task: Runnable)
-}
+import pl.syntaxdevteam.punisher.core.platform.SchedulerAdapter
 
 class BukkitSchedulerAdapter(
     private val plugin: Plugin,
@@ -42,8 +36,9 @@ class BukkitSchedulerAdapter(
         }
     }
 
-    override fun runRegionally(location: Location, task: Runnable) {
-        if (foliaBased) {
+    override fun runRegionally(anchor: Any, task: Runnable) {
+        val location = anchor as? Location
+        if (foliaBased && location != null) {
             plugin.server.regionScheduler.execute(plugin, location, task)
         } else {
             runSync(task)

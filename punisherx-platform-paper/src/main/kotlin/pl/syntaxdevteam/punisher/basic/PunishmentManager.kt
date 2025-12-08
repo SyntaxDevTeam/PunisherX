@@ -1,6 +1,6 @@
 package pl.syntaxdevteam.punisher.basic
 
-import pl.syntaxdevteam.punisher.databases.PunishmentData
+import pl.syntaxdevteam.punisher.api.model.PunishmentData
 
 
 class PunishmentManager {
