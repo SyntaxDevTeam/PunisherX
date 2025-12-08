@@ -2,7 +2,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.2.21"
+    kotlin("jvm") version "2.3.0-RC2"
     id("com.gradleup.shadow") version "9.3.0"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.6.1-DEV"
+version = "1.7.0-DEV"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val targetJavaVersion = 21
