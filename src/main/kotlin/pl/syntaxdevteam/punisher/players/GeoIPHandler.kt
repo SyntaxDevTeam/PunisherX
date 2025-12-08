@@ -111,7 +111,7 @@ class GeoIPHandler(private val plugin: PunisherX) {
         val reader = databaseReader ?: return "Unknown country"
         return try {
             val response = reader.city(InetAddress.getByName(ip))
-            response.country.name
+            response.country()?.names()?.get("en")
         } catch (e: AddressNotFoundException) {
             "Unknown country"
         } catch (e: Exception) {
@@ -128,7 +128,7 @@ class GeoIPHandler(private val plugin: PunisherX) {
         val reader = databaseReader ?: return "Unknown city"
         return try {
             val response = reader.city(InetAddress.getByName(ip))
-            response.city.name
+            response.city()?.names()?.get("en")
         } catch (e: AddressNotFoundException) {
             "Unknown city"
         } catch (e: Exception) {
