@@ -40,7 +40,9 @@ class ReportOfflineGUI(plugin: PunisherX) : BaseGUI(plugin) {
             .asSequence()
             .filter { it.name != null && it.name!!.isNotBlank() }
             .filter { !it.isOnline }
-            .filter { it.lastPlayed > 0L && (now - it.lastPlayed) <= oneHourMs }
+            .map { player -> player to player.lastSeen }
+            .filter { (_, lastSeen) -> lastSeen > 0L && (now - lastSeen) <= oneHourMs }
+            .map { (player, _) -> player }
             .sortedBy { it.name!!.lowercase() }
             .toList()
 
