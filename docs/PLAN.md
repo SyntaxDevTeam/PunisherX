@@ -342,5 +342,5 @@ Dzięki temu każdy element planu:
 
 ---
 
-Ten dokument jest szkieletem, który możesz rozwijać, dopisując szczegóły implementacyjne w miarę realizacji kolejnych kroków – każdy krok opisany w devlogu z datą, godziną i sugerowanym następnym krokiem.
+Ten dokument jest szkieletem, który będzie rozwijany przez dopisywanie szczegółów implementacyji w miarę realizacji kolejnych kroków – każdy krok opisany w devlogu z datą, godziną i sugerowanym następnym krokiem.
 
