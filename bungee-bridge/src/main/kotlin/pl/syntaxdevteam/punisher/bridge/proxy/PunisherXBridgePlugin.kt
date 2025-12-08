@@ -62,7 +62,7 @@ class PunisherXBridgePlugin : Plugin(), Listener {
     private fun handleBanIp(targetIp: String, reason: String, end: Long) {
         val normalizedIp = targetIp.trim()
         proxy.players.filter { player ->
-            player.address?.address?.hostAddress == normalizedIp
+            (player.socketAddress as? java.net.InetSocketAddress)?.address?.hostAddress == normalizedIp
         }.forEach { player -> disconnect(player, "BANIP", reason, end) }
     }
 

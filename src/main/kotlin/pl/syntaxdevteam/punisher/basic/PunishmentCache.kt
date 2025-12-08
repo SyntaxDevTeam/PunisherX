@@ -194,7 +194,7 @@ class PunishmentCache(private val plugin: PunisherX) {
         val modernType = object : TypeToken<MutableMap<String, CachedPunishment>>() {}.type
         runCatching { gson.fromJson<MutableMap<String, CachedPunishment>>(json, modernType) }
             .getOrNull()
-            ?.let { return it ?: mutableMapOf() }
+            ?.let { return it }
 
         val legacyType = object : TypeToken<MutableMap<String, Long>>() {}.type
         val legacy = runCatching { gson.fromJson<MutableMap<String, Long>>(json, legacyType) }.getOrNull()

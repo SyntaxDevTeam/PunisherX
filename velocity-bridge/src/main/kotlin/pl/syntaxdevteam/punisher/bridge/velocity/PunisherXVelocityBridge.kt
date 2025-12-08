@@ -35,7 +35,7 @@ private const val BRIDGE_VERSION: String = "1.6.0-DEV" // Keep aligned with the 
 class PunisherXVelocityBridge @Inject constructor(
     private val server: ProxyServer,
     private val logger: Logger,
-    @DataDirectory private val dataDirectory: Path
+    @param:DataDirectory private val dataDirectory: Path
 ) {
 
     private val channel: ChannelIdentifier = MinecraftChannelIdentifier.from("punisherx:bridge")
