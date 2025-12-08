@@ -46,6 +46,8 @@ object PermissionChecker { private val AUTHOR_UUID: UUID = UUID.fromString("248e
         PANELS_COMMAND("punisherx.cmd.panel"),
 
         //Komunikaty
+
+        SEE_REPORTS("punisherx.see.reports"),
         SEE("punisherx.see"),
         SEE_BAN("punisherx.see.ban"),
         SEE_BANIP("punisherx.see.banip"),
@@ -98,6 +100,7 @@ object PermissionChecker { private val AUTHOR_UUID: UUID = UUID.fromString("248e
         PermissionKey.MANAGE_SET_SPAWN -> "Allows you to set your respawn location after serving your prison sentence."
         PermissionKey.MANAGE_SET_JAIL -> "Allows setting the jail location."
 
+        PermissionKey.SEE_REPORTS -> "Allows viewing all reports"
         PermissionKey.SEE -> "Allows viewing all punishments."
         PermissionKey.SEE_BAN -> "Allows viewing ban punishments."
         PermissionKey.SEE_BANIP -> "Allows viewing IP ban punishments."

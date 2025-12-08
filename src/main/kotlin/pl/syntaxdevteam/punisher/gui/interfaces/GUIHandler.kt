@@ -17,6 +17,10 @@ import pl.syntaxdevteam.punisher.gui.player.action.PunishTimeGUI
 import pl.syntaxdevteam.punisher.gui.player.action.PunishTypeGUI
 import pl.syntaxdevteam.punisher.gui.punishments.PunishedListGUI
 import pl.syntaxdevteam.punisher.gui.PunisherMain
+import pl.syntaxdevteam.punisher.gui.report.ReportPlayerGUI
+import pl.syntaxdevteam.punisher.gui.report.ReportReasonGUI
+import pl.syntaxdevteam.punisher.gui.report.ReportSelectorGUI
+import pl.syntaxdevteam.punisher.gui.report.ReportOfflineGUI
 
 class GUIHandler(private val plugin: PunisherX) : Listener {
 
@@ -40,6 +44,10 @@ class GUIHandler(private val plugin: PunisherX) : Listener {
             plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "BanList.title") -> BanListGUI(plugin).handleClick(event)
             plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "JailList.title") -> JailListGUI(plugin).handleClick(event)
             plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "Config.title") -> ConfigGUI(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "Report.menu.title") -> ReportSelectorGUI(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "Report.player.title") -> ReportPlayerGUI(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "Report.offline.title") -> ReportOfflineGUI(plugin).handleClick(event)
+            plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "Report.reason.title") -> ReportReasonGUI(plugin).handleClick(event)
         }
     }
 }
