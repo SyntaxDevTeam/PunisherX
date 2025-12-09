@@ -33,6 +33,8 @@ import pl.syntaxdevteam.punisher.platform.BukkitSchedulerAdapter
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
 import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
+import pl.syntaxdevteam.punisher.core.punishment.PunishmentDataCache
+import pl.syntaxdevteam.punisher.core.punishment.PunishmentQueryService
 import java.io.File
 import java.util.Locale
 
@@ -104,7 +106,9 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.geoIPHandler = GeoIPHandler(plugin)
         plugin.cache = PunishmentCache(plugin)
         plugin.punishmentActionBarNotifier = PunishmentActionBarNotifier(plugin).also { it.start() }
-        plugin.punisherXApi = PunisherXApiImpl(plugin.databaseHandler)
+        plugin.punishmentDataCache = PunishmentDataCache()
+        plugin.punishmentQueryService = PunishmentQueryService(plugin.databaseHandler, plugin.punishmentDataCache)
+        plugin.punisherXApi = PunisherXApiImpl(plugin.punishmentQueryService)
         PunisherXApiProvider.set(plugin.punisherXApi)
         plugin.hookHandler = HookHandler(plugin)
         plugin.discordWebhook = DiscordWebhook(plugin)

@@ -4,7 +4,8 @@ plugins {
 
 dependencies {
     api(project(":punisherx-api"))
-    compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.3")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.2.3")
+    testImplementation(kotlin("test"))
 }
 
 java {

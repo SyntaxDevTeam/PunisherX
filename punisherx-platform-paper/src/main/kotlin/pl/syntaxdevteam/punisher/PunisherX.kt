@@ -38,6 +38,8 @@ import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import java.io.File
 import java.util.*
+import pl.syntaxdevteam.punisher.core.punishment.PunishmentDataCache
+import pl.syntaxdevteam.punisher.core.punishment.PunishmentQueryService
 
 class PunisherX : JavaPlugin(), Listener {
     private lateinit var pluginInitializer: PluginInitializer
@@ -59,6 +61,8 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var cache: PunishmentCache
     lateinit var punishmentActionBarNotifier: PunishmentActionBarNotifier
     lateinit var punisherXApi: PunisherXApi
+    lateinit var punishmentQueryService: PunishmentQueryService
+    lateinit var punishmentDataCache: PunishmentDataCache
     lateinit var hookHandler: HookHandler
     lateinit var discordWebhook: DiscordWebhook
     lateinit var commandLoggerPlugin: CommandLoggerPlugin
@@ -146,7 +150,9 @@ class PunisherX : JavaPlugin(), Listener {
         }
 
         server.servicesManager.unregister(punisherXApi)
-        punisherXApi = PunisherXApiImpl(databaseHandler)
+        punishmentDataCache = PunishmentDataCache()
+        punishmentQueryService = PunishmentQueryService(databaseHandler, punishmentDataCache)
+        punisherXApi = PunisherXApiImpl(punishmentQueryService)
         server.servicesManager.register(
             PunisherXApi::class.java,
             punisherXApi,

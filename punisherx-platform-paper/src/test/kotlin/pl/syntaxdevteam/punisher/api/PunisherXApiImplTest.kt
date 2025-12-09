@@ -1,6 +1,8 @@
 package pl.syntaxdevteam.punisher.api
 
 import pl.syntaxdevteam.punisher.api.model.PunishmentData
+import pl.syntaxdevteam.punisher.core.punishment.PunishmentDataCache
+import pl.syntaxdevteam.punisher.core.punishment.PunishmentQueryService
 import pl.syntaxdevteam.punisher.core.punishment.PunishmentRepository
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -10,7 +12,7 @@ import kotlin.test.assertTrue
 class PunisherXApiImplTest {
 
     private val repository = FakePunishmentRepository()
-    private val api = PunisherXApiImpl(repository)
+    private val api = PunisherXApiImpl(PunishmentQueryService(repository, PunishmentDataCache()))
 
     @Test
     fun `filters active punishments by type`() {
@@ -60,8 +62,8 @@ class PunisherXApiImplTest {
         uuid = "uuid",
         type = type,
         reason = "reason",
-        start = 0,
-        end = 0,
+        start = System.currentTimeMillis(),
+        end = System.currentTimeMillis() + 10_000,
         name = "Steve",
         operator = "Console",
     )
