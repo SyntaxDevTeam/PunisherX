@@ -1,4 +1,4 @@
-# [Data: 2025-12-10 09:30] Integracja serwisu zapytań z eventami i schedulerem
+# [Data: 2025-12-09 18:30] Integracja serwisu zapytań z eventami i schedulerem
 
 ## Co zostało zrobione
 - Dodano w `punisherx-core` adapter `PunishmentCacheRefresher`, który asynchronicznie unieważnia i dogrzewa cache zapytań po zmianach w karach.
