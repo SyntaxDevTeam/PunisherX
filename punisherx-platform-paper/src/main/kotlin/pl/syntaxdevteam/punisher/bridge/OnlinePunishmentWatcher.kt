@@ -55,8 +55,7 @@ class OnlinePunishmentWatcher(private val plugin: PunisherX) {
         val uuid = player.uniqueId.toString()
         val ip = player.address?.address?.hostAddress
 
-        val punishments = plugin.databaseHandler.getPunishments(uuid)
-            .filter { plugin.punishmentManager.isPunishmentActive(it) }
+        val punishments = plugin.punishmentQueryService.getActivePunishments(uuid)
         val ipPunishments = ip?.let { plugin.databaseHandler.getPunishmentsByIP(it) }?.filter {
             plugin.punishmentManager.isPunishmentActive(it)
         } ?: emptyList()

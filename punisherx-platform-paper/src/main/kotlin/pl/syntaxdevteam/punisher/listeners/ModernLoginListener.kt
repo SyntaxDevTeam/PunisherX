@@ -142,6 +142,7 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
                 }
             } else {
                 plugin.databaseHandler.removePunishment(uuid.toString(), punishment.type, true)
+                plugin.publishPunishmentRevoked(uuid.toString())
                 plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
             }
         }

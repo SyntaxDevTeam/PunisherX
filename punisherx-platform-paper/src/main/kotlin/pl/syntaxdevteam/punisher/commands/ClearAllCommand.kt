@@ -16,10 +16,15 @@ class ClearAllCommand(private val plugin: PunisherX) : BasicCommand {
                 val uuid = plugin.resolvePlayerUuid(player).toString()
                 val punishments = plugin.databaseHandler.getPunishments(uuid)
                 if (punishments.isNotEmpty()) {
+                    var removed = false
                     punishments.forEach { punishment ->
                         if (punishment.type == "MUTE" || punishment.type == "BAN" || punishment.type == "WARN") {
                             plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
+                            removed = true
                         }
+                    }
+                    if (removed) {
+                        plugin.publishPunishmentRevoked(uuid)
                     }
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("clear", "clearall", mapOf("player" to player)))
                     val targetPlayer = Bukkit.getPlayer(player)

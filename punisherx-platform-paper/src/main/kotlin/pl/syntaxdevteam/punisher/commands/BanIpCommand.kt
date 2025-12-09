@@ -73,6 +73,8 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
                 plugin.logger.err("DB error ban-ip $ip")
                 dbError = true
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban-ip $ip")
+            } else {
+                plugin.publishPunishmentApplied(ip)
             }
             plugin.databaseHandler.addPunishmentHistory(rawTarget, ip, reason, stack.sender.name,
                 "BANIP", start, normalizedEnd)

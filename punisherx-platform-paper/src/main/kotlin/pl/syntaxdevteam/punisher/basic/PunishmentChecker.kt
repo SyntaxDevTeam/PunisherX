@@ -44,8 +44,8 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             plugin.logger.warning("Jail lub unjail location niezdefiniowane!")
         } else {
             plugin.schedulerAdapter.runAsync {
-                val punishments = plugin.databaseHandler.getPunishments(uuid.toString())
-                val isJailed = punishments.any { it.type == "JAIL" && plugin.punishmentManager.isPunishmentActive(it) }
+                val punishments = plugin.punishmentQueryService.getActivePunishments(uuid.toString())
+                val isJailed = punishments.any { it.type == "JAIL" }
 
                 plugin.schedulerAdapter.runSync {
                     if (!player.isOnline) {
@@ -100,7 +100,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             val messageComponent = event.message()
             val plainMessage = PlainTextComponentSerializer.plainText().serialize(messageComponent)
 
-            val punishments = plugin.databaseHandler.getPunishments(uuid)
+            val punishments = plugin.punishmentQueryService.getActivePunishments(uuid)
             if (punishments.isEmpty()) {
                 plugin.logger.debug("No punishments found for player: $playerName")
                 return
@@ -134,6 +134,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                 }
 
                 plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
+                plugin.publishPunishmentRevoked(uuid)
                 plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
             }
         } catch (e: Exception) {
@@ -149,7 +150,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             val uuid = player.uniqueId.toString()
             val originalCommand = event.message.split(" ")[0]
             val command = originalCommand.lowercase(Locale.getDefault()).removePrefix("/")
-            val punishments = plugin.databaseHandler.getPunishments(uuid)
+            val punishments = plugin.punishmentQueryService.getActivePunishments(uuid)
 
             if (plugin.config.getBoolean("mute.pm")) {
                 val muteCommands = plugin.config.getStringList("mute.cmd")
@@ -166,6 +167,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                             player.sendMessage(muteMessage)
                         } else if (punishment.type == "MUTE") {
                             plugin.databaseHandler.removePunishment(uuid, "MUTE", true)
+                            plugin.publishPunishmentRevoked(uuid)
                             plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
                         }
                     }
@@ -182,6 +184,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                     activeJailFound = true
                 } else {
                     plugin.databaseHandler.removePunishment(uuid, "JAIL", true)
+                    plugin.publishPunishmentRevoked(uuid)
                     plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
                 }
             }

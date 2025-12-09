@@ -60,6 +60,8 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                         val banList: ProfileBanList = Bukkit.getBanList(BanListType.PROFILE)
                         val banEndDate = if (gtime != null) Date(System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
                         banList.addBan(playerProfile, reason, banEndDate, stack.sender.name)
+                    } else {
+                        plugin.publishPunishmentApplied(uuid.toString())
                     }
                     clp.logCommand(stack.sender.name, punishmentType, player, reason)
                     plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, normalizedEnd)

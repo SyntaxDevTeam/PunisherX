@@ -40,6 +40,10 @@ import java.io.File
 import java.util.*
 import pl.syntaxdevteam.punisher.core.punishment.PunishmentDataCache
 import pl.syntaxdevteam.punisher.core.punishment.PunishmentQueryService
+import pl.syntaxdevteam.punisher.core.punishment.PunishmentCacheRefresher
+import pl.syntaxdevteam.punisher.events.PunishmentAppliedEvent
+import pl.syntaxdevteam.punisher.events.PunishmentRevokedEvent
+import pl.syntaxdevteam.punisher.events.PunishmentCacheSyncListener
 
 class PunisherX : JavaPlugin(), Listener {
     private lateinit var pluginInitializer: PluginInitializer
@@ -77,6 +81,7 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var cfg: ConfigManager
     lateinit var proxyBridgeMessenger: ProxyBridgeMessenger
     lateinit var onlinePunishmentWatcher: OnlinePunishmentWatcher
+    lateinit var punishmentCacheRefresher: PunishmentCacheRefresher
 
 
     /**
@@ -152,6 +157,7 @@ class PunisherX : JavaPlugin(), Listener {
         server.servicesManager.unregister(punisherXApi)
         punishmentDataCache = PunishmentDataCache()
         punishmentQueryService = PunishmentQueryService(databaseHandler, punishmentDataCache)
+        punishmentCacheRefresher = PunishmentCacheRefresher(punishmentQueryService, schedulerAdapter)
         punisherXApi = PunisherXApiImpl(punishmentQueryService)
         server.servicesManager.register(
             PunisherXApi::class.java,
@@ -171,6 +177,15 @@ class PunisherX : JavaPlugin(), Listener {
         playerJoinListener = PlayerJoinListener(playerIPManager, punishmentChecker)
         server.pluginManager.registerEvents(playerJoinListener, this)
         server.pluginManager.registerEvents(punishmentChecker, this)
+        server.pluginManager.registerEvents(PunishmentCacheSyncListener(punishmentCacheRefresher), this)
+    }
+
+    fun publishPunishmentApplied(target: String) {
+        server.pluginManager.callEvent(PunishmentAppliedEvent(target))
+    }
+
+    fun publishPunishmentRevoked(target: String) {
+        server.pluginManager.callEvent(PunishmentRevokedEvent(target))
     }
 
     /**

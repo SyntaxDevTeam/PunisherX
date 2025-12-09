@@ -68,8 +68,11 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         val formattedTime = plugin.timeHandler.formatTime(gtime)
 
         fun finalizePunishment() {
-            plugin.databaseHandler.addPunishment(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+            val added = plugin.databaseHandler.addPunishment(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
             plugin.databaseHandler.addPunishmentHistory(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+            if (added) {
+                plugin.publishPunishmentApplied(uuid.toString())
+            }
             plugin.cache.addOrUpdatePunishment(uuid, end ?: -1, previousLocation)
 
             val placeholders = mapOf("reason" to reason, "time" to formattedTime)

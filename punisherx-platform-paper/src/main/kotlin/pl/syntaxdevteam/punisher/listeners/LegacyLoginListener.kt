@@ -56,6 +56,7 @@ class LegacyLoginListener(private val plugin: PunisherX) : Listener {
                     }
                 } else {
                     plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
+                    plugin.publishPunishmentRevoked(uuid)
                     plugin.logger.debug("Punishment for UUID: $uuid has expired and has been removed")
                 }
             }

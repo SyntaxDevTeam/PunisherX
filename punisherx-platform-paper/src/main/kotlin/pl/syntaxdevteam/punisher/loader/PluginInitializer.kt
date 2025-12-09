@@ -35,6 +35,8 @@ import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
 import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
 import pl.syntaxdevteam.punisher.core.punishment.PunishmentDataCache
 import pl.syntaxdevteam.punisher.core.punishment.PunishmentQueryService
+import pl.syntaxdevteam.punisher.core.punishment.PunishmentCacheRefresher
+import pl.syntaxdevteam.punisher.events.PunishmentCacheSyncListener
 import java.io.File
 import java.util.Locale
 
@@ -108,6 +110,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.punishmentActionBarNotifier = PunishmentActionBarNotifier(plugin).also { it.start() }
         plugin.punishmentDataCache = PunishmentDataCache()
         plugin.punishmentQueryService = PunishmentQueryService(plugin.databaseHandler, plugin.punishmentDataCache)
+        plugin.punishmentCacheRefresher = PunishmentCacheRefresher(plugin.punishmentQueryService, plugin.schedulerAdapter)
         plugin.punisherXApi = PunisherXApiImpl(plugin.punishmentQueryService)
         PunisherXApiProvider.set(plugin.punisherXApi)
         plugin.hookHandler = HookHandler(plugin)
@@ -143,6 +146,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.playerJoinListener = PlayerJoinListener(plugin.playerIPManager, plugin.punishmentChecker)
         plugin.server.pluginManager.registerEvents(plugin.playerJoinListener, plugin)
         plugin.server.pluginManager.registerEvents(plugin.punishmentChecker, plugin)
+        plugin.server.pluginManager.registerEvents(PunishmentCacheSyncListener(plugin.punishmentCacheRefresher), plugin)
         if (versionChecker.isAtLeast("1.21.7")) {
             plugin.server.pluginManager.registerEvents(ModernLoginListener(plugin), plugin)
             plugin.logger.debug("Registered ModernLoginListener for 1.21.7+")
