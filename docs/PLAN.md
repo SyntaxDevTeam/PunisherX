@@ -341,6 +341,6 @@ Dzięki temu każdy element planu:
     - devlog per dodatek.
 
 ---
-
-Ten dokument jest szkieletem, który będzie rozwijany przez dopisywanie szczegółów implementacyji w miarę realizacji kolejnych kroków – każdy krok opisany w devlogu z datą, godziną i sugerowanym następnym krokiem.
+**UWAGA**
+Ten dokument jest szkieletem, który będzie rozwijany przez dopisywanie szczegółów implementacyji w miarę realizacji kolejnych kroków – każdy krok opisany w devlogu z prawdziwą datą, faktyczną godziną i sugerowanym następnym krokiem.
 
