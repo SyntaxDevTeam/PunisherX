@@ -86,6 +86,9 @@ class PluginInitializer(private val plugin: PunisherX) {
         } else if (ServerEnvironment.isPaperBased()) {
             plugin.logger.debug("Detected Paper server, using async database connection handling.")
             plugin.server.scheduler.runTaskAsynchronously(plugin, databaseSetupTask)
+        } else {
+            plugin.logger.debug("Running sync database setup for non-Paper server.")
+            databaseSetupTask.run()
         }
     }
 
