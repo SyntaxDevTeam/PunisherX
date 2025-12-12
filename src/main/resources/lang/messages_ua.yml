@@ -350,7 +350,11 @@ placeholders:
   jail_remaining_time: "<gray>У в'язниці до: <gold>"
   total_punishments: "<gray>Усього покарань: <gold>"
   total_active_punishments: "<gray>Усього активних покарань: <gold>"
-
+  active_punishments_list: "<gray>Активні покарання (останні <gold><limit></gold>):</gray><newline><list>"
+  punishment_history_list: "<gray>Історія покарань (останні <gold><limit></gold>):</gray><newline><list>"
+  punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
+  punishment_list_empty: "<gray>Покарання не знайдені.</gray>"
+  punishment_list_permanent: "невизначено"
 # Форматування часу
 formatTime:
   undefined: "невизначено"

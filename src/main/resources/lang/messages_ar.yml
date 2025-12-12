@@ -396,7 +396,11 @@ placeholders:
   jail_remaining_time: "<gray>في السجن حتى: <gold>"
   total_punishments: "<gray>إجمالي العقوبات: <gold>"
   total_active_punishments: "<gray>إجمالي العقوبات الفعالة: <gold>"
-
+  active_punishments_list: "<gray>العقوبات النشطة (آخر <gold><limit></gold>):</gray><newline><list>"
+  punishment_history_list: "<gray>سجل العقوبات (آخر <gold><limit></gold>):</gray><newline><list>"
+  punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
+  punishment_list_empty: "<gray>لا توجد عقوبات.</gray>"
+  punishment_list_permanent: "غير محدد"
 # تنسيق الوقت
 formatTime:
   undefined: "غير محدد"

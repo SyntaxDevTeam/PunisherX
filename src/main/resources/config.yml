@@ -1,4 +1,4 @@
-config-version: 160
+config-version: 161
 
 # /********************************************/
 #    Global settings
@@ -92,6 +92,10 @@ notifications:
     enabled: true
     # How often (in ticks) the counter should update. 20 ticks = 1 second.
     period_ticks: 20
+
+placeholders:
+  # Maximum number of punishments displayed by PlaceholderAPI list placeholders.
+  punishment_list_limit: 5
 
 # Settings for the prison location and its radius.
 jail:

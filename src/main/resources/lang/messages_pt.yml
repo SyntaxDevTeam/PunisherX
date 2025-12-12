@@ -350,7 +350,11 @@ placeholders:
   jail_remaining_time: "<gray>Na prisão até: <gold>"
   total_punishments: "<gray>Total de punições: <gold>"
   total_active_punishments: "<gray>Total de punições ativas: <gold>"
-
+  active_punishments_list: "<gray>Punições ativas (últimas <gold><limit></gold>):</gray><newline><list>"
+  punishment_history_list: "<gray>Histórico de punições (últimas <gold><limit></gold>):</gray><newline><list>"
+  punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
+  punishment_list_empty: "<gray>Nenhuma punição encontrada.</gray>"
+  punishment_list_permanent: "indefinido"
 # Formatação de tempo
 formatTime:
   undefined: "indefinido"

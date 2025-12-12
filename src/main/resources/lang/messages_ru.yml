@@ -348,7 +348,11 @@ placeholders:
   jail_remaining_time: "<gray>В тюрьме до: <gold>"
   total_punishments: "<gray>Всего наказаний: <gold>"
   total_active_punishments: "<gray>Всего активных наказаний: <gold>"
-
+  active_punishments_list: "<gray>Активные наказания (последние <gold><limit></gold>):</gray><newline><list>"
+  punishment_history_list: "<gray>История наказаний (последние <gold><limit></gold>):</gray><newline><list>"
+  punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
+  punishment_list_empty: "<gray>Наказания не найдены.</gray>"
+  punishment_list_permanent: "неопределено"
 # Форматирование времени
 formatTime:
   undefined: "неопределено"

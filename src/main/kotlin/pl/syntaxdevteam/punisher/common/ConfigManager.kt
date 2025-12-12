@@ -18,6 +18,7 @@ class ConfigManager(private val plugin: PunisherX) {
         private const val V_104 = 104
         private const val V_141 = 141
         private const val V_160 = 160
+        private const val V_161 = 161
     }
 
     lateinit var config: YamlDocument
@@ -42,7 +43,7 @@ class ConfigManager(private val plugin: PunisherX) {
 
         val sourceVersion = detectSourceVersion(rawUserDoc)
 
-        if (sourceVersion < V_160 && dataFile.exists()) {
+        if (sourceVersion < V_161 && dataFile.exists()) {
             val bak = File(dataFile.parentFile, "$FILE_NAME.$sourceVersion.bak")
             try {
                 Files.copy(dataFile.toPath(), bak.toPath(), StandardCopyOption.REPLACE_EXISTING)
@@ -67,7 +68,7 @@ class ConfigManager(private val plugin: PunisherX) {
 
         migrateFrom(sourceVersion)
 
-        config.set(VERSION_KEY, V_160)
+        config.set(VERSION_KEY, V_161)
         config.save()
         plugin.logger.success("[Config] Done. Current version: ${config.getInt(VERSION_KEY)}")
     }
@@ -86,11 +87,11 @@ class ConfigManager(private val plugin: PunisherX) {
         val guessed = guessVersionFromComment()
         if (guessed != null) return guessed
 
-        return if (doc == null) V_160 else V_141
+        return if (doc == null) V_161 else V_141
     }
 
     private fun migrateFrom(sourceVersion: Int) {
-        if (sourceVersion >= V_160) return
+        if (sourceVersion >= V_161) return
 
         if (sourceVersion <= V_104) {
             plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_104 …")
@@ -99,6 +100,10 @@ class ConfigManager(private val plugin: PunisherX) {
         if (sourceVersion <= V_141) {
             plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_160 …")
             migrate141to160()
+        }
+        if (sourceVersion < V_161) {
+            plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_161 …")
+            migrate160to161()
         }
     }
 
@@ -206,6 +211,12 @@ class ConfigManager(private val plugin: PunisherX) {
         if (!config.contains("server")) {
             config.set("server", "network")
             plugin.logger.debug("[Config] server = \"network\" set (default)")
+        }
+    }
+
+    private fun migrate160to161() {
+        if (!config.contains("placeholders.punishment_list_limit")) {
+            config.set("placeholders.punishment_list_limit", 5)
         }
     }
 

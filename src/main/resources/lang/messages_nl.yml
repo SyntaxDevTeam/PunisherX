@@ -300,7 +300,11 @@ placeholders:
   warn_remaining_time: "<gray>Waarschuwing geldig tot: <gold>"
   total_punishments: "<gray>Totaal aantal straffen: <gold>"
   total_active_punishments: "<gray>Totaal actieve straffen: <gold>"
-
+  active_punishments_list: "<gray>Actieve straffen (laatste <gold><limit></gold>):</gray><newline><list>"
+  punishment_history_list: "<gray>Strafgeschiedenis (laatste <gold><limit></gold>):</gray><newline><list>"
+  punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
+  punishment_list_empty: "<gray>Geen straffen gevonden.</gray>"
+  punishment_list_permanent: "onbepaald"
 # Tijd formatering
 formatTime:
   undefined: "onbepaald"

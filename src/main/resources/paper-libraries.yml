@@ -24,4 +24,4 @@ libraries:
   - dev.dejvokep:boosted-yaml:1.3.7
   # SyntaxDevTeam libraries
   - pl.syntaxdevteam:core:1.2.7-SNAPSHOT
-  - pl.syntaxdevteam:messageHandler-paper:1.0.0
+  - pl.syntaxdevteam:messageHandler-paper:1.0.2-SNAPSHOT

@@ -45,7 +45,7 @@ dependencies {
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
     //implementation(files("libs/SyntaxCore-1.2.6n-SNAPSHOT-all.jar"))
     compileOnly("pl.syntaxdevteam:core:1.2.7-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.0.0")
+    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.0.2-SNAPSHOT")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.5")
     compileOnly("com.google.code.gson:gson:2.13.2")
