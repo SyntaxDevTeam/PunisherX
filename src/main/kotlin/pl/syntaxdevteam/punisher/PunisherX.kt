@@ -121,50 +121,10 @@ class PunisherX : JavaPlugin(), Listener {
      * Reloads the plugin configuration and reinitializes the database connection.
      */
     private fun reloadMyConfig() {
-        databaseHandler.closeConnection()
-        runCatching { punishmentActionBarNotifier.stop() }
-        try {
-            messageHandler.reloadMessages()
-        } catch (e: Exception) {
-            logger.err("${messageHandler.stringMessageToComponent("error", "reload")} ${e.message}")
-        }
-
-        saveDefaultConfig()
-        pluginInitializer.setupConfig()
+        pluginInitializer.onDisable()
         reloadConfig()
-
-        databaseHandler = DatabaseHandler(this)
-        val databaseSetupTask = Runnable {
-            databaseHandler.openConnection()
-            databaseHandler.createTables()
-        }
-
-        if (ServerEnvironment.isFoliaBased()) {
-            server.globalRegionScheduler.execute(this, databaseSetupTask)
-        } else {
-            server.scheduler.runTaskAsynchronously(this, databaseSetupTask)
-        }
-
-        server.servicesManager.unregister(punisherXApi)
-        punisherXApi = PunisherXApiImpl(databaseHandler)
-        server.servicesManager.register(
-            PunisherXApi::class.java,
-            punisherXApi,
-            this,
-            ServicePriority.Normal
-        )
-
-        discordWebhook = DiscordWebhook(this)
-        actionExecutor = PunishmentActionExecutor(this)
-        HandlerList.unregisterAll(playerJoinListener)
-        HandlerList.unregisterAll(punishmentChecker)
-        geoIPHandler = GeoIPHandler(this)
-        playerIPManager = PlayerIPManager(this, geoIPHandler)
-        punishmentChecker = PunishmentChecker(this)
-        punishmentActionBarNotifier = PunishmentActionBarNotifier(this).also { it.start() }
-        playerJoinListener = PlayerJoinListener(playerIPManager, punishmentChecker)
-        server.pluginManager.registerEvents(playerJoinListener, this)
-        server.pluginManager.registerEvents(punishmentChecker, this)
+        pluginInitializer = PluginInitializer(this)
+        pluginInitializer.onEnable()
     }
 
     /**
