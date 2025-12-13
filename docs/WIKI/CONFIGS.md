@@ -55,3 +55,4 @@ This page explains every configurable option in `config.yml`, how to tune it, an
 ## Debugging and telemetry
 - `debug` — enable verbose logging.
 - `stats.enabled` — toggle anonymous stats collection.
+> Warning! Features and settings marked as experimental may function incorrectly or not at all, and the author advises against using them on production servers.
