@@ -23,6 +23,7 @@ import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
 import pl.syntaxdevteam.punisher.gui.interfaces.GUIHandler
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
+import pl.syntaxdevteam.punisher.listeners.ReloadListener
 import pl.syntaxdevteam.punisher.listeners.LegacyLoginListener
 import pl.syntaxdevteam.punisher.listeners.ModernLoginListener
 import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
@@ -144,6 +145,7 @@ class PluginInitializer(private val plugin: PunisherX) {
             plugin.server.pluginManager.registerEvents(LegacyLoginListener(plugin), plugin)
             plugin.logger.debug("Registered LegacyLoginListener for pre-1.21.7")
         }
+        plugin.server.pluginManager.registerEvents(ReloadListener(plugin), plugin)
         plugin.server.servicesManager.register(PunisherXApi::class.java, plugin.punisherXApi, plugin, ServicePriority.Normal)
         if (plugin.hookHandler.checkPlaceholderAPI()) {
             PlaceholderHandler(plugin).register()
