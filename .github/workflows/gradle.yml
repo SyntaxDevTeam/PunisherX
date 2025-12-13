@@ -52,11 +52,14 @@ jobs:
         with:
           name: gradle-build-results
           path: build/reports/gradle-actions/build-results.json
-      - name: Upload JAR
+      - name: Upload JARs
         uses: actions/upload-artifact@v5
         with:
-          name: PunisherX-latest-DEV.jar
-          path: build/libs/*.jar
+          name: PunisherX-latest-DEV
+          path: |
+            build/libs/*.jar
+            bungee-bridge/build/libs/*.jar
+            velocity-bridge/build/libs/*.jar
 
   dependency-submission:
     runs-on: ubuntu-latest
