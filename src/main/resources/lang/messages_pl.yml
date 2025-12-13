@@ -388,6 +388,7 @@ placeholders:
   punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
   punishment_list_empty: "<gray>Brak znalezionych kar.</gray>"
   punishment_list_permanent: "nieokreślony"
+
 # Formatowanie czasu
 formatTime:
   undefined: "nieokreślony"

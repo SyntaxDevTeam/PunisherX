@@ -4,12 +4,14 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.databases.PunishmentData
+import pl.syntaxdevteam.message.MessageHandler
 import java.text.SimpleDateFormat
 import java.util.Date
 
 class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion() {
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    private val placeholderFormat: MessageHandler.MessageFormat? by lazy { resolvePlaceholderFormat() }
 
     override fun getIdentifier(): String {
         return "prx"
@@ -58,7 +60,7 @@ class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion()
         }
         val remainingTime = (punishData.end - System.currentTimeMillis())  / 1000
         return if (remainingTime > 0) {
-            plugin.messageHandler.stringMessageToStringNoPrefix("placeholders", punishment) + plugin.timeHandler.formatTime(remainingTime.toString())
+            placeholderMessage(punishment) + plugin.timeHandler.formatTime(remainingTime.toString())
         } else {
             null
         }
@@ -91,22 +93,21 @@ class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion()
         }.take(limit)
 
         if (punishments.isEmpty()) {
-            return plugin.messageHandler.stringMessageToStringNoPrefix("placeholders", "punishment_list_empty")
+            return placeholderMessage("punishment_list_empty")
         }
 
-        val entryTemplate = plugin.messageHandler.stringMessageToStringNoPrefix("placeholders", "punishment_list_entry")
+        val entryTemplate = placeholderMessage("punishment_list_entry")
         val formattedEntries = punishments.joinToString("\n") { formatPunishmentEntry(entryTemplate, it) }
 
         val wrapperKey = if (includeHistory) "punishment_history_list" else "active_punishments_list"
-        return plugin.messageHandler
-            .stringMessageToStringNoPrefix("placeholders", wrapperKey)
+        return placeholderMessage(wrapperKey)
             .replace("<limit>", limit.toString())
             .replace("<list>", formattedEntries)
     }
 
     private fun formatPunishmentEntry(template: String, punishment: PunishmentData): String {
         val end = if (punishment.end <= 0) {
-            plugin.messageHandler.stringMessageToStringNoPrefix("placeholders", "punishment_list_permanent")
+            placeholderMessage("punishment_list_permanent")
         } else {
             dateFormat.format(Date(punishment.end))
         }
@@ -124,7 +125,7 @@ class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion()
         return if (totalPunishments > 0) {
         plugin.logger.debug("Total active punishments: $totalPunishments")
         plugin.logger.debug("Formatting message for total active punishments: ${plugin.messageHandler.stringMessageToStringNoPrefix("placeholders", "total_active_punishments")}")
-        plugin.messageHandler.stringMessageToStringNoPrefix("placeholders", "total_active_punishments") + totalPunishments.toString()
+        placeholderMessage("total_active_punishments") + totalPunishments.toString()
         } else {
             null
         }
@@ -136,11 +137,26 @@ class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion()
         return if (totalPunishmentHistory > 0) {
             plugin.logger.debug("Total punishments: $totalPunishmentHistory")
             plugin.logger.debug("Formatting message for total punishments: ${plugin.messageHandler.stringMessageToStringNoPrefix("placeholders", "total_punishments")}")
-            plugin.messageHandler.stringMessageToStringNoPrefix("placeholders", "total_punishments").let {
+            placeholderMessage("total_punishments").let {
                 it + totalPunishmentHistory.toString()
             }
         } else {
             null
         }
+    }
+
+    private fun placeholderMessage(key: String, placeholders: Map<String, String> = emptyMap()): String {
+        return placeholderFormat?.let {
+            plugin.messageHandler.stringMessageToStringNoPrefix("placeholders", key, it, placeholders)
+        } ?: plugin.messageHandler.stringMessageToStringNoPrefix("placeholders", key, placeholders)
+    }
+
+    private fun resolvePlaceholderFormat(): MessageHandler.MessageFormat? {
+        val configured = plugin.config.getString("placeholders.message_format")?.trim()?.uppercase() ?: return null
+        return runCatching { MessageHandler.MessageFormat.valueOf(configured) }
+            .getOrElse {
+                plugin.logger.warning("Unknown placeholders.message_format '$configured'. Using default MessageHandler formatting.")
+                null
+            }
     }
 }

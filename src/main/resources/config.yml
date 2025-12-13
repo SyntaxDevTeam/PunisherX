@@ -96,6 +96,9 @@ notifications:
 placeholders:
   # Maximum number of punishments displayed by PlaceholderAPI list placeholders.
   punishment_list_limit: 5
+  # Force MessageHandler to format placeholder results using the selected format.
+  # Available options include: MINI_MESSAGE, LEGACY_AMPERSAND, LEGACY_SECTION, PLAIN_TEXT.
+  message_format: "MINI_MESSAGE"
 
 # Settings for the prison location and its radius.
 jail:

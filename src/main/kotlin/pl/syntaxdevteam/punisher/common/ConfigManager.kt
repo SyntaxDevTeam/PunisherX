@@ -101,15 +101,13 @@ class ConfigManager(private val plugin: PunisherX) {
             plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_160 …")
             migrate141to160()
         }
-        if (sourceVersion < V_161) {
-            plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_161 …")
-            migrate160to161()
-        }
+        plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_161 …")
+        migrate160to161()
     }
 
     private fun migrate104to160() {
         val oldWarn = readSectionMapRaw(rawUserDoc, "WarnActions")
-        if (oldWarn != null && oldWarn.isNotEmpty()) {
+        if (!oldWarn.isNullOrEmpty()) {
             val dst = "actions.warn.count"
             val it = oldWarn.entries.iterator()
             while (it.hasNext()) {
@@ -154,11 +152,11 @@ class ConfigManager(private val plugin: PunisherX) {
 
         var oldWarn = readSectionMapRaw(rawUserDoc, "warn.actions")
 
-        if (oldWarn == null || oldWarn.isEmpty()) {
+        if (oldWarn.isNullOrEmpty()) {
             oldWarn = readSectionMapRaw(rawUserDoc, "actions.warn.count")
         }
 
-        if (oldWarn != null && oldWarn.isNotEmpty()) {
+        if (!oldWarn.isNullOrEmpty()) {
             val dst = "actions.warn.count"
 
             val it = oldWarn.entries.iterator()
@@ -176,7 +174,7 @@ class ConfigManager(private val plugin: PunisherX) {
         }
 
         val oldSpawnLoc = readSectionMapRaw(rawUserDoc, "spawn.location")
-        if (oldSpawnLoc != null && oldSpawnLoc.isNotEmpty()) {
+        if (!oldSpawnLoc.isNullOrEmpty()) {
             config.set("unjail.unjail_location", oldSpawnLoc)
             plugin.logger.debug("[Config] spawn.location → unjail.unjail_location (server)")
         }
@@ -217,6 +215,9 @@ class ConfigManager(private val plugin: PunisherX) {
     private fun migrate160to161() {
         if (!config.contains("placeholders.punishment_list_limit")) {
             config.set("placeholders.punishment_list_limit", 5)
+        }
+        if (!config.contains("placeholders.message_format")) {
+            config.set("placeholders.message_format", "MINI_MESSAGE")
         }
     }
 
