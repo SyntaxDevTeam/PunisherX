@@ -35,12 +35,16 @@ repositories {
     maven("https://repo.codemc.org/repository/maven-public/") // VaultUnlockedAPI
     maven("https://jitpack.io") // VaultAPI
     maven("https://repo.essentialsx.net/releases/") // EssentialsX
+    maven("https://repo.leavesmc.org/snapshots/") {
+        name = "leavesmc-repo"
+    }
 }
 
 val mockitoAgent by configurations.creating
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
+    //compileOnly("org.leavesmc.leaves:leaves-api:1.21.10-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
     //implementation(files("libs/SyntaxCore-1.2.6n-SNAPSHOT-all.jar"))
