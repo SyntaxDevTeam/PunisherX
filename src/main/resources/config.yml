@@ -15,11 +15,12 @@ server: "network"
 # /********************************************/
 
 database:
-  # Available options: mariadb, mysql, postgresql, sqlite, h2
+  # Available options: mariadb, mysql, mssql, postgresql, sqlite, h2
   type: "sqlite"
   sql:
     host: "localhost"
-    port: 3306          # 5432 if you use PostgreSQL; Default for MySQL is 3306.
+    # 5432 if you use PostgreSQL or 1433 for MSSQL; Default for MySQL is 3306.
+    port: 3306
     dbname: "my_database"
     username: "root"
     password: "password"
