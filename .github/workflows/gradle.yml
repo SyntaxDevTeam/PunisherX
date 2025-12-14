@@ -55,7 +55,7 @@ jobs:
       - name: Upload JARs
         uses: actions/upload-artifact@v5
         with:
-          name: PunisherX-latest-DEV
+          name: PunisherX-${{ github.ref_name }}-latest-DEV
           path: |
             build/libs/*.jar
             bungee-bridge/build/libs/*.jar
