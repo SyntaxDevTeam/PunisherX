@@ -80,7 +80,7 @@ class PluginInitializer(private val plugin: PunisherX) {
             plugin.databaseHandler.openConnection()
             plugin.databaseHandler.createTables()
         }
-        plugin.logger.debug("Detected server: ${ServerEnvironment.platformName}")
+        plugin.logger.debug("Detected server: ${ServerEnvironment.platformName} (${ServerEnvironment.family})")
         if (ServerEnvironment.isFoliaBased()) {
             plugin.logger.debug("Detected Folia server, using async database connection handling.")
             plugin.server.globalRegionScheduler.execute(plugin, databaseSetupTask)
