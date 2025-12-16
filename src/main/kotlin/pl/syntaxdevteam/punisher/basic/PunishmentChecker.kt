@@ -41,16 +41,22 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         }
         val locationsConfigured = jailLoc != null && unjailLoc != null
         if (!locationsConfigured) {
-            plugin.logger.warning("Jail lub unjail location niezdefiniowane!")
+            plugin.logger.warning("Jail or unjail location undefined!")
         } else {
             plugin.schedulerAdapter.runAsync {
                 val punishments = plugin.databaseHandler.getPunishments(uuid.toString())
-                val isJailed = punishments.any { it.type == "JAIL" && plugin.punishmentManager.isPunishmentActive(it) }
+                val activeJail = punishments.firstOrNull { it.type == "JAIL" && plugin.punishmentManager.isPunishmentActive(it) }
+                val isJailed = activeJail != null
 
                 plugin.schedulerAdapter.runSync {
                     if (!player.isOnline) {
-                        plugin.logger.debug("Pomijam teleportację ${player.name}, gracz jest offline")
+                        plugin.logger.debug("Skipping teleportation of ${player.name}, player is offline")
                         return@runSync
+                    }
+
+                    if (isJailed && !plugin.cache.isPlayerInCache(uuid)) {
+                        plugin.cache.addOrUpdatePunishment(uuid, activeJail.end, player.location.clone())
+                        plugin.logger.debug("Restore jail sentence from database for player ${player.name} (end=${activeJail.end})")
                     }
 
                     val (targetLoc, targetMode) = when {
@@ -66,7 +72,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                     }
 
                     if (targetLoc.world == null) {
-                        plugin.logger.warning("Brak świata dla $targetLoc")
+                        plugin.logger.warning("Missing world for $targetLoc")
                         return@runSync
                     }
 
