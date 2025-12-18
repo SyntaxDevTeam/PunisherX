@@ -38,7 +38,11 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                     val start = System.currentTimeMillis()
                     val end: Long? = if (gtime != null) (System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
 
-                    plugin.databaseHandler.addPunishment(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    val success = plugin.databaseHandler.addPunishment(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    if (!success) {
+                        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
+                        return
+                    }
                     plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
 
                     val warnCount = plugin.databaseHandler.getActiveWarnCount(uuid.toString())
