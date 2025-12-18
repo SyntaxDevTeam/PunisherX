@@ -37,6 +37,8 @@ import java.io.File
 import java.util.*
 
 class PunisherX : JavaPlugin(), Listener {
+    @Volatile
+    var commandsRegistered: Boolean = false
     private lateinit var pluginInitializer: PluginInitializer
 
     lateinit var logger: Logger

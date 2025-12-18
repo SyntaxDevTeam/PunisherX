@@ -124,7 +124,10 @@ class PluginInitializer(private val plugin: PunisherX) {
     private fun registerCommands(){
         plugin.commandLoggerPlugin = CommandLoggerPlugin(plugin)
         plugin.commandManager = CommandManager(plugin)
+        if (plugin.commandsRegistered) return
+
         plugin.commandManager.registerCommands()
+        plugin.commandsRegistered = true
     }
 
     /**
