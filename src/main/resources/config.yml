@@ -1,4 +1,4 @@
-config-version: 161
+config-version: 162
 
 # /********************************************/
 #    Global settings
@@ -195,6 +195,29 @@ webhook:
   discord:
     enabled: false
     url: "YOUR_WEBHOOK_URL_HERE"
+    username: ""
+    avatar-url: ""
+    colors:
+      # Accepts integers (Discord decimal), hex with #/0x, or common names like red/orange/blue/black/white.
+      ban: 9447935
+      mute: 15158332
+      warn: 16753920
+      kick: 16776960
+      default: 8421504
+    embed:
+      thumbnail-url: ""
+      image-url: ""
+      author:
+        name: ""
+        icon-url: ""
+      footer:
+        icon-url: ""
+      fields:
+        player: true
+        operator: true
+        type: true
+        reason: true
+        time: true
 
 # Update check and auto-download settings.
 update:

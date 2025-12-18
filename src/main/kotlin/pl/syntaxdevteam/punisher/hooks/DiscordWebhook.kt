@@ -18,9 +18,38 @@ import java.util.concurrent.CompletableFuture
 class DiscordWebhook(plugin: PunisherX) {
     private val webhookUrl: String = plugin.config.getString("webhook.discord.url") ?: ""
     private val enabled: Boolean = plugin.config.getBoolean("webhook.discord.enabled", false)
+    private val webhookSection = plugin.config.getConfigurationSection("webhook.discord")
+    private val embedSection = webhookSection?.getConfigurationSection("embed")
+    private val fieldsSection = embedSection?.getConfigurationSection("fields")
+    private val colorSection = webhookSection?.getConfigurationSection("colors")
     private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
     private val log = plugin.logger
     private val mh = plugin.messageHandler
+
+    private val namedColors = mapOf(
+        "black" to 0x000000,
+        "white" to 0xFFFFFF,
+        "red" to 0xFF0000,
+        "green" to 0x00FF00,
+        "blue" to 0x0000FF,
+        "yellow" to 0xFFFF00,
+        "orange" to 0xFFA500,
+        "purple" to 0x800080,
+        "pink" to 0xFFC0CB,
+        "cyan" to 0x00FFFF,
+        "magenta" to 0xFF00FF,
+        "gray" to 0x808080,
+        "grey" to 0x808080,
+        "brown" to 0xA52A2A,
+    )
+
+    private val defaultColors = mapOf(
+        "ban" to 9447935,
+        "mute" to 15158332,
+        "warn" to 16753920,
+        "kick" to 16776960,
+        "default" to 8421504,
+    )
 
     /**
      * Sends a punishment notification to a Discord channel
@@ -46,12 +75,26 @@ class DiscordWebhook(plugin: PunisherX) {
             return
         }
 
-        val fields = JsonArray().apply {
-            add(createField(mh.stringMessageToStringNoPrefix("webhook", "player"), playerName, true))
-            add(createField(mh.stringMessageToStringNoPrefix("webhook", "operator"), adminName, true))
-            add(createField(mh.stringMessageToStringNoPrefix("webhook", "type"), type.uppercase(), true))
-            add(createField(mh.stringMessageToStringNoPrefix("webhook", "reason"), reason, false))
-            add(createField(mh.stringMessageToStringNoPrefix("webhook", "time"), formatDuration(duration), true))
+        val fields = JsonArray()
+
+        if (fieldsSection?.getBoolean("player", true) != false) {
+            fields.add(createField(mh.stringMessageToStringNoPrefix("webhook", "player"), playerName, true))
+        }
+
+        if (fieldsSection?.getBoolean("operator", true) != false) {
+            fields.add(createField(mh.stringMessageToStringNoPrefix("webhook", "operator"), adminName, true))
+        }
+
+        if (fieldsSection?.getBoolean("type", true) != false) {
+            fields.add(createField(mh.stringMessageToStringNoPrefix("webhook", "type"), type.uppercase(), true))
+        }
+
+        if (fieldsSection?.getBoolean("reason", true) != false) {
+            fields.add(createField(mh.stringMessageToStringNoPrefix("webhook", "reason"), reason, false))
+        }
+
+        if (fieldsSection?.getBoolean("time", true) != false) {
+            fields.add(createField(mh.stringMessageToStringNoPrefix("webhook", "time"), formatDuration(duration), true))
         }
 
         val embed = JsonObject().apply {
@@ -61,10 +104,35 @@ class DiscordWebhook(plugin: PunisherX) {
             add("fields", fields)
             add("footer", JsonObject().apply {
                 addProperty("text", "${mh.stringMessageToStringNoPrefix("webhook", "app_name")}${LocalDateTime.now().format(formatter)}")
+                embedSection?.getString("footer.icon-url")?.takeIf { it.isNotBlank() }?.let { iconUrl ->
+                    addProperty("icon_url", iconUrl)
+                }
             })
+
+            embedSection?.getConfigurationSection("author")?.let { authorSection ->
+                val authorObject = JsonObject()
+
+                authorSection.getString("name")?.takeIf { it.isNotBlank() }
+                    ?.let { authorObject.addProperty("name", it) }
+                authorSection.getString("icon-url")?.takeIf { it.isNotBlank() }
+                    ?.let { authorObject.addProperty("icon_url", it) }
+                if (authorObject.entrySet().isNotEmpty()) {
+                    add("author", authorObject)
+                }
+            }
+
+            embedSection?.getString("thumbnail-url")?.takeIf { it.isNotBlank() }?.let { url ->
+                add("thumbnail", JsonObject().apply { addProperty("url", url) })
+            }
+
+            embedSection?.getString("image-url")?.takeIf { it.isNotBlank() }?.let { url ->
+                add("image", JsonObject().apply { addProperty("url", url) })
+            }
         }
 
         val json = JsonObject().apply {
+            webhookSection?.getString("username")?.takeIf { it.isNotBlank() }?.let { addProperty("username", it) }
+            webhookSection?.getString("avatar-url")?.takeIf { it.isNotBlank() }?.let { addProperty("avatar_url", it) }
             add("embeds", JsonArray().apply {
                 add(embed)
             })
@@ -83,23 +151,48 @@ class DiscordWebhook(plugin: PunisherX) {
     }
 
     private fun getColorForPunishmentType(type: String): Int {
-        return when (type.lowercase()) {
-            "ban" -> 9447935 // Purple
-            "mute" -> 15158332 // Red
-            "warn" -> 16753920 // Orange
-            "kick" -> 16776960 // Yellow
-            else -> 8421504 // Gray
-        }
+        val key = type.lowercase()
+        val color = getColorValue(key) ?: getColorValue("default") ?: defaultColors[key]
+        return color ?: defaultColors.getValue("default")
     }
 
     private fun formatDuration(duration: Long): String {
-        return if (duration == -1L) "PERMANENT" else {
+        return if (duration == -1L) {
+            mh.stringMessageToStringNoPrefix("formatTime", "undefined")
+        } else {
             val dateTime = LocalDateTime.ofInstant(
                 Instant.ofEpochMilli(duration),
                 ZoneId.systemDefault()
             )
             dateTime.format(formatter)
         }
+    }
+
+    private fun getColorValue(type: String): Int? {
+        val value = colorSection?.get(type) ?: return null
+
+        return when (value) {
+            is Number -> value.toInt()
+            is String -> parseColorString(value)
+            else -> null
+        }
+    }
+
+    private fun parseColorString(raw: String): Int? {
+        val trimmed = raw.trim()
+        if (trimmed.isEmpty()) return null
+
+        val lower = trimmed.lowercase()
+        namedColors[lower]?.let { return it }
+
+        val normalized = lower
+            .removePrefix("#")
+            .removePrefix("0x")
+
+        normalized.toIntOrNull(16)?.let { return it }
+        normalized.toIntOrNull()?.let { return it }
+
+        return null
     }
 
     private fun sendWebhook(content: String) {

@@ -50,6 +50,10 @@ This page explains every configurable option in `config.yml`, how to tune it, an
 ## Integrations and updates
 - `geoDatabase.licenseKey` — MaxMind key for GeoIP lookups.
 - `webhook.discord.enabled` / `url` — toggle Discord webhook notifications.
+- `webhook.discord.username` / `avatar-url` — override the webhook username and avatar.
+- `webhook.discord.colors.*` — per-punishment embed colors with a `default` fallback; accepts Discord decimal values, hex (with `#` or `0x`), or basic names like `red`, `orange`, `blue`, `white`, `black`.
+- `webhook.discord.embed.thumbnail-url` / `image-url` / `author.*` / `footer.icon-url` — control embed visuals.
+- `webhook.discord.embed.fields.*` — toggle which fields (player, operator, type, reason, time) appear in the embed.
 - `update.check-for-updates` / `auto-download` — control update checking and auto-downloads; `hangar`, `github`, `modrinth` flags choose sources.
 
 ## Debugging and telemetry

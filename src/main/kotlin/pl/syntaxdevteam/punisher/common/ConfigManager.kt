@@ -19,6 +19,7 @@ class ConfigManager(private val plugin: PunisherX) {
         private const val V_141 = 141
         private const val V_160 = 160
         private const val V_161 = 161
+        private const val V_162 = 162
     }
 
     lateinit var config: YamlDocument
@@ -43,7 +44,7 @@ class ConfigManager(private val plugin: PunisherX) {
 
         val sourceVersion = detectSourceVersion(rawUserDoc)
 
-        if (sourceVersion < V_161 && dataFile.exists()) {
+        if (sourceVersion < V_162 && dataFile.exists()) {
             val bak = File(dataFile.parentFile, "$FILE_NAME.$sourceVersion.bak")
             try {
                 Files.copy(dataFile.toPath(), bak.toPath(), StandardCopyOption.REPLACE_EXISTING)
@@ -68,7 +69,7 @@ class ConfigManager(private val plugin: PunisherX) {
 
         migrateFrom(sourceVersion)
 
-        config.set(VERSION_KEY, V_161)
+        config.set(VERSION_KEY, V_162)
         config.save()
         plugin.logger.success("[Config] Done. Current version: ${config.getInt(VERSION_KEY)}")
     }
@@ -87,11 +88,11 @@ class ConfigManager(private val plugin: PunisherX) {
         val guessed = guessVersionFromComment()
         if (guessed != null) return guessed
 
-        return if (doc == null) V_161 else V_141
+        return if (doc == null) V_162 else V_141
     }
 
     private fun migrateFrom(sourceVersion: Int) {
-        if (sourceVersion >= V_161) return
+        if (sourceVersion >= V_162) return
 
         if (sourceVersion <= V_104) {
             plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_104 …")
@@ -103,6 +104,8 @@ class ConfigManager(private val plugin: PunisherX) {
         }
         plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_161 …")
         migrate160to161()
+        plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_162 …")
+        migrate161to162()
     }
 
     private fun migrate104to160() {
@@ -219,6 +222,35 @@ class ConfigManager(private val plugin: PunisherX) {
         if (!config.contains("placeholders.message_format")) {
             config.set("placeholders.message_format", "MINI_MESSAGE")
         }
+    }
+
+    private fun migrate161to162() {
+        fun setIfMissing(path: String, value: Any) {
+            if (!config.contains(path)) {
+                config.set(path, value)
+            }
+        }
+
+        setIfMissing("webhook.discord.username", "")
+        setIfMissing("webhook.discord.avatar-url", "")
+
+        setIfMissing("webhook.discord.colors.ban", 9447935)
+        setIfMissing("webhook.discord.colors.mute", 15158332)
+        setIfMissing("webhook.discord.colors.warn", 16753920)
+        setIfMissing("webhook.discord.colors.kick", 16776960)
+        setIfMissing("webhook.discord.colors.default", 8421504)
+
+        setIfMissing("webhook.discord.embed.thumbnail-url", "")
+        setIfMissing("webhook.discord.embed.image-url", "")
+        setIfMissing("webhook.discord.embed.author.name", "")
+        setIfMissing("webhook.discord.embed.author.icon-url", "")
+        setIfMissing("webhook.discord.embed.footer.icon-url", "")
+
+        setIfMissing("webhook.discord.embed.fields.player", true)
+        setIfMissing("webhook.discord.embed.fields.operator", true)
+        setIfMissing("webhook.discord.embed.fields.type", true)
+        setIfMissing("webhook.discord.embed.fields.reason", true)
+        setIfMissing("webhook.discord.embed.fields.time", true)
     }
 
     // ================= HELPERS =================
