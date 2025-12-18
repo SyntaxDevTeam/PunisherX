@@ -60,10 +60,18 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             }
 
             args[0].equals("reload", ignoreCase = true) -> {
-                plugin.onReload()
-                stack.sender.sendMessage(
-                    mH.miniMessageFormat("$prefix <green>PunisherX has been reloaded.</green>")
-                )
+                runCatching { plugin.onReload() }
+                    .onSuccess {
+                        stack.sender.sendMessage(
+                            mH.miniMessageFormat("$prefix <green>PunisherX has been reloaded.</green>")
+                        )
+                    }
+                    .onFailure { throwable ->
+                        plugin.logger.err("[Reload] Failed to reload PunisherX: ${throwable.message ?: throwable::class.simpleName}")
+                        stack.sender.sendMessage(
+                            mH.miniMessageFormat("$prefix <red>Failed to reload PunisherX. Check console for details.</red>")
+                        )
+                    }
             }
 
             args[0].equals("export", ignoreCase = true) -> {

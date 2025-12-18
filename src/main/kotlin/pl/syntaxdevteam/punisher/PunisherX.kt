@@ -3,6 +3,7 @@ package pl.syntaxdevteam.punisher
 import io.papermc.paper.event.player.AsyncChatEvent
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
@@ -118,6 +119,9 @@ class PunisherX : JavaPlugin(), Listener {
      */
     private fun reloadMyConfig() {
         pluginInitializer.onDisable()
+        server.scheduler.cancelTasks(this)
+        runCatching { proxyBridgeMessenger.unregisterChannel() }
+        HandlerList.unregisterAll(this as Plugin)
         reloadConfig()
         pluginInitializer = PluginInitializer(this)
         pluginInitializer.onEnable()
