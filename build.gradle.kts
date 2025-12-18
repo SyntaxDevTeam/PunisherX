@@ -2,7 +2,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.3.0-RC2"
+    kotlin("jvm") version "2.3.0"
     id("com.gradleup.shadow") version "9.3.0"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
@@ -40,7 +40,7 @@ repositories {
     }
 }
 
-val mockitoAgent by configurations.creating
+val mockitoAgent: Configuration by configurations.creating
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
