@@ -43,7 +43,7 @@ setunjail:
 
 # /jail command messages
 jail:
-  jail: "<green>You jailed player <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green>"
+  jail: "<green>You jailed player <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct usage: <gold>/jail <player_name> (time) <reason>"
   jail_message: "<red>You have been jailed for <b><reason></b> for <b><time></b></red>"
   teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
@@ -79,7 +79,7 @@ unjail:
 
 # /ban command messages
 ban:
-  ban: "<green>You banned <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green>"
+  ban: "<green>You banned <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct usage: <gold>/ban <player_name> (time) <reason>"
   kick_message:
     # You can freely customize the message shown to the banned player
@@ -111,7 +111,7 @@ ban:
 
 # /banip command messages
 banip:
-  ban: "<green>You banned a player's IP for <gold><reason></gold> for <gold><time></gold></green>"
+  ban: "<green>You banned a player's IP for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct usage: <gold>/banip <player|ip> (time) <reason>"
   kick_message:
     # You can freely customize the message shown to the banned player
@@ -140,7 +140,7 @@ unban:
 
 # /mute command messages
 mute:
-  mute: "<green>You muted player <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green>"
+  mute: "<green>You muted player <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct usage: <gold>/mute <player_name> (time) <reason>"
   mute_message: "<red>You have been muted for <b><reason></b> for <b><time></b></red>"
   mute_info_message: "<red>You are trying to speak, but you are still muted for <time>.</red>"
@@ -170,7 +170,7 @@ unmute:
 
 # /warn command messages
 warn:
-  warn: "<green>You warned (<warn_no> time) <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green>"
+  warn: "<green>You warned (<warn_no> time) <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct usage: <gold>/warn <player_name> (time) <reason>"
   warn_message: "<red>You received a <b><warn_no></b> warning!</red>"
   broadcast: "<dark_gray>Player <gray><player></gray> received a warning for <gray><reason></gray> for <gray><time></gray></dark_gray>"

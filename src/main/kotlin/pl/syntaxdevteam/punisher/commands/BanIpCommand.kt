@@ -64,28 +64,35 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
         val start = System.currentTimeMillis()
         val end = durationSec?.let { start + it * 1000 }
         val formattedTime = plugin.timeHandler.formatTime(timeArg)
-        val placeholders = mapOf(
-            "player" to rawTarget,
-            "operator" to stack.sender.name,
-            "reason" to reason,
-            "time" to formattedTime,
-            "type" to "BANIP"
-        )
-
         var dbError = false
         val normalizedEnd = end ?: -1
+        val punishmentIds = mutableListOf<Long>()
         playerIPs.distinct().forEach { ip ->
-            val success = plugin.databaseHandler.addPunishment(rawTarget, ip, reason, stack.sender.name,
+            val punishmentId = plugin.databaseHandler.addPunishment(rawTarget, ip, reason, stack.sender.name,
                 "BANIP", start, normalizedEnd)
-            if (!success) {
+            if (punishmentId == null) {
                 plugin.logger.err("DB error ban-ip $ip")
                 dbError = true
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban-ip $ip")
+            } else {
+                punishmentIds.add(punishmentId)
             }
             plugin.databaseHandler.addPunishmentHistory(rawTarget, ip, reason, stack.sender.name,
                 "BANIP", start, normalizedEnd)
             plugin.proxyBridgeMessenger.notifyIpBan(ip, reason, normalizedEnd)
         }
+        val placeholders = mapOf(
+            "player" to rawTarget,
+            "operator" to stack.sender.name,
+            "reason" to reason,
+            "time" to formattedTime,
+            "type" to "BANIP",
+            "id" to when {
+                punishmentIds.isEmpty() -> "?"
+                punishmentIds.size == 1 -> punishmentIds.first().toString()
+                else -> punishmentIds.joinToString(",")
+            }
+        )
         clp.logCommand(stack.sender.name, "BANIP", rawTarget, reason)
         if (dbError) stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
 

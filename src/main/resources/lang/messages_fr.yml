@@ -34,7 +34,7 @@ setunjail:
 
 # Messages de la commande /jail
 jail:
-  jail: "<green>Vous avez emprisonné le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
+  jail: "<green>Vous avez emprisonné le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Utilisation correcte : <gold>/jail <pseudo> (durée) <raison>"
   jail_message: "<red>Vous avez été emprisonné pour <b><reason></b> pendant <b><time></b></red>"
   teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
@@ -70,7 +70,7 @@ unjail:
 
 # Messages de la commande /ban
 ban:
-  ban: "<green>Vous avez banni <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
+  ban: "<green>Vous avez banni <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Utilisation correcte : <gold>/ban <pseudo> (durée) <raison>"
   kick_message:
     # Vous pouvez personnaliser le message affiché au joueur banni
@@ -102,7 +102,7 @@ ban:
 
 # Messages de la commande /banip
 banip:
-  ban: "<green>Vous avez banni l’IP du joueur pour <gold><reason></gold> pendant <gold><time></gold></green>"
+  ban: "<green>Vous avez banni l’IP du joueur pour <gold><reason></gold> pendant <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Utilisation correcte : <gold>/banip <joueur|ip> (durée) <raison>"
   kick_message:
     # Vous pouvez personnaliser le message affiché au joueur banni
@@ -130,7 +130,7 @@ unban:
   broadcast: "<dark_gray>Le joueur <gray><player></gray> a été débanni</dark_gray>"
 # Messages de la commande /mute
 mute:
-  mute: "<green>Vous avez réduit au silence le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
+  mute: "<green>Vous avez réduit au silence le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Utilisation correcte : <gold>/mute <pseudo> (durée) <raison>"
   mute_message: "<red>Vous avez été réduit au silence pour <b><reason></b> pendant <b><time></b></red>"
   mute_info_message: "<red>Vous essayez de parler, mais vous êtes encore réduit au silence pendant <time>.</red>"
@@ -160,7 +160,7 @@ unmute:
 
 # Messages de la commande /warn
 warn:
-  warn: "<green>Vous avez averti (<warn_no> fois) le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
+  warn: "<green>Vous avez averti (<warn_no> fois) le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Utilisation correcte : <gold>/warn <pseudo> (durée) <raison>"
   warn_message: "<red>Vous avez reçu un avertissement n°<b><warn_no></b> !</red>"
   broadcast: "<dark_gray>Le joueur <gray><player></gray> a reçu un avertissement pour <gray><reason></gray> pendant <gray><time></gray></dark_gray>"

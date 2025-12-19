@@ -34,7 +34,7 @@ setunjail:
 
 # Wiadomości komendy /jail
 jail:
-  jail: "<green>Zamknąłeś gracza <gold><player></gold> w więzieniu za <gold><reason></gold> na czas <gold><time></gold></green>"
+  jail: "<green>Zamknąłeś gracza <gold><player></gold> w więzieniu za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Poprawne użycie to: <gold>/jail <nazwa_gracza> (czas) <powód>"
   jail_message: "<red>Zostałeś/aś zesłany/a do więzienia za <b><reason></b> na czas <b><time></b></red>"
   teleport_failed: "<red>Teleportacja przerwana: skonfigurowana lokalizacja więzienia jest niebezpieczna.</red>"
@@ -70,7 +70,7 @@ unjail:
 
 # Wiadomości komendy /ban
 ban:
-  ban: "<green>Zbanowałeś <gold><player></gold> za <gold><reason></gold> na czas <gold><time></gold></green>"
+  ban: "<green>Zbanowałeś <gold><player></gold> za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Poprawne użycie to: <gold>/ban <nazwa_gracza> (czas) <powód>"
   kick_message:
     # Możesz dowolnie dostosować komunikat dla wyrzuconego gracza
@@ -102,7 +102,7 @@ ban:
 
 # Wiadomości komendy /banip
 banip:
-  ban: "<green>Zbanowałeś IP gracza za <gold><reason></gold> na czas <gold><time></gold></green>"
+  ban: "<green>Zbanowałeś IP gracza za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Poprawne użycie to: <gold>/banip <player|ip> (czas) <powód>"
   kick_message:
     # Możesz dowolnie dostosować komunikat dla wyrzuconego gracza
@@ -131,7 +131,7 @@ unban:
 
 # Wiadomości komendy /mute
 mute:
-  mute: "<green>Wyciszyłeś gracza <gold><player></gold> za <gold><reason></gold> na czas <gold><time></gold></green>"
+  mute: "<green>Wyciszyłeś gracza <gold><player></gold> za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Poprawne użycie to: <gold>/mute <nazwa_gracza> (time) <reason>"
   mute_message: "<red>Zostałeś/aś wyciszony/a za <b><reason></b> na czas <b><time></b></red>"
   mute_info_message: "<red>Próbujesz coś powiedzieć, ale jesteś wyciszony/a jeszcze przez <time>.</red>"
@@ -161,7 +161,7 @@ unmute:
 
 # Wiadomości komendy /warn
 warn:
-  warn: "<green>Ostrzegłeś (<warn_no> raz) <gold><player></gold> za <gold><reason></gold> na czas <gold><time></gold></green>"
+  warn: "<green>Ostrzegłeś (<warn_no> raz) <gold><player></gold> za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Poprawne użycie to: <gold>/warn <nazwa_gracza> (czas) <powód>"
   warn_message: "<red>Dostałeś/aś <b><warn_no></b> ostrzeżenie!</red>"
   broadcast: "<dark_gray>Gracz <gray><player></gray> otrzymał ostrzeżenie za <gray><reason></gray> na czas <gray><time></gray></dark_gray>"

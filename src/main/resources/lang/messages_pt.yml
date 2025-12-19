@@ -34,7 +34,7 @@ setunjail:
 
 # Mensagens do comando /jail
 jail:
-  jail: "<green>Você prendeu o jogador <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green>"
+  jail: "<green>Você prendeu o jogador <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Uso correto: <gold>/jail <nome_do_jogador> (tempo) <motivo>"
   jail_message: "<red>Você foi preso por <b><reason></b> durante <b><time></b></red>"
   teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
@@ -70,7 +70,7 @@ unjail:
 
 # Mensagens do comando /ban
 ban:
-  ban: "<green>Você baniu <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green>"
+  ban: "<green>Você baniu <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Uso correto: <gold>/ban <nome_do_jogador> (tempo) <motivo>"
   kick_message:
     # Você pode personalizar a mensagem exibida para o jogador banido
@@ -102,7 +102,7 @@ ban:
 
 # Mensagens do comando /banip
 banip:
-  ban: "<green>Você baniu o IP do jogador por <gold><reason></gold> durante <gold><time></gold></green>"
+  ban: "<green>Você baniu o IP do jogador por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Uso correto: <gold>/banip <jogador|ip> (tempo) <motivo>"
   kick_message:
     # Você pode personalizar a mensagem exibida para o jogador banido
@@ -130,7 +130,7 @@ unban:
   broadcast: "<dark_gray>O jogador <gray><player></gray> foi desbanido</dark_gray>"
 # Mensagens do comando /mute
 mute:
-  mute: "<green>Você silenciou o jogador <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green>"
+  mute: "<green>Você silenciou o jogador <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Uso correto: <gold>/mute <nome_do_jogador> (tempo) <motivo>"
   mute_message: "<red>Você foi silenciado por <b><reason></b> durante <b><time></b></red>"
   mute_info_message: "<red>Você tenta falar, mas ainda está silenciado por <time>.</red>"
@@ -160,7 +160,7 @@ unmute:
 
 # Mensagens do comando /warn
 warn:
-  warn: "<green>Você advertiu (<warn_no> vez) o jogador <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green>"
+  warn: "<green>Você advertiu (<warn_no> vez) o jogador <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Uso correto: <gold>/warn <nome_do_jogador> (tempo) <motivo>"
   warn_message: "<red>Você recebeu o aviso nº <b><warn_no></b>!</red>"
   broadcast: "<dark_gray>O jogador <gray><player></gray> recebeu um aviso por <gray><reason></gray> durante <gray><time></gray></dark_gray>"

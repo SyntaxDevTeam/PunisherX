@@ -36,7 +36,7 @@ setunjail:
 
 # رسائل أمر /jail
 jail:
-  jail: "<green>لقد سجنت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
+  jail: "<green>لقد سجنت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "الاستخدام الصحيح: <gold>/jail <player_name> (المدة) <السبب>"
   jail_message: "<red>لقد تم سجنك بسبب <b><reason></b> لمدة <b><time></b></red>"
   teleport_failed: "<red>تم إلغاء النقل: موقع السجن المحدد غير آمن.</red>"
@@ -72,7 +72,7 @@ unjail:
 
 # رسائل أمر /ban
 ban:
-  ban: "<green>لقد حظرت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
+  ban: "<green>لقد حظرت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "الاستخدام الصحيح: <gold>/ban <player_name> (المدة) <السبب>"
   kick_message:
     - "اسم الخادم"
@@ -104,7 +104,7 @@ ban:
 
 # رسائل أمر /banip
 banip:
-  ban: "<green>لقد حظرت عنوان IP الخاص باللاعب بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
+  ban: "<green>لقد حظرت عنوان IP الخاص باللاعب بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "الاستخدام الصحيح: <gold>/banip <player|ip> (المدة) <السبب>"
   kick_message:
     - "اسم الخادم"
@@ -132,7 +132,7 @@ unban:
 
 # /mute command messages
 mute:
-  mute: "<green>لقد كمّمت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
+  mute: "<green>لقد كمّمت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "الاستخدام الصحيح: <gold>/mute <player_name> (المدة) <السبب>"
   mute_message: "<red>لقد تم كمّك بسبب <b><reason></b> لمدة <b><time></b></red>"
   mute_info_message: "<red>تحاول التحدث، ولكنك لا تزال مكمومًا لمدة <time>.</red>"
@@ -163,7 +163,7 @@ unmute:
 
 # رسائل أمر /warn
 warn:
-  warn: "<green>لقد حذّرت (<warn_no> مرة) اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
+  warn: "<green>لقد حذّرت (<warn_no> مرة) اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "الاستخدام الصحيح: <gold>/warn <player_name> (المدة) <السبب>"
   warn_message: "<red>لقد تلقيت تحذيرًا رقم <b><warn_no></b>!</red>"
   broadcast: "<dark_gray>اللاعب <gray><player></gray> تلقى تحذيرًا بسبب <gray><reason></gray> لمدة <gray><time></gray></dark_gray>"

@@ -5,6 +5,7 @@ import pl.syntaxdevteam.core.database.*
 import pl.syntaxdevteam.punisher.PunisherX
 import java.io.File
 import java.io.IOException
+import java.sql.Statement
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -183,26 +184,82 @@ class DatabaseHandler(private val plugin: PunisherX) {
         punishmentType: String,
         start: Long,
         end: Long
-    ): Boolean {
+    ): Long? {
         return try {
-            execute(
-                """
+            val insertSql = """
                 INSERT INTO punishments (name, uuid, reason, operator, punishmentType, start, endTime)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-                """.trimIndent(),
-                name, uuid, reason, operator, punishmentType, start, end
-            )
-            plugin.discordWebhook.sendPunishmentWebhook(
-                playerName = name,
-                adminName = operator,
-                reason = reason,
-                type = punishmentType,
-                duration = end
-            )
-            true
+            """.trimIndent()
+            val punishmentId = db.getConnection().use { connection ->
+                when (dbType) {
+                    DatabaseType.POSTGRESQL, DatabaseType.SQLITE, DatabaseType.H2 -> {
+                        val sql = "$insertSql RETURNING id"
+                        connection.prepareStatement(sql).use { statement ->
+                            statement.setString(1, name)
+                            statement.setString(2, uuid)
+                            statement.setString(3, reason)
+                            statement.setString(4, operator)
+                            statement.setString(5, punishmentType)
+                            statement.setLong(6, start)
+                            statement.setLong(7, end)
+                            statement.executeQuery().use { resultSet ->
+                                if (resultSet.next()) resultSet.getLong(1) else null
+                            }
+                        }
+                    }
+                    DatabaseType.MYSQL, DatabaseType.MARIADB -> {
+                        connection.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS).use { statement ->
+                            statement.setString(1, name)
+                            statement.setString(2, uuid)
+                            statement.setString(3, reason)
+                            statement.setString(4, operator)
+                            statement.setString(5, punishmentType)
+                            statement.setLong(6, start)
+                            statement.setLong(7, end)
+                            val rows = statement.executeUpdate()
+                            if (rows == 0) {
+                                null
+                            } else {
+                                statement.generatedKeys.use { resultSet ->
+                                    if (resultSet.next()) resultSet.getLong(1) else null
+                                }
+                            }
+                        }
+                    }
+                    else -> {
+                        connection.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS).use { statement ->
+                            statement.setString(1, name)
+                            statement.setString(2, uuid)
+                            statement.setString(3, reason)
+                            statement.setString(4, operator)
+                            statement.setString(5, punishmentType)
+                            statement.setLong(6, start)
+                            statement.setLong(7, end)
+                            val rows = statement.executeUpdate()
+                            if (rows == 0) {
+                                null
+                            } else {
+                                statement.generatedKeys.use { resultSet ->
+                                    if (resultSet.next()) resultSet.getLong(1) else null
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (punishmentId != null) {
+                plugin.discordWebhook.sendPunishmentWebhook(
+                    playerName = name,
+                    adminName = operator,
+                    reason = reason,
+                    type = punishmentType,
+                    duration = end
+                )
+            }
+            punishmentId
         } catch (e: Exception) {
             logger.err("Failed to add punishment for player $name. ${e.message}")
-            false
+            null
         }
     }
 

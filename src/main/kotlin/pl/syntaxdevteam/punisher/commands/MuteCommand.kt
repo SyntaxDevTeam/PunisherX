@@ -47,8 +47,8 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                     val start = System.currentTimeMillis()
                     val end: Long? = if (gtime != null) (System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
 
-                    val success = plugin.databaseHandler.addPunishment(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
-                    if (!success) {
+                    val punishmentId = plugin.databaseHandler.addPunishment(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    if (punishmentId == null) {
                         stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
                         return
                     }
@@ -60,7 +60,8 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                         "operator" to stack.sender.name,
                         "reason" to reason,
                         "time" to formattedTime,
-                        "type" to punishmentType
+                        "type" to punishmentType,
+                        "id" to punishmentId.toString()
                     )
                     plugin.messageHandler.getSmartMessage(
                         "mute",

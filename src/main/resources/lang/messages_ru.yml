@@ -31,7 +31,7 @@ setunjail:
 
 # Сообщения команды /jail
 jail:
-  jail: "<green>Вы посадили игрока <gold><player></gold> в тюрьму за <gold><reason></gold> на <gold><time></gold></green>"
+  jail: "<green>Вы посадили игрока <gold><player></gold> в тюрьму за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильное использование: <gold>/jail <игрок> (время) <причина>"
   jail_message: "<red>Вы были посажены в тюрьму за <b><reason></b> на <b><time></b></red>"
   teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
@@ -67,7 +67,7 @@ unjail:
 
 # Сообщения команды /ban
 ban:
-  ban: "<green>Вы забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  ban: "<green>Вы забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильное использование: <gold>/ban <игрок> (время) <причина>"
   kick_message:
     # Вы можете настроить сообщение для выгнанного игрока
@@ -99,7 +99,7 @@ ban:
 
 # Сообщения команды /banip
 banip:
-  ban: "<green>Вы забанили IP игрока за <gold><reason></gold> на <gold><time></gold></green>"
+  ban: "<green>Вы забанили IP игрока за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильное использование: <gold>/banip <игрок|ip> (время) <причина>"
   kick_message:
     # Вы можете настроить сообщение для выгнанного игрока
@@ -128,7 +128,7 @@ unban:
 
 # Сообщения команды /mute
 mute:
-  mute: "<green>Вы заглушили игрока <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  mute: "<green>Вы заглушили игрока <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильное использование: <gold>/mute <игрок> (время) <причина>"
   mute_message: "<red>Вы были заглушены за <b><reason></b> на <b><time></b></red>"
   mute_info_message: "<red>Вы пытаетесь говорить, но вы заглушены ещё <time>.</red>"
@@ -158,7 +158,7 @@ unmute:
 
 # Сообщения команды /warn
 warn:
-  warn: "<green>Вы выдали предупреждение (<warn_no> раз) игроку <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  warn: "<green>Вы выдали предупреждение (<warn_no> раз) игроку <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильное использование: <gold>/warn <игрок> (время) <причина>"
   warn_message: "<red>Вы получили <b><warn_no></b> предупреждение!</red>"
   broadcast: "<dark_gray>Игрок <gray><player></gray> получил предупреждение за <gray><reason></gray> на <gray><time></gray></dark_gray>"

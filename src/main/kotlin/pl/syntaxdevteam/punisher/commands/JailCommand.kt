@@ -66,7 +66,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         plugin.logger.debug("<yellow>Jail location: ${jailLocation}</yellow>")
 
         val formattedTime = plugin.timeHandler.formatTime(gtime)
-        val placeholders = mapOf(
+        val basePlaceholders = mapOf(
             "player" to playerName,
             "operator" to stack.sender.name,
             "reason" to reason,
@@ -75,13 +75,14 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         )
 
         fun finalizePunishment() {
-            val success = plugin.databaseHandler.addPunishment(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
-            if (!success) {
+            val punishmentId = plugin.databaseHandler.addPunishment(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+            if (punishmentId == null) {
                 stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
                 return
             }
             plugin.databaseHandler.addPunishmentHistory(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
             plugin.cache.addOrUpdatePunishment(uuid, end ?: -1, previousLocation)
+            val placeholders = basePlaceholders + ("id" to punishmentId.toString())
 
             targetPlayer?.sendMessage(
                 plugin.messageHandler.stringMessageToComponent(
