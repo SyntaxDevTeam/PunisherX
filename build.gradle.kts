@@ -43,7 +43,7 @@ repositories {
 val mockitoAgent: Configuration by configurations.creating
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     //compileOnly("org.leavesmc.leaves:leaves-api:1.21.10-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
@@ -53,12 +53,12 @@ dependencies {
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.5")
     compileOnly("com.google.code.gson:gson:2.13.2")
-    compileOnly("net.kyori:adventure-text-serializer-legacy:4.25.0")
-    compileOnly("net.kyori:adventure-text-minimessage:4.25.0")
-    compileOnly("net.kyori:adventure-text-serializer-gson:4.25.0")
-    compileOnly("net.kyori:adventure-text-serializer-plain:4.25.0")
-    compileOnly("net.kyori:adventure-text-serializer-ansi:4.25.0")
-    compileOnly("net.kyori:adventure-nbt:4.25.0")
+    compileOnly("net.kyori:adventure-text-serializer-legacy:4.26.1")
+    compileOnly("net.kyori:adventure-text-minimessage:4.26.1")
+    compileOnly("net.kyori:adventure-text-serializer-gson:4.26.1")
+    compileOnly("net.kyori:adventure-text-serializer-plain:4.26.1")
+    compileOnly("net.kyori:adventure-text-serializer-ansi:4.26.1")
+    compileOnly("net.kyori:adventure-nbt:4.26.1")
     compileOnly("com.maxmind.geoip2:geoip2:5.0.2")
     compileOnly("org.apache.ant:ant:1.10.15")
     compileOnly("com.zaxxer:HikariCP:7.0.2")
@@ -74,7 +74,7 @@ dependencies {
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
 
     testImplementation(kotlin("test"))
-    testImplementation("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
+    testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     testImplementation("org.mockito:mockito-core:5.20.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:6.1.0")

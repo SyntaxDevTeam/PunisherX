@@ -240,17 +240,48 @@ class ConfigManager(private val plugin: PunisherX) {
         setIfMissing("webhook.discord.colors.kick", 16776960)
         setIfMissing("webhook.discord.colors.default", 8421504)
 
+        setIfMissing("webhook.discord.embed.title", "Event Title")
+        setIfMissing("webhook.discord.embed.description", "Administrator {operator} {type} {player} for {reason} for {time}")
+        setIfMissing("webhook.discord.embed.url", "https://example.com")
+        setIfMissing("webhook.discord.embed.timestamp", "")
         setIfMissing("webhook.discord.embed.thumbnail-url", "")
         setIfMissing("webhook.discord.embed.image-url", "")
         setIfMissing("webhook.discord.embed.author.name", "")
         setIfMissing("webhook.discord.embed.author.icon-url", "")
+        setIfMissing("webhook.discord.embed.footer.text", "")
         setIfMissing("webhook.discord.embed.footer.icon-url", "")
 
-        setIfMissing("webhook.discord.embed.fields.player", true)
-        setIfMissing("webhook.discord.embed.fields.operator", true)
-        setIfMissing("webhook.discord.embed.fields.type", true)
-        setIfMissing("webhook.discord.embed.fields.reason", true)
-        setIfMissing("webhook.discord.embed.fields.time", true)
+        val existingFields = config.get("webhook.discord.embed.fields")
+        if (existingFields is Section) {
+            val fields = mutableListOf<Map<String, Any>>()
+            if (existingFields.getBoolean("player", true)) {
+                fields.add(mapOf("name" to "Player", "value" to "{player}", "inline" to true))
+            }
+            if (existingFields.getBoolean("operator", true)) {
+                fields.add(mapOf("name" to "Operator", "value" to "{operator}", "inline" to true))
+            }
+            if (existingFields.getBoolean("type", true)) {
+                fields.add(mapOf("name" to "Type", "value" to "{type}", "inline" to true))
+            }
+            if (existingFields.getBoolean("reason", true)) {
+                fields.add(mapOf("name" to "Reason", "value" to "{reason}", "inline" to false))
+            }
+            if (existingFields.getBoolean("time", true)) {
+                fields.add(mapOf("name" to "Time", "value" to "{time}", "inline" to true))
+            }
+            if (fields.isNotEmpty()) {
+                config.set("webhook.discord.embed.fields", fields)
+            }
+        } else if (existingFields == null) {
+            val fields = mutableListOf<Map<String, Any>>()
+            fields.add(mapOf("name" to "Player", "value" to "{player}", "inline" to true))
+            fields.add(mapOf("name" to "Operator", "value" to "{operator}", "inline" to true))
+            fields.add(mapOf("name" to "Type", "value" to "{type}", "inline" to true))
+            fields.add(mapOf("name" to "Reason", "value" to "{reason}", "inline" to false))
+            fields.add(mapOf("name" to "Time", "value" to "{time}", "inline" to true))
+            config.set("webhook.discord.embed.fields", fields)
+        }
+
     }
 
     // ================= HELPERS =================
