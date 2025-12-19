@@ -54,14 +54,18 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                     }
                     plugin.databaseHandler.addPunishmentHistory(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
 
+                    val formattedTime = plugin.timeHandler.formatTime(gtime)
                     val placeholders = mapOf(
+                        "player" to player,
+                        "operator" to stack.sender.name,
                         "reason" to reason,
-                        "time" to plugin.timeHandler.formatTime(gtime)
+                        "time" to formattedTime,
+                        "type" to punishmentType
                     )
                     plugin.messageHandler.getSmartMessage(
                         "mute",
                         "mute",
-                        mapOf("player" to player) + placeholders
+                        placeholders
                     ).forEach { stack.sender.sendMessage(it) }
 
                     plugin.actionExecutor.executeAction("muted", player, placeholders)
@@ -76,7 +80,7 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                     val broadcastMessages = plugin.messageHandler.getSmartMessage(
                         "mute",
                         "broadcast",
-                        mapOf("player" to player, "reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
+                        placeholders
                     )
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_MUTE)) {

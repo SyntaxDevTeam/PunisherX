@@ -66,6 +66,13 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         plugin.logger.debug("<yellow>Jail location: ${jailLocation}</yellow>")
 
         val formattedTime = plugin.timeHandler.formatTime(gtime)
+        val placeholders = mapOf(
+            "player" to playerName,
+            "operator" to stack.sender.name,
+            "reason" to reason,
+            "time" to formattedTime,
+            "type" to punishmentType
+        )
 
         fun finalizePunishment() {
             val success = plugin.databaseHandler.addPunishment(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
@@ -76,8 +83,6 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.databaseHandler.addPunishmentHistory(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
             plugin.cache.addOrUpdatePunishment(uuid, end ?: -1, previousLocation)
 
-            val placeholders = mapOf("reason" to reason, "time" to formattedTime)
-
             targetPlayer?.sendMessage(
                 plugin.messageHandler.stringMessageToComponent(
                     "jail", "jail_message",
@@ -87,7 +92,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
 
             val broadcastMessages = plugin.messageHandler.getSmartMessage(
                 "jail", "broadcast",
-                mapOf("player" to playerName) + placeholders
+                placeholders
             )
             plugin.server.onlinePlayers.forEach { onlinePlayer ->
                 if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_JAIL)) {
@@ -100,7 +105,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.messageHandler.getSmartMessage(
                 "jail",
                 "jail",
-                mapOf("player" to playerName) + placeholders
+                placeholders
             ).forEach { stack.sender.sendMessage(it) }
             plugin.actionExecutor.executeAction("jailed", playerName, placeholders)
         }

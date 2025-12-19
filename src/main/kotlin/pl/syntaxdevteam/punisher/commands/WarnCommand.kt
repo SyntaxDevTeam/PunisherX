@@ -46,37 +46,33 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                     plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
 
                     val warnCount = plugin.databaseHandler.getActiveWarnCount(uuid.toString())
+                    val formattedTime = plugin.timeHandler.formatTime(gtime)
+                    val placeholders = mapOf(
+                        "player" to player,
+                        "operator" to stack.sender.name,
+                        "reason" to reason,
+                        "time" to formattedTime,
+                        "type" to punishmentType,
+                        "warn_no" to warnCount.toString()
+                    )
+
                     plugin.messageHandler.getSmartMessage(
                         "warn",
                         "warn",
-                        mapOf(
-                            "player" to player,
-                            "reason" to reason,
-                            "time" to plugin.timeHandler.formatTime(gtime),
-                            "warn_no" to warnCount.toString()
-                        )
+                        placeholders
                     ).forEach { stack.sender.sendMessage(it) }
 
                     val warnMessages = plugin.messageHandler.getSmartMessage(
                         "warn",
                         "warn_message",
-                        mapOf(
-                            "reason" to reason,
-                            "time" to plugin.timeHandler.formatTime(gtime),
-                            "warn_no" to warnCount.toString()
-                        )
+                        placeholders
                     )
                     targetPlayer?.let { p -> warnMessages.forEach { p.sendMessage(it) } }
 
                     val broadcastMessages = plugin.messageHandler.getSmartMessage(
                         "warn",
                         "broadcast",
-                        mapOf(
-                            "player" to player,
-                            "reason" to reason,
-                            "time" to plugin.timeHandler.formatTime(gtime),
-                            "warn_no" to warnCount.toString()
-                        )
+                        placeholders
                     )
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_WARN)) {

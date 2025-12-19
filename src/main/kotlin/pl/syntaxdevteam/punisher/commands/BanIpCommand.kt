@@ -63,6 +63,14 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
 
         val start = System.currentTimeMillis()
         val end = durationSec?.let { start + it * 1000 }
+        val formattedTime = plugin.timeHandler.formatTime(timeArg)
+        val placeholders = mapOf(
+            "player" to rawTarget,
+            "operator" to stack.sender.name,
+            "reason" to reason,
+            "time" to formattedTime,
+            "type" to "BANIP"
+        )
 
         var dbError = false
         val normalizedEnd = end ?: -1
@@ -85,21 +93,17 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
             val lines = plugin.messageHandler.getSmartMessage(
                 "banip",
                 "kick_message",
-                mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(timeArg))
+                placeholders
             )
             val builder = Component.text()
             lines.forEach { builder.append(it).append(Component.newline()) }
             targetPlayer.kick(builder.build())
         }
 
-        val placeholders = mapOf(
-            "reason" to reason,
-            "time" to plugin.timeHandler.formatTime(timeArg)
-        )
         val msgLines = plugin.messageHandler.getSmartMessage(
             "banip",
             "ban",
-            mapOf("player" to rawTarget) + placeholders
+            placeholders
         )
         msgLines.forEach { stack.sender.sendMessage(it) }
 

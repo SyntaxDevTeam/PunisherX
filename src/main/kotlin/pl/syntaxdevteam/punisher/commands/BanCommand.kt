@@ -65,11 +65,20 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                     plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, normalizedEnd)
                     plugin.proxyBridgeMessenger.notifyBan(uuid, reason, normalizedEnd)
 
+                    val formattedTime = plugin.timeHandler.formatTime(gtime)
+                    val placeholders = mapOf(
+                        "player" to player,
+                        "operator" to stack.sender.name,
+                        "reason" to reason,
+                        "time" to formattedTime,
+                        "type" to punishmentType
+                    )
+
                     if (targetPlayer != null) {
                         val kickMessages = plugin.messageHandler.getSmartMessage(
                             "ban",
                             "kick_message",
-                            mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(gtime))
+                            placeholders
                         )
                         val kickMessage = Component.text()
                         kickMessages.forEach { line ->
@@ -79,14 +88,10 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                         targetPlayer.kick(kickMessage.build())
                     }
 
-                    val placeholders = mapOf(
-                        "reason" to reason,
-                        "time" to plugin.timeHandler.formatTime(gtime)
-                    )
                     plugin.messageHandler.getSmartMessage(
                         "ban",
                         "ban",
-                        mapOf("player" to player) + placeholders
+                        placeholders
                     ).forEach { stack.sender.sendMessage(it) }
 
                     plugin.actionExecutor.executeAction("banned", player, placeholders)
@@ -94,7 +99,7 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                     val broadcastMessages = plugin.messageHandler.getSmartMessage(
                         "ban",
                         "broadcast",
-                        mapOf("player" to player) + placeholders
+                        placeholders
                     )
 
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
