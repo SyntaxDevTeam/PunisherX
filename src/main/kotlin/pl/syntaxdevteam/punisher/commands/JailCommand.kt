@@ -139,14 +139,9 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         }
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
-            2 -> generateTimeSuggestions()
+            2 -> TimeSuggestionProvider.generateTimeSuggestions()
             3 -> plugin.messageHandler.getMessageStringList("jail", "reasons")
             else -> emptyList()
         }
-    }
-
-    private fun generateTimeSuggestions(): List<String> {
-        val units = listOf("s", "m", "h", "d")
-        return (1..999).flatMap { i -> units.map { unit -> "$i$unit" } }
     }
 }
