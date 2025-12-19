@@ -233,6 +233,9 @@ webhook:
         - name: "Time"
           value: "{time}"
           inline: true
+        - name: "ID"
+          value: "{id}"
+          inline: true
 
 # Update check and auto-download settings.
 update:

@@ -249,6 +249,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
             }
             if (punishmentId != null) {
                 plugin.discordWebhook.sendPunishmentWebhook(
+                    playerId = punishmentId.toString(),
                     playerName = name,
                     adminName = operator,
                     reason = reason,

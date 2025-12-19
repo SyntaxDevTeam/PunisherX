@@ -269,6 +269,9 @@ class ConfigManager(private val plugin: PunisherX) {
             if (existingFields.getBoolean("time", true)) {
                 fields.add(mapOf("name" to "Time", "value" to "{time}", "inline" to true))
             }
+            if (existingFields.getBoolean("id", true)) {
+                fields.add(mapOf("name" to "ID", "value" to "{id}", "inline" to true))
+            }
             if (fields.isNotEmpty()) {
                 config.set("webhook.discord.embed.fields", fields)
             }
@@ -279,6 +282,7 @@ class ConfigManager(private val plugin: PunisherX) {
             fields.add(mapOf("name" to "Type", "value" to "{type}", "inline" to true))
             fields.add(mapOf("name" to "Reason", "value" to "{reason}", "inline" to false))
             fields.add(mapOf("name" to "Time", "value" to "{time}", "inline" to true))
+            fields.add(mapOf("name" to "ID", "value" to "{id}", "inline" to true))
             config.set("webhook.discord.embed.fields", fields)
         }
 

@@ -63,6 +63,7 @@ class DiscordWebhook(plugin: PunisherX) {
      * @param duration Duration of the punishment (in milliseconds)
      */
     fun sendPunishmentWebhook(
+        playerId: String,
         playerName: String,
         adminName: String,
         reason: String,
@@ -79,13 +80,15 @@ class DiscordWebhook(plugin: PunisherX) {
         }
 
         CompletableFuture.runAsync {
-            val placeholders = buildPlaceholders(playerName, adminName, reason, type, duration)
+            val placeholders = buildPlaceholders(playerId, playerName, adminName, reason, type, duration)
             val fields = resolveFields(placeholders)
 
             val embed = JsonObject().apply {
                 resolveString("title", mh.stringMessageToStringNoPrefix("webhook", "title"), placeholders)
                     ?.let { addProperty("title", it) }
                 resolveString("description", null, placeholders)
+                    ?.let { addProperty("description", it) }
+                resolveString("id", null, placeholders)
                     ?.let { addProperty("description", it) }
                 resolveString("url", null, placeholders)
                     ?.let { addProperty("url", it) }
@@ -165,6 +168,7 @@ class DiscordWebhook(plugin: PunisherX) {
     }
 
     private fun buildPlaceholders(
+        playerId: String,
         playerName: String,
         adminName: String,
         reason: String,
@@ -172,6 +176,7 @@ class DiscordWebhook(plugin: PunisherX) {
         duration: Long
     ): Map<String, String> {
         return mapOf(
+            "id"    to playerId,
             "player" to playerName,
             "operator" to adminName,
             "reason" to reason,
