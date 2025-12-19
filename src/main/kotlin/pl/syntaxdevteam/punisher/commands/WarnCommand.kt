@@ -38,45 +38,42 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                     val start = System.currentTimeMillis()
                     val end: Long? = if (gtime != null) (System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
 
-                    val success = plugin.databaseHandler.addPunishment(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
-                    if (!success) {
+                    val punishmentId = plugin.databaseHandler.addPunishment(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    if (punishmentId == null) {
                         stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
                         return
                     }
                     plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
 
                     val warnCount = plugin.databaseHandler.getActiveWarnCount(uuid.toString())
+                    val formattedTime = plugin.timeHandler.formatTime(gtime)
+                    val placeholders = mapOf(
+                        "player" to player,
+                        "operator" to stack.sender.name,
+                        "reason" to reason,
+                        "time" to formattedTime,
+                        "type" to punishmentType,
+                        "warn_no" to warnCount.toString(),
+                        "id" to punishmentId.toString()
+                    )
+
                     plugin.messageHandler.getSmartMessage(
                         "warn",
                         "warn",
-                        mapOf(
-                            "player" to player,
-                            "reason" to reason,
-                            "time" to plugin.timeHandler.formatTime(gtime),
-                            "warn_no" to warnCount.toString()
-                        )
+                        placeholders
                     ).forEach { stack.sender.sendMessage(it) }
 
                     val warnMessages = plugin.messageHandler.getSmartMessage(
                         "warn",
                         "warn_message",
-                        mapOf(
-                            "reason" to reason,
-                            "time" to plugin.timeHandler.formatTime(gtime),
-                            "warn_no" to warnCount.toString()
-                        )
+                        placeholders
                     )
                     targetPlayer?.let { p -> warnMessages.forEach { p.sendMessage(it) } }
 
                     val broadcastMessages = plugin.messageHandler.getSmartMessage(
                         "warn",
                         "broadcast",
-                        mapOf(
-                            "player" to player,
-                            "reason" to reason,
-                            "time" to plugin.timeHandler.formatTime(gtime),
-                            "warn_no" to warnCount.toString()
-                        )
+                        placeholders
                     )
                     plugin.server.onlinePlayers.forEach { onlinePlayer ->
                         if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_WARN)) {
@@ -102,21 +99,10 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
         }
         return when (args.size) {
             1 -> plugin.server.onlinePlayers.map { it.name }
-            2 -> generateTimeSuggestions()
+            2 -> TimeSuggestionProvider.generateTimeSuggestions()
             3 -> plugin.messageHandler.getMessageStringList("warn", "reasons")
             else -> emptyList()
         }
-    }
-
-    private fun generateTimeSuggestions(): List<String> {
-        val units = listOf("s", "m", "h", "d")
-        val suggestions = mutableListOf<String>()
-        for (i in 1..999) {
-            for (unit in units) {
-                suggestions.add("$i$unit")
-            }
-        }
-        return suggestions
     }
 
 }

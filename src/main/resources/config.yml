@@ -196,7 +196,7 @@ webhook:
     enabled: false
     url: "YOUR_WEBHOOK_URL_HERE"
     username: ""
-    avatar-url: ""
+    avatar-url: "" # URL, Minecraft nick/UUID (mc-heads), or base64 PNG data
     colors:
       # Accepts integers (Discord decimal), hex with #/0x, or common names like red/orange/blue/black/white.
       ban: 9447935
@@ -205,19 +205,37 @@ webhook:
       kick: 16776960
       default: 8421504
     embed:
-      thumbnail-url: ""
-      image-url: ""
+      title: "Event Title"
+      description: "Administrator {operator} {type} {player} for {reason} for {time}"
+      url: "https://example.com"
+      timestamp: "" # ISO-8601 or "now" for current time
+      thumbnail-url: "" # URL, Minecraft nick/UUID, or base64 PNG data
+      image-url: "" # URL, Minecraft nick/UUID, or base64 PNG data
       author:
-        name: ""
-        icon-url: ""
+        name: "Author Name"
+        icon-url: "" # URL, Minecraft nick/UUID, or base64 PNG data
       footer:
-        icon-url: ""
+        text: "Footer text"
+        icon-url: "" # URL, Minecraft nick/UUID, or base64 PNG data
       fields:
-        player: true
-        operator: true
-        type: true
-        reason: true
-        time: true
+        - name: "Player"
+          value: "{player}"
+          inline: true
+        - name: "Operator"
+          value: "{operator}"
+          inline: true
+        - name: "Type"
+          value: "{type}"
+          inline: true
+        - name: "Reason"
+          value: "{reason}"
+          inline: false
+        - name: "Time"
+          value: "{time}"
+          inline: true
+        - name: "ID"
+          value: "{id}"
+          inline: true
 
 # Update check and auto-download settings.
 update:

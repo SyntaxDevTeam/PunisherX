@@ -20,7 +20,6 @@ class DiscordWebhook(plugin: PunisherX) {
     private val enabled: Boolean = plugin.config.getBoolean("webhook.discord.enabled", false)
     private val webhookSection = plugin.config.getConfigurationSection("webhook.discord")
     private val embedSection = webhookSection?.getConfigurationSection("embed")
-    private val fieldsSection = embedSection?.getConfigurationSection("fields")
     private val colorSection = webhookSection?.getConfigurationSection("colors")
     private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
     private val log = plugin.logger
@@ -50,6 +49,10 @@ class DiscordWebhook(plugin: PunisherX) {
         "kick" to 16776960,
         "default" to 8421504,
     )
+    private val uuidRegex = Regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+    private val nameRegex = Regex("^[A-Za-z0-9_]{3,16}$")
+    private val avatarTimeoutMs = 2500
+    private val webhookTimeoutMs = 5000
 
     /**
      * Sends a punishment notification to a Discord channel
@@ -60,6 +63,7 @@ class DiscordWebhook(plugin: PunisherX) {
      * @param duration Duration of the punishment (in milliseconds)
      */
     fun sendPunishmentWebhook(
+        playerId: String,
         playerName: String,
         adminName: String,
         reason: String,
@@ -75,71 +79,66 @@ class DiscordWebhook(plugin: PunisherX) {
             return
         }
 
-        val fields = JsonArray()
+        CompletableFuture.runAsync {
+            val placeholders = buildPlaceholders(playerId, playerName, adminName, reason, type, duration)
+            val fields = resolveFields(placeholders)
 
-        if (fieldsSection?.getBoolean("player", true) != false) {
-            fields.add(createField(mh.stringMessageToStringNoPrefix("webhook", "player"), playerName, true))
-        }
-
-        if (fieldsSection?.getBoolean("operator", true) != false) {
-            fields.add(createField(mh.stringMessageToStringNoPrefix("webhook", "operator"), adminName, true))
-        }
-
-        if (fieldsSection?.getBoolean("type", true) != false) {
-            fields.add(createField(mh.stringMessageToStringNoPrefix("webhook", "type"), type.uppercase(), true))
-        }
-
-        if (fieldsSection?.getBoolean("reason", true) != false) {
-            fields.add(createField(mh.stringMessageToStringNoPrefix("webhook", "reason"), reason, false))
-        }
-
-        if (fieldsSection?.getBoolean("time", true) != false) {
-            fields.add(createField(mh.stringMessageToStringNoPrefix("webhook", "time"), formatDuration(duration), true))
-        }
-
-        val embed = JsonObject().apply {
-            addProperty("title", mh.stringMessageToStringNoPrefix("webhook", "title"))
-            addProperty("color", getColorForPunishmentType(type))
-            addProperty("timestamp", Instant.now().toString())
-            add("fields", fields)
-            add("footer", JsonObject().apply {
-                addProperty("text", "${mh.stringMessageToStringNoPrefix("webhook", "app_name")}${LocalDateTime.now().format(formatter)}")
-                embedSection?.getString("footer.icon-url")?.takeIf { it.isNotBlank() }?.let { iconUrl ->
-                    addProperty("icon_url", iconUrl)
+            val embed = JsonObject().apply {
+                resolveString("title", mh.stringMessageToStringNoPrefix("webhook", "title"), placeholders)
+                    ?.let { addProperty("title", it) }
+                resolveString("description", null, placeholders)
+                    ?.let { addProperty("description", it) }
+                resolveString("id", null, placeholders)
+                    ?.let { addProperty("description", it) }
+                resolveString("url", null, placeholders)
+                    ?.let { addProperty("url", it) }
+                addProperty("color", getColorForPunishmentType(type))
+                resolveTimestamp()?.let { addProperty("timestamp", it) }
+                if (fields.size() > 0) {
+                    add("fields", fields)
                 }
-            })
+                add("footer", JsonObject().apply {
+                    val defaultFooter = "${mh.stringMessageToStringNoPrefix("webhook", "app_name")}${LocalDateTime.now().format(formatter)}"
+                    val footerRaw = embedSection?.getString("footer.text")
+                    val footerText = when {
+                        footerRaw != null -> footerRaw.takeIf { it.isNotBlank() }?.let { applyPlaceholders(it, placeholders) }
+                        else -> applyPlaceholders(defaultFooter, placeholders)
+                    }
+                    footerText?.let { addProperty("text", it) }
+                    resolveImageUrl(embedSection?.getString("footer.icon-url"))
+                        ?.let { iconUrl -> addProperty("icon_url", iconUrl) }
+                })
 
-            embedSection?.getConfigurationSection("author")?.let { authorSection ->
-                val authorObject = JsonObject()
+                embedSection?.getConfigurationSection("author")?.let { authorSection ->
+                    val authorObject = JsonObject()
 
-                authorSection.getString("name")?.takeIf { it.isNotBlank() }
-                    ?.let { authorObject.addProperty("name", it) }
-                authorSection.getString("icon-url")?.takeIf { it.isNotBlank() }
-                    ?.let { authorObject.addProperty("icon_url", it) }
-                if (authorObject.entrySet().isNotEmpty()) {
-                    add("author", authorObject)
+                    resolveString("author.name", null, placeholders)
+                        ?.let { authorObject.addProperty("name", it) }
+                    resolveImageUrl(authorSection.getString("icon-url"))
+                        ?.let { authorObject.addProperty("icon_url", it) }
+                    if (authorObject.entrySet().isNotEmpty()) {
+                        add("author", authorObject)
+                    }
                 }
+
+                resolveImageUrl(embedSection?.getString("thumbnail-url"))
+                    ?.let { url -> add("thumbnail", JsonObject().apply { addProperty("url", url) }) }
+                resolveImageUrl(embedSection?.getString("image-url"))
+                    ?.let { url -> add("image", JsonObject().apply { addProperty("url", url) }) }
             }
 
-            embedSection?.getString("thumbnail-url")?.takeIf { it.isNotBlank() }?.let { url ->
-                add("thumbnail", JsonObject().apply { addProperty("url", url) })
+            val json = JsonObject().apply {
+                webhookSection?.getString("username")?.takeIf { it.isNotBlank() }?.let { addProperty("username", it) }
+                resolveImageUrl(webhookSection?.getString("avatar-url"))
+                    ?.let { addProperty("avatar_url", it) }
+                add("embeds", JsonArray().apply {
+                    add(embed)
+                })
             }
 
-            embedSection?.getString("image-url")?.takeIf { it.isNotBlank() }?.let { url ->
-                add("image", JsonObject().apply { addProperty("url", url) })
-            }
+            log.debug("Sending JSON: $json")
+            sendWebhook(json.toString())
         }
-
-        val json = JsonObject().apply {
-            webhookSection?.getString("username")?.takeIf { it.isNotBlank() }?.let { addProperty("username", it) }
-            webhookSection?.getString("avatar-url")?.takeIf { it.isNotBlank() }?.let { addProperty("avatar_url", it) }
-            add("embeds", JsonArray().apply {
-                add(embed)
-            })
-        }
-
-        log.debug("Sending JSON: $json")
-        sendWebhook(json.toString())
     }
 
     private fun createField(name: String, value: String, inline: Boolean): JsonObject {
@@ -166,6 +165,98 @@ class DiscordWebhook(plugin: PunisherX) {
             )
             dateTime.format(formatter)
         }
+    }
+
+    private fun buildPlaceholders(
+        playerId: String,
+        playerName: String,
+        adminName: String,
+        reason: String,
+        type: String,
+        duration: Long
+    ): Map<String, String> {
+        return mapOf(
+            "id"    to playerId,
+            "player" to playerName,
+            "operator" to adminName,
+            "reason" to reason,
+            "type" to type.uppercase(),
+            "time" to formatDuration(duration),
+        )
+    }
+
+    private fun resolveString(path: String, fallback: String?, placeholders: Map<String, String>): String? {
+        val raw = when {
+            path.contains(".") -> embedSection?.getString(path)
+            else -> embedSection?.getString(path)
+        }
+        val value = raw?.takeIf { it.isNotBlank() } ?: fallback
+        if (value.isNullOrBlank()) return null
+        return applyPlaceholders(value, placeholders)
+    }
+
+    private fun applyPlaceholders(text: String, placeholders: Map<String, String>): String {
+        var output = text
+        placeholders.forEach { (key, value) ->
+            output = output.replace("{$key}", value)
+        }
+        return output
+    }
+
+    private fun resolveTimestamp(): String? {
+        val raw = embedSection?.getString("timestamp")?.trim().orEmpty()
+        if (raw.isBlank()) {
+            return Instant.now().toString()
+        }
+        if (raw.equals("now", ignoreCase = true)) {
+            return Instant.now().toString()
+        }
+        return try {
+            Instant.parse(raw).toString()
+        } catch (e: Exception) {
+            log.debug("Invalid webhook timestamp format '$raw', falling back to now.")
+            Instant.now().toString()
+        }
+    }
+
+    private fun resolveFields(placeholders: Map<String, String>): JsonArray {
+        val fields = JsonArray()
+        val rawFields = embedSection?.get("fields")
+        if (rawFields is List<*>) {
+            for (entry in rawFields) {
+                val fieldMap = (entry as? Map<*, *>)?.mapKeys { it.key.toString() } ?: continue
+                val name = fieldMap["name"]?.toString()?.takeIf { it.isNotBlank() } ?: continue
+                val value = fieldMap["value"]?.toString()?.takeIf { it.isNotBlank() } ?: continue
+                val inline = (fieldMap["inline"] as? Boolean) ?: false
+                fields.add(createField(applyPlaceholders(name, placeholders), applyPlaceholders(value, placeholders), inline))
+            }
+            if (fields.size() > 0) {
+                return fields
+            }
+        }
+
+        val fieldsSection = embedSection?.getConfigurationSection("fields")
+        if (fieldsSection?.getBoolean("player", true) != false) {
+            fields.add(createField(mh.stringMessageToStringNoPrefix("webhook", "player"), placeholders.getValue("player"), true))
+        }
+
+        if (fieldsSection?.getBoolean("operator", true) != false) {
+            fields.add(createField(mh.stringMessageToStringNoPrefix("webhook", "operator"), placeholders.getValue("operator"), true))
+        }
+
+        if (fieldsSection?.getBoolean("type", true) != false) {
+            fields.add(createField(mh.stringMessageToStringNoPrefix("webhook", "type"), placeholders.getValue("type"), true))
+        }
+
+        if (fieldsSection?.getBoolean("reason", true) != false) {
+            fields.add(createField(mh.stringMessageToStringNoPrefix("webhook", "reason"), placeholders.getValue("reason"), false))
+        }
+
+        if (fieldsSection?.getBoolean("time", true) != false) {
+            fields.add(createField(mh.stringMessageToStringNoPrefix("webhook", "time"), placeholders.getValue("time"), true))
+        }
+
+        return fields
     }
 
     private fun getColorValue(type: String): Int? {
@@ -195,34 +286,76 @@ class DiscordWebhook(plugin: PunisherX) {
         return null
     }
 
+    private fun resolveImageUrl(raw: String?): String? {
+        val trimmed = raw?.trim()?.takeIf { it.isNotEmpty() } ?: return null
+        if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+            return trimmed
+        }
+        if (uuidRegex.matches(trimmed) || nameRegex.matches(trimmed)) {
+            return resolveAvatarUrlWithFallback(trimmed)
+        }
+        val normalized = trimmed.replace("\n", "").replace("\r", "")
+        return if (normalized.startsWith("data:")) {
+            normalized
+        } else {
+            "data:image/png;base64,$normalized"
+        }
+    }
+
+    private fun resolveAvatarUrlWithFallback(identifier: String): String {
+        val primary = "https://mc-heads.net/avatar/$identifier"
+        if (isUrlReachable(primary)) {
+            return primary
+        }
+        val fallback = "https://minotar.net/helm/$identifier"
+        return if (isUrlReachable(fallback)) fallback else fallback
+    }
+
+    private fun isUrlReachable(url: String): Boolean {
+        return try {
+            val connection = URI(url).toURL().openConnection() as HttpURLConnection
+            connection.requestMethod = "GET"
+            connection.instanceFollowRedirects = true
+            connection.connectTimeout = avatarTimeoutMs
+            connection.readTimeout = avatarTimeoutMs
+            connection.useCaches = false
+            val responseCode = connection.responseCode
+            connection.inputStream?.close()
+            connection.disconnect()
+            responseCode in 200..399
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     private fun sendWebhook(content: String) {
-        CompletableFuture.runAsync {
-            try {
-                log.debug("Attempting to send webhook asynchronously...")
-                val uri = URI(webhookUrl)
-                val connection = uri.toURL().openConnection() as HttpURLConnection
-                connection.requestMethod = "POST"
-                connection.setRequestProperty("Content-Type", "application/json")
-                connection.doOutput = true
+        try {
+            log.debug("Attempting to send webhook asynchronously...")
+            val uri = URI(webhookUrl)
+            val connection = uri.toURL().openConnection() as HttpURLConnection
+            connection.requestMethod = "POST"
+            connection.setRequestProperty("Content-Type", "application/json")
+            connection.connectTimeout = webhookTimeoutMs
+            connection.readTimeout = webhookTimeoutMs
+            connection.doOutput = true
 
-                OutputStreamWriter(connection.outputStream).use { writer ->
-                    writer.write(content)
-                }
-
-                val responseCode = connection.responseCode
-                log.debug("Response code: $responseCode")
-
-                if (responseCode != 204) {
-                    log.debug("Error sending webhook. Response code: $responseCode")
-                    val errorStream = connection.errorStream?.bufferedReader()?.use { it.readText() }
-                    log.debug("Error content: $errorStream")
-                }
-
-                connection.disconnect()
-            } catch (e: Exception) {
-                log.debug("Error occurred while sending webhook: ${e.message}")
-                e.printStackTrace()
+            OutputStreamWriter(connection.outputStream).use { writer ->
+                writer.write(content)
             }
+
+            val responseCode = connection.responseCode
+            log.debug("Response code: $responseCode")
+
+            if (responseCode != 204) {
+                log.debug("Error sending webhook. Response code: $responseCode")
+                val errorStream = connection.errorStream?.bufferedReader()?.use { it.readText() }
+                log.debug("Error content: $errorStream")
+            }
+
+            connection.disconnect()
+        } catch (e: Exception) {
+            log.debug("Error occurred while sending webhook: ${e.message}")
+            e.printStackTrace()
         }
     }
 }

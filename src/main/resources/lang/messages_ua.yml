@@ -34,7 +34,7 @@ setunjail:
 
 # Повідомлення команди /jail
 jail:
-  jail: "<green>Ви ув'язнили гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  jail: "<green>Ви ув'язнили гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильне використання: <gold>/jail <нік_гравця> (час) <причина>"
   jail_message: "<red>Вас було ув'язнено за <b><reason></b> на <b><time></b></red>"
   teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
@@ -70,7 +70,7 @@ unjail:
 
 # Повідомлення команди /ban
 ban:
-  ban: "<green>Ви забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  ban: "<green>Ви забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильне використання: <gold>/ban <нік_гравця> (час) <причина>"
   kick_message:
     # Ви можете змінити повідомлення для забаненого гравця
@@ -102,7 +102,7 @@ ban:
 
 # Повідомлення команди /banip
 banip:
-  ban: "<green>Ви забанили IP гравця за <gold><reason></gold> на <gold><time></gold></green>"
+  ban: "<green>Ви забанили IP гравця за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильне використання: <gold>/banip <гравець|ip> (час) <причина>"
   kick_message:
     # Ви можете змінити повідомлення для забаненого гравця
@@ -130,7 +130,7 @@ unban:
   broadcast: "<dark_gray>Гравець <gray><player></gray> був розбанений</dark_gray>"
 # Повідомлення команди /mute
 mute:
-  mute: "<green>Ви заглушили гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  mute: "<green>Ви заглушили гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильне використання: <gold>/mute <нік_гравця> (час) <причина>"
   mute_message: "<red>Вас було заглушено за <b><reason></b> на <b><time></b></red>"
   mute_info_message: "<red>Ви намагаєтесь щось сказати, але ви все ще заглушені ще <time>.</red>"
@@ -160,7 +160,7 @@ unmute:
 
 # Повідомлення команди /warn
 warn:
-  warn: "<green>Ви попередили (<warn_no> раз) гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  warn: "<green>Ви попередили (<warn_no> раз) гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильне використання: <gold>/warn <нік_гравця> (час) <причина>"
   warn_message: "<red>Ви отримали попередження №<b><warn_no></b>!</red>"
   broadcast: "<dark_gray>Гравець <gray><player></gray> отримав попередження за <gray><reason></gray> на <gray><time></gray></dark_gray>"
