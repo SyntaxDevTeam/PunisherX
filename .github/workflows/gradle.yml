@@ -52,10 +52,12 @@ jobs:
         with:
           name: gradle-build-results
           path: build/reports/gradle-actions/build-results.json
+      - name: Prepare artifact name
+        run: echo "ARTIFACT_NAME=PunisherX-${GITHUB_REF_NAME//\//-}-latest-DEV.jar" >> "$GITHUB_ENV"
       - name: Upload JAR
         uses: actions/upload-artifact@v5
         with:
-          name: PunisherX-${{ github.ref_name }}-latest-DEV.jar
+          name: ${{ env.ARTIFACT_NAME }}
           path: build/libs/*.jar
 
   dependency-submission:

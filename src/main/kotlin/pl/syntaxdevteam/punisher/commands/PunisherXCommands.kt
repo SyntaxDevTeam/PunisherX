@@ -67,7 +67,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
                         )
                     }
                     .onFailure { throwable ->
-                        plugin.logger.err("[Reload] Failed to reload PunisherX: ${throwable.message ?: throwable::class.simpleName}")
+                        plugin.logger.err("[Reload] Failed to reload PunisherX: ${throwable.message ?: throwable.javaClass}")
                         stack.sender.sendMessage(
                             mH.miniMessageFormat("$prefix <red>Failed to reload PunisherX. Check console for details.</red>")
                         )
