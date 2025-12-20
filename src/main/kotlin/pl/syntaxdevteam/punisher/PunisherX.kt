@@ -33,6 +33,7 @@ import pl.syntaxdevteam.punisher.platform.SchedulerAdapter
 import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
 import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
+import pl.syntaxdevteam.core.platform.ServerEnvironment
 import java.io.File
 import java.util.*
 
@@ -121,12 +122,30 @@ class PunisherX : JavaPlugin(), Listener {
      */
     private fun reloadMyConfig() {
         pluginInitializer.onDisable()
-        server.scheduler.cancelTasks(this)
+        cancelPluginTasks()
         runCatching { proxyBridgeMessenger.unregisterChannel() }
         HandlerList.unregisterAll(this as Plugin)
         reloadConfig()
         pluginInitializer = PluginInitializer(this)
         pluginInitializer.onEnable()
+    }
+
+    private fun cancelPluginTasks() {
+        if (ServerEnvironment.isFoliaBased()) {
+            tryCancelScheduler("getGlobalRegionScheduler")
+            tryCancelScheduler("getRegionScheduler")
+            tryCancelScheduler("getAsyncScheduler")
+        } else {
+            server.scheduler.cancelTasks(this)
+        }
+    }
+
+    private fun tryCancelScheduler(methodName: String) {
+        try {
+            val scheduler = server.javaClass.getMethod(methodName).invoke(server) ?: return
+            scheduler.javaClass.getMethod("cancelTasks", Plugin::class.java).invoke(scheduler, this)
+        } catch (_: Throwable) {
+        }
     }
 
     /**
