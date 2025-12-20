@@ -190,6 +190,14 @@ warn:
     - "Player insult"
     - "Offensive language"
 
+# /punish command messages
+punish:
+  usage: "Correct usage: <gold>/punish <player_name> <template> (lvl)"
+  template_not_found: "<red>Template <gold><template></gold> not found.</red>"
+  invalid_level: "<red>Invalid template level: <gold><level></gold>.</red>"
+  invalid_time: "<red>Invalid template time: <gold><time></gold>.</red>"
+  invalid_type: "<red>Unsupported template punishment type: <gold><type></gold>.</red>"
+
 # /unwarn command messages
 unwarn:
   unwarn: "<green>You removed a warning for player <gold><player></gold></green>"

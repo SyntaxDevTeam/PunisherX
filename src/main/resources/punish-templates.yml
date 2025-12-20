@@ -1,0 +1,24 @@
+# Example punishment templates for /punish command.
+templates:
+  Griefing:
+    reason: "You Grief."
+    1:
+      punish: warn
+      time: "1d"
+    2:
+      punish: ban
+      time: "1d"
+    3:
+      punish: ban
+      time: "7d"
+  Spam:
+    reason: "Chat spam"
+    1:
+      punish: mute
+      time: "10m"
+    2:
+      punish: mute
+      time: "1h"
+    3:
+      punish: mute
+      time: "12h"

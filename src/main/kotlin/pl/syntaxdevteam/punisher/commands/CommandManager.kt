@@ -48,6 +48,11 @@ class CommandManager(private val plugin: PunisherX) {
                 WarnCommand(plugin)
             )
             commands.register(
+                "punish",
+                plugin.messageHandler.stringMessageToString("punish", "usage"),
+                PunishCommand(plugin)
+            )
+            commands.register(
                 "unwarn",
                 plugin.messageHandler.stringMessageToString("unwarn", "usage"),
                 UnWarnCommand(plugin)
@@ -152,6 +157,12 @@ class CommandManager(private val plugin: PunisherX) {
                         commandName,
                         plugin.messageHandler.stringMessageToString("warn", "usage"),
                         WarnCommand(plugin)
+                    )
+
+                    "punish" -> commands.register(
+                        commandName,
+                        plugin.messageHandler.stringMessageToString("punish", "usage"),
+                        PunishCommand(plugin)
                     )
 
                     "unwarn" -> commands.register(

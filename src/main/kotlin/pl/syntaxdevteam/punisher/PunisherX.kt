@@ -34,6 +34,7 @@ import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
 import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import pl.syntaxdevteam.core.platform.ServerEnvironment
+import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
 import java.io.File
 import java.util.*
 
@@ -73,6 +74,7 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var cfg: ConfigManager
     lateinit var proxyBridgeMessenger: ProxyBridgeMessenger
     lateinit var onlinePunishmentWatcher: OnlinePunishmentWatcher
+    lateinit var punishTemplateManager: PunishTemplateManager
 
 
     /**

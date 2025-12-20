@@ -180,6 +180,14 @@ warn:
     - "Insulti"
     - "Linguaggio volgare"
 
+# Messaggi del comando /punish
+punish:
+  usage: "Uso corretto: <gold>/punish <nome_giocatore> <modello> (lvl)"
+  template_not_found: "<red>Modello <gold><template></gold> non trovato.</red>"
+  invalid_level: "<red>Livello modello non valido: <gold><level></gold>.</red>"
+  invalid_time: "<red>Tempo del modello non valido: <gold><time></gold>.</red>"
+  invalid_type: "<red>Tipo di punizione non supportato nel modello: <gold><type></gold>.</red>"
+
 # Messaggi del comando /unwarn
 unwarn:
   unwarn: "<green>Hai rimosso un avvertimento al giocatore <gold><player></gold></green>"

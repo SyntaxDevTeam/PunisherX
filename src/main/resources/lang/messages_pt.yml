@@ -180,6 +180,14 @@ warn:
     - "Ofensa a jogador"
     - "Linguagem ofensiva"
 
+# Mensagens do comando /punish
+punish:
+  usage: "Uso correto: <gold>/punish <nome_do_jogador> <modelo> (lvl)"
+  template_not_found: "<red>Modelo <gold><template></gold> não encontrado.</red>"
+  invalid_level: "<red>Nível de modelo inválido: <gold><level></gold>.</red>"
+  invalid_time: "<red>Tempo do modelo inválido: <gold><time></gold>.</red>"
+  invalid_type: "<red>Tipo de punição não suportado no modelo: <gold><type></gold>.</red>"
+
 # Mensagens do comando /unwarn
 unwarn:
   unwarn: "<green>Você removeu um aviso do jogador <gold><player></gold></green>"

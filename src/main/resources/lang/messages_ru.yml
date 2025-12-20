@@ -178,6 +178,14 @@ warn:
     - "Оскорбление игрока"
     - "Оскорбительная лексика"
 
+# Сообщения команды /punish
+punish:
+  usage: "Правильное использование: <gold>/punish <игрок> <шаблон> (lvl)"
+  template_not_found: "<red>Шаблон <gold><template></gold> не найден.</red>"
+  invalid_level: "<red>Недопустимый уровень шаблона: <gold><level></gold>.</red>"
+  invalid_time: "<red>Неверное время в шаблоне: <gold><time></gold>.</red>"
+  invalid_type: "<red>Неподдерживаемый тип наказания в шаблоне: <gold><type></gold>.</red>"
+
 # Сообщения команды /unwarn
 unwarn:
   unwarn: "<green>Вы сняли предупреждение с игрока <gold><player></gold></green>"

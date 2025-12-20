@@ -180,6 +180,14 @@ warn:
     - "Spielerbeleidigung"
     - "Anstößige Sprache"
 
+# Nachrichten für den Befehl /punish
+punish:
+  usage: "Richtige Verwendung: <gold>/punish <spielername> <vorlage> (lvl)"
+  template_not_found: "<red>Vorlage <gold><template></gold> nicht gefunden.</red>"
+  invalid_level: "<red>Ungültiges Vorlagen-Level: <gold><level></gold>.</red>"
+  invalid_time: "<red>Ungültige Zeit in der Vorlage: <gold><time></gold>.</red>"
+  invalid_type: "<red>Nicht unterstützter Strafentyp in der Vorlage: <gold><type></gold>.</red>"
+
 # Nachrichten für den Befehl /unwarn
 unwarn:
   unwarn: "<green>Du hast die Verwarnung von Spieler <gold><player></gold> entfernt</green>"

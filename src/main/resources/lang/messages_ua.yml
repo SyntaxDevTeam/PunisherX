@@ -180,6 +180,14 @@ warn:
     - "Образа гравця"
     - "Нецензурна мова"
 
+# Повідомлення команди /punish
+punish:
+  usage: "Правильне використання: <gold>/punish <нік_гравця> <шаблон> (lvl)"
+  template_not_found: "<red>Шаблон <gold><template></gold> не знайдено.</red>"
+  invalid_level: "<red>Неприпустимий рівень шаблону: <gold><level></gold>.</red>"
+  invalid_time: "<red>Невірний час у шаблоні: <gold><time></gold>.</red>"
+  invalid_type: "<red>Непідтримуваний тип покарання в шаблоні: <gold><type></gold>.</red>"
+
 # Повідомлення команди /unwarn
 unwarn:
   unwarn: "<green>Ви зняли попередження з гравця <gold><player></gold></green>"

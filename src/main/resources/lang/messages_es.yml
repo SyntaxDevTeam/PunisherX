@@ -181,6 +181,14 @@ warn:
     - "Insulto a jugador"
     - "Lenguaje ofensivo"
 
+# Mensajes del comando /punish
+punish:
+  usage: "Uso correcto: <gold>/punish <nombre_jugador> <plantilla> (lvl)"
+  template_not_found: "<red>Plantilla <gold><template></gold> no encontrada.</red>"
+  invalid_level: "<red>Nivel de plantilla inválido: <gold><level></gold>.</red>"
+  invalid_time: "<red>Tiempo de plantilla inválido: <gold><time></gold>.</red>"
+  invalid_type: "<red>Tipo de castigo no compatible en la plantilla: <gold><type></gold>.</red>"
+
 # Mensajes del comando /unwarn
 unwarn:
   unwarn: "<green>Has eliminado una advertencia al jugador <gold><player></gold></green>"

@@ -180,6 +180,13 @@ warn:
     - "Spam"
     - "Obraza gracza"
     - "Wulgarny język"
+# Wiadomości komendy /punish
+punish:
+  usage: "Poprawne użycie to: <gold>/punish <nazwa_gracza> <szablon> (lvl)"
+  template_not_found: "<red>Nie znaleziono szablonu <gold><template></gold>.</red>"
+  invalid_level: "<red>Nieprawidłowy poziom szablonu: <gold><level></gold>.</red>"
+  invalid_time: "<red>Nieprawidłowy czas w szablonie: <gold><time></gold>.</red>"
+  invalid_type: "<red>Nieobsługiwany typ kary w szablonie: <gold><type></gold>.</red>"
 # Wiadomości komendy /unwarn
 unwarn:
   unwarn: "<green>Usunąłeś ostrzeżenie dla gracza <gold><player></gold></green>"

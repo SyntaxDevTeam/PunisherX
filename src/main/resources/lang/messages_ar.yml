@@ -183,6 +183,14 @@ warn:
     - "إهانة لاعب"
     - "ألفاظ مسيئة"
 
+# رسائل أمر /punish
+punish:
+  usage: "الاستخدام الصحيح: <gold>/punish <player_name> <template> (lvl)"
+  template_not_found: "<red>لم يتم العثور على القالب <gold><template></gold>.</red>"
+  invalid_level: "<red>مستوى القالب غير صالح: <gold><level></gold>.</red>"
+  invalid_time: "<red>وقت القالب غير صالح: <gold><time></gold>.</red>"
+  invalid_type: "<red>نوع العقوبة غير مدعوم في القالب: <gold><type></gold>.</red>"
+
 # رسائل أمر /unwarn
 unwarn:
   unwarn: "<green>لقد أزلت تحذيرًا من اللاعب <gold><player></gold></green>"

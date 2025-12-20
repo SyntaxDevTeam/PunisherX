@@ -33,6 +33,7 @@ import pl.syntaxdevteam.punisher.platform.BukkitSchedulerAdapter
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
 import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
+import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
 import java.io.File
 import java.util.Locale
 
@@ -69,6 +70,8 @@ class PluginInitializer(private val plugin: PunisherX) {
         //        plugin.cfg = ConfigManager(plugin, plugin.logger, confFile.toString(), version.toString(), 141, 150, true)
         plugin.cfg = ConfigManager(plugin)
         plugin.cfg.load()
+        plugin.punishTemplateManager = PunishTemplateManager(plugin)
+        plugin.punishTemplateManager.load()
     }
 
     /**

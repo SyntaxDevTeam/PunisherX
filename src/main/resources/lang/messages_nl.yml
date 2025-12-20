@@ -140,6 +140,14 @@ warn:
     - "Speler beledigen"
     - "Beledigende taal"
 
+# /punish commando berichten
+punish:
+  usage: "Correct gebruik is: <gold>/punish <speler> <sjabloon> (lvl)"
+  template_not_found: "<red>Sjabloon <gold><template></gold> niet gevonden.</red>"
+  invalid_level: "<red>Ongeldig sjabloonniveau: <gold><level></gold>.</red>"
+  invalid_time: "<red>Ongeldige sjabloontijd: <gold><time></gold>.</red>"
+  invalid_type: "<red>Niet-ondersteund straftype in sjabloon: <gold><type></gold>.</red>"
+
 # /unwarn commando berichten
 unwarn:
   unwarn: "<green>Je hebt de waarschuwing voor speler <gold><player></gold> verwijderd</green>"
