@@ -3,7 +3,6 @@ package pl.syntaxdevteam.punisher.commands
 import io.papermc.paper.ban.BanListType
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.ban.ProfileBanList
@@ -16,7 +15,7 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
     private val clp = plugin.commandLoggerPlugin
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-    if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN)) {  
+        if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN)) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("ban", "usage"))
@@ -31,21 +30,16 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                             return
                         }
                     }
-                    if(PermissionChecker.isAuthor(uuid)){
-                        stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("<red>You can't punish the plugin author</red>",
-                            TagResolver.empty()))
+                    if (PermissionChecker.isAuthor(uuid)) {
+                        stack.sender.sendMessage(
+                            plugin.messageHandler.formatMixedTextToMiniMessage(
+                                "<red>You can't punish the plugin author</red>",
+                                TagResolver.empty()
+                            )
+                        )
                         return
                     }
-                    var gtime: String?
-                    var reason: String
-                    try {
-                        gtime = args[1]
-                        plugin.timeHandler.parseTime(gtime)
-                        reason = args.slice(2 until args.size).filterNot { it == "--force" }.joinToString(" ")
-                    } catch (_: NumberFormatException) {
-                        gtime = null
-                        reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
-                    }
+                    val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, args, 1)
 
                     val punishmentType = "BAN"
                     val start = System.currentTimeMillis()
@@ -66,48 +60,19 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                     plugin.proxyBridgeMessenger.notifyBan(uuid, reason, normalizedEnd)
 
                     val formattedTime = plugin.timeHandler.formatTime(gtime)
-                    val placeholders = mapOf(
-                        "player" to player,
-                        "operator" to stack.sender.name,
-                        "reason" to reason,
-                        "time" to formattedTime,
-                        "type" to punishmentType,
-                        "id" to (punishmentId?.toString() ?: "?")
+                    val placeholders = PunishmentCommandUtils.buildPlaceholders(
+                        player = player,
+                        operator = stack.sender.name,
+                        reason = reason,
+                        time = formattedTime,
+                        type = punishmentType,
+                        extra = mapOf("id" to (punishmentId?.toString() ?: "?"))
                     )
 
-                    if (targetPlayer != null) {
-                        val kickMessages = plugin.messageHandler.getSmartMessage(
-                            "ban",
-                            "kick_message",
-                            placeholders
-                        )
-                        val kickMessage = Component.text()
-                        kickMessages.forEach { line ->
-                            kickMessage.append(line)
-                            kickMessage.append(Component.newline())
-                        }
-                        targetPlayer.kick(kickMessage.build())
-                    }
-
-                    plugin.messageHandler.getSmartMessage(
-                        "ban",
-                        "ban",
-                        placeholders
-                    ).forEach { stack.sender.sendMessage(it) }
-
+                    PunishmentCommandUtils.sendKickMessage(plugin, targetPlayer, "ban", "kick_message", placeholders)
+                    PunishmentCommandUtils.sendSenderMessages(plugin, stack, "ban", "ban", placeholders)
                     plugin.actionExecutor.executeAction("banned", player, placeholders)
-
-                    val broadcastMessages = plugin.messageHandler.getSmartMessage(
-                        "ban",
-                        "broadcast",
-                        placeholders
-                    )
-
-                    plugin.server.onlinePlayers.forEach { onlinePlayer ->
-                        if(PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_BAN)) {
-                            broadcastMessages.forEach { onlinePlayer.sendMessage(it) }
-                        }
-                    }
+                    PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_BAN, "ban", "broadcast", placeholders)
                     if (isForce) {
                         plugin.logger.warning("Force-banned by ${stack.sender.name} on $player")
                     }

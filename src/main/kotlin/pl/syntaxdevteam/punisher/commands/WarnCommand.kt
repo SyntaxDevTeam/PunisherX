@@ -23,16 +23,7 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                         stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "bypass", mapOf("player" to player)))
                         return
                     }
-                    var gtime: String?
-                    var reason: String
-                    try {
-                        gtime = args[1]
-                        plugin.timeHandler.parseTime(gtime)
-                        reason = args.slice(2 until args.size).filterNot { it == "--force" }.joinToString(" ")
-                    } catch (_: NumberFormatException) {
-                        gtime = null
-                        reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
-                    }
+                    val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, args, 1)
 
                     val punishmentType = "WARN"
                     val start = System.currentTimeMillis()
@@ -47,39 +38,21 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
 
                     val warnCount = plugin.databaseHandler.getActiveWarnCount(uuid.toString())
                     val formattedTime = plugin.timeHandler.formatTime(gtime)
-                    val placeholders = mapOf(
-                        "player" to player,
-                        "operator" to stack.sender.name,
-                        "reason" to reason,
-                        "time" to formattedTime,
-                        "type" to punishmentType,
-                        "warn_no" to warnCount.toString(),
-                        "id" to punishmentId.toString()
+                    val placeholders = PunishmentCommandUtils.buildPlaceholders(
+                        player = player,
+                        operator = stack.sender.name,
+                        reason = reason,
+                        time = formattedTime,
+                        type = punishmentType,
+                        extra = mapOf(
+                            "warn_no" to warnCount.toString(),
+                            "id" to punishmentId.toString()
+                        )
                     )
 
-                    plugin.messageHandler.getSmartMessage(
-                        "warn",
-                        "warn",
-                        placeholders
-                    ).forEach { stack.sender.sendMessage(it) }
-
-                    val warnMessages = plugin.messageHandler.getSmartMessage(
-                        "warn",
-                        "warn_message",
-                        placeholders
-                    )
-                    targetPlayer?.let { p -> warnMessages.forEach { p.sendMessage(it) } }
-
-                    val broadcastMessages = plugin.messageHandler.getSmartMessage(
-                        "warn",
-                        "broadcast",
-                        placeholders
-                    )
-                    plugin.server.onlinePlayers.forEach { onlinePlayer ->
-                        if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_WARN)) {
-                            broadcastMessages.forEach { onlinePlayer.sendMessage(it) }
-                        }
-                    }
+                    PunishmentCommandUtils.sendSenderMessages(plugin, stack, "warn", "warn", placeholders)
+                    PunishmentCommandUtils.sendTargetMessages(plugin, targetPlayer, "warn", "warn_message", placeholders)
+                    PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_WARN, "warn", "broadcast", placeholders)
                     if (isForce) {
                         plugin.logger.warning("Force-warned by ${stack.sender.name} on $player")
                     }

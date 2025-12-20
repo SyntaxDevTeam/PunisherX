@@ -105,6 +105,7 @@ class PunishmentCache(private val plugin: PunisherX) {
         }
     }
 
+    //TODO: zweryfikować czy będzie potrzebne i ewnetualnie wdrożyć lub usunąć
     fun isPunishmentActive(uuid: UUID): Boolean {
         return cache.getIfPresent(uuid)?.let { it.endTime > System.currentTimeMillis() || it.endTime == -1L } ?: false
     }
@@ -115,6 +116,7 @@ class PunishmentCache(private val plugin: PunisherX) {
     fun getPunishmentEnd(uuid: UUID): Long? =
         cache.getIfPresent(uuid)?.endTime
 
+    //TODO: zweryfikować czy będzie potrzebne i ewnetualnie wdrożyć lub usunąć
     fun getActivePunishments(): Map<UUID, Long> =
         cache.asMap()
             .filterValues { it.endTime > System.currentTimeMillis() || it.endTime == -1L }
