@@ -105,7 +105,7 @@ class DiscordWebhook(plugin: PunisherX) {
                         else -> applyPlaceholders(defaultFooter, placeholders)
                     }
                     footerText?.let { addProperty("text", it) }
-                    resolveImageUrl(embedSection?.getString("footer.icon-url"))
+                    resolveImageUrl(embedSection?.getString("footer.icon-url"), placeholders)
                         ?.let { iconUrl -> addProperty("icon_url", iconUrl) }
                 })
 
@@ -114,22 +114,22 @@ class DiscordWebhook(plugin: PunisherX) {
 
                     resolveString("author.name", null, placeholders)
                         ?.let { authorObject.addProperty("name", it) }
-                    resolveImageUrl(authorSection.getString("icon-url"))
+                    resolveImageUrl(authorSection.getString("icon-url"), placeholders)
                         ?.let { authorObject.addProperty("icon_url", it) }
                     if (authorObject.entrySet().isNotEmpty()) {
                         add("author", authorObject)
                     }
                 }
 
-                resolveImageUrl(embedSection?.getString("thumbnail-url"))
+                resolveImageUrl(embedSection?.getString("thumbnail-url"), placeholders)
                     ?.let { url -> add("thumbnail", JsonObject().apply { addProperty("url", url) }) }
-                resolveImageUrl(embedSection?.getString("image-url"))
+                resolveImageUrl(embedSection?.getString("image-url"), placeholders)
                     ?.let { url -> add("image", JsonObject().apply { addProperty("url", url) }) }
             }
 
             val json = JsonObject().apply {
                 webhookSection?.getString("username")?.takeIf { it.isNotBlank() }?.let { addProperty("username", it) }
-                resolveImageUrl(webhookSection?.getString("avatar-url"))
+                resolveImageUrl(webhookSection?.getString("avatar-url"), placeholders)
                     ?.let { addProperty("avatar_url", it) }
                 add("embeds", JsonArray().apply {
                     add(embed)
@@ -213,7 +213,7 @@ class DiscordWebhook(plugin: PunisherX) {
         }
         return try {
             Instant.parse(raw).toString()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             log.debug("Invalid webhook timestamp format '$raw', falling back to now.")
             Instant.now().toString()
         }
@@ -286,8 +286,9 @@ class DiscordWebhook(plugin: PunisherX) {
         return null
     }
 
-    private fun resolveImageUrl(raw: String?): String? {
-        val trimmed = raw?.trim()?.takeIf { it.isNotEmpty() } ?: return null
+    private fun resolveImageUrl(raw: String?, placeholders: Map<String, String>): String? {
+        val substituted = raw?.let { applyPlaceholders(it, placeholders) }
+        val trimmed = substituted?.trim()?.takeIf { it.isNotEmpty() } ?: return null
         if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
             return trimmed
         }
@@ -323,7 +324,7 @@ class DiscordWebhook(plugin: PunisherX) {
             connection.inputStream?.close()
             connection.disconnect()
             responseCode in 200..399
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
