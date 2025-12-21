@@ -10,6 +10,10 @@ config-version: 162
 # The default setting is "network" and means that the penalty received will apply to all servers on the network.
 server: "network"
 
+# Plugin language selection. Possible values: EN, PL, NL, ES, FR, DE, RU, UK, IT, PT, AR.
+# To add your own language file, please contact us on Discord: https://discord.gg/Zk6mxv7eMh
+language: "EN"
+
 # /********************************************/
 #    Settings for connecting to the database
 # /********************************************/
@@ -28,7 +32,6 @@ database:
 playerCache:
   # Choose where player IP information is stored: "file" or "database"
   storage: "file"
-
 
 # /********************************************/
 #    Settings for main commands
@@ -86,20 +89,24 @@ mute:
     - "ehelpop"
     - "p msg"
 
-# Action bar countdown for active punishments.
-notifications:
-  punishment_bar:
-    # Enable the bottom-bar countdown for active jail or mute punishments.
-    enabled: true
-    # How often (in ticks) the counter should update. 20 ticks = 1 second.
-    period_ticks: 20
-
-placeholders:
-  # Maximum number of punishments displayed by PlaceholderAPI list placeholders.
-  punishment_list_limit: 5
-  # Force MessageHandler to format placeholder results using the selected format.
-  # Available options include: MINI_MESSAGE, LEGACY_AMPERSAND, LEGACY_SECTION, PLAIN_TEXT.
-  message_format: "MINI_MESSAGE"
+# Custom aliases for commands.
+aliases:
+  check:    "cx"
+  history:  "hx"
+  kick:     "kx"
+  warn:     "wx"
+  unwarn:   "uw"
+  mute:     "mx"
+  unmute:   "um"
+  jail:     "j"
+  unjail:   "uj"
+  ban:      "bx"
+  banip:    "bip"   # For security reasons, do not use "ban-ip" for this alias.
+  unban:    "ub"
+  clearall: "ca"
+  setjail:  "sjail"
+  setunjail: "sunjail"
+  panel:    "px"
 
 # Settings for the prison location and its radius.
 jail:
@@ -134,6 +141,16 @@ unjail:
     # * "world" - default world spawn point (/setworldspawn)
     set: unjail
 
+# Action bar countdown for active punishments.
+notifications:
+  punishment_bar:
+    # Enable the bottom-bar countdown for active jail or mute punishments.
+    enabled: true
+    # How often (in ticks) the counter should update. 20 ticks = 1 second.
+    period_ticks: 20
+
+
+
 # /********************************************/
 #    GUI settings
 # /********************************************/
@@ -161,29 +178,6 @@ gui:
 # /********************************************/
 #    Internal settings
 # /********************************************/
-
-# Plugin language selection. Possible values: EN, PL, NL, ES, FR, DE, RU, UK, IT, PT, AR.
-# To add your own language file, please contact us on Discord: https://discord.gg/Zk6mxv7eMh
-language: "EN"
-
-# Custom aliases for commands.
-aliases:
-  check:    "cx"
-  history:  "hx"
-  kick:     "kx"
-  warn:     "wx"
-  unwarn:   "uw"
-  mute:     "mx"
-  unmute:   "um"
-  jail:     "j"
-  unjail:   "uj"
-  ban:      "bx"
-  banip:    "bip"   # For security reasons, do not use "ban-ip" for this alias.
-  unban:    "ub"
-  clearall: "ca"
-  setjail:  "sjail"
-  setunjail: "sunjail"
-  panel:    "px"
 
 geoDatabase:
   # To use GeoIP functionality, you need a MaxMind license key.
@@ -236,6 +230,14 @@ webhook:
         - name: "ID"
           value: "{id}"
           inline: true
+
+placeholders:
+  # Maximum number of punishments displayed by PlaceholderAPI list placeholders.
+  punishment_list_limit: 5
+  # Force MessageHandler to format placeholder results using the selected format.
+  # Available options include: MINI_MESSAGE, LEGACY_AMPERSAND, LEGACY_SECTION, PLAIN_TEXT.
+  message_format: "LEGACY_AMPERSAND"
+
 
 # Update check and auto-download settings.
 update:
