@@ -1,20 +1,21 @@
 package pl.syntaxdevteam.punisher.commands
 
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.ban.BanListType
-import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
+import io.papermc.paper.command.brigadier.Commands
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.ban.ProfileBanList
-import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.*
 
-class BanCommand(private var plugin: PunisherX) : BasicCommand {
+class BanCommand(private var plugin: PunisherX) : BrigadierCommand {
     private val clp = plugin.commandLoggerPlugin
 
-    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+    override fun execute(stack: CommandSourceStack, args: List<String>) {
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN)) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
@@ -86,7 +87,7 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
         }
     }
 
-    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+    override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN)) {
             return emptyList()
         }
@@ -96,5 +97,55 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
             3 -> plugin.messageHandler.getMessageStringList("ban", "reasons")
             else -> emptyList()
         }
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val targetArg = Commands.argument("target", StringArgumentType.word())
+            .suggests(BrigadierCommandUtils.suggestions(this) { emptyList() })
+            .executes { context ->
+                val target = StringArgumentType.getString(context, "target")
+                execute(context.source, listOf(target))
+                1
+            }
+            .then(
+                Commands.argument("time", StringArgumentType.word())
+                    .suggests(BrigadierCommandUtils.suggestions(this) { context ->
+                        listOf(StringArgumentType.getString(context, "target"), "")
+                    })
+                    .executes { context ->
+                        val target = StringArgumentType.getString(context, "target")
+                        val time = StringArgumentType.getString(context, "time")
+                        execute(context.source, listOf(target, time))
+                        1
+                    }
+                    .then(
+                        Commands.argument("reason", StringArgumentType.greedyString())
+                            .executes { context ->
+                                val target = StringArgumentType.getString(context, "target")
+                                val time = StringArgumentType.getString(context, "time")
+                                val reason = StringArgumentType.getString(context, "reason")
+                                execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target, time), reason))
+                                1
+                            }
+                    )
+            )
+            .then(
+                Commands.argument("reason", StringArgumentType.greedyString())
+                    .executes { context ->
+                        val target = StringArgumentType.getString(context, "target")
+                        val reason = StringArgumentType.getString(context, "reason")
+                        execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target), reason))
+                        1
+                    }
+            )
+
+        return Commands.literal(name)
+            .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.BAN))
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .then(targetArg)
+            .build()
     }
 }

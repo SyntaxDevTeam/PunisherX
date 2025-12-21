@@ -1,16 +1,17 @@
 package pl.syntaxdevteam.punisher.commands
 
-import io.papermc.paper.command.brigadier.BasicCommand
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
+import io.papermc.paper.command.brigadier.Commands
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.UUID
 
-class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
+class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
     companion object {
         private val IP_REGEX = Regex("\\d+\\.\\d+\\.\\d+\\.\\d+")
         private val UUID_REGEX = Regex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
@@ -18,7 +19,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
 
     private val clp = plugin.commandLoggerPlugin
 
-    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+    override fun execute(stack: CommandSourceStack, args: List<String>) {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BANIP)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
@@ -122,7 +123,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
         if (isForce) plugin.logger.warning("Force by ${stack.sender.name} on $rawTarget")
     }
 
-    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+    override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
         if (!PermissionChecker.hasWithLegacy(stack.sender as Player, PermissionChecker.PermissionKey.BANIP)) return emptyList()
         return when (args.size) {
             0, 1 -> plugin.server.onlinePlayers.map { it.name }
@@ -130,5 +131,55 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
             3 -> plugin.messageHandler.getMessageStringList("banip", "reasons")
             else -> emptyList()
         }
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val targetArg = Commands.argument("target", StringArgumentType.word())
+            .suggests(BrigadierCommandUtils.suggestions(this) { emptyList() })
+            .executes { context ->
+                val target = StringArgumentType.getString(context, "target")
+                execute(context.source, listOf(target))
+                1
+            }
+            .then(
+                Commands.argument("time", StringArgumentType.word())
+                    .suggests(BrigadierCommandUtils.suggestions(this) { context ->
+                        listOf(StringArgumentType.getString(context, "target"), "")
+                    })
+                    .executes { context ->
+                        val target = StringArgumentType.getString(context, "target")
+                        val time = StringArgumentType.getString(context, "time")
+                        execute(context.source, listOf(target, time))
+                        1
+                    }
+                    .then(
+                        Commands.argument("reason", StringArgumentType.greedyString())
+                            .executes { context ->
+                                val target = StringArgumentType.getString(context, "target")
+                                val time = StringArgumentType.getString(context, "time")
+                                val reason = StringArgumentType.getString(context, "reason")
+                                execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target, time), reason))
+                                1
+                            }
+                    )
+            )
+            .then(
+                Commands.argument("reason", StringArgumentType.greedyString())
+                    .executes { context ->
+                        val target = StringArgumentType.getString(context, "target")
+                        val reason = StringArgumentType.getString(context, "reason")
+                        execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target), reason))
+                        1
+                    }
+            )
+
+        return Commands.literal(name)
+            .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.BANIP))
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .then(targetArg)
+            .build()
     }
 }

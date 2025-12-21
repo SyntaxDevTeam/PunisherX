@@ -1,15 +1,16 @@
 package pl.syntaxdevteam.punisher.commands
 
-import io.papermc.paper.command.brigadier.BasicCommand
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
+import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
-import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
-class WarnCommand(private val plugin: PunisherX) : BasicCommand {
+class WarnCommand(private val plugin: PunisherX) : BrigadierCommand {
 
-    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+    override fun execute(stack: CommandSourceStack, args: List<String>) {
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.WARN)) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
@@ -66,7 +67,7 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
         }
     }
 
-    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+    override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.WARN)) {
             return emptyList()
         }
@@ -76,6 +77,56 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
             3 -> plugin.messageHandler.getMessageStringList("warn", "reasons")
             else -> emptyList()
         }
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val targetArg = Commands.argument("target", StringArgumentType.word())
+            .suggests(BrigadierCommandUtils.suggestions(this) { emptyList() })
+            .executes { context ->
+                val target = StringArgumentType.getString(context, "target")
+                execute(context.source, listOf(target))
+                1
+            }
+            .then(
+                Commands.argument("time", StringArgumentType.word())
+                    .suggests(BrigadierCommandUtils.suggestions(this) { context ->
+                        listOf(StringArgumentType.getString(context, "target"), "")
+                    })
+                    .executes { context ->
+                        val target = StringArgumentType.getString(context, "target")
+                        val time = StringArgumentType.getString(context, "time")
+                        execute(context.source, listOf(target, time))
+                        1
+                    }
+                    .then(
+                        Commands.argument("reason", StringArgumentType.greedyString())
+                            .executes { context ->
+                                val target = StringArgumentType.getString(context, "target")
+                                val time = StringArgumentType.getString(context, "time")
+                                val reason = StringArgumentType.getString(context, "reason")
+                                execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target, time), reason))
+                                1
+                            }
+                    )
+            )
+            .then(
+                Commands.argument("reason", StringArgumentType.greedyString())
+                    .executes { context ->
+                        val target = StringArgumentType.getString(context, "target")
+                        val reason = StringArgumentType.getString(context, "reason")
+                        execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target), reason))
+                        1
+                    }
+            )
+
+        return Commands.literal(name)
+            .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.WARN))
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .then(targetArg)
+            .build()
     }
 
 }

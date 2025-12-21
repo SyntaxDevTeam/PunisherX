@@ -1,20 +1,22 @@
 package pl.syntaxdevteam.punisher.commands
 
-import io.papermc.paper.command.brigadier.BasicCommand
+import com.mojang.brigadier.arguments.IntegerArgumentType
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
+import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
-import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.players.PlayerIPManager
 import java.text.SimpleDateFormat
 import java.util.*
 
-class HistoryCommand(private val plugin: PunisherX, private val playerIPManager: PlayerIPManager) : BasicCommand {
+class HistoryCommand(private val plugin: PunisherX, private val playerIPManager: PlayerIPManager) : BrigadierCommand {
 
     private val dateFormat = SimpleDateFormat("yy-MM-dd HH:mm:ss")
 
-    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+    override fun execute(stack: CommandSourceStack, args: List<String>) {
 
         if (args.isEmpty()) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("history", "usage"))
@@ -95,7 +97,7 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
         }
     }
 
-    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+    override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.HISTORY)) {
             return emptyList()
         }
@@ -103,5 +105,32 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
             0, 1 -> plugin.server.onlinePlayers.map { it.name }
             else -> emptyList()
         }
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val playerArg = Commands.argument("player", StringArgumentType.word())
+            .suggests(BrigadierCommandUtils.suggestions(this) { emptyList() })
+            .executes { context ->
+                val player = StringArgumentType.getString(context, "player")
+                execute(context.source, listOf(player))
+                1
+            }
+            .then(
+                Commands.argument("page", IntegerArgumentType.integer(1))
+                    .executes { context ->
+                        val player = StringArgumentType.getString(context, "player")
+                        val page = IntegerArgumentType.getInteger(context, "page")
+                        execute(context.source, listOf(player, page.toString()))
+                        1
+                    }
+            )
+
+        return Commands.literal(name)
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .then(playerArg)
+            .build()
     }
 }

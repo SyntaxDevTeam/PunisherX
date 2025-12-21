@@ -1,9 +1,12 @@
 package pl.syntaxdevteam.punisher.commands
 
-import io.papermc.paper.command.brigadier.BasicCommand
+import com.mojang.brigadier.arguments.IntegerArgumentType
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.suggestion.SuggestionProvider
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
+import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventOwner
-import org.jetbrains.annotations.NotNull
 import java.lang.management.ManagementFactory
 import java.net.HttpURLConnection
 import java.net.URI
@@ -17,11 +20,11 @@ private data class ConnectivityCheckResult(
     val durationMs: Long
 )
 
-class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
+class PunishesXCommands(private val plugin: PunisherX) : BrigadierCommand {
     private val mH = plugin.messageHandler
     private var pendingMigration: Pair<DatabaseType, DatabaseType>? = null
 
-    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+    override fun execute(stack: CommandSourceStack, args: List<String>) {
         val prefix = plugin.messageHandler.getPrefix()
         if (args.isNotEmpty() && args[0].equals("help", ignoreCase = true)) {
             val page = args.getOrNull(1)?.toIntOrNull() ?: 1
@@ -291,7 +294,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
         stack.sender.sendMessage(mH.miniMessageFormat(" <gray>+-------------------------------------------------"))
     }
 
-    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+    override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
 
         if (args.isEmpty()) {
             val baseSuggestions = mutableListOf("help")
@@ -348,5 +351,125 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             }
         }
         return emptyList()
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val adminRequirement = BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.PUNISHERX_COMMAND)
+        val databaseSuggestions = SuggestionProvider<CommandSourceStack> { _, builder ->
+            DatabaseType::class.java.enumConstants
+                ?.map { it.name.lowercase() }
+                ?.forEach { builder.suggest(it) }
+            builder.buildFuture()
+        }
+
+        val migrateCommand = Commands.literal("migrate")
+            .requires(adminRequirement)
+            .then(
+                Commands.argument("from", StringArgumentType.word())
+                    .suggests(databaseSuggestions)
+                    .then(
+                        Commands.argument("to", StringArgumentType.word())
+                            .suggests(databaseSuggestions)
+                            .executes { context ->
+                                val from = StringArgumentType.getString(context, "from")
+                                val to = StringArgumentType.getString(context, "to")
+                                execute(context.source, listOf("migrate", from, to))
+                                1
+                            }
+                            .then(
+                                Commands.literal("--force")
+                                    .executes { context ->
+                                        val from = StringArgumentType.getString(context, "from")
+                                        val to = StringArgumentType.getString(context, "to")
+                                        execute(context.source, listOf("migrate", from, to, "--force"))
+                                        1
+                                    }
+                            )
+                    )
+                    .then(
+                        Commands.literal("--force")
+                            .then(
+                                Commands.argument("to", StringArgumentType.word())
+                                    .suggests(databaseSuggestions)
+                                    .executes { context ->
+                                        val from = StringArgumentType.getString(context, "from")
+                                        val to = StringArgumentType.getString(context, "to")
+                                        execute(context.source, listOf("migrate", from, "--force", to))
+                                        1
+                                    }
+                            )
+                    )
+            )
+
+        return Commands.literal(name)
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .then(
+                Commands.literal("help")
+                    .executes { context ->
+                        execute(context.source, listOf("help"))
+                        1
+                    }
+                    .then(
+                        Commands.argument("page", IntegerArgumentType.integer(1))
+                            .executes { context ->
+                                val page = IntegerArgumentType.getInteger(context, "page")
+                                execute(context.source, listOf("help", page.toString()))
+                                1
+                            }
+                    )
+            )
+            .then(
+                Commands.literal("version")
+                    .requires(adminRequirement)
+                    .executes { context ->
+                        execute(context.source, listOf("version"))
+                        1
+                    }
+            )
+            .then(
+                Commands.literal("reload")
+                    .requires(adminRequirement)
+                    .executes { context ->
+                        execute(context.source, listOf("reload"))
+                        1
+                    }
+            )
+            .then(
+                Commands.literal("export")
+                    .requires(adminRequirement)
+                    .executes { context ->
+                        execute(context.source, listOf("export"))
+                        1
+                    }
+            )
+            .then(
+                Commands.literal("import")
+                    .requires(adminRequirement)
+                    .executes { context ->
+                        execute(context.source, listOf("import"))
+                        1
+                    }
+            )
+            .then(
+                Commands.literal("diag")
+                    .requires(adminRequirement)
+                    .executes { context ->
+                        execute(context.source, listOf("diag"))
+                        1
+                    }
+            )
+            .then(
+                Commands.literal("diagnostics")
+                    .requires(adminRequirement)
+                    .executes { context ->
+                        execute(context.source, listOf("diagnostics"))
+                        1
+                    }
+            )
+            .then(migrateCommand)
+            .build()
     }
 }

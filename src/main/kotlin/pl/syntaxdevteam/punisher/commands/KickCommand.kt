@@ -1,16 +1,17 @@
 package pl.syntaxdevteam.punisher.commands
 
-import io.papermc.paper.command.brigadier.BasicCommand
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
+import io.papermc.paper.command.brigadier.Commands
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
-import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
-class KickCommand(private val plugin: PunisherX) : BasicCommand {
+class KickCommand(private val plugin: PunisherX) : BrigadierCommand {
 
-    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+    override fun execute(stack: CommandSourceStack, args: List<String>) {
         val history: Boolean = plugin.config.getBoolean("kick.history", false)
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.KICK)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
@@ -131,7 +132,7 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
         PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_KICK, "kick", "broadcast", placeholders)
     }
 
-    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+    override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.KICK)) {
             return emptyList()
         }
@@ -140,5 +141,51 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
             2 -> plugin.messageHandler.getMessageStringList("kick", "reasons")
             else -> emptyList()
         }
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val forceLiteral = Commands.literal("--force")
+            .executes { context ->
+                val target = StringArgumentType.getString(context, "target")
+                execute(context.source, listOf(target, "--force"))
+                1
+            }
+            .then(
+                Commands.argument("reason", StringArgumentType.greedyString())
+                    .executes { context ->
+                        val target = StringArgumentType.getString(context, "target")
+                        val reason = StringArgumentType.getString(context, "reason")
+                        val args = BrigadierCommandUtils.greedyArgs(listOf(target, "--force"), reason)
+                        execute(context.source, args)
+                        1
+                    }
+            )
+
+        val reasonArg = Commands.argument("reason", StringArgumentType.greedyString())
+            .executes { context ->
+                val target = StringArgumentType.getString(context, "target")
+                val reason = StringArgumentType.getString(context, "reason")
+                execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target), reason))
+                1
+            }
+
+        val targetArg = Commands.argument("target", StringArgumentType.word())
+            .suggests(BrigadierCommandUtils.suggestions(this) { emptyList() })
+            .executes { context ->
+                val target = StringArgumentType.getString(context, "target")
+                execute(context.source, listOf(target))
+                1
+            }
+            .then(forceLiteral)
+            .then(reasonArg)
+
+        return Commands.literal(name)
+            .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.KICK))
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .then(targetArg)
+            .build()
     }
 }

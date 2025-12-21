@@ -9,7 +9,7 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 internal object PunishmentCommandUtils {
     fun parseTimeAndReason(
         plugin: PunisherX,
-        args: Array<String>,
+        args: List<String>,
         timeIndex: Int,
         forceFlag: String = "--force"
     ): Pair<String?, String> {

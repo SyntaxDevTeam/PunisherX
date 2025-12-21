@@ -1,16 +1,16 @@
 package pl.syntaxdevteam.punisher.commands
 
-import io.papermc.paper.command.brigadier.BasicCommand
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
+import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.entity.Player
-import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.gui.PunisherMain
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
-class PanelCommand(private val plugin: PunisherX) : BasicCommand {
+class PanelCommand(private val plugin: PunisherX) : BrigadierCommand {
 
-    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+    override fun execute(stack: CommandSourceStack, args: List<String>) {
         if (stack.sender !is Player) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "not_a_player"))
             return
@@ -20,5 +20,15 @@ class PanelCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
         PunisherMain(plugin).open(stack.sender as Player)
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        return Commands.literal(name)
+            .requires(BrigadierCommandUtils.requiresPlayerPermission(PermissionChecker.PermissionKey.PUNISHERX_COMMAND))
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .build()
     }
 }

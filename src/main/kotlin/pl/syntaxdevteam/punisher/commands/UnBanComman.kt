@@ -1,14 +1,15 @@
 package pl.syntaxdevteam.punisher.commands
 
-import io.papermc.paper.command.brigadier.BasicCommand
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import org.jetbrains.annotations.NotNull
+import io.papermc.paper.command.brigadier.Commands
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
-class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
+class UnBanCommand(private val plugin: PunisherX) : BrigadierCommand {
 
-    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+    override fun execute(stack: CommandSourceStack, args: List<String>) {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNBAN)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
@@ -121,11 +122,30 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
             .forEach { player -> messages.forEach { player.sendMessage(it) } }
     }
 
-    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+    override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
         return if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNBAN) && args.size == 1) {
             plugin.server.onlinePlayers.map { it.name }
         } else {
             emptyList()
         }
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val targetArg = Commands.argument("target", StringArgumentType.word())
+            .suggests(BrigadierCommandUtils.suggestions(this) { emptyList() })
+            .executes { context ->
+                val target = StringArgumentType.getString(context, "target")
+                execute(context.source, listOf(target))
+                1
+            }
+
+        return Commands.literal(name)
+            .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.UNBAN))
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .then(targetArg)
+            .build()
     }
 }

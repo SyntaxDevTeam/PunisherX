@@ -1,16 +1,17 @@
 package pl.syntaxdevteam.punisher.commands
 
-import org.jetbrains.annotations.NotNull
-import io.papermc.paper.command.brigadier.BasicCommand
+import com.mojang.brigadier.arguments.DoubleArgumentType
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
+import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.basic.JailUtils
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
-class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
+class SetjailCommand(private val plugin: PunisherX) : BrigadierCommand {
 
-    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+    override fun execute(stack: CommandSourceStack, args: List<String>) {
 
         if (stack.sender !is Player) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponentNoPrefix("error", "console"))
@@ -61,7 +62,7 @@ class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
         }
     }
 
-    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+    override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
         if (!PermissionChecker.hasWithManage(stack.sender, PermissionChecker.PermissionKey.MANAGE_SET_JAIL)) {
             return emptyList()
         }
@@ -71,5 +72,23 @@ class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
             }
             else -> emptyList()
         }
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val radiusArg = Commands.argument("radius", DoubleArgumentType.doubleArg(0.0))
+            .executes { context ->
+                val radius = DoubleArgumentType.getDouble(context, "radius")
+                execute(context.source, listOf(radius.toString()))
+                1
+            }
+
+        return Commands.literal(name)
+            .requires(BrigadierCommandUtils.requiresPlayerPermission(PermissionChecker.PermissionKey.MANAGE_SET_JAIL))
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .then(radiusArg)
+            .build()
     }
 }

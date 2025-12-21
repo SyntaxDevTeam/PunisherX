@@ -1,14 +1,16 @@
 package pl.syntaxdevteam.punisher.commands
 
-import io.papermc.paper.command.brigadier.BasicCommand
+import com.mojang.brigadier.arguments.IntegerArgumentType
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import org.jetbrains.annotations.NotNull
+import io.papermc.paper.command.brigadier.Commands
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
-class ChangeReasonCommand(private val plugin: PunisherX) : BasicCommand {
+class ChangeReasonCommand(private val plugin: PunisherX) : BrigadierCommand {
 
-    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+    override fun execute(stack: CommandSourceStack, args: List<String>) {
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.CHANGE_REASON)) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
@@ -48,7 +50,7 @@ class ChangeReasonCommand(private val plugin: PunisherX) : BasicCommand {
 
     }
 
-    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+    override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.CHANGE_REASON)) {
             return emptyList()
         }
@@ -57,5 +59,32 @@ class ChangeReasonCommand(private val plugin: PunisherX) : BasicCommand {
             2 -> TimeSuggestionProvider.generateTimeSuggestions()
             else -> emptyList()
         }
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val reasonArg = Commands.argument("reason", StringArgumentType.greedyString())
+            .executes { context ->
+                val id = IntegerArgumentType.getInteger(context, "id")
+                val reason = StringArgumentType.getString(context, "reason")
+                execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(id.toString()), reason))
+                1
+            }
+
+        val idArg = Commands.argument("id", IntegerArgumentType.integer(1))
+            .executes { context ->
+                val id = IntegerArgumentType.getInteger(context, "id")
+                execute(context.source, listOf(id.toString()))
+                1
+            }
+            .then(reasonArg)
+
+        return Commands.literal(name)
+            .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.CHANGE_REASON))
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .then(idArg)
+            .build()
     }
 }

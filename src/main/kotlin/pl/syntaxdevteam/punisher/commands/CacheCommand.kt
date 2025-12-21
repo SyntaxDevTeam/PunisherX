@@ -1,13 +1,13 @@
 package pl.syntaxdevteam.punisher.commands
 
-import io.papermc.paper.command.brigadier.BasicCommand
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import org.jetbrains.annotations.NotNull
+import io.papermc.paper.command.brigadier.Commands
 import pl.syntaxdevteam.punisher.PunisherX
 
-class CacheCommand(private val plugin: PunisherX) : BasicCommand {
+class CacheCommand(private val plugin: PunisherX) : BrigadierCommand {
 
-    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+    override fun execute(stack: CommandSourceStack, args: List<String>) {
         val sender = stack.sender
 
         if (sender !is org.bukkit.command.ConsoleCommandSender) {
@@ -26,5 +26,15 @@ class CacheCommand(private val plugin: PunisherX) : BasicCommand {
                 plugin.logger.info(record.toString())
             }
         }
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        return Commands.literal(name)
+            .requires(BrigadierCommandUtils.requiresConsole())
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .build()
     }
 }

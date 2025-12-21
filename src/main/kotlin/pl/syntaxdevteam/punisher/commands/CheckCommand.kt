@@ -1,16 +1,17 @@
 package pl.syntaxdevteam.punisher.commands
 
-import io.papermc.paper.command.brigadier.BasicCommand
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
+import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
-import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.players.PlayerIPManager
 
-class CheckCommand(private val plugin: PunisherX, private val playerIPManager: PlayerIPManager) : BasicCommand {
+class CheckCommand(private val plugin: PunisherX, private val playerIPManager: PlayerIPManager) : BrigadierCommand {
 
-    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+    override fun execute(stack: CommandSourceStack, args: List<String>) {
 
         if (args.isEmpty()) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("check", "usage"))
@@ -95,11 +96,41 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
         }
     }
 
-    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+    override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
         return when (args.size) {
             0, 1 -> plugin.server.onlinePlayers.map { it.name }
             2 -> listOf("all", "warn", "mute", "jail", "ban")
             else -> emptyList()
         }
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val playerArg = Commands.argument("player", StringArgumentType.word())
+            .suggests(BrigadierCommandUtils.suggestions(this) { emptyList() })
+            .executes { context ->
+                val player = StringArgumentType.getString(context, "player")
+                execute(context.source, listOf(player))
+                1
+            }
+            .then(
+                Commands.argument("type", StringArgumentType.word())
+                    .suggests(BrigadierCommandUtils.suggestions(this) { context ->
+                        listOf(StringArgumentType.getString(context, "player"), "")
+                    })
+                    .executes { context ->
+                        val player = StringArgumentType.getString(context, "player")
+                        val type = StringArgumentType.getString(context, "type")
+                        execute(context.source, listOf(player, type))
+                        1
+                    }
+            )
+
+        return Commands.literal(name)
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .then(playerArg)
+            .build()
     }
 }

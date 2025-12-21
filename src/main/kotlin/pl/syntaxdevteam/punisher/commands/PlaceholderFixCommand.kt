@@ -1,8 +1,8 @@
 package pl.syntaxdevteam.punisher.commands
 
-import io.papermc.paper.command.brigadier.BasicCommand
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import org.jetbrains.annotations.NotNull
+import io.papermc.paper.command.brigadier.Commands
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.io.File
@@ -13,8 +13,8 @@ import java.util.Locale
  * to the new angle bracket style (<player>) in the language file that matches the
  * language selected in the plugin configuration.
  */
-class PlaceholderFixCommand(private val plugin: PunisherX) : BasicCommand {
-    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+class PlaceholderFixCommand(private val plugin: PunisherX) : BrigadierCommand {
+    override fun execute(stack: CommandSourceStack, args: List<String>) {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.PUNISHERX_COMMAND)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
@@ -44,5 +44,15 @@ class PlaceholderFixCommand(private val plugin: PunisherX) : BasicCommand {
         }
     }
 
-    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> = emptyList()
+    override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> = emptyList()
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        return Commands.literal(name)
+            .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.PUNISHERX_COMMAND))
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .build()
+    }
 }

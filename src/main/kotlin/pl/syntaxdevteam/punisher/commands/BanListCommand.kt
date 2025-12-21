@@ -1,19 +1,20 @@
 package pl.syntaxdevteam.punisher.commands
 
-import io.papermc.paper.command.brigadier.BasicCommand
+import com.mojang.brigadier.arguments.IntegerArgumentType
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import org.jetbrains.annotations.NotNull
+import io.papermc.paper.command.brigadier.Commands
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.text.SimpleDateFormat
 import java.util.*
 
-class BanListCommand(private val plugin: PunisherX) : BasicCommand {
+class BanListCommand(private val plugin: PunisherX) : BrigadierCommand {
 
     private val dateFormat = SimpleDateFormat("yy-MM-dd HH:mm:ss")
     private val mh = plugin.messageHandler
 
-    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+    override fun execute(stack: CommandSourceStack, args: List<String>) {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN_LIST)) {
             stack.sender.sendMessage(mh.stringMessageToComponent("error", "no_permission"))
             return
@@ -82,7 +83,7 @@ class BanListCommand(private val plugin: PunisherX) : BasicCommand {
         stack.sender.sendMessage(navigation)
     }
 
-    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+    override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN_LIST)) {
             return emptyList()
         }
@@ -90,5 +91,39 @@ class BanListCommand(private val plugin: PunisherX) : BasicCommand {
             1 -> listOf("--h") + (1..5).map { it.toString() } // Sugestie dla historii i numerów stron
             else -> emptyList()
         }
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val history = Commands.literal("--h")
+            .executes { context ->
+                execute(context.source, listOf("--h"))
+                1
+            }
+            .then(
+                Commands.argument("page", IntegerArgumentType.integer(1))
+                    .executes { context ->
+                        val page = IntegerArgumentType.getInteger(context, "page")
+                        execute(context.source, listOf("--h", page.toString()))
+                        1
+                    }
+            )
+
+        val pageArg = Commands.argument("page", IntegerArgumentType.integer(1))
+            .executes { context ->
+                val page = IntegerArgumentType.getInteger(context, "page")
+                execute(context.source, listOf(page.toString()))
+                1
+            }
+            .then(history)
+
+        return Commands.literal(name)
+            .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.BAN_LIST))
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .then(history)
+            .then(pageArg)
+            .build()
     }
 }

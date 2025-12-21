@@ -1,13 +1,15 @@
 package pl.syntaxdevteam.punisher.commands
 
+import com.mojang.brigadier.arguments.IntegerArgumentType
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.ban.BanListType
-import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
+import io.papermc.paper.command.brigadier.Commands
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.ban.ProfileBanList
-import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.basic.JailUtils
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
@@ -17,9 +19,9 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 
-class PunishCommand(private val plugin: PunisherX) : BasicCommand {
+class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
 
-    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+    override fun execute(stack: CommandSourceStack, args: List<String>) {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.PUNISH)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
@@ -82,7 +84,7 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         applyTemplatePunishment(stack, targetName, uuid, template, templateLevel)
     }
 
-    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+    override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.PUNISH)) {
             return emptyList()
         }
@@ -101,6 +103,54 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
             }
             else -> emptyList()
         }
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val levelArg = Commands.argument("level", IntegerArgumentType.integer(1))
+            .suggests(BrigadierCommandUtils.suggestions(this) { context ->
+                listOf(
+                    StringArgumentType.getString(context, "target"),
+                    StringArgumentType.getString(context, "template"),
+                    ""
+                )
+            })
+            .executes { context ->
+                val target = StringArgumentType.getString(context, "target")
+                val template = StringArgumentType.getString(context, "template")
+                val level = IntegerArgumentType.getInteger(context, "level")
+                execute(context.source, listOf(target, template, level.toString()))
+                1
+            }
+
+        val templateArg = Commands.argument("template", StringArgumentType.word())
+            .suggests(BrigadierCommandUtils.suggestions(this) { context ->
+                listOf(StringArgumentType.getString(context, "target"), "")
+            })
+            .executes { context ->
+                val target = StringArgumentType.getString(context, "target")
+                val template = StringArgumentType.getString(context, "template")
+                execute(context.source, listOf(target, template))
+                1
+            }
+            .then(levelArg)
+
+        val targetArg = Commands.argument("target", StringArgumentType.word())
+            .suggests(BrigadierCommandUtils.suggestions(this) { emptyList() })
+            .executes { context ->
+                val target = StringArgumentType.getString(context, "target")
+                execute(context.source, listOf(target))
+                1
+            }
+            .then(templateArg)
+
+        return Commands.literal(name)
+            .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.PUNISH))
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .then(targetArg)
+            .build()
     }
 
     private fun applyTemplatePunishment(
