@@ -5,6 +5,7 @@ import pl.syntaxdevteam.core.database.*
 import pl.syntaxdevteam.punisher.PunisherX
 import java.io.File
 import java.io.IOException
+import java.sql.DatabaseMetaData
 import java.sql.Statement
 import java.time.Instant
 import java.time.LocalDate
@@ -32,6 +33,9 @@ data class DatabaseHealthCheckResult(
 class DatabaseHandler(private val plugin: PunisherX) {
     private val logger = plugin.logger
 
+    private companion object {
+        private const val NETWORK_SCOPE = "network"
+    }
 
     private val dbType: DatabaseType = plugin.config
         .getString("database.type")
@@ -94,6 +98,23 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return db.query(sql, *params, mapper = mapper)
     }
 
+    private fun normalizedServerScope(): String {
+        val raw = plugin.config.getString("server")?.trim().orEmpty()
+        return raw.ifEmpty { NETWORK_SCOPE }.lowercase()
+    }
+
+    private fun appendServerFilter(sql: String, params: MutableList<Any>, hasWhere: Boolean): String {
+        val scope = normalizedServerScope()
+        if (scope == NETWORK_SCOPE) return sql
+        params.add(scope)
+        params.add(NETWORK_SCOPE)
+        return if (hasWhere) {
+            "$sql AND (server = ? OR server = ?)"
+        } else {
+            "$sql WHERE (server = ? OR server = ?)"
+        }
+    }
+
     /** Returns database specific definition for auto increment column. */
     private fun idDefinition(): String = when (dbType) {
         DatabaseType.SQLITE -> "INTEGER PRIMARY KEY AUTOINCREMENT"
@@ -127,7 +148,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
                 Column("operator", "VARCHAR(16)"),
                 Column("punishmentType", "VARCHAR(16)"),
                 Column("start", "BIGINT"),
-                Column("endTime", "BIGINT")
+                Column("endTime", "BIGINT"),
+                Column("server", "VARCHAR(64) DEFAULT '$NETWORK_SCOPE'")
             )
         )
 
@@ -135,6 +157,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
         db.createTable(punishmentSchema)
         db.createTable(historySchema)
+        ensureServerScopeColumns()
 
         val playerCacheSchema = TableSchema(
             "playercache",
@@ -172,6 +195,40 @@ class DatabaseHandler(private val plugin: PunisherX) {
         db.createTable(bridgeQueueSchema)
     }
 
+    private fun ensureServerScopeColumns() {
+        val alterStatement = "ALTER TABLE %s ADD COLUMN server VARCHAR(64) DEFAULT '$NETWORK_SCOPE'"
+        val tables = listOf("punishments", "punishmenthistory")
+        runCatching {
+            db.getConnection().use { connection ->
+                val metadata = connection.metaData
+                tables.forEach { table ->
+                    val columnExists = hasColumn(metadata, table, "server")
+                    if (!columnExists) {
+                        runCatching {
+                            execute(alterStatement.format(table))
+                        }.onFailure { exception ->
+                            logger.debug("Skipping server column migration on $table: ${exception.message}")
+                        }
+                    }
+                }
+            }
+        }
+        runCatching { execute("UPDATE punishments SET server = ? WHERE server IS NULL", NETWORK_SCOPE) }
+        runCatching { execute("UPDATE punishmenthistory SET server = ? WHERE server IS NULL", NETWORK_SCOPE) }
+    }
+
+    private fun hasColumn(meta: DatabaseMetaData, table: String, column: String): Boolean {
+        fun check(tableName: String, columnName: String): Boolean {
+            meta.getColumns(null, null, tableName, columnName).use { result ->
+                return result.next()
+            }
+        }
+
+        return check(table, column)
+            || check(table.lowercase(), column.lowercase())
+            || check(table.uppercase(), column.uppercase())
+    }
+
     // ---------------------------------------------------------------------
     // Data modification helpers
     // ---------------------------------------------------------------------
@@ -187,8 +244,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
     ): Long? {
         return try {
             val insertSql = """
-                INSERT INTO punishments (name, uuid, reason, operator, punishmentType, start, endTime)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO punishments (name, uuid, reason, operator, punishmentType, start, endTime, server)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """.trimIndent()
             val punishmentId = db.getConnection().use { connection ->
                 when (dbType) {
@@ -202,6 +259,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                             statement.setString(5, punishmentType)
                             statement.setLong(6, start)
                             statement.setLong(7, end)
+                            statement.setString(8, normalizedServerScope())
                             statement.executeQuery().use { resultSet ->
                                 if (resultSet.next()) resultSet.getLong(1) else null
                             }
@@ -216,6 +274,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                             statement.setString(5, punishmentType)
                             statement.setLong(6, start)
                             statement.setLong(7, end)
+                            statement.setString(8, normalizedServerScope())
                             val rows = statement.executeUpdate()
                             if (rows == 0) {
                                 null
@@ -235,6 +294,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                             statement.setString(5, punishmentType)
                             statement.setLong(6, start)
                             statement.setLong(7, end)
+                            statement.setString(8, normalizedServerScope())
                             val rows = statement.executeUpdate()
                             if (rows == 0) {
                                 null
@@ -293,10 +353,10 @@ class DatabaseHandler(private val plugin: PunisherX) {
         try {
             execute(
                 """
-                INSERT INTO punishmenthistory (name, uuid, reason, operator, punishmentType, start, endTime)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO punishmenthistory (name, uuid, reason, operator, punishmentType, start, endTime, server)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """.trimIndent(),
-                name, uuid, reason, operator, punishmentType, start, end
+                name, uuid, reason, operator, punishmentType, start, end, normalizedServerScope()
             )
         } catch (e: Exception) {
             logger.err("Failed to add punishment history for player $name. ${e.message}")
@@ -304,23 +364,27 @@ class DatabaseHandler(private val plugin: PunisherX) {
     }
 
     fun removePunishment(uuidOrIp: String, punishmentType: String, removeAll: Boolean = false) {
-        val base = "DELETE FROM punishments WHERE uuid = ? AND punishmentType = ?"
+        val params = mutableListOf<Any>(uuidOrIp, punishmentType)
+        val base = appendServerFilter("DELETE FROM punishments WHERE uuid = ? AND punishmentType = ?", params, true)
         val query = if (removeAll) {
             base
         } else {
             when (dbType) {
-                DatabaseType.POSTGRESQL, DatabaseType.H2, DatabaseType.SQLITE ->
-                    "$base AND start = (SELECT start FROM punishments WHERE uuid = ? AND punishmentType = ? ORDER BY start DESC LIMIT 1)"
+                DatabaseType.POSTGRESQL, DatabaseType.H2, DatabaseType.SQLITE -> {
+                    val subParams = mutableListOf<Any>(uuidOrIp, punishmentType)
+                    val subSql = appendServerFilter(
+                        "SELECT start FROM punishments WHERE uuid = ? AND punishmentType = ?",
+                        subParams,
+                        true
+                    )
+                    params.addAll(subParams)
+                    "$base AND start = ($subSql ORDER BY start DESC LIMIT 1)"
+                }
                 else -> "$base ORDER BY start DESC LIMIT 1"
             }
         }
 
         try {
-            val params = mutableListOf<Any>(uuidOrIp, punishmentType)
-            if (!removeAll && (dbType == DatabaseType.POSTGRESQL || dbType == DatabaseType.H2 || dbType == DatabaseType.SQLITE)) {
-                params.add(uuidOrIp)
-                params.add(punishmentType)
-            }
             execute(query, *params.toTypedArray())
         } catch (e: Exception) {
             logger.err("Failed to remove punishment of type $punishmentType for $uuidOrIp. ${e.message}")
@@ -329,8 +393,12 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun deletePlayerData(uuid: String) {
         try {
-            execute("DELETE FROM punishments WHERE uuid = ?", uuid)
-            execute("DELETE FROM punishmenthistory WHERE uuid = ?", uuid)
+            val punishmentsParams = mutableListOf<Any>(uuid)
+            val punishmentsSql = appendServerFilter("DELETE FROM punishments WHERE uuid = ?", punishmentsParams, true)
+            execute(punishmentsSql, *punishmentsParams.toTypedArray())
+            val historyParams = mutableListOf<Any>(uuid)
+            val historySql = appendServerFilter("DELETE FROM punishmenthistory WHERE uuid = ?", historyParams, true)
+            execute(historySql, *historyParams.toTypedArray())
         } catch (e: Exception) {
             logger.err("Failed to delete player data. ${e.message}")
         }
@@ -464,8 +532,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
             DatabaseType.SQLITE
         )
 
-        var sql = "SELECT * FROM punishments WHERE uuid = ?"
         val params = mutableListOf<Any>(uuid)
+        var sql = appendServerFilter("SELECT * FROM punishments WHERE uuid = ?", params, true)
 
         if (supportsOrderAndLimit && limit != null && offset != null) {
             sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
@@ -483,7 +551,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.getLong("start"),
                     rs.getLong("endTime"),
                     rs.getString("name"),
-                    rs.getString("operator")
+                    rs.getString("operator"),
+                    rs.getString("server")
                 )
             }
             val punishmentsToRemove = rows.filterNot { plugin.punishmentManager.isPunishmentActive(it) }
@@ -503,10 +572,9 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun getPunishmentsByIP(ip: String): List<PunishmentData> {
         return try {
-            val rows = query(
-                "SELECT * FROM punishments WHERE uuid = ?",
-                ip
-            ) { rs ->
+            val params = mutableListOf<Any>(ip)
+            val sql = appendServerFilter("SELECT * FROM punishments WHERE uuid = ?", params, true)
+            val rows = query(sql, *params.toTypedArray()) { rs ->
                 PunishmentData(
                     rs.getInt("id"),
                     ip,
@@ -515,7 +583,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.getLong("start"),
                     rs.getLong("endTime"),
                     rs.getString("name"),
-                    rs.getString("operator")
+                    rs.getString("operator"),
+                    rs.getString("server")
                 )
             }
             rows.filter { plugin.punishmentManager.isPunishmentActive(it) }
@@ -533,8 +602,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
             DatabaseType.SQLITE
         )
 
-        var sql = "SELECT * FROM punishmenthistory WHERE uuid = ?"
         val params = mutableListOf<Any>(uuid)
+        var sql = appendServerFilter("SELECT * FROM punishmenthistory WHERE uuid = ?", params, true)
         if (supportsOrderAndLimit && limit != null && offset != null) {
             sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
             params.add(limit)
@@ -551,7 +620,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.getLong("start"),
                     rs.getLong("endTime"),
                     rs.getString("name"),
-                    rs.getString("operator")
+                    rs.getString("operator"),
+                    rs.getString("server")
                 )
             }.toMutableList()
         } catch (e: Exception) {
@@ -568,8 +638,12 @@ class DatabaseHandler(private val plugin: PunisherX) {
             DatabaseType.SQLITE
         )
 
-        var sql = "SELECT * FROM punishments WHERE punishmentType IN ('BAN', 'BANIP')"
         val params = mutableListOf<Any>()
+        var sql = appendServerFilter(
+            "SELECT * FROM punishments WHERE punishmentType IN ('BAN', 'BANIP')",
+            params,
+            true
+        )
         if (supportsOrderAndLimit) {
             sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
             params.add(limit)
@@ -586,7 +660,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.getLong("start"),
                     rs.getLong("endTime"),
                     rs.getString("name"),
-                    rs.getString("operator")
+                    rs.getString("operator"),
+                    rs.getString("server")
                 )
             }.toMutableList()
         } catch (e: Exception) {
@@ -603,8 +678,12 @@ class DatabaseHandler(private val plugin: PunisherX) {
             DatabaseType.SQLITE
         )
 
-        var sql = "SELECT * FROM punishmenthistory WHERE punishmentType IN ('BAN', 'BANIP')"
         val params = mutableListOf<Any>()
+        var sql = appendServerFilter(
+            "SELECT * FROM punishmenthistory WHERE punishmentType IN ('BAN', 'BANIP')",
+            params,
+            true
+        )
         if (supportsOrderAndLimit) {
             sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
             params.add(limit)
@@ -621,7 +700,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.getLong("start"),
                     rs.getLong("endTime"),
                     rs.getString("name"),
-                    rs.getString("operator")
+                    rs.getString("operator"),
+                    rs.getString("server")
                 )
             }.toMutableList()
         } catch (e: Exception) {
@@ -638,8 +718,12 @@ class DatabaseHandler(private val plugin: PunisherX) {
             DatabaseType.SQLITE
         )
 
-        var sql = "SELECT * FROM punishments WHERE punishmentType = 'JAIL'"
         val params = mutableListOf<Any>()
+        var sql = appendServerFilter(
+            "SELECT * FROM punishments WHERE punishmentType = 'JAIL'",
+            params,
+            true
+        )
         if (supportsOrderAndLimit) {
             sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
             params.add(limit)
@@ -656,7 +740,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.getLong("start"),
                     rs.getLong("endTime"),
                     rs.getString("name"),
-                    rs.getString("operator")
+                    rs.getString("operator"),
+                    rs.getString("server")
                 )
             }.toMutableList()
         } catch (e: Exception) {
@@ -668,10 +753,13 @@ class DatabaseHandler(private val plugin: PunisherX) {
     fun getActiveWarnCount(uuid: String): Int {
         val currentTime = System.currentTimeMillis()
         return try {
-            query(
+            val params = mutableListOf<Any>(uuid, currentTime)
+            val sql = appendServerFilter(
                 "SELECT COUNT(*) AS cnt FROM punishments WHERE uuid = ? AND punishmentType = 'WARN' AND (endTime = -1 OR endTime > ?)",
-                uuid, currentTime
-            ) { rs -> rs.getInt("cnt") }.firstOrNull() ?: 0
+                params,
+                true
+            )
+            query(sql, *params.toTypedArray()) { rs -> rs.getInt("cnt") }.firstOrNull() ?: 0
         } catch (e: Exception) {
             logger.err("Failed to count active warns: ${e.message}")
             0
@@ -680,8 +768,9 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun countAllPunishments(): Int {
         return try {
-            query("SELECT COUNT(*) AS cnt FROM punishments") { rs -> rs.getInt("cnt") }
-                .firstOrNull() ?: 0
+            val params = mutableListOf<Any>()
+            val sql = appendServerFilter("SELECT COUNT(*) AS cnt FROM punishments", params, false)
+            query(sql, *params.toTypedArray()) { rs -> rs.getInt("cnt") }.firstOrNull() ?: 0
         } catch (e: Exception) {
             logger.err("Failed to count punishments. ${e.message}")
             0
@@ -690,8 +779,9 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun countAllPunishmentHistory(): Int {
         return try {
-            query("SELECT COUNT(*) AS cnt FROM punishmenthistory") { rs -> rs.getInt("cnt") }
-                .firstOrNull() ?: 0
+            val params = mutableListOf<Any>()
+            val sql = appendServerFilter("SELECT COUNT(*) AS cnt FROM punishmenthistory", params, false)
+            query(sql, *params.toTypedArray()) { rs -> rs.getInt("cnt") }.firstOrNull() ?: 0
         } catch (e: Exception) {
             logger.err("Failed to count punishment history. ${e.message}")
             0
@@ -702,14 +792,20 @@ class DatabaseHandler(private val plugin: PunisherX) {
         val startOfDay = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000
         return try {
             var count = 0
-            count += query(
+            val punishParams = mutableListOf<Any>(startOfDay)
+            val punishSql = appendServerFilter(
                 "SELECT COUNT(*) AS cnt FROM punishments WHERE start >= ?",
-                startOfDay
-            ) { rs -> rs.getInt("cnt") }.firstOrNull() ?: 0
-            count += query(
+                punishParams,
+                true
+            )
+            count += query(punishSql, *punishParams.toTypedArray()) { rs -> rs.getInt("cnt") }.firstOrNull() ?: 0
+            val historyParams = mutableListOf<Any>(startOfDay)
+            val historySql = appendServerFilter(
                 "SELECT COUNT(*) AS cnt FROM punishmenthistory WHERE start >= ?",
-                startOfDay
-            ) { rs -> rs.getInt("cnt") }.firstOrNull() ?: 0
+                historyParams,
+                true
+            )
+            count += query(historySql, *historyParams.toTypedArray()) { rs -> rs.getInt("cnt") }.firstOrNull() ?: 0
             count
         } catch (e: Exception) {
             logger.err("Failed to count today's punishments. ${e.message}")
@@ -719,10 +815,13 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun countPlayerAllPunishmentHistory(uuid: UUID): Int {
         return try {
-            query(
+            val params = mutableListOf<Any>(uuid.toString())
+            val sql = appendServerFilter(
                 "SELECT COUNT(*) AS cnt FROM punishmenthistory WHERE uuid = ?",
-                uuid.toString()
-            ) { rs -> rs.getInt("cnt") }.firstOrNull() ?: 0
+                params,
+                true
+            )
+            query(sql, *params.toTypedArray()) { rs -> rs.getInt("cnt") }.firstOrNull() ?: 0
         } catch (e: Exception) {
             logger.err("Failed to count punishment history. ${e.message}")
             0
@@ -731,10 +830,14 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun getLastTenPunishments(uuid: String): List<PunishmentData> {
         return try {
-            query(
-                "SELECT * FROM punishmenthistory WHERE uuid = ? ORDER BY start DESC LIMIT 10",
-                uuid
-            ) { rs ->
+            val params = mutableListOf<Any>(uuid)
+            var sql = appendServerFilter(
+                "SELECT * FROM punishmenthistory WHERE uuid = ?",
+                params,
+                true
+            )
+            sql += " ORDER BY start DESC LIMIT 10"
+            query(sql, *params.toTypedArray()) { rs ->
                 PunishmentData(
                     rs.getInt("id"),
                     uuid,
@@ -743,7 +846,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.getLong("start"),
                     rs.getLong("endTime"),
                     rs.getString("name"),
-                    rs.getString("operator")
+                    rs.getString("operator"),
+                    rs.getString("server")
                 )
             }
         } catch (e: Exception) {
@@ -879,7 +983,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
                             Column("operator", "VARCHAR(16)"),
                             Column("punishmentType", "VARCHAR(16)"),
                             Column("start", "BIGINT"),
-                            Column("endTime", "BIGINT")
+                            Column("endTime", "BIGINT"),
+                            Column("server", "VARCHAR(64) DEFAULT '$NETWORK_SCOPE'")
                         )
                     )
                     val historySchema = punishmentSchema.copy(name = "punishmenthistory")

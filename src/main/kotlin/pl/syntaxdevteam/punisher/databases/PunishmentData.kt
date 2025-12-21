@@ -11,6 +11,7 @@ package pl.syntaxdevteam.punisher.databases
  * @param end The end of the punishment
  * @param name The name of the punished player
  * @param operator The operator of the punishment
+ * @param server The server scope of the punishment
  */
 data class PunishmentData(
     val id: Int,
@@ -20,5 +21,6 @@ data class PunishmentData(
     val start: Long,
     val end: Long,
     val name: String,
-    val operator: String
+    val operator: String,
+    val server: String
 )
