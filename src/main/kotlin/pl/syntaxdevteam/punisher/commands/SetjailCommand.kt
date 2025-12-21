@@ -11,13 +11,13 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 class SetjailCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
-        // Sprawdzamy, czy to gracz
+
         if (stack.sender !is Player) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponentNoPrefix("error", "console"))
             return
         }
 
-        // Sprawdzamy uprawnienia
+
         if (!PermissionChecker.hasWithManage(stack.sender, PermissionChecker.PermissionKey.MANAGE_SET_JAIL)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return

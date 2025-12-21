@@ -37,9 +37,19 @@ class PunishTemplateManager(private val plugin: PunisherX) {
 
     fun load() {
         if (!plugin.dataFolder.exists()) plugin.dataFolder.mkdirs()
+        val dataFile = File(plugin.dataFolder, FILE_NAME)
+        if (dataFile.exists()) {
+            config = YamlDocument.create(
+                dataFile,
+                GeneralSettings.builder().setUseDefaults(false).build(),
+                LoaderSettings.builder().setAutoUpdate(false).build(),
+                DumperSettings.builder().setIndentation(2).build()
+            )
+            return
+        }
+
         val defaults = plugin.getResource(FILE_NAME)
             ?: error("Missing $FILE_NAME in resources.")
-        val dataFile = File(plugin.dataFolder, FILE_NAME)
         config = YamlDocument.create(
             dataFile,
             defaults,

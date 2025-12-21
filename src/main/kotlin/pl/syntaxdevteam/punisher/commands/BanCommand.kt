@@ -91,7 +91,7 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
             return emptyList()
         }
         return when (args.size) {
-            1 -> plugin.server.onlinePlayers.map { it.name }
+            0, 1 -> plugin.server.onlinePlayers.map { it.name }
             2 -> TimeSuggestionProvider.generateTimeSuggestions()
             3 -> plugin.messageHandler.getMessageStringList("ban", "reasons")
             else -> emptyList()
