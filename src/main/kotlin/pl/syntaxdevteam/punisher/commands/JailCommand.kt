@@ -1,6 +1,5 @@
 package pl.syntaxdevteam.punisher.commands
 
-import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
@@ -11,6 +10,9 @@ import org.bukkit.GameMode
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.basic.JailUtils
 import pl.syntaxdevteam.punisher.common.TimeSuggestionProvider
+import pl.syntaxdevteam.punisher.commands.arguments.PunishmentDuration
+import pl.syntaxdevteam.punisher.commands.arguments.PunishmentDurationArgumentType
+import pl.syntaxdevteam.punisher.commands.arguments.ReasonArgumentType
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
@@ -27,9 +29,95 @@ class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
         }
 
         val playerName = args[0]
+        val isForce = args.contains("--force")
+
+        val parsedDuration = PunishmentDurationArgumentType.parseRaw(args[1])
+        val (duration, reason) = if (parsedDuration != null) {
+            parsedDuration to args.drop(2).filterNot { it == "--force" }.joinToString(" ")
+        } else {
+            null to args.drop(1).filterNot { it == "--force" }.joinToString(" ")
+        }
+
+        executeJail(stack, playerName, duration, reason, isForce)
+    }
+
+    override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.JAIL)) {
+            return emptyList()
+        }
+        return when (args.size) {
+            0, 1 -> plugin.server.onlinePlayers.map { it.name }
+            2 -> TimeSuggestionProvider.generateTimeSuggestions()
+            3 -> plugin.messageHandler.getMessageStringList("jail", "reasons")
+            else -> emptyList()
+        }
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val targetArg = Commands.argument("target", ArgumentTypes.playerProfiles())
+            .executes { context ->
+                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                    execute(context.source, listOf(target))
+                }
+                1
+            }
+            .then(
+                Commands.argument("time", PunishmentDurationArgumentType.duration())
+                    .suggests(BrigadierCommandUtils.suggestions(this) { context ->
+                        val target = BrigadierCommandUtils.resolvePlayerProfileNames(context, "target")
+                            .firstOrNull()
+                            .orEmpty()
+                        listOf(target, "")
+                    })
+                    .executes { context ->
+                        val time = PunishmentDurationArgumentType.getDuration(context, "time")
+                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                            executeJail(context.source, target, time, "", false)
+                        }
+                        1
+                    }
+                    .then(
+                        Commands.argument("reason", ReasonArgumentType.reason())
+                            .executes { context ->
+                                val time = PunishmentDurationArgumentType.getDuration(context, "time")
+                                val reason = ReasonArgumentType.getReason(context, "reason")
+                                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                                    executeJail(context.source, target, time, reason, false)
+                                }
+                                1
+                            }
+                    )
+            )
+            .then(
+                Commands.argument("reason", ReasonArgumentType.reason())
+                    .executes { context ->
+                        val reason = ReasonArgumentType.getReason(context, "reason")
+                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                            executeJail(context.source, target, null, reason, false)
+                        }
+                        1
+                    }
+            )
+
+        return Commands.literal(name)
+            .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.JAIL))
+            .executes { context ->
+                execute(context.source, emptyList())
+                1
+            }
+            .then(targetArg)
+            .build()
+    }
+
+    private fun executeJail(
+        stack: CommandSourceStack,
+        playerName: String,
+        duration: PunishmentDuration?,
+        reason: String,
+        isForce: Boolean
+    ) {
         val uuid = plugin.resolvePlayerUuid(playerName)
         val targetPlayer = Bukkit.getPlayer(uuid)
-        val isForce = args.contains("--force")
 
         if (targetPlayer != null && !isForce && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_JAIL)) {
             stack.sender.sendMessage(
@@ -39,26 +127,17 @@ class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
         }
         val prefix = plugin.messageHandler.getPrefix()
 
-        if(PermissionChecker.isAuthor(uuid)){
-            stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("$prefix <red>You can't punish the plugin author</red>",
-                TagResolver.empty()))
+        if (PermissionChecker.isAuthor(uuid)) {
+            stack.sender.sendMessage(
+                plugin.messageHandler.formatMixedTextToMiniMessage("$prefix <red>You can't punish the plugin author</red>",
+                    TagResolver.empty())
+            )
             return
-        }
-
-        var gtime: String?
-        var reason: String
-        try {
-            gtime = args[1]
-            plugin.timeHandler.parseTime(gtime)
-            reason = args.slice(2 until args.size).filterNot { it == "--force" }.joinToString(" ")
-        } catch (_: NumberFormatException) {
-            gtime = null
-            reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
         }
 
         val punishmentType = "JAIL"
         val start = System.currentTimeMillis()
-        val end: Long? = if (gtime != null) start + plugin.timeHandler.parseTime(gtime) * 1000 else null
+        val end: Long? = duration?.let { start + it.seconds * 1000 }
         val previousLocation = targetPlayer?.location?.clone()
 
         val jailLocation = JailUtils.getJailLocation(plugin.config)
@@ -68,7 +147,7 @@ class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
         }
         plugin.logger.debug("<yellow>Jail location: ${jailLocation}</yellow>")
 
-        val formattedTime = plugin.timeHandler.formatTime(gtime)
+        val formattedTime = plugin.timeHandler.formatTime(duration?.raw)
         val basePlaceholders = mapOf(
             "player" to playerName,
             "operator" to stack.sender.name,
@@ -135,73 +214,5 @@ class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
         } else {
             finalizePunishment()
         }
-    }
-
-    override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
-        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.JAIL)) {
-            return emptyList()
-        }
-        return when (args.size) {
-            0, 1 -> plugin.server.onlinePlayers.map { it.name }
-            2 -> TimeSuggestionProvider.generateTimeSuggestions()
-            3 -> plugin.messageHandler.getMessageStringList("jail", "reasons")
-            else -> emptyList()
-        }
-    }
-
-    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
-        val targetArg = Commands.argument("target", ArgumentTypes.playerProfiles())
-            .executes { context ->
-                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
-                    execute(context.source, listOf(target))
-                }
-                1
-            }
-            .then(
-                Commands.argument("time", StringArgumentType.word())
-                    .suggests(BrigadierCommandUtils.suggestions(this) { context ->
-                        val target = BrigadierCommandUtils.resolvePlayerProfileNames(context, "target")
-                            .firstOrNull()
-                            .orEmpty()
-                        listOf(target, "")
-                    })
-                    .executes { context ->
-                        val time = StringArgumentType.getString(context, "time")
-                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
-                            execute(context.source, listOf(target, time))
-                        }
-                        1
-                    }
-                    .then(
-                        Commands.argument("reason", StringArgumentType.greedyString())
-                            .executes { context ->
-                                val time = StringArgumentType.getString(context, "time")
-                                val reason = StringArgumentType.getString(context, "reason")
-                                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
-                                    execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target, time), reason))
-                                }
-                                1
-                            }
-                    )
-            )
-            .then(
-                Commands.argument("reason", StringArgumentType.greedyString())
-                    .executes { context ->
-                        val reason = StringArgumentType.getString(context, "reason")
-                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
-                            execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target), reason))
-                        }
-                        1
-                    }
-            )
-
-        return Commands.literal(name)
-            .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.JAIL))
-            .executes { context ->
-                execute(context.source, emptyList())
-                1
-            }
-            .then(targetArg)
-            .build()
     }
 }

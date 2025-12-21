@@ -1,11 +1,11 @@
 package pl.syntaxdevteam.punisher.commands
 
 import com.mojang.brigadier.arguments.IntegerArgumentType
-import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.commands.arguments.ReasonArgumentType
 import pl.syntaxdevteam.punisher.common.TimeSuggestionProvider
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
@@ -24,24 +24,7 @@ class ChangeReasonCommand(private val plugin: PunisherX) : BrigadierCommand {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("change-reason", "invalid_id"))
                     return
                 }
-                val success = plugin.databaseHandler.updatePunishmentReason(id, newReason)
-                if (success) {
-                    stack.sender.sendMessage(
-                        plugin.messageHandler.stringMessageToComponent(
-                            "change-reason",
-                            "success",
-                            mapOf("id" to id.toString(), "reason" to newReason)
-                        )
-                    )
-                } else {
-                    stack.sender.sendMessage(
-                        plugin.messageHandler.stringMessageToComponent(
-                            "change-reason",
-                            "failure",
-                            mapOf("id" to id.toString())
-                        )
-                    )
-                }
+                executeChangeReason(stack, id, newReason)
             } else {
                 stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("ban", "usage"))
             }
@@ -63,11 +46,11 @@ class ChangeReasonCommand(private val plugin: PunisherX) : BrigadierCommand {
     }
 
     override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
-        val reasonArg = Commands.argument("reason", StringArgumentType.greedyString())
+        val reasonArg = Commands.argument("reason", ReasonArgumentType.reason())
             .executes { context ->
                 val id = IntegerArgumentType.getInteger(context, "id")
-                val reason = StringArgumentType.getString(context, "reason")
-                execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(id.toString()), reason))
+                val reason = ReasonArgumentType.getReason(context, "reason")
+                executeChangeReason(context.source, id, reason)
                 1
             }
 
@@ -87,5 +70,26 @@ class ChangeReasonCommand(private val plugin: PunisherX) : BrigadierCommand {
             }
             .then(idArg)
             .build()
+    }
+
+    private fun executeChangeReason(stack: CommandSourceStack, id: Int, newReason: String) {
+        val success = plugin.databaseHandler.updatePunishmentReason(id, newReason)
+        if (success) {
+            stack.sender.sendMessage(
+                plugin.messageHandler.stringMessageToComponent(
+                    "change-reason",
+                    "success",
+                    mapOf("id" to id.toString(), "reason" to newReason)
+                )
+            )
+        } else {
+            stack.sender.sendMessage(
+                plugin.messageHandler.stringMessageToComponent(
+                    "change-reason",
+                    "failure",
+                    mapOf("id" to id.toString())
+                )
+            )
+        }
     }
 }

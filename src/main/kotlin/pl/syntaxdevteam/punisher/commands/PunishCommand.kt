@@ -1,7 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 
 import com.mojang.brigadier.arguments.IntegerArgumentType
-import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.ban.BanListType
 import io.papermc.paper.command.brigadier.CommandSourceStack
@@ -14,6 +13,7 @@ import org.bukkit.ban.ProfileBanList
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.basic.JailUtils
 import pl.syntaxdevteam.punisher.common.PunishmentCommandUtils
+import pl.syntaxdevteam.punisher.commands.arguments.TemplateNameArgumentType
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.templates.PunishTemplate
 import pl.syntaxdevteam.punisher.templates.PunishTemplateLevel
@@ -112,12 +112,12 @@ class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
             .suggests(BrigadierCommandUtils.suggestions(this) { context ->
                 listOf(
                     BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").firstOrNull().orEmpty(),
-                    StringArgumentType.getString(context, "template"),
+                    TemplateNameArgumentType.getTemplateName(context, "template"),
                     ""
                 )
             })
             .executes { context ->
-                val template = StringArgumentType.getString(context, "template")
+                val template = TemplateNameArgumentType.getTemplateName(context, "template")
                 val level = IntegerArgumentType.getInteger(context, "level")
                 BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
                     execute(context.source, listOf(target, template, level.toString()))
@@ -125,13 +125,16 @@ class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
                 1
             }
 
-        val templateArg = Commands.argument("template", StringArgumentType.word())
+        val templateArg = Commands.argument(
+            "template",
+            TemplateNameArgumentType.templateName { plugin.punishTemplateManager.getTemplateNames() }
+        )
             .suggests(BrigadierCommandUtils.suggestions(this) { context ->
                 val target = BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").firstOrNull().orEmpty()
                 listOf(target, "")
             })
             .executes { context ->
-                val template = StringArgumentType.getString(context, "template")
+                val template = TemplateNameArgumentType.getTemplateName(context, "template")
                 BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
                     execute(context.source, listOf(target, template))
                 }
@@ -192,7 +195,7 @@ class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
             "BAN" -> applyBan(stack, targetName, uuid, template.reason, templateLevel)
             "MUTE" -> applyMute(stack, targetName, uuid, template.reason, templateLevel)
             "WARN" -> applyWarn(stack, targetName, uuid, template.reason, templateLevel)
-            "KICK" -> applyKick(stack, targetName, uuid, template.reason, templateLevel)
+            "KICK" -> applyKick(stack, targetName, uuid, template.reason)
             "JAIL" -> applyJail(stack, targetName, uuid, template.reason, templateLevel)
             else -> stack.sender.sendMessage(
                 plugin.messageHandler.stringMessageToComponent(
@@ -360,8 +363,7 @@ class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
         stack: CommandSourceStack,
         targetName: String,
         uuid: UUID,
-        reason: String,
-        templateLevel: PunishTemplateLevel
+        reason: String
     ) {
         val punishmentType = "KICK"
         val start = System.currentTimeMillis()

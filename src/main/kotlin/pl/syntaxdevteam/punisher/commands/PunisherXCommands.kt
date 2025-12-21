@@ -1,8 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 
 import com.mojang.brigadier.arguments.IntegerArgumentType
-import com.mojang.brigadier.arguments.StringArgumentType
-import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
@@ -12,6 +10,7 @@ import java.net.HttpURLConnection
 import java.net.URI
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.core.database.DatabaseType
+import pl.syntaxdevteam.punisher.commands.arguments.DatabaseTypeArgumentType
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 private data class ConnectivityCheckResult(
@@ -106,37 +105,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BrigadierCommand {
                     stack.sender.sendMessage(mH.miniMessageFormat("$prefix <red>Unknown database type.</red>"))
                     return
                 }
-                if (!force) {
-                    val pending = pendingMigration
-                    if (pending == null || pending.first != fromType || pending.second != toType) {
-                        pendingMigration = fromType to toType
-                        stack.sender.sendMessage(
-                            mH.miniMessageFormat(
-                                "$prefix <yellow>Update the connection details for <gold>${toType.name.lowercase()}</gold> in config.yml, then rerun this command. " +
-                                        "Use <gold>--force</gold> to skip this confirmation."
-                            )
-                        )
-                        return
-                    }
-                }
-
-                pendingMigration = null
-                stack.sender.sendMessage(
-                    mH.miniMessageFormat("$prefix <yellow>Starting migration from <gold>${fromType.name.lowercase()}</gold> to <gold>${toType.name.lowercase()}</gold>...</yellow>")
-                )
-
-                val future = plugin.databaseHandler.migrateDatabase(fromType, toType)
-                future.whenComplete { result, throwable ->
-                    val response = when {
-                        throwable != null -> "$prefix <red>Failed to migrate database: ${throwable.message ?: "Unknown error"}</red>"
-                        result == null -> "$prefix <red>Migration finished with an unknown state.</red>"
-                        result.success -> "$prefix <green>${result.message}</green>"
-                        else -> "$prefix <red>${result.message}</red>"
-                    }
-                    plugin.server.scheduler.runTask(plugin, Runnable {
-                        stack.sender.sendMessage(mH.miniMessageFormat(response))
-                    })
-                }
+                executeMigration(stack, fromType, toType, force)
             }
             /*
             args[0].equals("panel", ignoreCase = true) -> {
@@ -348,40 +317,67 @@ class PunishesXCommands(private val plugin: PunisherX) : BrigadierCommand {
                     }
                     return listOf("--force").filter { it.startsWith(current.lowercase()) }
                 }
+                else -> return emptyList()
             }
         }
         return emptyList()
     }
 
-    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
-        val adminRequirement = BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.PUNISHERX_COMMAND)
-        val databaseSuggestions = SuggestionProvider<CommandSourceStack> { _, builder ->
-            DatabaseType::class.java.enumConstants
-                ?.map { it.name.lowercase() }
-                ?.forEach { builder.suggest(it) }
-            builder.buildFuture()
+    private fun executeMigration(stack: CommandSourceStack, fromType: DatabaseType, toType: DatabaseType, force: Boolean) {
+        val prefix = plugin.messageHandler.getPrefix()
+        if (!force) {
+            val pending = pendingMigration
+            if (pending == null || pending.first != fromType || pending.second != toType) {
+                pendingMigration = fromType to toType
+                stack.sender.sendMessage(
+                    mH.miniMessageFormat(
+                        "$prefix <yellow>Update the connection details for <gold>${toType.name.lowercase()}</gold> in config.yml, then rerun this command. " +
+                                "Use <gold>--force</gold> to skip this confirmation."
+                    )
+                )
+                return
+            }
         }
 
+        pendingMigration = null
+        stack.sender.sendMessage(
+            mH.miniMessageFormat("$prefix <yellow>Starting migration from <gold>${fromType.name.lowercase()}</gold> to <gold>${toType.name.lowercase()}</gold>...</yellow>")
+        )
+
+        val future = plugin.databaseHandler.migrateDatabase(fromType, toType)
+        future.whenComplete { result, throwable ->
+            val response = when {
+                throwable != null -> "$prefix <red>Failed to migrate database: ${throwable.message ?: "Unknown error"}</red>"
+                result == null -> "$prefix <red>Migration finished with an unknown state.</red>"
+                result.success -> "$prefix <green>${result.message}</green>"
+                else -> "$prefix <red>${result.message}</red>"
+            }
+            plugin.server.scheduler.runTask(plugin, Runnable {
+                stack.sender.sendMessage(mH.miniMessageFormat(response))
+            })
+        }
+    }
+
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val adminRequirement = BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.PUNISHERX_COMMAND)
         val migrateCommand = Commands.literal("migrate")
             .requires(adminRequirement)
             .then(
-                Commands.argument("from", StringArgumentType.word())
-                    .suggests(databaseSuggestions)
+                Commands.argument("from", DatabaseTypeArgumentType.databaseType())
                     .then(
-                        Commands.argument("to", StringArgumentType.word())
-                            .suggests(databaseSuggestions)
+                        Commands.argument("to", DatabaseTypeArgumentType.databaseType())
                             .executes { context ->
-                                val from = StringArgumentType.getString(context, "from")
-                                val to = StringArgumentType.getString(context, "to")
-                                execute(context.source, listOf("migrate", from, to))
+                                val from = DatabaseTypeArgumentType.getDatabaseType(context, "from")
+                                val to = DatabaseTypeArgumentType.getDatabaseType(context, "to")
+                                executeMigration(context.source, from, to, false)
                                 1
                             }
                             .then(
                                 Commands.literal("--force")
                                     .executes { context ->
-                                        val from = StringArgumentType.getString(context, "from")
-                                        val to = StringArgumentType.getString(context, "to")
-                                        execute(context.source, listOf("migrate", from, to, "--force"))
+                                        val from = DatabaseTypeArgumentType.getDatabaseType(context, "from")
+                                        val to = DatabaseTypeArgumentType.getDatabaseType(context, "to")
+                                        executeMigration(context.source, from, to, true)
                                         1
                                     }
                             )
@@ -389,12 +385,11 @@ class PunishesXCommands(private val plugin: PunisherX) : BrigadierCommand {
                     .then(
                         Commands.literal("--force")
                             .then(
-                                Commands.argument("to", StringArgumentType.word())
-                                    .suggests(databaseSuggestions)
+                                Commands.argument("to", DatabaseTypeArgumentType.databaseType())
                                     .executes { context ->
-                                        val from = StringArgumentType.getString(context, "from")
-                                        val to = StringArgumentType.getString(context, "to")
-                                        execute(context.source, listOf("migrate", from, "--force", to))
+                                        val from = DatabaseTypeArgumentType.getDatabaseType(context, "from")
+                                        val to = DatabaseTypeArgumentType.getDatabaseType(context, "to")
+                                        executeMigration(context.source, from, to, true)
                                         1
                                     }
                             )

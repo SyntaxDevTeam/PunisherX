@@ -1,11 +1,12 @@
 package pl.syntaxdevteam.punisher.commands
 
+import com.google.common.net.InetAddresses
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
-import com.mojang.brigadier.arguments.StringArgumentType
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.commands.arguments.IpAddressArgumentType
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 class UnBanCommand(private val plugin: PunisherX) : BrigadierCommand {
@@ -23,7 +24,7 @@ class UnBanCommand(private val plugin: PunisherX) : BrigadierCommand {
 
         val playerOrIpOrUUID = args[0]
 
-        if (playerOrIpOrUUID.matches(Regex("\\d+\\.\\d+\\.\\d+\\.\\d+"))) {
+        if (InetAddresses.isInetAddress(playerOrIpOrUUID)) {
             unbanIP(stack, playerOrIpOrUUID)
             return
         }
@@ -142,10 +143,10 @@ class UnBanCommand(private val plugin: PunisherX) : BrigadierCommand {
 
         val ipArg = Commands.literal("ip")
             .then(
-                Commands.argument("address", StringArgumentType.word())
+                Commands.argument("address", IpAddressArgumentType.ipAddress())
                     .executes { context ->
-                        val address = StringArgumentType.getString(context, "address")
-                        execute(context.source, listOf(address))
+                        val address = IpAddressArgumentType.getAddress(context, "address")
+                        unbanIP(context.source, address)
                         1
                     }
             )
