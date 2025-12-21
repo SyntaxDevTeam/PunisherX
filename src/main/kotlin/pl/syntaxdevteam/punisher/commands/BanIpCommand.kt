@@ -4,10 +4,12 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.common.TimeSuggestionProvider
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.UUID
 
@@ -134,31 +136,36 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
     }
 
     override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
-        val targetArg = Commands.argument("target", StringArgumentType.word())
-            .suggests(BrigadierCommandUtils.suggestions(this) { emptyList() })
+        val targetArg = Commands.argument("target", ArgumentTypes.playerProfiles())
             .executes { context ->
-                val target = StringArgumentType.getString(context, "target")
-                execute(context.source, listOf(target))
+                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                    execute(context.source, listOf(target))
+                }
                 1
             }
             .then(
                 Commands.argument("time", StringArgumentType.word())
                     .suggests(BrigadierCommandUtils.suggestions(this) { context ->
-                        listOf(StringArgumentType.getString(context, "target"), "")
+                        val target = BrigadierCommandUtils.resolvePlayerProfileNames(context, "target")
+                            .firstOrNull()
+                            .orEmpty()
+                        listOf(target, "")
                     })
                     .executes { context ->
-                        val target = StringArgumentType.getString(context, "target")
                         val time = StringArgumentType.getString(context, "time")
-                        execute(context.source, listOf(target, time))
+                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                            execute(context.source, listOf(target, time))
+                        }
                         1
                     }
                     .then(
                         Commands.argument("reason", StringArgumentType.greedyString())
                             .executes { context ->
-                                val target = StringArgumentType.getString(context, "target")
                                 val time = StringArgumentType.getString(context, "time")
                                 val reason = StringArgumentType.getString(context, "reason")
-                                execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target, time), reason))
+                                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                                    execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target, time), reason))
+                                }
                                 1
                             }
                     )
@@ -166,11 +173,50 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
             .then(
                 Commands.argument("reason", StringArgumentType.greedyString())
                     .executes { context ->
-                        val target = StringArgumentType.getString(context, "target")
                         val reason = StringArgumentType.getString(context, "reason")
-                        execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target), reason))
+                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                            execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target), reason))
+                        }
                         1
                     }
+            )
+
+        val ipArg = Commands.literal("ip")
+            .then(
+                Commands.argument("address", StringArgumentType.word())
+                    .executes { context ->
+                        val address = StringArgumentType.getString(context, "address")
+                        execute(context.source, listOf(address))
+                        1
+                    }
+                    .then(
+                        Commands.argument("time", StringArgumentType.word())
+                            .executes { context ->
+                                val address = StringArgumentType.getString(context, "address")
+                                val time = StringArgumentType.getString(context, "time")
+                                execute(context.source, listOf(address, time))
+                                1
+                            }
+                            .then(
+                                Commands.argument("reason", StringArgumentType.greedyString())
+                                    .executes { context ->
+                                        val address = StringArgumentType.getString(context, "address")
+                                        val time = StringArgumentType.getString(context, "time")
+                                        val reason = StringArgumentType.getString(context, "reason")
+                                        execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(address, time), reason))
+                                        1
+                                    }
+                            )
+                    )
+                    .then(
+                        Commands.argument("reason", StringArgumentType.greedyString())
+                            .executes { context ->
+                                val address = StringArgumentType.getString(context, "address")
+                                val reason = StringArgumentType.getString(context, "reason")
+                                execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(address), reason))
+                                1
+                            }
+                    )
             )
 
         return Commands.literal(name)
@@ -180,6 +226,7 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
                 1
             }
             .then(targetArg)
+            .then(ipArg)
             .build()
     }
 }

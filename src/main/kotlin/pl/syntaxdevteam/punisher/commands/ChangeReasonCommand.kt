@@ -6,6 +6,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.common.TimeSuggestionProvider
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 class ChangeReasonCommand(private val plugin: PunisherX) : BrigadierCommand {

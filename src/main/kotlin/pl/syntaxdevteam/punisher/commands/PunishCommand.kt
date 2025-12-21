@@ -6,12 +6,14 @@ import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.ban.BanListType
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.ban.ProfileBanList
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.basic.JailUtils
+import pl.syntaxdevteam.punisher.common.PunishmentCommandUtils
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.templates.PunishTemplate
 import pl.syntaxdevteam.punisher.templates.PunishTemplateLevel
@@ -109,36 +111,39 @@ class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
         val levelArg = Commands.argument("level", IntegerArgumentType.integer(1))
             .suggests(BrigadierCommandUtils.suggestions(this) { context ->
                 listOf(
-                    StringArgumentType.getString(context, "target"),
+                    BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").firstOrNull().orEmpty(),
                     StringArgumentType.getString(context, "template"),
                     ""
                 )
             })
             .executes { context ->
-                val target = StringArgumentType.getString(context, "target")
                 val template = StringArgumentType.getString(context, "template")
                 val level = IntegerArgumentType.getInteger(context, "level")
-                execute(context.source, listOf(target, template, level.toString()))
+                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                    execute(context.source, listOf(target, template, level.toString()))
+                }
                 1
             }
 
         val templateArg = Commands.argument("template", StringArgumentType.word())
             .suggests(BrigadierCommandUtils.suggestions(this) { context ->
-                listOf(StringArgumentType.getString(context, "target"), "")
+                val target = BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").firstOrNull().orEmpty()
+                listOf(target, "")
             })
             .executes { context ->
-                val target = StringArgumentType.getString(context, "target")
                 val template = StringArgumentType.getString(context, "template")
-                execute(context.source, listOf(target, template))
+                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                    execute(context.source, listOf(target, template))
+                }
                 1
             }
             .then(levelArg)
 
-        val targetArg = Commands.argument("target", StringArgumentType.word())
-            .suggests(BrigadierCommandUtils.suggestions(this) { emptyList() })
+        val targetArg = Commands.argument("target", ArgumentTypes.playerProfiles())
             .executes { context ->
-                val target = StringArgumentType.getString(context, "target")
-                execute(context.source, listOf(target))
+                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                    execute(context.source, listOf(target))
+                }
                 1
             }
             .then(templateArg)

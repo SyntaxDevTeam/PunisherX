@@ -1,9 +1,9 @@
 package pl.syntaxdevteam.punisher.commands
 
-import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
@@ -42,11 +42,11 @@ class UnWarnCommand(private val plugin: PunisherX) : BrigadierCommand {
     }
 
     override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
-        val playerArg = Commands.argument("player", StringArgumentType.word())
-            .suggests(BrigadierCommandUtils.suggestions(this) { emptyList() })
+        val playerArg = Commands.argument("player", ArgumentTypes.playerProfiles())
             .executes { context ->
-                val player = StringArgumentType.getString(context, "player")
-                execute(context.source, listOf(player))
+                BrigadierCommandUtils.resolvePlayerProfileNames(context, "player").forEach { player ->
+                    execute(context.source, listOf(player))
+                }
                 1
             }
 

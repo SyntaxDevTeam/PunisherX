@@ -1,9 +1,12 @@
 package pl.syntaxdevteam.punisher.commands
 
+import com.destroystokyo.paper.profile.PlayerProfile
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.command.brigadier.argument.resolvers.PlayerProfileListResolver
+import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver
 import java.util.function.Predicate
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
@@ -24,6 +27,25 @@ object BrigadierCommandUtils {
         }
         val parts = value.split(" ").map { it.trim() }.filter { it.isNotEmpty() }
         return base + parts
+    }
+
+    fun resolvePlayers(context: CommandContext<CommandSourceStack>, argName: String): List<Player> {
+        val resolver = context.getArgument(argName, PlayerSelectorArgumentResolver::class.java)
+        return resolver.resolve(context.source)
+    }
+
+    fun resolvePlayerNames(context: CommandContext<CommandSourceStack>, argName: String): List<String> {
+        return resolvePlayers(context, argName).map { it.name }
+    }
+
+    fun resolvePlayerProfiles(context: CommandContext<CommandSourceStack>, argName: String): Collection<PlayerProfile> {
+        val resolver = context.getArgument(argName, PlayerProfileListResolver::class.java)
+        return resolver.resolve(context.source)
+    }
+
+    fun resolvePlayerProfileNames(context: CommandContext<CommandSourceStack>, argName: String): List<String> {
+        return resolvePlayerProfiles(context, argName)
+            .mapNotNull { profile -> profile.name ?: profile.id?.toString() }
     }
 
     fun requiresPermission(key: PermissionChecker.PermissionKey): Predicate<CommandSourceStack> {

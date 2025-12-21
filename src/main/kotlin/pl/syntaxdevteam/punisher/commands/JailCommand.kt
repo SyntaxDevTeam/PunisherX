@@ -4,11 +4,13 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import org.bukkit.Bukkit
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.GameMode
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.basic.JailUtils
+import pl.syntaxdevteam.punisher.common.TimeSuggestionProvider
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
@@ -148,31 +150,36 @@ class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
     }
 
     override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
-        val targetArg = Commands.argument("target", StringArgumentType.word())
-            .suggests(BrigadierCommandUtils.suggestions(this) { emptyList() })
+        val targetArg = Commands.argument("target", ArgumentTypes.playerProfiles())
             .executes { context ->
-                val target = StringArgumentType.getString(context, "target")
-                execute(context.source, listOf(target))
+                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                    execute(context.source, listOf(target))
+                }
                 1
             }
             .then(
                 Commands.argument("time", StringArgumentType.word())
                     .suggests(BrigadierCommandUtils.suggestions(this) { context ->
-                        listOf(StringArgumentType.getString(context, "target"), "")
+                        val target = BrigadierCommandUtils.resolvePlayerProfileNames(context, "target")
+                            .firstOrNull()
+                            .orEmpty()
+                        listOf(target, "")
                     })
                     .executes { context ->
-                        val target = StringArgumentType.getString(context, "target")
                         val time = StringArgumentType.getString(context, "time")
-                        execute(context.source, listOf(target, time))
+                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                            execute(context.source, listOf(target, time))
+                        }
                         1
                     }
                     .then(
                         Commands.argument("reason", StringArgumentType.greedyString())
                             .executes { context ->
-                                val target = StringArgumentType.getString(context, "target")
                                 val time = StringArgumentType.getString(context, "time")
                                 val reason = StringArgumentType.getString(context, "reason")
-                                execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target, time), reason))
+                                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                                    execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target, time), reason))
+                                }
                                 1
                             }
                     )
@@ -180,9 +187,10 @@ class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
             .then(
                 Commands.argument("reason", StringArgumentType.greedyString())
                     .executes { context ->
-                        val target = StringArgumentType.getString(context, "target")
                         val reason = StringArgumentType.getString(context, "reason")
-                        execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target), reason))
+                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                            execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target), reason))
+                        }
                         1
                     }
             )

@@ -1,9 +1,10 @@
 package pl.syntaxdevteam.punisher.commands
 
-import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes
+import com.mojang.brigadier.arguments.StringArgumentType
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
@@ -131,13 +132,23 @@ class UnBanCommand(private val plugin: PunisherX) : BrigadierCommand {
     }
 
     override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
-        val targetArg = Commands.argument("target", StringArgumentType.word())
-            .suggests(BrigadierCommandUtils.suggestions(this) { emptyList() })
+        val targetArg = Commands.argument("target", ArgumentTypes.playerProfiles())
             .executes { context ->
-                val target = StringArgumentType.getString(context, "target")
-                execute(context.source, listOf(target))
+                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                    execute(context.source, listOf(target))
+                }
                 1
             }
+
+        val ipArg = Commands.literal("ip")
+            .then(
+                Commands.argument("address", StringArgumentType.word())
+                    .executes { context ->
+                        val address = StringArgumentType.getString(context, "address")
+                        execute(context.source, listOf(address))
+                        1
+                    }
+            )
 
         return Commands.literal(name)
             .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.UNBAN))
@@ -146,6 +157,7 @@ class UnBanCommand(private val plugin: PunisherX) : BrigadierCommand {
                 1
             }
             .then(targetArg)
+            .then(ipArg)
             .build()
     }
 }

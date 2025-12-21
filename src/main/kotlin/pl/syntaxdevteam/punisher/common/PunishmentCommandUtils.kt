@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.commands
+package pl.syntaxdevteam.punisher.common
 
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import net.kyori.adventure.text.Component

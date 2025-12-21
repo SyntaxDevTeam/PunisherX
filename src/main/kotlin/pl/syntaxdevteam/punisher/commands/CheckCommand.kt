@@ -1,9 +1,10 @@
 package pl.syntaxdevteam.punisher.commands
 
-import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes
+import com.mojang.brigadier.arguments.StringArgumentType
 import org.bukkit.Bukkit
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
@@ -105,22 +106,26 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
     }
 
     override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
-        val playerArg = Commands.argument("player", StringArgumentType.word())
-            .suggests(BrigadierCommandUtils.suggestions(this) { emptyList() })
+        val playerArg = Commands.argument("player", ArgumentTypes.playerProfiles())
             .executes { context ->
-                val player = StringArgumentType.getString(context, "player")
-                execute(context.source, listOf(player))
+                BrigadierCommandUtils.resolvePlayerProfileNames(context, "player").forEach { player ->
+                    execute(context.source, listOf(player))
+                }
                 1
             }
             .then(
                 Commands.argument("type", StringArgumentType.word())
                     .suggests(BrigadierCommandUtils.suggestions(this) { context ->
-                        listOf(StringArgumentType.getString(context, "player"), "")
+                        val target = BrigadierCommandUtils.resolvePlayerProfileNames(context, "player")
+                            .firstOrNull()
+                            .orEmpty()
+                        listOf(target, "")
                     })
                     .executes { context ->
-                        val player = StringArgumentType.getString(context, "player")
                         val type = StringArgumentType.getString(context, "type")
-                        execute(context.source, listOf(player, type))
+                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "player").forEach { player ->
+                            execute(context.source, listOf(player, type))
+                        }
                         1
                     }
             )

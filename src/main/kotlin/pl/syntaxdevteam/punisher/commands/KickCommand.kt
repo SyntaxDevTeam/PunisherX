@@ -4,9 +4,11 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.common.PunishmentCommandUtils
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 class KickCommand(private val plugin: PunisherX) : BrigadierCommand {
@@ -146,38 +148,68 @@ class KickCommand(private val plugin: PunisherX) : BrigadierCommand {
     override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
         val forceLiteral = Commands.literal("--force")
             .executes { context ->
-                val target = StringArgumentType.getString(context, "target")
-                execute(context.source, listOf(target, "--force"))
+                BrigadierCommandUtils.resolvePlayerNames(context, "target")
+                    .forEach { target -> execute(context.source, listOf(target, "--force")) }
                 1
             }
             .then(
                 Commands.argument("reason", StringArgumentType.greedyString())
                     .executes { context ->
-                        val target = StringArgumentType.getString(context, "target")
                         val reason = StringArgumentType.getString(context, "reason")
-                        val args = BrigadierCommandUtils.greedyArgs(listOf(target, "--force"), reason)
-                        execute(context.source, args)
+                        BrigadierCommandUtils.resolvePlayerNames(context, "target").forEach { target ->
+                            val args = BrigadierCommandUtils.greedyArgs(listOf(target, "--force"), reason)
+                            execute(context.source, args)
+                        }
                         1
                     }
             )
 
         val reasonArg = Commands.argument("reason", StringArgumentType.greedyString())
             .executes { context ->
-                val target = StringArgumentType.getString(context, "target")
                 val reason = StringArgumentType.getString(context, "reason")
-                execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target), reason))
+                BrigadierCommandUtils.resolvePlayerNames(context, "target").forEach { target ->
+                    execute(context.source, BrigadierCommandUtils.greedyArgs(listOf(target), reason))
+                }
                 1
             }
 
-        val targetArg = Commands.argument("target", StringArgumentType.word())
-            .suggests(BrigadierCommandUtils.suggestions(this) { emptyList() })
+        val targetArg = Commands.argument("target", ArgumentTypes.player())
             .executes { context ->
-                val target = StringArgumentType.getString(context, "target")
-                execute(context.source, listOf(target))
+                BrigadierCommandUtils.resolvePlayerNames(context, "target")
+                    .forEach { target -> execute(context.source, listOf(target)) }
                 1
             }
             .then(forceLiteral)
             .then(reasonArg)
+
+        val allArg = Commands.literal("all")
+            .executes { context ->
+                execute(context.source, listOf("all"))
+                1
+            }
+            .then(
+                Commands.literal("--force")
+                    .executes { context ->
+                        execute(context.source, listOf("all", "--force"))
+                        1
+                    }
+                    .then(
+                        Commands.argument("reason", StringArgumentType.greedyString())
+                            .executes { context ->
+                                val reason = StringArgumentType.getString(context, "reason")
+                                execute(context.source, BrigadierCommandUtils.greedyArgs(listOf("all", "--force"), reason))
+                                1
+                            }
+                    )
+            )
+            .then(
+                Commands.argument("reason", StringArgumentType.greedyString())
+                    .executes { context ->
+                        val reason = StringArgumentType.getString(context, "reason")
+                        execute(context.source, BrigadierCommandUtils.greedyArgs(listOf("all"), reason))
+                        1
+                    }
+            )
 
         return Commands.literal(name)
             .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.KICK))
@@ -186,6 +218,7 @@ class KickCommand(private val plugin: PunisherX) : BrigadierCommand {
                 1
             }
             .then(targetArg)
+            .then(allArg)
             .build()
     }
 }

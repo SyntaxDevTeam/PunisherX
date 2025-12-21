@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.commands
+package pl.syntaxdevteam.punisher.common
 
 object TimeSuggestionProvider {
     fun generateTimeSuggestions(): List<String> {
