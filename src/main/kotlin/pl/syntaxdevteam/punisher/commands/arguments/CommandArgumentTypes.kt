@@ -120,7 +120,7 @@ class DatabaseTypeArgumentType private constructor(private val values: Array<Dat
     companion object {
         private val INVALID_DB_TYPE = SimpleCommandExceptionType(LiteralMessage("Unknown database type"))
 
-        fun databaseType(): DatabaseTypeArgumentType = DatabaseTypeArgumentType(DatabaseType.entries.toTypedArray())
+        fun databaseType(): DatabaseTypeArgumentType = DatabaseTypeArgumentType(DatabaseType.values())
 
         fun getDatabaseType(context: CommandContext<*>, name: String): DatabaseType {
             return context.getArgument(name, DatabaseType::class.java)
