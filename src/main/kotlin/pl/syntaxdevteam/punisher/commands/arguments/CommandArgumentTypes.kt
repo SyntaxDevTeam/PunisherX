@@ -4,10 +4,12 @@ import com.google.common.net.InetAddresses
 import com.mojang.brigadier.LiteralMessage
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.arguments.ArgumentType
+import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
+import io.papermc.paper.command.brigadier.argument.CustomArgumentType
 import pl.syntaxdevteam.core.database.DatabaseType
 import java.util.Locale
 import java.util.concurrent.CompletableFuture
@@ -30,13 +32,15 @@ enum class PunishmentCheckType {
     WARN
 }
 
-class PunishmentDurationArgumentType private constructor() : ArgumentType<PunishmentDuration> {
+class PunishmentDurationArgumentType private constructor() : CustomArgumentType<PunishmentDuration, String> {
     override fun parse(reader: StringReader): PunishmentDuration {
         val raw = reader.readUnquotedString()
         return parseRaw(raw) ?: throw INVALID_DURATION.createWithContext(reader)
     }
 
-    override fun getExamples(): Collection<String> = listOf("10m", "1h", "2d")
+    override fun getNativeType(): ArgumentType<String> = StringArgumentType.word()
+
+    //override fun getExamples(): Collection<String> = listOf("10m", "1h", "2d")
 
     companion object {
         private val INVALID_DURATION = SimpleCommandExceptionType(LiteralMessage("Invalid duration"))
@@ -64,14 +68,16 @@ class PunishmentDurationArgumentType private constructor() : ArgumentType<Punish
     }
 }
 
-class ReasonArgumentType private constructor() : ArgumentType<String> {
+class ReasonArgumentType private constructor() : CustomArgumentType<String, String> {
     override fun parse(reader: StringReader): String {
         val remaining = reader.remaining
         reader.cursor = reader.totalLength
         return remaining
     }
 
-    override fun getExamples(): Collection<String> = listOf("spamming", "cheating in chat")
+    override fun getNativeType(): ArgumentType<String> = StringArgumentType.greedyString()
+
+    //override fun getExamples(): Collection<String> = listOf("spamming", "cheating in chat")
 
     companion object {
         fun reason(): ReasonArgumentType = ReasonArgumentType()
@@ -82,7 +88,7 @@ class ReasonArgumentType private constructor() : ArgumentType<String> {
     }
 }
 
-class IpAddressArgumentType private constructor() : ArgumentType<String> {
+class IpAddressArgumentType private constructor() : CustomArgumentType<String, String> {
     override fun parse(reader: StringReader): String {
         val raw = reader.readUnquotedString()
         if (!InetAddresses.isInetAddress(raw)) {
@@ -91,7 +97,9 @@ class IpAddressArgumentType private constructor() : ArgumentType<String> {
         return raw
     }
 
-    override fun getExamples(): Collection<String> = listOf("127.0.0.1", "192.168.1.5")
+    override fun getNativeType(): ArgumentType<String> = StringArgumentType.word()
+
+    //override fun getExamples(): Collection<String> = listOf("127.0.0.1", "192.168.1.5")
 
     companion object {
         private val INVALID_IP = SimpleCommandExceptionType(LiteralMessage("Invalid IP address"))
@@ -104,23 +112,29 @@ class IpAddressArgumentType private constructor() : ArgumentType<String> {
     }
 }
 
-class DatabaseTypeArgumentType private constructor(private val values: Array<DatabaseType>) : ArgumentType<DatabaseType> {
+class DatabaseTypeArgumentType private constructor(private val values: Array<DatabaseType>) :
+    CustomArgumentType<DatabaseType, String> {
     override fun parse(reader: StringReader): DatabaseType {
         val raw = reader.readUnquotedString()
         return values.firstOrNull { it.name.equals(raw, ignoreCase = true) }
             ?: throw INVALID_DB_TYPE.createWithContext(reader)
     }
 
-    override fun <S> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
+    override fun getNativeType(): ArgumentType<String> = StringArgumentType.word()
+
+    override fun <S : Any> listSuggestions(
+        context: CommandContext<S>,
+        builder: SuggestionsBuilder
+    ): CompletableFuture<Suggestions> {
         return suggestMatching(values.map { it.name.lowercase(Locale.ROOT) }, builder)
     }
 
-    override fun getExamples(): Collection<String> = values.take(3).map { it.name.lowercase(Locale.ROOT) }
+    //override fun getExamples(): Collection<String> = values.take(3).map { it.name.lowercase(Locale.ROOT) }
 
     companion object {
         private val INVALID_DB_TYPE = SimpleCommandExceptionType(LiteralMessage("Unknown database type"))
 
-        fun databaseType(): DatabaseTypeArgumentType = DatabaseTypeArgumentType(DatabaseType.entries.toTypedArray())
+        fun databaseType(): DatabaseTypeArgumentType = DatabaseTypeArgumentType(DatabaseType.values())
 
         fun getDatabaseType(context: CommandContext<*>, name: String): DatabaseType {
             return context.getArgument(name, DatabaseType::class.java)
@@ -128,18 +142,24 @@ class DatabaseTypeArgumentType private constructor(private val values: Array<Dat
     }
 }
 
-class PunishmentCheckTypeArgumentType private constructor(private val values: Array<PunishmentCheckType>) : ArgumentType<PunishmentCheckType> {
+class PunishmentCheckTypeArgumentType private constructor(private val values: Array<PunishmentCheckType>) :
+    CustomArgumentType<PunishmentCheckType, String> {
     override fun parse(reader: StringReader): PunishmentCheckType {
         val raw = reader.readUnquotedString()
         return values.firstOrNull { it.name.equals(raw, ignoreCase = true) }
             ?: throw INVALID_CHECK_TYPE.createWithContext(reader)
     }
 
-    override fun <S> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
+    override fun getNativeType(): ArgumentType<String> = StringArgumentType.word()
+
+    override fun <S : Any> listSuggestions(
+        context: CommandContext<S>,
+        builder: SuggestionsBuilder
+    ): CompletableFuture<Suggestions> {
         return suggestMatching(values.map { it.name.lowercase(Locale.ROOT) }, builder)
     }
 
-    override fun getExamples(): Collection<String> = values.map { it.name.lowercase(Locale.ROOT) }
+    //override fun getExamples(): Collection<String> = values.map { it.name.lowercase(Locale.ROOT) }
 
     companion object {
         private val INVALID_CHECK_TYPE = SimpleCommandExceptionType(LiteralMessage("Unknown check type"))
@@ -152,14 +172,20 @@ class PunishmentCheckTypeArgumentType private constructor(private val values: Ar
     }
 }
 
-class TemplateNameArgumentType private constructor(private val templateNames: () -> Collection<String>) : ArgumentType<String> {
+class TemplateNameArgumentType private constructor(private val templateNames: () -> Collection<String>) :
+    CustomArgumentType<String, String> {
     override fun parse(reader: StringReader): String = reader.readUnquotedString()
 
-    override fun <S> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
+    override fun getNativeType(): ArgumentType<String> = StringArgumentType.word()
+
+    override fun <S : Any> listSuggestions(
+        context: CommandContext<S>,
+        builder: SuggestionsBuilder
+    ): CompletableFuture<Suggestions> {
         return suggestMatching(templateNames(), builder)
     }
 
-    override fun getExamples(): Collection<String> = listOf("default", "cheat")
+    //override fun getExamples(): Collection<String> = listOf("default", "cheat")
 
     companion object {
         fun templateName(templateNames: () -> Collection<String>): TemplateNameArgumentType {
