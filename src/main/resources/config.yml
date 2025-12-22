@@ -1,4 +1,4 @@
-config-version: 162
+config-version: 161
 
 # /********************************************/
 #    Global settings
@@ -197,6 +197,7 @@ webhook:
       mute: 15158332
       warn: 16753920
       kick: 16776960
+      jail: 9447935
       default: 8421504
     embed:
       title: "Event Title"
@@ -231,11 +232,13 @@ webhook:
           value: "{id}"
           inline: true
 
+# Placeholder settings for PlaceholderAPI.
+# The list of available placeholders can be found at https://github.com/SyntaxDevTeam/PunisherX/wiki/Placeholders#full-set-of-available-placeholders
 placeholders:
   # Maximum number of punishments displayed by PlaceholderAPI list placeholders.
   punishment_list_limit: 5
   # Force MessageHandler to format placeholder results using the selected format.
-  # Available options include: MINI_MESSAGE, LEGACY_AMPERSAND, LEGACY_SECTION, PLAIN_TEXT.
+  # Available options include: MINI_MESSAGE, LEGACY_AMPERSAND (recommended), LEGACY_SECTION, PLAIN_TEXT.
   message_format: "LEGACY_AMPERSAND"
 
 

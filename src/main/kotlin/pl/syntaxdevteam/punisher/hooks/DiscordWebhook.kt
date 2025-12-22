@@ -47,6 +47,7 @@ class DiscordWebhook(plugin: PunisherX) {
         "mute" to 15158332,
         "warn" to 16753920,
         "kick" to 16776960,
+        "jail" to 9447935,
         "default" to 8421504,
     )
     private val uuidRegex = Regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
