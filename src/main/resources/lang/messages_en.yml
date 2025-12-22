@@ -112,7 +112,7 @@ ban:
 # /banip command messages
 banip:
   ban: "<green>You banned a player's IP for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
-  usage: "Correct usage: <gold>/banip <player|ip> (time) <reason>"
+  usage: "Correct usage: <gold>/banip <player> (time) <reason> | /banip ip <ip> (time) <reason>"
   kick_message:
     # You can freely customize the message shown to the banned player
     - 'Server Name'
@@ -135,7 +135,7 @@ banip:
 # /unban command messages
 unban:
   unban: "<green>Player <gold><player></gold> has been unbanned</green>"
-  usage: "Correct usage: <gold>/unban <player_name>"
+  usage: "Correct usage: <gold>/unban <player> | /unban ip <ip>"
   broadcast: "<dark_gray>Player <gray><player></gray> has been unbanned</dark_gray>"
 
 # /mute command messages

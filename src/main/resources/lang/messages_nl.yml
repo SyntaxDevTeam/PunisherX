@@ -81,7 +81,7 @@ ban:
 # /banip commando berichten
 banip:
   ban: "<green>Je hebt het IP van de speler verbannen voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
-  usage: "Correct gebruik is: <gold>/banip <speler|ip> (tijd) <reden>"
+  usage: "Correct gebruik is: <gold>/banip <speler> (tijd) <reden> | /banip ip <ip> (tijd) <reden>"
   kick_message:
     - 'Server Naam'
     - 'PunisherX &8» &7Je IP is verbannen!'
@@ -103,7 +103,7 @@ banip:
 # /unban commando berichten
 unban:
   unban: "<green>Speler <gold><player></gold> is uit de ban gehaald</green>"
-  usage: "Correct gebruik is: <gold>/unban <speler>"
+  usage: "Correct gebruik is: <gold>/unban <speler> | /unban ip <ip>"
   broadcast: "<dark_gray>Speler <gray><player></gray> is uit de ban gehaald</dark_gray>"
 
 # /mute commando berichten

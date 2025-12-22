@@ -103,7 +103,7 @@ ban:
 # Mensajes del comando /banip
 banip:
   ban: "<green>Has baneado la IP del jugador por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
-  usage: "Uso correcto: <gold>/banip <jugador|ip> (tiempo) <razón>"
+  usage: "Uso correcto: <gold>/banip <jugador> (tiempo) <razón> | /banip ip <ip> (tiempo) <razón>"
   kick_message:
     # Puedes personalizar libremente el mensaje mostrado al jugador baneado
     - 'Nombre del Servidor'
@@ -126,7 +126,7 @@ banip:
 # Mensajes del comando /unban
 unban:
   unban: "<green>El jugador <gold><player></gold> ha sido desbaneado</green>"
-  usage: "Uso correcto: <gold>/unban <nombre_jugador>"
+  usage: "Uso correcto: <gold>/unban <nombre_jugador> | /unban ip <ip>"
   broadcast: "<dark_gray>El jugador <gray><player></gray> ha sido desbaneado</dark_gray>"
 
 # Mensajes del comando /mute

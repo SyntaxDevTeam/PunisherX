@@ -55,11 +55,11 @@ commands:
     permission: punisherx.cmd.ban
   banip:
     description: Bans a player's IP for a specified time with a reason.
-    usage: /banip <ip|player> (time) <reason>
+    usage: /banip <player> (time) <reason> | /banip ip <ip> (time) <reason>
     permission: punisherx.cmd.banip
   unban:
     description: Unbans a player or IP.
-    usage: /unban <ip|player>
+    usage: /unban <player> | /unban ip <ip>
     permission: punisherx.cmd.unban
   jail:
     description: Allows administrators to jail a player in a specified location in the config.yml for a set duration.

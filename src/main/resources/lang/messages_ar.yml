@@ -105,7 +105,7 @@ ban:
 # رسائل أمر /banip
 banip:
   ban: "<green>لقد حظرت عنوان IP الخاص باللاعب بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
-  usage: "الاستخدام الصحيح: <gold>/banip <player|ip> (المدة) <السبب>"
+  usage: "الاستخدام الصحيح: <gold>/banip <player> (المدة) <السبب> | /banip ip <ip> (المدة) <السبب>"
   kick_message:
     - "اسم الخادم"
     - "PunisherX &8» &7تم حظر عنوان IP الخاص بك!"
@@ -127,7 +127,7 @@ banip:
 # رسائل أمر /unban
 unban:
   unban: "<green>تم إلغاء حظر اللاعب <gold><player></gold></green>"
-  usage: "الاستخدام الصحيح: <gold>/unban <player_name>"
+  usage: "الاستخدام الصحيح: <gold>/unban <player_name> | /unban ip <ip>"
   broadcast: "<dark_gray>تم إلغاء حظر اللاعب <gray><player></gray></dark_gray>"
 
 # /mute command messages

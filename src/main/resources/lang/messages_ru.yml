@@ -100,7 +100,7 @@ ban:
 # Сообщения команды /banip
 banip:
   ban: "<green>Вы забанили IP игрока за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
-  usage: "Правильное использование: <gold>/banip <игрок|ip> (время) <причина>"
+  usage: "Правильное использование: <gold>/banip <игрок> (время) <причина> | /banip ip <ip> (время) <причина>"
   kick_message:
     # Вы можете настроить сообщение для выгнанного игрока
     - 'Название Сервера'
@@ -123,7 +123,7 @@ banip:
 # Сообщения команды /unban
 unban:
   unban: "<green>Игрок <gold><player></gold> был разбанен</green>"
-  usage: "Правильное использование: <gold>/unban <игрок>"
+  usage: "Правильное использование: <gold>/unban <игрок> | /unban ip <ip>"
   broadcast: "<dark_gray>Игрок <gray><player></gray> был разбанен</dark_gray>"
 
 # Сообщения команды /mute
