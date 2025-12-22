@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 
+import com.destroystokyo.paper.profile.PlayerProfile
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
@@ -16,19 +17,24 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 class MuteCommand(private val plugin: PunisherX) : BrigadierCommand {
 
     override fun execute(stack: CommandSourceStack, args: List<String>) {
-        if(PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.MUTE)) {
+        executeLegacy(stack, args)
+    }
+
+    private fun executeLegacy(stack: CommandSourceStack, args: List<String>) {
+        if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.MUTE)) {
             if (args.isNotEmpty()) {
                 if (args.size < 2) {
-                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("mute", "usage"))
+                    sendUsage(stack)
                 } else {
                     val player = args[0]
                     val isForce = args.contains("--force")
                     val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, args, 1)
                     val duration = gtime?.let { PunishmentDurationArgumentType.parseRaw(it) }
-                    executeMute(stack, player, duration, reason, isForce)
+                    val uuid = plugin.resolvePlayerUuid(player)
+                    executeMute(stack, Bukkit.createProfile(uuid, player), duration, reason, isForce)
                 }
             } else {
-                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("mute", "usage"))
+                sendUsage(stack)
             }
         } else {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
@@ -50,9 +56,7 @@ class MuteCommand(private val plugin: PunisherX) : BrigadierCommand {
     override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
         val targetArg = Commands.argument("target", ArgumentTypes.playerProfiles())
             .executes { context ->
-                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
-                    execute(context.source, listOf(target))
-                }
+                sendUsage(context.source)
                 1
             }
             .then(
@@ -65,7 +69,7 @@ class MuteCommand(private val plugin: PunisherX) : BrigadierCommand {
                     })
                     .executes { context ->
                         val time = PunishmentDurationArgumentType.getDuration(context, "time")
-                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                        BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
                             executeMute(context.source, target, time, "", false)
                         }
                         1
@@ -75,7 +79,7 @@ class MuteCommand(private val plugin: PunisherX) : BrigadierCommand {
                             .executes { context ->
                                 val time = PunishmentDurationArgumentType.getDuration(context, "time")
                                 val reason = ReasonArgumentType.getReason(context, "reason")
-                                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                                BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
                                     executeMute(context.source, target, time, reason, false)
                                 }
                                 1
@@ -86,7 +90,7 @@ class MuteCommand(private val plugin: PunisherX) : BrigadierCommand {
                 Commands.argument("reason", ReasonArgumentType.reason())
                     .executes { context ->
                         val reason = ReasonArgumentType.getReason(context, "reason")
-                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                        BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
                             executeMute(context.source, target, null, reason, false)
                         }
                         1
@@ -96,7 +100,7 @@ class MuteCommand(private val plugin: PunisherX) : BrigadierCommand {
         return Commands.literal(name)
             .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.MUTE))
             .executes { context ->
-                execute(context.source, emptyList())
+                sendUsage(context.source)
                 1
             }
             .then(targetArg)
@@ -105,12 +109,18 @@ class MuteCommand(private val plugin: PunisherX) : BrigadierCommand {
 
     private fun executeMute(
         stack: CommandSourceStack,
-        player: String,
+        profile: PlayerProfile,
         duration: PunishmentDuration?,
         reason: String,
         isForce: Boolean
     ) {
-        val targetPlayer = Bukkit.getPlayer(player)
+        val player = profile.name ?: profile.id?.toString()
+        if (player == null) {
+            sendUsage(stack)
+            return
+        }
+        val uuid = profile.id ?: plugin.resolvePlayerUuid(player)
+        val targetPlayer = Bukkit.getPlayer(uuid)
         if (targetPlayer != null) {
             if (!isForce && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_MUTE)) {
                 stack.sender.sendMessage(
@@ -123,18 +133,18 @@ class MuteCommand(private val plugin: PunisherX) : BrigadierCommand {
                 return
             }
         }
-        val uuid = plugin.resolvePlayerUuid(player).toString()
+        val uuidString = uuid.toString()
 
         val punishmentType = "MUTE"
         val start = System.currentTimeMillis()
         val end: Long? = duration?.let { start + it.seconds * 1000 }
 
-        val punishmentId = plugin.databaseHandler.addPunishment(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
+        val punishmentId = plugin.databaseHandler.addPunishment(player, uuidString, reason, stack.sender.name, punishmentType, start, end ?: -1)
         if (punishmentId == null) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
             return
         }
-        plugin.databaseHandler.addPunishmentHistory(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
+        plugin.databaseHandler.addPunishmentHistory(player, uuidString, reason, stack.sender.name, punishmentType, start, end ?: -1)
 
         val formattedTime = plugin.timeHandler.formatTime(duration?.raw)
         val placeholders = PunishmentCommandUtils.buildPlaceholders(
@@ -149,5 +159,9 @@ class MuteCommand(private val plugin: PunisherX) : BrigadierCommand {
         plugin.actionExecutor.executeAction("muted", player, placeholders)
         PunishmentCommandUtils.sendTargetMessages(plugin, targetPlayer, "mute", "mute_message", placeholders)
         PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_MUTE, "mute", "broadcast", placeholders)
+    }
+
+    private fun sendUsage(stack: CommandSourceStack) {
+        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("mute", "usage"))
     }
 }

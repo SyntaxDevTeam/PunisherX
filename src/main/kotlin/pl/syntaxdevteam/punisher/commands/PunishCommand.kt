@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 
+import com.destroystokyo.paper.profile.PlayerProfile
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.ban.BanListType
@@ -24,29 +25,21 @@ import java.util.UUID
 class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
 
     override fun execute(stack: CommandSourceStack, args: List<String>) {
+        executeLegacy(stack, args)
+    }
+
+    private fun executeLegacy(stack: CommandSourceStack, args: List<String>) {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.PUNISH)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
         if (args.size < 2) {
-            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("punish", "usage"))
+            sendUsage(stack)
             return
         }
 
         val targetName = args[0]
         val templateName = args[1]
-        val template = plugin.punishTemplateManager.getTemplate(templateName)
-        if (template == null) {
-            stack.sender.sendMessage(
-                plugin.messageHandler.stringMessageToComponent(
-                    "punish",
-                    "template_not_found",
-                    mapOf("template" to templateName)
-                )
-            )
-            return
-        }
-
         val levelArg = args.getOrNull(2)
         val requestedLevel = levelArg?.toIntOrNull()
         if (levelArg != null && requestedLevel == null) {
@@ -61,29 +54,7 @@ class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
         }
 
         val uuid = plugin.resolvePlayerUuid(targetName)
-        val templateReason = template.reason
-        val computedLevel = if (requestedLevel != null) {
-            requestedLevel
-        } else {
-            val historyCount = plugin.databaseHandler
-                .getPunishmentHistory(uuid.toString())
-                .count { it.reason == templateReason }
-            historyCount + 1
-        }
-
-        val templateLevel = template.resolveLevel(computedLevel)
-        if (templateLevel == null) {
-            stack.sender.sendMessage(
-                plugin.messageHandler.stringMessageToComponent(
-                    "punish",
-                    "invalid_level",
-                    mapOf("level" to computedLevel.toString())
-                )
-            )
-            return
-        }
-
-        applyTemplatePunishment(stack, targetName, uuid, template, templateLevel)
+        executePunish(stack, Bukkit.createProfile(uuid, targetName), templateName, requestedLevel)
     }
 
     override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
@@ -119,8 +90,8 @@ class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
             .executes { context ->
                 val template = TemplateNameArgumentType.getTemplateName(context, "template")
                 val level = IntegerArgumentType.getInteger(context, "level")
-                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
-                    execute(context.source, listOf(target, template, level.toString()))
+                BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
+                    executePunish(context.source, target, template, level)
                 }
                 1
             }
@@ -135,8 +106,8 @@ class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
             })
             .executes { context ->
                 val template = TemplateNameArgumentType.getTemplateName(context, "template")
-                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
-                    execute(context.source, listOf(target, template))
+                BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
+                    executePunish(context.source, target, template, null)
                 }
                 1
             }
@@ -144,9 +115,7 @@ class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
 
         val targetArg = Commands.argument("target", ArgumentTypes.playerProfiles())
             .executes { context ->
-                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
-                    execute(context.source, listOf(target))
-                }
+                sendUsage(context.source)
                 1
             }
             .then(templateArg)
@@ -154,11 +123,66 @@ class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
         return Commands.literal(name)
             .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.PUNISH))
             .executes { context ->
-                execute(context.source, emptyList())
+                sendUsage(context.source)
                 1
             }
             .then(targetArg)
             .build()
+    }
+
+    private fun executePunish(
+        stack: CommandSourceStack,
+        profile: PlayerProfile,
+        templateName: String,
+        requestedLevel: Int?
+    ) {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.PUNISH)) {
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
+            return
+        }
+
+        val targetName = profile.name ?: profile.id?.toString()
+        if (targetName == null) {
+            sendUsage(stack)
+            return
+        }
+        val uuid = profile.id ?: plugin.resolvePlayerUuid(targetName)
+
+        val template = plugin.punishTemplateManager.getTemplate(templateName)
+        if (template == null) {
+            stack.sender.sendMessage(
+                plugin.messageHandler.stringMessageToComponent(
+                    "punish",
+                    "template_not_found",
+                    mapOf("template" to templateName)
+                )
+            )
+            return
+        }
+
+        val templateReason = template.reason
+        val computedLevel = if (requestedLevel != null) {
+            requestedLevel
+        } else {
+            val historyCount = plugin.databaseHandler
+                .getPunishmentHistory(uuid.toString())
+                .count { it.reason == templateReason }
+            historyCount + 1
+        }
+
+        val templateLevel = template.resolveLevel(computedLevel)
+        if (templateLevel == null) {
+            stack.sender.sendMessage(
+                plugin.messageHandler.stringMessageToComponent(
+                    "punish",
+                    "invalid_level",
+                    mapOf("level" to computedLevel.toString())
+                )
+            )
+            return
+        }
+
+        applyTemplatePunishment(stack, targetName, uuid, template, templateLevel)
     }
 
     private fun applyTemplatePunishment(
@@ -479,5 +503,9 @@ class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
         } else {
             finalizePunishment()
         }
+    }
+
+    private fun sendUsage(stack: CommandSourceStack) {
+        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("punish", "usage"))
     }
 }

@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 
+import com.destroystokyo.paper.profile.PlayerProfile
 import com.google.common.net.InetAddresses
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
@@ -25,12 +26,16 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
     private val clp = plugin.commandLoggerPlugin
 
     override fun execute(stack: CommandSourceStack, args: List<String>) {
+        executeLegacy(stack, args)
+    }
+
+    private fun executeLegacy(stack: CommandSourceStack, args: List<String>) {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BANIP)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
         if (args.size < 2) {
-            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("banip", "usage"))
+            sendUsage(stack)
             return
         }
 
@@ -41,7 +46,17 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
         val duration = timeArg?.let { PunishmentDurationArgumentType.parseRaw(it) }
         val reason = if (duration != null) filtered.drop(2).joinToString(" ") else filtered.drop(1).joinToString(" ")
 
-        executeBanIp(stack, rawTarget, duration, reason, isForce)
+        when {
+            InetAddresses.isInetAddress(rawTarget) -> executeBanIpAddress(stack, rawTarget, duration, reason, isForce)
+            UUID_REGEX.matches(rawTarget) -> {
+                val uuid = UUID.fromString(rawTarget)
+                executeBanIpProfile(stack, Bukkit.createProfile(uuid, null), duration, reason, isForce)
+            }
+            else -> {
+                val uuid = plugin.resolvePlayerUuid(rawTarget)
+                executeBanIpProfile(stack, Bukkit.createProfile(uuid, rawTarget), duration, reason, isForce)
+            }
+        }
     }
 
     override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
@@ -57,9 +72,7 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
     override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
         val targetArg = Commands.argument("target", ArgumentTypes.playerProfiles())
             .executes { context ->
-                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
-                    execute(context.source, listOf(target))
-                }
+                sendUsage(context.source)
                 1
             }
             .then(
@@ -72,8 +85,8 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
                     })
                     .executes { context ->
                         val time = PunishmentDurationArgumentType.getDuration(context, "time")
-                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
-                            executeBanIp(context.source, target, time, "", false)
+                        BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
+                            executeBanIpProfile(context.source, target, time, "", false)
                         }
                         1
                     }
@@ -82,8 +95,8 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
                             .executes { context ->
                                 val time = PunishmentDurationArgumentType.getDuration(context, "time")
                                 val reason = ReasonArgumentType.getReason(context, "reason")
-                                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
-                                    executeBanIp(context.source, target, time, reason, false)
+                                BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
+                                    executeBanIpProfile(context.source, target, time, reason, false)
                                 }
                                 1
                             }
@@ -93,8 +106,8 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
                 Commands.argument("reason", ReasonArgumentType.reason())
                     .executes { context ->
                         val reason = ReasonArgumentType.getReason(context, "reason")
-                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
-                            executeBanIp(context.source, target, null, reason, false)
+                        BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
+                            executeBanIpProfile(context.source, target, null, reason, false)
                         }
                         1
                     }
@@ -105,7 +118,7 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
                 Commands.argument("address", IpAddressArgumentType.ipAddress())
                     .executes { context ->
                         val address = IpAddressArgumentType.getAddress(context, "address")
-                        executeBanIp(context.source, address, null, "", false)
+                        executeBanIpAddress(context.source, address, null, "", false)
                         1
                     }
                     .then(
@@ -113,7 +126,7 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
                             .executes { context ->
                                 val address = IpAddressArgumentType.getAddress(context, "address")
                                 val time = PunishmentDurationArgumentType.getDuration(context, "time")
-                                executeBanIp(context.source, address, time, "", false)
+                                executeBanIpAddress(context.source, address, time, "", false)
                                 1
                             }
                             .then(
@@ -122,7 +135,7 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
                                         val address = IpAddressArgumentType.getAddress(context, "address")
                                         val time = PunishmentDurationArgumentType.getDuration(context, "time")
                                         val reason = ReasonArgumentType.getReason(context, "reason")
-                                        executeBanIp(context.source, address, time, reason, false)
+                                        executeBanIpAddress(context.source, address, time, reason, false)
                                         1
                                     }
                             )
@@ -132,7 +145,7 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
                             .executes { context ->
                                 val address = IpAddressArgumentType.getAddress(context, "address")
                                 val reason = ReasonArgumentType.getReason(context, "reason")
-                                executeBanIp(context.source, address, null, reason, false)
+                                executeBanIpAddress(context.source, address, null, reason, false)
                                 1
                             }
                     )
@@ -141,7 +154,7 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
         return Commands.literal(name)
             .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.BANIP))
             .executes { context ->
-                execute(context.source, emptyList())
+                sendUsage(context.source)
                 1
             }
             .then(targetArg)
@@ -149,18 +162,23 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
             .build()
     }
 
-    private fun executeBanIp(
+    private fun executeBanIpProfile(
         stack: CommandSourceStack,
-        rawTarget: String,
+        profile: PlayerProfile,
         duration: PunishmentDuration?,
         reason: String,
         isForce: Boolean
     ) {
-        val isIpAddress = InetAddresses.isInetAddress(rawTarget)
-        val playerIPs: List<String> = when {
-            isIpAddress -> listOf(rawTarget)
-            UUID_REGEX.matches(rawTarget) -> plugin.playerIPManager.getPlayerIPsByUUID(rawTarget)
-            else -> plugin.playerIPManager.getPlayerIPsByName(rawTarget.lowercase())
+        val rawTarget = profile.name ?: profile.id?.toString()
+        if (rawTarget == null) {
+            sendUsage(stack)
+            return
+        }
+        val playerUUID = profile.id
+        val playerIPs = if (playerUUID != null) {
+            plugin.playerIPManager.getPlayerIPsByUUID(playerUUID.toString())
+        } else {
+            plugin.playerIPManager.getPlayerIPsByName(rawTarget.lowercase())
         }
 
         if (playerIPs.isEmpty()) {
@@ -168,13 +186,8 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
             return
         }
 
-        val targetUUID: UUID? = when {
-            isIpAddress -> plugin.playerIPManager.getAllDecryptedRecords()
-                .find { it.playerIP == rawTarget }
-                ?.let { UUID.fromString(it.playerUUID) }
-            else -> plugin.resolvePlayerUuid(rawTarget)
-        }
-        val targetPlayer: Player? = targetUUID?.let { Bukkit.getPlayer(it) }
+        val targetUUID = playerUUID ?: plugin.resolvePlayerUuid(rawTarget)
+        val targetPlayer: Player? = Bukkit.getPlayer(targetUUID)
 
         if (targetPlayer != null && !isForce && PermissionChecker.hasWithLegacy(targetPlayer, PermissionChecker.PermissionKey.BYPASS_BANIP)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "bypass", mapOf("player" to rawTarget)))
@@ -240,5 +253,88 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
             .forEach { player -> msgLines.forEach { player.sendMessage(it) } }
 
         if (isForce) plugin.logger.warning("Force by ${stack.sender.name} on $rawTarget")
+    }
+
+    private fun executeBanIpAddress(
+        stack: CommandSourceStack,
+        address: String,
+        duration: PunishmentDuration?,
+        reason: String,
+        isForce: Boolean
+    ) {
+        val playerIPs = listOf(address)
+        val targetUUID = plugin.playerIPManager.getAllDecryptedRecords()
+            .find { it.playerIP == address }
+            ?.let { UUID.fromString(it.playerUUID) }
+        val targetPlayer = targetUUID?.let { Bukkit.getPlayer(it) }
+
+        if (targetPlayer != null && !isForce && PermissionChecker.hasWithLegacy(targetPlayer, PermissionChecker.PermissionKey.BYPASS_BANIP)) {
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "bypass", mapOf("player" to address)))
+            return
+        }
+
+        val start = System.currentTimeMillis()
+        val end = duration?.let { start + it.seconds * 1000 }
+        val formattedTime = plugin.timeHandler.formatTime(duration?.raw)
+        var dbError = false
+        val normalizedEnd = end ?: -1
+        val punishmentIds = mutableListOf<Long>()
+        playerIPs.forEach { ip ->
+            val punishmentId = plugin.databaseHandler.addPunishment(address, ip, reason, stack.sender.name,
+                "BANIP", start, normalizedEnd)
+            if (punishmentId == null) {
+                plugin.logger.err("DB error ban-ip $ip")
+                dbError = true
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban-ip $ip")
+            } else {
+                punishmentIds.add(punishmentId)
+            }
+            plugin.databaseHandler.addPunishmentHistory(address, ip, reason, stack.sender.name,
+                "BANIP", start, normalizedEnd)
+            plugin.proxyBridgeMessenger.notifyIpBan(ip, reason, normalizedEnd)
+        }
+        val placeholders = mapOf(
+            "player" to address,
+            "operator" to stack.sender.name,
+            "reason" to reason,
+            "time" to formattedTime,
+            "type" to "BANIP",
+            "id" to when {
+                punishmentIds.isEmpty() -> "?"
+                punishmentIds.size == 1 -> punishmentIds.first().toString()
+                else -> punishmentIds.joinToString(",")
+            }
+        )
+        clp.logCommand(stack.sender.name, "BANIP", address, reason)
+        if (dbError) stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
+
+        if (targetPlayer != null) {
+            val lines = plugin.messageHandler.getSmartMessage(
+                "banip",
+                "kick_message",
+                placeholders
+            )
+            val builder = Component.text()
+            lines.forEach { builder.append(it).append(Component.newline()) }
+            targetPlayer.kick(builder.build())
+        }
+
+        val msgLines = plugin.messageHandler.getSmartMessage(
+            "banip",
+            "ban",
+            placeholders
+        )
+        msgLines.forEach { stack.sender.sendMessage(it) }
+
+        plugin.actionExecutor.executeAction("ip_banned", address, placeholders)
+
+        plugin.server.onlinePlayers.filter { PermissionChecker.hasWithSee(it, PermissionChecker.PermissionKey.SEE_BANIP) }
+            .forEach { player -> msgLines.forEach { player.sendMessage(it) } }
+
+        if (isForce) plugin.logger.warning("Force by ${stack.sender.name} on $address")
+    }
+
+    private fun sendUsage(stack: CommandSourceStack) {
+        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("banip", "usage"))
     }
 }

@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 
+import com.destroystokyo.paper.profile.PlayerProfile
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
@@ -18,13 +19,16 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
 
     override fun execute(stack: CommandSourceStack, args: List<String>) {
+        executeLegacy(stack, args)
+    }
 
+    private fun executeLegacy(stack: CommandSourceStack, args: List<String>) {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.JAIL)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
         if (args.isEmpty() || args.size < 2) {
-            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("jail", "usage"))
+            sendUsage(stack)
             return
         }
 
@@ -38,7 +42,8 @@ class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
             null to args.drop(1).filterNot { it == "--force" }.joinToString(" ")
         }
 
-        executeJail(stack, playerName, duration, reason, isForce)
+        val uuid = plugin.resolvePlayerUuid(playerName)
+        executeJail(stack, Bukkit.createProfile(uuid, playerName), duration, reason, isForce)
     }
 
     override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
@@ -56,9 +61,7 @@ class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
     override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
         val targetArg = Commands.argument("target", ArgumentTypes.playerProfiles())
             .executes { context ->
-                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
-                    execute(context.source, listOf(target))
-                }
+                sendUsage(context.source)
                 1
             }
             .then(
@@ -71,7 +74,7 @@ class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
                     })
                     .executes { context ->
                         val time = PunishmentDurationArgumentType.getDuration(context, "time")
-                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                        BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
                             executeJail(context.source, target, time, "", false)
                         }
                         1
@@ -81,7 +84,7 @@ class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
                             .executes { context ->
                                 val time = PunishmentDurationArgumentType.getDuration(context, "time")
                                 val reason = ReasonArgumentType.getReason(context, "reason")
-                                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                                BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
                                     executeJail(context.source, target, time, reason, false)
                                 }
                                 1
@@ -92,7 +95,7 @@ class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
                 Commands.argument("reason", ReasonArgumentType.reason())
                     .executes { context ->
                         val reason = ReasonArgumentType.getReason(context, "reason")
-                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                        BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
                             executeJail(context.source, target, null, reason, false)
                         }
                         1
@@ -102,7 +105,7 @@ class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
         return Commands.literal(name)
             .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.JAIL))
             .executes { context ->
-                execute(context.source, emptyList())
+                sendUsage(context.source)
                 1
             }
             .then(targetArg)
@@ -111,12 +114,17 @@ class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
 
     private fun executeJail(
         stack: CommandSourceStack,
-        playerName: String,
+        profile: PlayerProfile,
         duration: PunishmentDuration?,
         reason: String,
         isForce: Boolean
     ) {
-        val uuid = plugin.resolvePlayerUuid(playerName)
+        val playerName = profile.name ?: profile.id?.toString()
+        if (playerName == null) {
+            sendUsage(stack)
+            return
+        }
+        val uuid = profile.id ?: plugin.resolvePlayerUuid(playerName)
         val targetPlayer = Bukkit.getPlayer(uuid)
 
         if (targetPlayer != null && !isForce && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_JAIL)) {
@@ -214,5 +222,9 @@ class JailCommand(private val plugin: PunisherX) : BrigadierCommand {
         } else {
             finalizePunishment()
         }
+    }
+
+    private fun sendUsage(stack: CommandSourceStack) {
+        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("jail", "usage"))
     }
 }

@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 
+import com.destroystokyo.paper.profile.PlayerProfile
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
@@ -16,23 +17,29 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 class WarnCommand(private val plugin: PunisherX) : BrigadierCommand {
 
     override fun execute(stack: CommandSourceStack, args: List<String>) {
-        if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.WARN)) {
-            if (args.isNotEmpty()) {
-                if (args.size < 2) {
-                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("warn", "usage"))
-                } else {
-                    val player = args[0]
-                    val isForce = args.contains("--force")
-                    val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, args, 1)
-                    val duration = gtime?.let { PunishmentDurationArgumentType.parseRaw(it) }
-                    executeWarn(stack, player, duration, reason, isForce)
-                }
-            } else {
-                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("warn", "usage"))
-            }
-        } else {
+        executeLegacy(stack, args)
+    }
+
+    private fun executeLegacy(stack: CommandSourceStack, args: List<String>) {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.WARN)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
+            return
         }
+        if (args.isEmpty()) {
+            sendUsage(stack)
+            return
+        }
+        if (args.size < 2) {
+            sendUsage(stack)
+            return
+        }
+
+        val player = args[0]
+        val isForce = args.contains("--force")
+        val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, args, 1)
+        val duration = gtime?.let { PunishmentDurationArgumentType.parseRaw(it) }
+        val uuid = plugin.resolvePlayerUuid(player)
+        executeWarn(stack, Bukkit.createProfile(uuid, player), duration, reason, isForce)
     }
 
     override fun suggest(stack: CommandSourceStack, args: List<String>): List<String> {
@@ -50,9 +57,7 @@ class WarnCommand(private val plugin: PunisherX) : BrigadierCommand {
     override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
         val targetArg = Commands.argument("target", ArgumentTypes.playerProfiles())
             .executes { context ->
-                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
-                    execute(context.source, listOf(target))
-                }
+                sendUsage(context.source)
                 1
             }
             .then(
@@ -65,7 +70,7 @@ class WarnCommand(private val plugin: PunisherX) : BrigadierCommand {
                     })
                     .executes { context ->
                         val time = PunishmentDurationArgumentType.getDuration(context, "time")
-                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                        BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
                             executeWarn(context.source, target, time, "", false)
                         }
                         1
@@ -75,7 +80,7 @@ class WarnCommand(private val plugin: PunisherX) : BrigadierCommand {
                             .executes { context ->
                                 val time = PunishmentDurationArgumentType.getDuration(context, "time")
                                 val reason = ReasonArgumentType.getReason(context, "reason")
-                                BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                                BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
                                     executeWarn(context.source, target, time, reason, false)
                                 }
                                 1
@@ -86,7 +91,7 @@ class WarnCommand(private val plugin: PunisherX) : BrigadierCommand {
                 Commands.argument("reason", ReasonArgumentType.reason())
                     .executes { context ->
                         val reason = ReasonArgumentType.getReason(context, "reason")
-                        BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                        BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
                             executeWarn(context.source, target, null, reason, false)
                         }
                         1
@@ -96,7 +101,7 @@ class WarnCommand(private val plugin: PunisherX) : BrigadierCommand {
         return Commands.literal(name)
             .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.WARN))
             .executes { context ->
-                execute(context.source, emptyList())
+                sendUsage(context.source)
                 1
             }
             .then(targetArg)
@@ -105,12 +110,17 @@ class WarnCommand(private val plugin: PunisherX) : BrigadierCommand {
 
     private fun executeWarn(
         stack: CommandSourceStack,
-        player: String,
+        profile: PlayerProfile,
         duration: PunishmentDuration?,
         reason: String,
         isForce: Boolean
     ) {
-        val uuid = plugin.resolvePlayerUuid(player)
+        val player = profile.name ?: profile.id?.toString()
+        if (player == null) {
+            sendUsage(stack)
+            return
+        }
+        val uuid = profile.id ?: plugin.resolvePlayerUuid(player)
         val targetPlayer = Bukkit.getPlayer(uuid)
         if (!isForce && targetPlayer != null && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_WARN)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "bypass", mapOf("player" to player)))
@@ -149,5 +159,9 @@ class WarnCommand(private val plugin: PunisherX) : BrigadierCommand {
             plugin.logger.warning("Force-warned by ${stack.sender.name} on $player")
         }
         plugin.actionExecutor.executeWarnCountActions(player, warnCount)
+    }
+
+    private fun sendUsage(stack: CommandSourceStack) {
+        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("warn", "usage"))
     }
 }
