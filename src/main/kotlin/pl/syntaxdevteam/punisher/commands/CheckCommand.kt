@@ -58,6 +58,11 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
             }
             .then(
                 Commands.argument("type", PunishmentCheckTypeArgumentType.checkType())
+                    .suggests(BrigadierCommandUtils.suggestions { _, remaining ->
+                        PunishmentCheckType.entries
+                            .map { it.name.lowercase() }
+                            .filter { it.startsWith(remaining, ignoreCase = true) }
+                    })
                     .executes { context ->
                         val type = PunishmentCheckTypeArgumentType.getCheckType(context, "type")
                         BrigadierCommandUtils.resolvePlayerProfileNames(context, "player").forEach { player ->

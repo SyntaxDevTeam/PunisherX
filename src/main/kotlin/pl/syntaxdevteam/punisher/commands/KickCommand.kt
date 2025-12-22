@@ -176,6 +176,10 @@ class KickCommand(private val plugin: PunisherX) : BrigadierCommand {
             }
             .then(
                 Commands.argument("reason", ReasonArgumentType.reason())
+                    .suggests(BrigadierCommandUtils.suggestions { _, remaining ->
+                        plugin.messageHandler.getMessageStringList("kick", "reasons")
+                            .filter { it.startsWith(remaining, ignoreCase = true) }
+                    })
                     .executes { context ->
                         val reason = ReasonArgumentType.getReason(context, "reason")
                         BrigadierCommandUtils.resolvePlayers(context, "target").forEach { target ->
@@ -186,6 +190,10 @@ class KickCommand(private val plugin: PunisherX) : BrigadierCommand {
             )
 
         val reasonArg = Commands.argument("reason", ReasonArgumentType.reason())
+            .suggests(BrigadierCommandUtils.suggestions { _, remaining ->
+                plugin.messageHandler.getMessageStringList("kick", "reasons")
+                    .filter { it.startsWith(remaining, ignoreCase = true) }
+            })
             .executes { context ->
                 val reason = ReasonArgumentType.getReason(context, "reason")
                 BrigadierCommandUtils.resolvePlayers(context, "target").forEach { target ->
@@ -216,6 +224,10 @@ class KickCommand(private val plugin: PunisherX) : BrigadierCommand {
                     }
                     .then(
                         Commands.argument("reason", ReasonArgumentType.reason())
+                            .suggests(BrigadierCommandUtils.suggestions { _, remaining ->
+                                plugin.messageHandler.getMessageStringList("kick", "reasons")
+                                    .filter { it.startsWith(remaining, ignoreCase = true) }
+                            })
                             .executes { context ->
                                 val reason = ReasonArgumentType.getReason(context, "reason")
                                 executeKickAll(context.source, reason, true)
@@ -225,6 +237,10 @@ class KickCommand(private val plugin: PunisherX) : BrigadierCommand {
             )
             .then(
                 Commands.argument("reason", ReasonArgumentType.reason())
+                    .suggests(BrigadierCommandUtils.suggestions { _, remaining ->
+                        plugin.messageHandler.getMessageStringList("kick", "reasons")
+                            .filter { it.startsWith(remaining, ignoreCase = true) }
+                    })
                     .executes { context ->
                         val reason = ReasonArgumentType.getReason(context, "reason")
                         executeKickAll(context.source, reason, false)

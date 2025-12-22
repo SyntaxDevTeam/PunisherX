@@ -68,11 +68,9 @@ class BanCommand(private var plugin: PunisherX) : BrigadierCommand {
             }
             .then(
                 Commands.argument("time", PunishmentDurationArgumentType.duration())
-                    .suggests(BrigadierCommandUtils.suggestions(this) { context ->
-                        val target = BrigadierCommandUtils.resolvePlayerProfileNames(context, "target")
-                            .firstOrNull()
-                            .orEmpty()
-                        listOf(target, "")
+                    .suggests(BrigadierCommandUtils.suggestions { _, remaining ->
+                        TimeSuggestionProvider.generateTimeSuggestions()
+                            .filter { it.startsWith(remaining, ignoreCase = true) }
                     })
                     .executes { context ->
                         val time = PunishmentDurationArgumentType.getDuration(context, "time")
@@ -83,6 +81,10 @@ class BanCommand(private var plugin: PunisherX) : BrigadierCommand {
                     }
                     .then(
                         Commands.argument("reason", ReasonArgumentType.reason())
+                            .suggests(BrigadierCommandUtils.suggestions { _, remaining ->
+                                plugin.messageHandler.getMessageStringList("ban", "reasons")
+                                    .filter { it.startsWith(remaining, ignoreCase = true) }
+                            })
                             .executes { context ->
                                 val time = PunishmentDurationArgumentType.getDuration(context, "time")
                                 val reason = ReasonArgumentType.getReason(context, "reason")
@@ -95,6 +97,10 @@ class BanCommand(private var plugin: PunisherX) : BrigadierCommand {
             )
             .then(
                 Commands.argument("reason", ReasonArgumentType.reason())
+                    .suggests(BrigadierCommandUtils.suggestions { _, remaining ->
+                        plugin.messageHandler.getMessageStringList("ban", "reasons")
+                            .filter { it.startsWith(remaining, ignoreCase = true) }
+                    })
                     .executes { context ->
                         val reason = ReasonArgumentType.getReason(context, "reason")
                         BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->

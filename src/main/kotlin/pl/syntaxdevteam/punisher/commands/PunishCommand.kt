@@ -80,12 +80,13 @@ class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
 
     override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
         val levelArg = Commands.argument("level", IntegerArgumentType.integer(1))
-            .suggests(BrigadierCommandUtils.suggestions(this) { context ->
-                listOf(
-                    BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").firstOrNull().orEmpty(),
-                    TemplateNameArgumentType.getTemplateName(context, "template"),
-                    ""
-                )
+            .suggests(BrigadierCommandUtils.suggestions { context, remaining ->
+                val templateName = TemplateNameArgumentType.getTemplateName(context, "template")
+                val template = plugin.punishTemplateManager.getTemplate(templateName)
+                    ?: return@suggestions emptyList()
+                template.levels.keys.sorted()
+                    .map { it.toString() }
+                    .filter { it.startsWith(remaining, ignoreCase = true) }
             })
             .executes { context ->
                 val template = TemplateNameArgumentType.getTemplateName(context, "template")
@@ -100,9 +101,9 @@ class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
             "template",
             TemplateNameArgumentType.templateName { plugin.punishTemplateManager.getTemplateNames() }
         )
-            .suggests(BrigadierCommandUtils.suggestions(this) { context ->
-                val target = BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").firstOrNull().orEmpty()
-                listOf(target, "")
+            .suggests(BrigadierCommandUtils.suggestions { _, remaining ->
+                plugin.punishTemplateManager.getTemplateNames()
+                    .filter { it.startsWith(remaining, ignoreCase = true) }
             })
             .executes { context ->
                 val template = TemplateNameArgumentType.getTemplateName(context, "template")

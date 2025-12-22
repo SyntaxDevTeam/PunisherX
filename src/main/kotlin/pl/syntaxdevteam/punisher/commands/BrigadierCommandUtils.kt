@@ -21,6 +21,19 @@ object BrigadierCommandUtils {
         builder.buildFuture()
     }
 
+    fun suggestions(valuesProvider: (CommandContext<CommandSourceStack>) -> Iterable<String>):
+        SuggestionProvider<CommandSourceStack> = SuggestionProvider { context, builder ->
+            valuesProvider(context).forEach { builder.suggest(it) }
+            builder.buildFuture()
+        }
+
+    fun suggestions(valuesProvider: (CommandContext<CommandSourceStack>, String) -> Iterable<String>):
+        SuggestionProvider<CommandSourceStack> = SuggestionProvider { context, builder ->
+            val remaining = builder.remainingLowerCase
+            valuesProvider(context, remaining).forEach { builder.suggest(it) }
+            builder.buildFuture()
+        }
+
     fun greedyArgs(base: List<String>, value: String): List<String> {
         if (value.isBlank()) {
             return base
