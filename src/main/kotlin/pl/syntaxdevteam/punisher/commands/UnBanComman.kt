@@ -1,6 +1,7 @@
 package pl.syntaxdevteam.punisher.commands
 
 import com.google.common.net.InetAddresses
+import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
@@ -136,17 +137,32 @@ class UnBanCommand(private val plugin: PunisherX) : BrigadierCommand {
         val targetArg = Commands.argument("target", ArgumentTypes.playerProfiles())
             .executes { context ->
                 BrigadierCommandUtils.resolvePlayerProfileNames(context, "target").forEach { target ->
+                    if (InetAddresses.isInetAddress(target)) {
+                        sendUsage(context.source)
+                        return@executes 1
+                    }
                     execute(context.source, listOf(target))
                 }
                 1
             }
 
         val ipArg = Commands.literal("ip")
+            .executes { context ->
+                sendUsage(context.source)
+                1
+            }
             .then(
                 Commands.argument("address", IpAddressArgumentType.ipAddress())
                     .executes { context ->
                         val address = IpAddressArgumentType.getAddress(context, "address")
                         unbanIP(context.source, address)
+                        1
+                    }
+            )
+            .then(
+                Commands.argument("raw", StringArgumentType.word())
+                    .executes { context ->
+                        sendUsage(context.source)
                         1
                     }
             )
@@ -160,5 +176,9 @@ class UnBanCommand(private val plugin: PunisherX) : BrigadierCommand {
             .then(targetArg)
             .then(ipArg)
             .build()
+    }
+
+    private fun sendUsage(stack: CommandSourceStack) {
+        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unban", "usage"))
     }
 }

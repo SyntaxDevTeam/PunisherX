@@ -2,6 +2,7 @@ package pl.syntaxdevteam.punisher.commands
 
 import com.destroystokyo.paper.profile.PlayerProfile
 import com.google.common.net.InetAddresses
+import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
@@ -85,7 +86,9 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
                     })
                     .executes { context ->
                         val time = PunishmentDurationArgumentType.getDuration(context, "time")
-                        BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
+                        val targets = BrigadierCommandUtils.resolvePlayerProfiles(context, "target")
+                        if (rejectIpTargets(context.source, targets)) return@executes 1
+                        targets.forEach { target ->
                             executeBanIpProfile(context.source, target, time, "", false)
                         }
                         1
@@ -95,7 +98,9 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
                             .executes { context ->
                                 val time = PunishmentDurationArgumentType.getDuration(context, "time")
                                 val reason = ReasonArgumentType.getReason(context, "reason")
-                                BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
+                                val targets = BrigadierCommandUtils.resolvePlayerProfiles(context, "target")
+                                if (rejectIpTargets(context.source, targets)) return@executes 1
+                                targets.forEach { target ->
                                     executeBanIpProfile(context.source, target, time, reason, false)
                                 }
                                 1
@@ -106,7 +111,9 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
                 Commands.argument("reason", ReasonArgumentType.reason())
                     .executes { context ->
                         val reason = ReasonArgumentType.getReason(context, "reason")
-                        BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
+                        val targets = BrigadierCommandUtils.resolvePlayerProfiles(context, "target")
+                        if (rejectIpTargets(context.source, targets)) return@executes 1
+                        targets.forEach { target ->
                             executeBanIpProfile(context.source, target, null, reason, false)
                         }
                         1
@@ -114,6 +121,10 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
             )
 
         val ipArg = Commands.literal("ip")
+            .executes { context ->
+                sendUsage(context.source)
+                1
+            }
             .then(
                 Commands.argument("address", IpAddressArgumentType.ipAddress())
                     .executes { context ->
@@ -149,6 +160,13 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
                                 1
                             }
                     )
+            )
+            .then(
+                Commands.argument("raw", StringArgumentType.word())
+                    .executes { context ->
+                        sendUsage(context.source)
+                        1
+                    }
             )
 
         return Commands.literal(name)
@@ -336,5 +354,16 @@ class BanIpCommand(private val plugin: PunisherX) : BrigadierCommand {
 
     private fun sendUsage(stack: CommandSourceStack) {
         stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("banip", "usage"))
+    }
+
+    private fun rejectIpTargets(stack: CommandSourceStack, targets: Collection<PlayerProfile>): Boolean {
+        val ipTarget = targets.firstOrNull { target ->
+            target.name?.let(InetAddresses::isInetAddress) == true
+        }
+        if (ipTarget != null) {
+            sendUsage(stack)
+            return true
+        }
+        return false
     }
 }
