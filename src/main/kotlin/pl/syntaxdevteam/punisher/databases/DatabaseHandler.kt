@@ -100,6 +100,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return db.query(sql, *params, mapper = mapper)
     }
 
+    fun serverScope(): String = normalizedServerScope()
+
     fun isReady(): Boolean = ready.get()
 
     private fun normalizedServerScope(): String {
@@ -245,7 +247,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
         operator: String,
         punishmentType: String,
         start: Long,
-        end: Long
+        end: Long,
+        server: String = normalizedServerScope()
     ): Long? {
         return try {
             val insertSql = """
@@ -264,7 +267,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                             statement.setString(5, punishmentType)
                             statement.setLong(6, start)
                             statement.setLong(7, end)
-                            statement.setString(8, normalizedServerScope())
+                            statement.setString(8, server)
                             statement.executeQuery().use { resultSet ->
                                 if (resultSet.next()) resultSet.getLong(1) else null
                             }
@@ -279,7 +282,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                             statement.setString(5, punishmentType)
                             statement.setLong(6, start)
                             statement.setLong(7, end)
-                            statement.setString(8, normalizedServerScope())
+                            statement.setString(8, server)
                             val rows = statement.executeUpdate()
                             if (rows == 0) {
                                 null
@@ -299,7 +302,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                             statement.setString(5, punishmentType)
                             statement.setLong(6, start)
                             statement.setLong(7, end)
-                            statement.setString(8, normalizedServerScope())
+                            statement.setString(8, server)
                             val rows = statement.executeUpdate()
                             if (rows == 0) {
                                 null
@@ -353,7 +356,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
         operator: String,
         punishmentType: String,
         start: Long,
-        end: Long
+        end: Long,
+        server: String = normalizedServerScope()
     ) {
         try {
             execute(
@@ -361,7 +365,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                 INSERT INTO punishmenthistory (name, uuid, reason, operator, punishmentType, start, endTime, server)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """.trimIndent(),
-                name, uuid, reason, operator, punishmentType, start, end, normalizedServerScope()
+                name, uuid, reason, operator, punishmentType, start, end, server
             )
         } catch (e: Exception) {
             logger.err("Failed to add punishment history for player $name. ${e.message}")
