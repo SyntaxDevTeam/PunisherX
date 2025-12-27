@@ -99,6 +99,12 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
     }
 
     private fun evaluatePunishments(uuid: UUID, playerName: String, ip: String): LoginAction {
+        if (!plugin.databaseHandler.isReady()) {
+            plugin.logger.debug("ModernLogin: database not ready yet, denying $playerName to avoid bypass")
+            val waitMessage = plugin.messageHandler.stringMessageToComponent("error", "db_not_ready")
+            return LoginAction.Deny(waitMessage)
+        }
+
         plugin.logger.debug("Checking punishment for player: $playerName")
         val punishments = plugin.databaseHandler.getPunishments(uuid.toString()) +
                 plugin.databaseHandler.getPunishmentsByIP(ip)

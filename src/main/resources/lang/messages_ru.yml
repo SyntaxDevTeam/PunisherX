@@ -13,6 +13,7 @@ error:
   player_not_found: "<gold>Игрок с ником <player> не найден.</gold>"
   ip_not_found: "<gold>Игрок с IP <ip> не найден.</gold>"
   player_not_punished: "<gold>У игрока <player> нет такого наказания.</gold>"
+  db_not_ready: "<red>База данных еще запускается, попробуйте снова через несколько секунд.</red>"
   reload: "<red>Произошла ошибка при перезагрузке конфигурации:</red> "
   bypass: "<red><b>ВНИМАНИЕ!</b> Игрок <gold><player></gold> не может быть наказан из-за своих прав (OP или bypass).</red><newline><dark_gray>Возможно, это можно обойти...</dark_gray>"
 

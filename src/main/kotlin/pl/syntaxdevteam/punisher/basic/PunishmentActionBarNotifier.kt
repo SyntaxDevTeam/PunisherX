@@ -8,11 +8,13 @@ import org.bukkit.scheduler.BukkitTask
 import pl.syntaxdevteam.core.platform.ServerEnvironment
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.databases.PunishmentData
+import java.util.concurrent.atomic.AtomicBoolean
 
 class PunishmentActionBarNotifier(private val plugin: PunisherX) {
 
     private var asyncTask: BukkitTask? = null
     private var foliaTask: ScheduledTask? = null
+    private val isRunning = AtomicBoolean(false)
 
     fun start() {
         stop()
@@ -46,17 +48,31 @@ class PunishmentActionBarNotifier(private val plugin: PunisherX) {
     }
 
     private fun notifyPlayers() {
+        if (!isRunning.compareAndSet(false, true)) {
+            plugin.logger.debug("Skipping action bar update, previous run still in progress")
+            return
+        }
+
         val now = System.currentTimeMillis()
         val onlinePlayers = plugin.server.onlinePlayers
-        if (onlinePlayers.isEmpty()) return
-
-        onlinePlayers.forEach { player ->
-            val punishments = plugin.databaseHandler.getPunishments(player.uniqueId.toString())
-                .filter { plugin.punishmentManager.isPunishmentActive(it) }
-
-            val actionBarMessage = buildActionBar(punishments, now) ?: return@forEach
-            sendActionBar(player, actionBarMessage)
+        if (onlinePlayers.isEmpty()) {
+            isRunning.set(false)
+            return
         }
+
+        runCatching {
+            onlinePlayers.forEach { player ->
+                val punishments = plugin.databaseHandler.getPunishments(player.uniqueId.toString())
+                    .filter { plugin.punishmentManager.isPunishmentActive(it) }
+
+                val actionBarMessage = buildActionBar(punishments, now) ?: return@forEach
+                sendActionBar(player, actionBarMessage)
+            }
+        }.onFailure { error ->
+            plugin.logger.warning("Failed to refresh action bar notifications: ${error.message}")
+        }
+
+        isRunning.set(false)
     }
 
     private fun sendActionBar(player: Player, message: Component) {

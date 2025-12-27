@@ -15,6 +15,7 @@ error:
   ip_not_found: "<gold>Aucun joueur trouvé avec l’IP <ip>.</gold>"
   no_data: "<red>Aucune donnée à afficher.</red>"
   db_error: "Une erreur est survenue lors de l’ajout de la sanction dans la base de données. Utilisation de la méthode de secours. Vérifiez la console !"
+  db_not_ready: "<red>La base de données démarre encore, veuillez réessayer dans quelques secondes.</red>"
   console: "<red>Seul un joueur peut utiliser cette commande.</red>"
   reload: "<red>Une erreur est survenue lors du rechargement de la configuration :</red>"
   bypass: "<red><b>ATTENTION !</b> Le joueur <gold><player></gold> ne peut pas être sanctionné en raison de ses permissions (OP ou bypass).</red><newline><dark_gray>Il y a peut-être un moyen de contourner cela...</dark_gray>"

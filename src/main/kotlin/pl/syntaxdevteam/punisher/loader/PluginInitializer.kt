@@ -79,17 +79,14 @@ class PluginInitializer(private val plugin: PunisherX) {
      */
     private fun setupDatabase() {
         plugin.databaseHandler = DatabaseHandler(plugin)
-        val databaseSetupTask = Runnable {
+        plugin.logger.debug("Detected server: ${ServerEnvironment.platformName} (${ServerEnvironment.family})")
+        try {
             plugin.databaseHandler.openConnection()
             plugin.databaseHandler.createTables()
-        }
-        plugin.logger.debug("Detected server: ${ServerEnvironment.platformName} (${ServerEnvironment.family})")
-        if (ServerEnvironment.isFoliaBased()) {
-            plugin.logger.debug("Detected Folia server, using async database connection handling.")
-            plugin.server.globalRegionScheduler.execute(plugin, databaseSetupTask)
-        } else if (ServerEnvironment.isPaperBased()) {
-            plugin.logger.debug("Detected Paper server, using async database connection handling.")
-            plugin.server.scheduler.runTaskAsynchronously(plugin, databaseSetupTask)
+            plugin.logger.debug("Database initialized before enabling player listeners.")
+        } catch (e: Exception) {
+            plugin.logger.severe("Failed to initialize database: ${e.message}")
+            throw e
         }
     }
 

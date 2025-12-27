@@ -15,6 +15,13 @@ class LegacyLoginListener(private val plugin: PunisherX) : Listener {
     fun onPlayerLogin(event: PlayerLoginEvent) {
         val player = event.player
         try {
+            if (!plugin.databaseHandler.isReady()) {
+                plugin.logger.debug("LegacyLogin: database not ready yet, denying ${player.name} to avoid bypass")
+                val waitMessage = plugin.messageHandler.stringMessageToComponent("error", "db_not_ready")
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, waitMessage)
+                return
+            }
+
             plugin.logger.debug("Checking punishment for player: ${player.name}")
 
             val uuid = player.uniqueId.toString()
