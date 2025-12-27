@@ -14,6 +14,7 @@ error:
   ip_not_found: "<gold>Nie znaleziono gracza o IP <ip>.</gold>"
   no_data: "<red>Brak danych do wyświetlenia.</red>"
   db_error: "Wystąpił błąd przy dodawaniu kary do bazy danych. Korzystanie z metody zapasowej. Sprawdź konsolę!"
+  db_not_ready: "<red>Baza danych wciąż się uruchamia, spróbuj ponownie za kilka sekund.</red>"
   console: "<red>Tylko gracz może użyć tej komendy.</red>"
   reload: "<red>Wystąpił błąd podczas przeładowania konfiguracji:</red>"
   bypass: "<red><b>UWAGA!</b> Gracz <gold><player></gold> nie może otrzymać kary ze względu na swoje uprawnienia (OP lub bypass).</red><newline><dark_gray>Może dałoby się to obejść...</dark_gray>"

@@ -13,6 +13,7 @@ error:
   player_not_found: "<gold>Speler met bijnaam <player> niet gevonden.</gold>"
   ip_not_found: "<gold>Speler met IP <ip> niet gevonden.</gold>"
   player_not_punished: "<gold>Speler <player> heeft geen dergelijke straf.</gold>"
+  db_not_ready: "<red>De database wordt nog opgestart, probeer het over een paar seconden opnieuw.</red>"
   reload: "<red>Er is een fout opgetreden tijdens het herladen van de configuratie:</red> "
   bypass: "<red><b>WAARSCHUWING!</b> Speler <gold><player><gold/> <red>kan niet worden gestraft vanwege hun rechten (OP of bypass).</red><dark_gray>Dit kan misschien worden omzeild...</dark_gray>"
 

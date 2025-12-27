@@ -15,6 +15,7 @@ error:
   ip_not_found: "<gold>Nessun giocatore trovato con l’IP <ip>.</gold>"
   no_data: "<red>Nessun dato da mostrare.</red>"
   db_error: "Si è verificato un errore durante l’aggiunta della punizione al database. Uso del metodo di riserva. Controlla la console!"
+  db_not_ready: "<red>Il database è ancora in fase di avvio, riprova tra qualche secondo.</red>"
   console: "<red>Solo un giocatore può usare questo comando.</red>"
   reload: "<red>Si è verificato un errore durante il ricaricamento della configurazione:</red>"
   bypass: "<red><b>ATTENZIONE!</b> Il giocatore <gold><player></gold> non può essere punito a causa dei suoi permessi (OP o bypass).</red><newline><dark_gray>Forse si può aggirare...</dark_gray>"

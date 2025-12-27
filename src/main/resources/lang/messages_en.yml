@@ -16,6 +16,7 @@ error:
   ip_not_found: "<gold>No player found with IP <ip>.</gold>"
   no_data: "<red>No data to display.</red>"
   db_error: "An error occurred while adding the punishment to the database. Using fallback method. Check console!"
+  db_not_ready: "<red>The database is still starting, please try again in a few seconds.</red>"
   console: "<red>Only a player can use this command.</red>"
   reload: "<red>An error occurred while reloading the configuration:</red>"
   bypass: "<red><b>WARNING!</b> Player <gold><player></gold> cannot be punished due to their permissions (OP or bypass).</red><newline><dark_gray>Maybe there is a way around this...</dark_gray>"

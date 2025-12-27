@@ -15,6 +15,7 @@ error:
   ip_not_found: "<gold>Kein Spieler mit der IP <ip> gefunden.</gold>"
   no_data: "<red>Keine Daten zum Anzeigen.</red>"
   db_error: "Beim Hinzufügen der Strafe zur Datenbank ist ein Fehler aufgetreten. Fallback-Methode wird verwendet. Überprüfe die Konsole!"
+  db_not_ready: "<red>Die Datenbank wird noch gestartet, bitte versuche es in ein paar Sekunden erneut.</red>"
   console: "<red>Diesen Befehl kann nur ein Spieler ausführen.</red>"
   reload: "<red>Beim Neuladen der Konfiguration ist ein Fehler aufgetreten:</red>"
   bypass: "<red><b>ACHTUNG!</b> Spieler <gold><player></gold> kann aufgrund seiner Berechtigungen (OP oder Bypass) nicht bestraft werden.</red><newline><dark_gray>Vielleicht gibt es einen Weg, das zu umgehen...</dark_gray>"

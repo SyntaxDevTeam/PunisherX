@@ -15,6 +15,7 @@ error:
   ip_not_found: "<gold>No se encontró ningún jugador con la IP <ip>.</gold>"
   no_data: "<red>No hay datos para mostrar.</red>"
   db_error: "Ocurrió un error al añadir el castigo a la base de datos. Usando método alternativo. ¡Revisa la consola!"
+  db_not_ready: "<red>La base de datos todavía se está iniciando, inténtalo de nuevo en unos segundos.</red>"
   console: "<red>Solo un jugador puede usar este comando.</red>"
   reload: "<red>Ocurrió un error al recargar la configuración:</red>"
   bypass: "<red><b>¡ATENCIÓN!</b> El jugador <gold><player></gold> no puede ser castigado debido a sus permisos (OP o bypass).</red><newline><dark_gray>Quizás haya una forma de evitar esto...</dark_gray>"

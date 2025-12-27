@@ -37,6 +37,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         private const val NETWORK_SCOPE = "network"
     }
 
+    private val ready = AtomicBoolean(false)
     private val dbType: DatabaseType = plugin.config
         .getString("database.type")
         ?.uppercase()
@@ -86,6 +87,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
     /** Closes the datasource. */
     fun closeConnection() {
         db.close()
+        ready.set(false)
     }
 
     /** Utility for executing update/insert/delete statements. */
@@ -97,6 +99,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
     private fun <T> query(sql: String, vararg params: Any, mapper: (java.sql.ResultSet) -> T): List<T> {
         return db.query(sql, *params, mapper = mapper)
     }
+
+    fun isReady(): Boolean = ready.get()
 
     private fun normalizedServerScope(): String {
         val raw = plugin.config.getString("server")?.trim().orEmpty()
@@ -193,6 +197,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
             )
         )
         db.createTable(bridgeQueueSchema)
+        ready.set(true)
     }
 
     private fun ensureServerScopeColumns() {
