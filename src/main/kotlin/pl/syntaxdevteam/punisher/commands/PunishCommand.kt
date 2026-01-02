@@ -99,20 +99,26 @@ class PunishCommand(private val plugin: PunisherX) : BrigadierCommand {
 
         val templateArg = Commands.argument(
             "template",
-            TemplateNameArgumentType.templateName { plugin.punishTemplateManager.getTemplateNames() }
+            com.mojang.brigadier.arguments.StringArgumentType.string()
         )
             .suggests(BrigadierCommandUtils.suggestions { _, remaining ->
                 plugin.punishTemplateManager.getTemplateNames()
+                    .map { name ->
+                        if (name.contains(" ")) "\"$name\"" else name
+                    }
                     .filter { it.startsWith(remaining, ignoreCase = true) }
             })
             .executes { context ->
-                val template = TemplateNameArgumentType.getTemplateName(context, "template")
+                val template = com.mojang.brigadier.arguments.StringArgumentType
+                    .getString(context, "template")
+
                 BrigadierCommandUtils.resolvePlayerProfiles(context, "target").forEach { target ->
                     executePunish(context.source, target, template, null)
                 }
                 1
             }
             .then(levelArg)
+
 
         val targetArg = Commands.argument("target", ArgumentTypes.playerProfiles())
             .executes { context ->
