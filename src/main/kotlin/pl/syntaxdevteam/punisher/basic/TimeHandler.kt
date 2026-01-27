@@ -18,15 +18,20 @@ class TimeHandler internal constructor(
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     fun parseTime(time: String): Long {
-        val amount = time.dropLast(1).toLong()
-        val unit = time.last()
+        val normalized = time.trim().lowercase()
+        if (!normalized.matches(Regex("\\d+[smhd]"))) {
+            throw NumberFormatException("Invalid time format: $time")
+        }
+
+        val amount = normalized.dropLast(1).toLong()
+        val unit = normalized.last()
 
         return when (unit) {
             's' -> amount
             'm' -> amount * 60
             'h' -> amount * 60 * 60
             'd' -> amount * 60 * 60 * 24
-            else -> 0
+            else -> throw NumberFormatException("Invalid time unit: $unit")
         }
     }
 
