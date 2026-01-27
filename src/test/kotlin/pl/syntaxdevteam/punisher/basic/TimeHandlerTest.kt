@@ -6,6 +6,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
 class TimeHandlerTest {
@@ -43,7 +44,8 @@ class TimeHandlerTest {
         assertEquals(120L, handler.parseTime("2m"))
         assertEquals(3600L, handler.parseTime("1h"))
         assertEquals(172800L, handler.parseTime("2d"))
-        assertEquals(0L, handler.parseTime("3x"))
+        assertEquals(300L, handler.parseTime("5M"))
+        assertFailsWith<NumberFormatException> { handler.parseTime("3x") }
     }
 
     @Test
