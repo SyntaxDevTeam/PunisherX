@@ -52,11 +52,13 @@ class ConfigManager(private val plugin: PunisherX) {
             }
         }
 
+        val shouldUpdate = !dataFile.exists() || sourceVersion < V_160
+
         config = YamlDocument.create(
             dataFile,
             defaultsStream,
             GeneralSettings.builder().setUseDefaults(true).build(),
-            LoaderSettings.builder().setAutoUpdate(true).build(),
+            LoaderSettings.builder().setAutoUpdate(shouldUpdate).build(),
             DumperSettings.builder().setIndentation(2).build()
         )
 
@@ -65,11 +67,16 @@ class ConfigManager(private val plugin: PunisherX) {
             config.set(VERSION_KEY, V_141)
         }
 
-        migrateFrom(sourceVersion)
+        if (shouldUpdate) {
+            migrateFrom(sourceVersion)
+            applyWarnCountOverrides()
 
-        config.set(VERSION_KEY, V_160)
-        config.save()
-        plugin.logger.success("[Config] Done. Current version: ${config.getInt(VERSION_KEY)}")
+            config.set(VERSION_KEY, V_160)
+            config.save()
+            plugin.logger.success("[Config] Done. Current version: ${config.getInt(VERSION_KEY)}")
+        } else {
+            plugin.logger.success("[Config] Loaded without update (version ${config.getInt(VERSION_KEY)})")
+        }
     }
 
     fun reload() {
@@ -210,6 +217,22 @@ class ConfigManager(private val plugin: PunisherX) {
     }
 
     // ================= HELPERS =================
+
+    private fun applyWarnCountOverrides() {
+        if (rawUserDoc == null) return
+        val warnOverrides =
+            readSectionMapRaw(rawUserDoc, "actions.warn.count")
+                ?: readSectionMapRaw(rawUserDoc, "warn.actions")
+                ?: readSectionMapRaw(rawUserDoc, "WarnActions")
+                ?: return
+
+        val normalized = LinkedHashMap<String, Any?>()
+        warnOverrides.forEach { (key, value) ->
+            normalized[key] = value
+        }
+        config.set("actions.warn.count", normalized)
+        plugin.logger.debug("[Config] warn.count overrides applied from user config")
+    }
 
     private fun parseVersionValue(raw: Any?): Int? {
         return when (raw) {
