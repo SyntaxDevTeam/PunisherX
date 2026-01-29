@@ -15,7 +15,7 @@ class PanelCommand(private val plugin: PunisherX) : BasicCommand {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "not_a_player"))
             return
         }
-        if (!PermissionChecker.hasWithManage(stack.sender, PermissionChecker.PermissionKey.PUNISHERX_COMMAND)) {
+        if (!PermissionChecker.hasWithManage(stack.sender, PermissionChecker.PermissionKey.PANELS_COMMAND)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }

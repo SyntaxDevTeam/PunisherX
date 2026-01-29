@@ -39,12 +39,14 @@ class PunishmentActionExecutor(private val plugin: PunisherX) {
         warnCount: Int,
         placeholders: Map<String, String>
     ) {
-        section.getKeys(false).forEach { key ->
-            val threshold = key.toIntOrNull() ?: return@forEach
-            if (warnCount == threshold) {
-                dispatchCommands(section.get(key), player, placeholders)
-            }
-        }
+        val thresholds = section.getKeys(false).mapNotNull { it.toIntOrNull() }
+        if (thresholds.isEmpty()) return
+
+        val matched = thresholds.firstOrNull { it == warnCount }
+            ?: thresholds.filter { it <= warnCount }.maxOrNull()
+            ?: return
+
+        dispatchCommands(section.get(matched.toString()), player, placeholders)
     }
 
     private fun dispatchCommands(value: Any?, player: String, placeholders: Map<String, String>) {
