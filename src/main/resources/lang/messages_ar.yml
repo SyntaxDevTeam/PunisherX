@@ -15,6 +15,7 @@ error:
   ip_not_found: "<gold>لم يتم العثور على لاعب يملك عنوان IP <ip>.</gold>"
   no_data: "<red>لا توجد بيانات للعرض.</red>"
   db_error: "حدث خطأ أثناء إضافة العقوبة إلى قاعدة البيانات. يتم استخدام طريقة بديلة. تحقق من وحدة التحكم!"
+  db_not_ready: "<red>قاعدة البيانات لا تزال قيد التشغيل، حاول مرة أخرى بعد بضع ثوان.</red>"
   console: "<red>هذا الأمر يمكن استخدامه من قبل اللاعبين فقط.</red>"
   reload: "<red>حدث خطأ أثناء إعادة تحميل الإعدادات:</red>"
   bypass: "<red><b>تحذير!</b> لا يمكن معاقبة اللاعب <gold><player></gold> بسبب صلاحياته (OP أو تجاوز).</red><newline><dark_gray>ربما هناك طريقة لتجاوز هذا...</dark_gray>"
@@ -36,7 +37,7 @@ setunjail:
 
 # رسائل أمر /jail
 jail:
-  jail: "<green>لقد سجنت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
+  jail: "<green>لقد سجنت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "الاستخدام الصحيح: <gold>/jail <player_name> (المدة) <السبب>"
   jail_message: "<red>لقد تم سجنك بسبب <b><reason></b> لمدة <b><time></b></red>"
   teleport_failed: "<red>تم إلغاء النقل: موقع السجن المحدد غير آمن.</red>"
@@ -72,7 +73,7 @@ unjail:
 
 # رسائل أمر /ban
 ban:
-  ban: "<green>لقد حظرت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
+  ban: "<green>لقد حظرت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "الاستخدام الصحيح: <gold>/ban <player_name> (المدة) <السبب>"
   kick_message:
     - "اسم الخادم"
@@ -104,7 +105,7 @@ ban:
 
 # رسائل أمر /banip
 banip:
-  ban: "<green>لقد حظرت عنوان IP الخاص باللاعب بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
+  ban: "<green>لقد حظرت عنوان IP الخاص باللاعب بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "الاستخدام الصحيح: <gold>/banip <player|ip> (المدة) <السبب>"
   kick_message:
     - "اسم الخادم"
@@ -132,7 +133,7 @@ unban:
 
 # /mute command messages
 mute:
-  mute: "<green>لقد كمّمت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
+  mute: "<green>لقد كمّمت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "الاستخدام الصحيح: <gold>/mute <player_name> (المدة) <السبب>"
   mute_message: "<red>لقد تم كمّك بسبب <b><reason></b> لمدة <b><time></b></red>"
   mute_info_message: "<red>تحاول التحدث، ولكنك لا تزال مكمومًا لمدة <time>.</red>"
@@ -163,7 +164,7 @@ unmute:
 
 # رسائل أمر /warn
 warn:
-  warn: "<green>لقد حذّرت (<warn_no> مرة) اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green>"
+  warn: "<green>لقد حذّرت (<warn_no> مرة) اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "الاستخدام الصحيح: <gold>/warn <player_name> (المدة) <السبب>"
   warn_message: "<red>لقد تلقيت تحذيرًا رقم <b><warn_no></b>!</red>"
   broadcast: "<dark_gray>اللاعب <gray><player></gray> تلقى تحذيرًا بسبب <gray><reason></gray> لمدة <gray><time></gray></dark_gray>"
@@ -182,6 +183,14 @@ warn:
     - "الإزعاج"
     - "إهانة لاعب"
     - "ألفاظ مسيئة"
+
+# رسائل أمر /punish
+punish:
+  usage: "الاستخدام الصحيح: <gold>/punish <player_name> <template> (lvl)"
+  template_not_found: "<red>لم يتم العثور على القالب <gold><template></gold>.</red>"
+  invalid_level: "<red>مستوى القالب غير صالح: <gold><level></gold>.</red>"
+  invalid_time: "<red>وقت القالب غير صالح: <gold><time></gold>.</red>"
+  invalid_type: "<red>نوع العقوبة غير مدعوم في القالب: <gold><type></gold>.</red>"
 
 # رسائل أمر /unwarn
 unwarn:
@@ -396,7 +405,11 @@ placeholders:
   jail_remaining_time: "<gray>في السجن حتى: <gold>"
   total_punishments: "<gray>إجمالي العقوبات: <gold>"
   total_active_punishments: "<gray>إجمالي العقوبات الفعالة: <gold>"
-
+  active_punishments_list: "<gray>العقوبات النشطة (آخر <gold><limit></gold>):</gray><newline><list>"
+  punishment_history_list: "<gray>سجل العقوبات (آخر <gold><limit></gold>):</gray><newline><list>"
+  punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
+  punishment_list_empty: "<gray>لا توجد عقوبات.</gray>"
+  punishment_list_permanent: "غير محدد"
 # تنسيق الوقت
 formatTime:
   undefined: "غير محدد"

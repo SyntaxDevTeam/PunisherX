@@ -18,6 +18,7 @@ class ConfigManager(private val plugin: PunisherX) {
         private const val V_104 = 104
         private const val V_141 = 141
         private const val V_160 = 160
+        private const val V_161 = 161
     }
 
     lateinit var config: YamlDocument
@@ -42,7 +43,7 @@ class ConfigManager(private val plugin: PunisherX) {
 
         val sourceVersion = detectSourceVersion(rawUserDoc)
 
-        if (sourceVersion < V_160 && dataFile.exists()) {
+        if (sourceVersion < V_161 && dataFile.exists()) {
             val bak = File(dataFile.parentFile, "$FILE_NAME.$sourceVersion.bak")
             try {
                 Files.copy(dataFile.toPath(), bak.toPath(), StandardCopyOption.REPLACE_EXISTING)
@@ -93,11 +94,11 @@ class ConfigManager(private val plugin: PunisherX) {
         val guessed = guessVersionFromComment()
         if (guessed != null) return guessed
 
-        return if (doc == null) V_160 else V_141
+        return if (doc == null) V_161 else V_141
     }
 
     private fun migrateFrom(sourceVersion: Int) {
-        if (sourceVersion >= V_160) return
+        if (sourceVersion >= V_161) return
 
         if (sourceVersion <= V_104) {
             plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_104 …")
@@ -107,11 +108,13 @@ class ConfigManager(private val plugin: PunisherX) {
             plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_160 …")
             migrate141to160()
         }
+        plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_161 …")
+        migrate160to161()
     }
 
     private fun migrate104to160() {
         val oldWarn = readSectionMapRaw(rawUserDoc, "WarnActions")
-        if (oldWarn != null && oldWarn.isNotEmpty()) {
+        if (!oldWarn.isNullOrEmpty()) {
             val dst = "actions.warn.count"
             val it = oldWarn.entries.iterator()
             while (it.hasNext()) {
@@ -156,11 +159,11 @@ class ConfigManager(private val plugin: PunisherX) {
 
         var oldWarn = readSectionMapRaw(rawUserDoc, "warn.actions")
 
-        if (oldWarn == null || oldWarn.isEmpty()) {
+        if (oldWarn.isNullOrEmpty()) {
             oldWarn = readSectionMapRaw(rawUserDoc, "actions.warn.count")
         }
 
-        if (oldWarn != null && oldWarn.isNotEmpty()) {
+        if (!oldWarn.isNullOrEmpty()) {
             val dst = "actions.warn.count"
 
             val it = oldWarn.entries.iterator()
@@ -178,7 +181,7 @@ class ConfigManager(private val plugin: PunisherX) {
         }
 
         val oldSpawnLoc = readSectionMapRaw(rawUserDoc, "spawn.location")
-        if (oldSpawnLoc != null && oldSpawnLoc.isNotEmpty()) {
+        if (!oldSpawnLoc.isNullOrEmpty()) {
             config.set("unjail.unjail_location", oldSpawnLoc)
             plugin.logger.debug("[Config] spawn.location → unjail.unjail_location (server)")
         }
@@ -213,6 +216,75 @@ class ConfigManager(private val plugin: PunisherX) {
         if (!config.contains("server")) {
             config.set("server", "network")
             plugin.logger.debug("[Config] server = \"network\" set (default)")
+        }
+    }
+
+    private fun migrate160to161() {
+        if (!config.contains("placeholders.punishment_list_limit")) {
+            config.set("placeholders.punishment_list_limit", 5)
+        }
+        if (!config.contains("placeholders.message_format")) {
+            config.set("placeholders.message_format", "LEGACY_AMPERSAND")
+        }
+        fun setIfMissing(path: String, value: Any) {
+            if (!config.contains(path)) {
+                config.set(path, value)
+            }
+        }
+
+        setIfMissing("webhook.discord.username", "")
+        setIfMissing("webhook.discord.avatar-url", "")
+
+        setIfMissing("webhook.discord.colors.ban", 9447935)
+        setIfMissing("webhook.discord.colors.mute", 15158332)
+        setIfMissing("webhook.discord.colors.warn", 16753920)
+        setIfMissing("webhook.discord.colors.kick", 16776960)
+        setIfMissing("webhook.discord.colors.default", 8421504)
+
+        setIfMissing("webhook.discord.embed.title", "Event Title")
+        setIfMissing("webhook.discord.embed.description", "Administrator {operator} {type} {player} for {reason} for {time}")
+        setIfMissing("webhook.discord.embed.url", "https://example.com")
+        setIfMissing("webhook.discord.embed.timestamp", "")
+        setIfMissing("webhook.discord.embed.thumbnail-url", "")
+        setIfMissing("webhook.discord.embed.image-url", "")
+        setIfMissing("webhook.discord.embed.author.name", "")
+        setIfMissing("webhook.discord.embed.author.icon-url", "")
+        setIfMissing("webhook.discord.embed.footer.text", "")
+        setIfMissing("webhook.discord.embed.footer.icon-url", "")
+
+        val existingFields = config.get("webhook.discord.embed.fields")
+        if (existingFields is Section) {
+            val fields = mutableListOf<Map<String, Any>>()
+            if (existingFields.getBoolean("player", true)) {
+                fields.add(mapOf("name" to "Player", "value" to "{player}", "inline" to true))
+            }
+            if (existingFields.getBoolean("operator", true)) {
+                fields.add(mapOf("name" to "Operator", "value" to "{operator}", "inline" to true))
+            }
+            if (existingFields.getBoolean("type", true)) {
+                fields.add(mapOf("name" to "Type", "value" to "{type}", "inline" to true))
+            }
+            if (existingFields.getBoolean("reason", true)) {
+                fields.add(mapOf("name" to "Reason", "value" to "{reason}", "inline" to false))
+            }
+            if (existingFields.getBoolean("time", true)) {
+                fields.add(mapOf("name" to "Time", "value" to "{time}", "inline" to true))
+            }
+            if (existingFields.getBoolean("id", true)) {
+                fields.add(mapOf("name" to "ID", "value" to "{id}", "inline" to true))
+            }
+            if (fields.isNotEmpty()) {
+                config.set("webhook.discord.embed.fields", fields)
+            }
+        } else if (existingFields == null) {
+            val fields = mutableListOf<Map<String, Any>>()
+            fields.add(mapOf("name" to "Player", "value" to "{player}", "inline" to true))
+            fields.add(mapOf("name" to "Operator", "value" to "{operator}", "inline" to true))
+            fields.add(mapOf("name" to "Type", "value" to "{type}", "inline" to true))
+            fields.add(mapOf("name" to "Reason", "value" to "{reason}", "inline" to false))
+            fields.add(mapOf("name" to "Time", "value" to "{time}", "inline" to true))
+            fields.add(mapOf("name" to "ID", "value" to "{id}", "inline" to true))
+            config.set("webhook.discord.embed.fields", fields)
         }
     }
 

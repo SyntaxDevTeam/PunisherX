@@ -13,6 +13,7 @@ error:
   player_not_found: "<gold>Игрок с ником <player> не найден.</gold>"
   ip_not_found: "<gold>Игрок с IP <ip> не найден.</gold>"
   player_not_punished: "<gold>У игрока <player> нет такого наказания.</gold>"
+  db_not_ready: "<red>База данных еще запускается, попробуйте снова через несколько секунд.</red>"
   reload: "<red>Произошла ошибка при перезагрузке конфигурации:</red> "
   bypass: "<red><b>ВНИМАНИЕ!</b> Игрок <gold><player></gold> не может быть наказан из-за своих прав (OP или bypass).</red><newline><dark_gray>Возможно, это можно обойти...</dark_gray>"
 
@@ -31,7 +32,7 @@ setunjail:
 
 # Сообщения команды /jail
 jail:
-  jail: "<green>Вы посадили игрока <gold><player></gold> в тюрьму за <gold><reason></gold> на <gold><time></gold></green>"
+  jail: "<green>Вы посадили игрока <gold><player></gold> в тюрьму за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильное использование: <gold>/jail <игрок> (время) <причина>"
   jail_message: "<red>Вы были посажены в тюрьму за <b><reason></b> на <b><time></b></red>"
   teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
@@ -67,7 +68,7 @@ unjail:
 
 # Сообщения команды /ban
 ban:
-  ban: "<green>Вы забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  ban: "<green>Вы забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильное использование: <gold>/ban <игрок> (время) <причина>"
   kick_message:
     # Вы можете настроить сообщение для выгнанного игрока
@@ -99,7 +100,7 @@ ban:
 
 # Сообщения команды /banip
 banip:
-  ban: "<green>Вы забанили IP игрока за <gold><reason></gold> на <gold><time></gold></green>"
+  ban: "<green>Вы забанили IP игрока за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильное использование: <gold>/banip <игрок|ip> (время) <причина>"
   kick_message:
     # Вы можете настроить сообщение для выгнанного игрока
@@ -128,7 +129,7 @@ unban:
 
 # Сообщения команды /mute
 mute:
-  mute: "<green>Вы заглушили игрока <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  mute: "<green>Вы заглушили игрока <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильное использование: <gold>/mute <игрок> (время) <причина>"
   mute_message: "<red>Вы были заглушены за <b><reason></b> на <b><time></b></red>"
   mute_info_message: "<red>Вы пытаетесь говорить, но вы заглушены ещё <time>.</red>"
@@ -158,7 +159,7 @@ unmute:
 
 # Сообщения команды /warn
 warn:
-  warn: "<green>Вы выдали предупреждение (<warn_no> раз) игроку <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  warn: "<green>Вы выдали предупреждение (<warn_no> раз) игроку <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильное использование: <gold>/warn <игрок> (время) <причина>"
   warn_message: "<red>Вы получили <b><warn_no></b> предупреждение!</red>"
   broadcast: "<dark_gray>Игрок <gray><player></gray> получил предупреждение за <gray><reason></gray> на <gray><time></gray></dark_gray>"
@@ -177,6 +178,14 @@ warn:
     - "Спам"
     - "Оскорбление игрока"
     - "Оскорбительная лексика"
+
+# Сообщения команды /punish
+punish:
+  usage: "Правильное использование: <gold>/punish <игрок> <шаблон> (lvl)"
+  template_not_found: "<red>Шаблон <gold><template></gold> не найден.</red>"
+  invalid_level: "<red>Недопустимый уровень шаблона: <gold><level></gold>.</red>"
+  invalid_time: "<red>Неверное время в шаблоне: <gold><time></gold>.</red>"
+  invalid_type: "<red>Неподдерживаемый тип наказания в шаблоне: <gold><type></gold>.</red>"
 
 # Сообщения команды /unwarn
 unwarn:
@@ -348,7 +357,11 @@ placeholders:
   jail_remaining_time: "<gray>В тюрьме до: <gold>"
   total_punishments: "<gray>Всего наказаний: <gold>"
   total_active_punishments: "<gray>Всего активных наказаний: <gold>"
-
+  active_punishments_list: "<gray>Активные наказания (последние <gold><limit></gold>):</gray><newline><list>"
+  punishment_history_list: "<gray>История наказаний (последние <gold><limit></gold>):</gray><newline><list>"
+  punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
+  punishment_list_empty: "<gray>Наказания не найдены.</gray>"
+  punishment_list_permanent: "неопределено"
 # Форматирование времени
 formatTime:
   undefined: "неопределено"

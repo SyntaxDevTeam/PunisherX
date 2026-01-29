@@ -23,6 +23,7 @@ import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
 import pl.syntaxdevteam.punisher.gui.interfaces.GUIHandler
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
+import pl.syntaxdevteam.punisher.listeners.ReloadListener
 import pl.syntaxdevteam.punisher.listeners.LegacyLoginListener
 import pl.syntaxdevteam.punisher.listeners.ModernLoginListener
 import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
@@ -32,6 +33,7 @@ import pl.syntaxdevteam.punisher.platform.BukkitSchedulerAdapter
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
 import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
+import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
 import java.io.File
 import java.util.Locale
 
@@ -68,6 +70,8 @@ class PluginInitializer(private val plugin: PunisherX) {
         //        plugin.cfg = ConfigManager(plugin, plugin.logger, confFile.toString(), version.toString(), 141, 150, true)
         plugin.cfg = ConfigManager(plugin)
         plugin.cfg.load()
+        plugin.punishTemplateManager = PunishTemplateManager(plugin)
+        plugin.punishTemplateManager.load()
     }
 
     /**
@@ -126,7 +130,10 @@ class PluginInitializer(private val plugin: PunisherX) {
     private fun registerCommands(){
         plugin.commandLoggerPlugin = CommandLoggerPlugin(plugin)
         plugin.commandManager = CommandManager(plugin)
+        if (plugin.commandsRegistered) return
+
         plugin.commandManager.registerCommands()
+        plugin.commandsRegistered = true
     }
 
     /**
@@ -147,6 +154,7 @@ class PluginInitializer(private val plugin: PunisherX) {
             plugin.server.pluginManager.registerEvents(LegacyLoginListener(plugin), plugin)
             plugin.logger.debug("Registered LegacyLoginListener for pre-1.21.7")
         }
+        plugin.server.pluginManager.registerEvents(ReloadListener(plugin), plugin)
         plugin.server.servicesManager.register(PunisherXApi::class.java, plugin.punisherXApi, plugin, ServicePriority.Normal)
         if (plugin.hookHandler.checkPlaceholderAPI()) {
             PlaceholderHandler(plugin).register()

@@ -3,11 +3,10 @@ package pl.syntaxdevteam.punisher
 import io.papermc.paper.event.player.AsyncChatEvent
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.event.HandlerList
-import org.bukkit.plugin.ServicePriority
 import pl.syntaxdevteam.core.SyntaxCore
 import pl.syntaxdevteam.core.manager.PluginManagerX
 import pl.syntaxdevteam.core.logging.Logger
@@ -16,13 +15,11 @@ import pl.syntaxdevteam.core.update.GitHubSource
 import pl.syntaxdevteam.core.update.ModrinthSource
 import pl.syntaxdevteam.message.MessageHandler
 import pl.syntaxdevteam.punisher.api.PunisherXApi
-import pl.syntaxdevteam.punisher.api.PunisherXApiImpl
 import pl.syntaxdevteam.punisher.basic.*
 import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigManager
-import pl.syntaxdevteam.core.platform.ServerEnvironment
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.databases.*
 import pl.syntaxdevteam.punisher.players.*
@@ -36,10 +33,14 @@ import pl.syntaxdevteam.punisher.platform.SchedulerAdapter
 import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
 import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
+import pl.syntaxdevteam.core.platform.ServerEnvironment
+import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
 import java.io.File
 import java.util.*
 
 class PunisherX : JavaPlugin(), Listener {
+    @Volatile
+    var commandsRegistered: Boolean = false
     private lateinit var pluginInitializer: PluginInitializer
 
     lateinit var logger: Logger
@@ -73,6 +74,7 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var cfg: ConfigManager
     lateinit var proxyBridgeMessenger: ProxyBridgeMessenger
     lateinit var onlinePunishmentWatcher: OnlinePunishmentWatcher
+    lateinit var punishTemplateManager: PunishTemplateManager
 
 
     /**
@@ -121,50 +123,31 @@ class PunisherX : JavaPlugin(), Listener {
      * Reloads the plugin configuration and reinitializes the database connection.
      */
     private fun reloadMyConfig() {
-        databaseHandler.closeConnection()
-        runCatching { punishmentActionBarNotifier.stop() }
-        try {
-            messageHandler.reloadMessages()
-        } catch (e: Exception) {
-            logger.err("${messageHandler.stringMessageToComponent("error", "reload")} ${e.message}")
-        }
-
-        saveDefaultConfig()
-        pluginInitializer.setupConfig()
+        pluginInitializer.onDisable()
+        cancelPluginTasks()
+        runCatching { proxyBridgeMessenger.unregisterChannel() }
+        HandlerList.unregisterAll(this as Plugin)
         reloadConfig()
+        pluginInitializer = PluginInitializer(this)
+        pluginInitializer.onEnable()
+    }
 
-        databaseHandler = DatabaseHandler(this)
-        val databaseSetupTask = Runnable {
-            databaseHandler.openConnection()
-            databaseHandler.createTables()
-        }
-
+    private fun cancelPluginTasks() {
         if (ServerEnvironment.isFoliaBased()) {
-            server.globalRegionScheduler.execute(this, databaseSetupTask)
+            tryCancelScheduler("getGlobalRegionScheduler")
+            tryCancelScheduler("getRegionScheduler")
+            tryCancelScheduler("getAsyncScheduler")
         } else {
-            server.scheduler.runTaskAsynchronously(this, databaseSetupTask)
+            server.scheduler.cancelTasks(this)
         }
+    }
 
-        server.servicesManager.unregister(punisherXApi)
-        punisherXApi = PunisherXApiImpl(databaseHandler)
-        server.servicesManager.register(
-            PunisherXApi::class.java,
-            punisherXApi,
-            this,
-            ServicePriority.Normal
-        )
-
-        discordWebhook = DiscordWebhook(this)
-        actionExecutor = PunishmentActionExecutor(this)
-        HandlerList.unregisterAll(playerJoinListener)
-        HandlerList.unregisterAll(punishmentChecker)
-        geoIPHandler = GeoIPHandler(this)
-        playerIPManager = PlayerIPManager(this, geoIPHandler)
-        punishmentChecker = PunishmentChecker(this)
-        punishmentActionBarNotifier = PunishmentActionBarNotifier(this).also { it.start() }
-        playerJoinListener = PlayerJoinListener(playerIPManager, punishmentChecker)
-        server.pluginManager.registerEvents(playerJoinListener, this)
-        server.pluginManager.registerEvents(punishmentChecker, this)
+    private fun tryCancelScheduler(methodName: String) {
+        try {
+            val scheduler = server.javaClass.getMethod(methodName).invoke(server) ?: return
+            scheduler.javaClass.getMethod("cancelTasks", Plugin::class.java).invoke(scheduler, this)
+        } catch (_: Throwable) {
+        }
     }
 
     /**

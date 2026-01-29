@@ -15,6 +15,7 @@ error:
   ip_not_found: "<gold>Aucun joueur trouvé avec l’IP <ip>.</gold>"
   no_data: "<red>Aucune donnée à afficher.</red>"
   db_error: "Une erreur est survenue lors de l’ajout de la sanction dans la base de données. Utilisation de la méthode de secours. Vérifiez la console !"
+  db_not_ready: "<red>La base de données démarre encore, veuillez réessayer dans quelques secondes.</red>"
   console: "<red>Seul un joueur peut utiliser cette commande.</red>"
   reload: "<red>Une erreur est survenue lors du rechargement de la configuration :</red>"
   bypass: "<red><b>ATTENTION !</b> Le joueur <gold><player></gold> ne peut pas être sanctionné en raison de ses permissions (OP ou bypass).</red><newline><dark_gray>Il y a peut-être un moyen de contourner cela...</dark_gray>"
@@ -34,7 +35,7 @@ setunjail:
 
 # Messages de la commande /jail
 jail:
-  jail: "<green>Vous avez emprisonné le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
+  jail: "<green>Vous avez emprisonné le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Utilisation correcte : <gold>/jail <pseudo> (durée) <raison>"
   jail_message: "<red>Vous avez été emprisonné pour <b><reason></b> pendant <b><time></b></red>"
   teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
@@ -70,7 +71,7 @@ unjail:
 
 # Messages de la commande /ban
 ban:
-  ban: "<green>Vous avez banni <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
+  ban: "<green>Vous avez banni <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Utilisation correcte : <gold>/ban <pseudo> (durée) <raison>"
   kick_message:
     # Vous pouvez personnaliser le message affiché au joueur banni
@@ -102,7 +103,7 @@ ban:
 
 # Messages de la commande /banip
 banip:
-  ban: "<green>Vous avez banni l’IP du joueur pour <gold><reason></gold> pendant <gold><time></gold></green>"
+  ban: "<green>Vous avez banni l’IP du joueur pour <gold><reason></gold> pendant <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Utilisation correcte : <gold>/banip <joueur|ip> (durée) <raison>"
   kick_message:
     # Vous pouvez personnaliser le message affiché au joueur banni
@@ -130,7 +131,7 @@ unban:
   broadcast: "<dark_gray>Le joueur <gray><player></gray> a été débanni</dark_gray>"
 # Messages de la commande /mute
 mute:
-  mute: "<green>Vous avez réduit au silence le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
+  mute: "<green>Vous avez réduit au silence le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Utilisation correcte : <gold>/mute <pseudo> (durée) <raison>"
   mute_message: "<red>Vous avez été réduit au silence pour <b><reason></b> pendant <b><time></b></red>"
   mute_info_message: "<red>Vous essayez de parler, mais vous êtes encore réduit au silence pendant <time>.</red>"
@@ -160,7 +161,7 @@ unmute:
 
 # Messages de la commande /warn
 warn:
-  warn: "<green>Vous avez averti (<warn_no> fois) le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green>"
+  warn: "<green>Vous avez averti (<warn_no> fois) le joueur <gold><player></gold> pour <gold><reason></gold> pendant <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Utilisation correcte : <gold>/warn <pseudo> (durée) <raison>"
   warn_message: "<red>Vous avez reçu un avertissement n°<b><warn_no></b> !</red>"
   broadcast: "<dark_gray>Le joueur <gray><player></gray> a reçu un avertissement pour <gray><reason></gray> pendant <gray><time></gray></dark_gray>"
@@ -179,6 +180,14 @@ warn:
     - "Spam"
     - "Insulte envers un joueur"
     - "Langage vulgaire"
+
+# Messages de la commande /punish
+punish:
+  usage: "Utilisation correcte : <gold>/punish <pseudo> <modèle> (lvl)"
+  template_not_found: "<red>Modèle <gold><template></gold> introuvable.</red>"
+  invalid_level: "<red>Niveau de modèle invalide : <gold><level></gold>.</red>"
+  invalid_time: "<red>Durée du modèle invalide : <gold><time></gold>.</red>"
+  invalid_type: "<red>Type de sanction non pris en charge dans le modèle : <gold><type></gold>.</red>"
 
 # Messages de la commande /unwarn
 unwarn:
@@ -350,7 +359,11 @@ placeholders:
   jail_remaining_time: "<gray>En prison jusqu’à : <gold>"
   total_punishments: "<gray>Total des sanctions : <gold>"
   total_active_punishments: "<gray>Total des sanctions actives : <gold>"
-
+  active_punishments_list: "<gray>Sanctions actives (dernières <gold><limit></gold>):</gray><newline><list>"
+  punishment_history_list: "<gray>Historique des sanctions (dernières <gold><limit></gold>):</gray><newline><list>"
+  punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
+  punishment_list_empty: "<gray>Aucune sanction trouvée.</gray>"
+  punishment_list_permanent: "indéfini"
 # Formatage du temps
 formatTime:
   undefined: "indéfini"

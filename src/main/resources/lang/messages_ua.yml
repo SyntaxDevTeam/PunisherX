@@ -15,6 +15,7 @@ error:
   ip_not_found: "<gold>Гравця з IP <ip> не знайдено.</gold>"
   no_data: "<red>Немає даних для відображення.</red>"
   db_error: "Сталася помилка при додаванні покарання в базу даних. Використовується запасний метод. Перевірте консоль!"
+  db_not_ready: "<red>База даних ще запускається, спробуйте знову через кілька секунд.</red>"
   console: "<red>Цю команду може використовувати лише гравець.</red>"
   reload: "<red>Сталася помилка під час перезавантаження конфігурації:</red>"
   bypass: "<red><b>УВАГА!</b> Гравець <gold><player></gold> не може бути покараний через свої дозволи (OP або bypass).</red><newline><dark_gray>Можливо, це можна обійти...</dark_gray>"
@@ -34,7 +35,7 @@ setunjail:
 
 # Повідомлення команди /jail
 jail:
-  jail: "<green>Ви ув'язнили гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  jail: "<green>Ви ув'язнили гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильне використання: <gold>/jail <нік_гравця> (час) <причина>"
   jail_message: "<red>Вас було ув'язнено за <b><reason></b> на <b><time></b></red>"
   teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
@@ -70,7 +71,7 @@ unjail:
 
 # Повідомлення команди /ban
 ban:
-  ban: "<green>Ви забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  ban: "<green>Ви забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильне використання: <gold>/ban <нік_гравця> (час) <причина>"
   kick_message:
     # Ви можете змінити повідомлення для забаненого гравця
@@ -102,7 +103,7 @@ ban:
 
 # Повідомлення команди /banip
 banip:
-  ban: "<green>Ви забанили IP гравця за <gold><reason></gold> на <gold><time></gold></green>"
+  ban: "<green>Ви забанили IP гравця за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильне використання: <gold>/banip <гравець|ip> (час) <причина>"
   kick_message:
     # Ви можете змінити повідомлення для забаненого гравця
@@ -130,7 +131,7 @@ unban:
   broadcast: "<dark_gray>Гравець <gray><player></gray> був розбанений</dark_gray>"
 # Повідомлення команди /mute
 mute:
-  mute: "<green>Ви заглушили гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  mute: "<green>Ви заглушили гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильне використання: <gold>/mute <нік_гравця> (час) <причина>"
   mute_message: "<red>Вас було заглушено за <b><reason></b> на <b><time></b></red>"
   mute_info_message: "<red>Ви намагаєтесь щось сказати, але ви все ще заглушені ще <time>.</red>"
@@ -160,7 +161,7 @@ unmute:
 
 # Повідомлення команди /warn
 warn:
-  warn: "<green>Ви попередили (<warn_no> раз) гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green>"
+  warn: "<green>Ви попередили (<warn_no> раз) гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильне використання: <gold>/warn <нік_гравця> (час) <причина>"
   warn_message: "<red>Ви отримали попередження №<b><warn_no></b>!</red>"
   broadcast: "<dark_gray>Гравець <gray><player></gray> отримав попередження за <gray><reason></gray> на <gray><time></gray></dark_gray>"
@@ -179,6 +180,14 @@ warn:
     - "Спам"
     - "Образа гравця"
     - "Нецензурна мова"
+
+# Повідомлення команди /punish
+punish:
+  usage: "Правильне використання: <gold>/punish <нік_гравця> <шаблон> (lvl)"
+  template_not_found: "<red>Шаблон <gold><template></gold> не знайдено.</red>"
+  invalid_level: "<red>Неприпустимий рівень шаблону: <gold><level></gold>.</red>"
+  invalid_time: "<red>Невірний час у шаблоні: <gold><time></gold>.</red>"
+  invalid_type: "<red>Непідтримуваний тип покарання в шаблоні: <gold><type></gold>.</red>"
 
 # Повідомлення команди /unwarn
 unwarn:
@@ -350,7 +359,11 @@ placeholders:
   jail_remaining_time: "<gray>У в'язниці до: <gold>"
   total_punishments: "<gray>Усього покарань: <gold>"
   total_active_punishments: "<gray>Усього активних покарань: <gold>"
-
+  active_punishments_list: "<gray>Активні покарання (останні <gold><limit></gold>):</gray><newline><list>"
+  punishment_history_list: "<gray>Історія покарань (останні <gold><limit></gold>):</gray><newline><list>"
+  punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
+  punishment_list_empty: "<gray>Покарання не знайдені.</gray>"
+  punishment_list_permanent: "невизначено"
 # Форматування часу
 formatTime:
   undefined: "невизначено"

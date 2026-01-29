@@ -22,6 +22,7 @@ object PermissionChecker { private val AUTHOR_UUID: UUID = UUID.fromString("248e
         UNMUTE("punisherx.cmd.unmute"),
         WARN("punisherx.cmd.warn"),
         UNWARN("punisherx.cmd.unwarn"),
+        PUNISH("punisherx.cmd.punish"),
 
         CHANGE_REASON("punisherx.cmd.change_reason"),
         BAN_LIST("punisherx.cmd.banlist"),
@@ -87,6 +88,7 @@ object PermissionChecker { private val AUTHOR_UUID: UUID = UUID.fromString("248e
         PermissionKey.UNMUTE -> "Allows unmuting a player, restoring their ability to send messages."
         PermissionKey.WARN -> "Allows warning a player with a specified reason."
         PermissionKey.UNWARN -> "Allows removing a warning from a player."
+        PermissionKey.PUNISH -> "Allows punishing a player using a configured template."
 
         PermissionKey.BYPASS -> "Allows bypassing all punishments."
         PermissionKey.BYPASS_WARN -> "Allows bypassing warnings."

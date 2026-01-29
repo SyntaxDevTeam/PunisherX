@@ -1,4 +1,4 @@
-config-version: 160
+config-version: 161
 
 # /********************************************/
 #    Global settings
@@ -10,16 +10,21 @@ config-version: 160
 # The default setting is "network" and means that the penalty received will apply to all servers on the network.
 server: "network"
 
+# Plugin language selection. Possible values: EN, PL, NL, ES, FR, DE, RU, UK, IT, PT, AR.
+# To add your own language file, please contact us on Discord: https://discord.gg/Zk6mxv7eMh
+language: "EN"
+
 # /********************************************/
 #    Settings for connecting to the database
 # /********************************************/
 
 database:
-  # Available options: mariadb, mysql, postgresql, sqlite, h2
+  # Available options: mariadb, mysql, mssql, postgresql, sqlite, h2
   type: "sqlite"
   sql:
     host: "localhost"
-    port: 3306          # 5432 if you use PostgreSQL; Default for MySQL is 3306.
+    # 5432 if you use PostgreSQL or 1433 for MSSQL; Default for MySQL is 3306.
+    port: 3306
     dbname: "my_database"
     username: "root"
     password: "password"
@@ -27,7 +32,6 @@ database:
 playerCache:
   # Choose where player IP information is stored: "file" or "database"
   storage: "file"
-
 
 # /********************************************/
 #    Settings for main commands
@@ -85,13 +89,24 @@ mute:
     - "ehelpop"
     - "p msg"
 
-# Action bar countdown for active punishments.
-notifications:
-  punishment_bar:
-    # Enable the bottom-bar countdown for active jail or mute punishments.
-    enabled: true
-    # How often (in ticks) the counter should update. 20 ticks = 1 second.
-    period_ticks: 20
+# Custom aliases for commands.
+aliases:
+  check:    "cx"
+  history:  "hx"
+  kick:     "kx"
+  warn:     "wx"
+  unwarn:   "uw"
+  mute:     "mx"
+  unmute:   "um"
+  jail:     "j"
+  unjail:   "uj"
+  ban:      "bx"
+  banip:    "bip"   # For security reasons, do not use "ban-ip" for this alias.
+  unban:    "ub"
+  clearall: "ca"
+  setjail:  "sjail"
+  setunjail: "sunjail"
+  panel:    "px"
 
 # Settings for the prison location and its radius.
 jail:
@@ -126,6 +141,16 @@ unjail:
     # * "world" - default world spawn point (/setworldspawn)
     set: unjail
 
+# Action bar countdown for active punishments.
+notifications:
+  punishment_bar:
+    # Enable the bottom-bar countdown for active jail or mute punishments.
+    enabled: true
+    # How often (in ticks) the counter should update. 20 ticks = 1 second.
+    period_ticks: 20
+
+
+
 # /********************************************/
 #    GUI settings
 # /********************************************/
@@ -154,29 +179,6 @@ gui:
 #    Internal settings
 # /********************************************/
 
-# Plugin language selection. Possible values: EN, PL, NL, ES, FR, DE, RU, UK, IT, PT, AR.
-# To add your own language file, please contact us on Discord: https://discord.gg/Zk6mxv7eMh
-language: "EN"
-
-# Custom aliases for commands.
-aliases:
-  check:    "cx"
-  history:  "hx"
-  kick:     "kx"
-  warn:     "wx"
-  unwarn:   "uw"
-  mute:     "mx"
-  unmute:   "um"
-  jail:     "j"
-  unjail:   "uj"
-  ban:      "bx"
-  banip:    "bip"   # For security reasons, do not use "ban-ip" for this alias.
-  unban:    "ub"
-  clearall: "ca"
-  setjail:  "sjail"
-  setunjail: "sunjail"
-  panel:    "px"
-
 geoDatabase:
   # To use GeoIP functionality, you need a MaxMind license key.
   # Obtain a free key at: https://www.maxmind.com/en/geolite2/signup
@@ -187,6 +189,58 @@ webhook:
   discord:
     enabled: false
     url: "YOUR_WEBHOOK_URL_HERE"
+    username: ""
+    avatar-url: "" # URL, Minecraft nick/UUID (mc-heads), or base64 PNG data
+    colors:
+      # Accepts integers (Discord decimal), hex with #/0x, or common names like red/orange/blue/black/white.
+      ban: 9447935
+      mute: 15158332
+      warn: 16753920
+      kick: 16776960
+      jail: 9447935
+      default: 8421504
+    embed:
+      title: "Event Title"
+      description: "Administrator {operator} {type} {player} for {reason} for {time}"
+      url: "https://example.com"
+      timestamp: "" # ISO-8601 or "now" for current time
+      thumbnail-url: "" # URL, Minecraft nick/UUID, or base64 PNG data
+      image-url: "" # URL, Minecraft nick/UUID, or base64 PNG data
+      author:
+        name: "Author Name"
+        icon-url: "" # URL, Minecraft nick/UUID, or base64 PNG data
+      footer:
+        text: "Footer text"
+        icon-url: "" # URL, Minecraft nick/UUID, or base64 PNG data
+      fields:
+        - name: "Player"
+          value: "{player}"
+          inline: true
+        - name: "Operator"
+          value: "{operator}"
+          inline: true
+        - name: "Type"
+          value: "{type}"
+          inline: true
+        - name: "Reason"
+          value: "{reason}"
+          inline: false
+        - name: "Time"
+          value: "{time}"
+          inline: true
+        - name: "ID"
+          value: "{id}"
+          inline: true
+
+# Placeholder settings for PlaceholderAPI.
+# The list of available placeholders can be found at https://github.com/SyntaxDevTeam/PunisherX/wiki/Placeholders#full-set-of-available-placeholders
+placeholders:
+  # Maximum number of punishments displayed by PlaceholderAPI list placeholders.
+  punishment_list_limit: 5
+  # Force MessageHandler to format placeholder results using the selected format.
+  # Available options include: MINI_MESSAGE, LEGACY_AMPERSAND (recommended), LEGACY_SECTION, PLAIN_TEXT.
+  message_format: "LEGACY_AMPERSAND"
+
 
 # Update check and auto-download settings.
 update:

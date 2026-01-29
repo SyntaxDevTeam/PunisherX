@@ -2,7 +2,6 @@ package pl.syntaxdevteam.punisher.commands
 
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
@@ -28,7 +27,7 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
         val reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
         val punishmentType = "KICK"
         val start = System.currentTimeMillis()
-        val placeholders = mapOf("reason" to reason)
+        val formattedTime = plugin.timeHandler.formatTime(null)
 
         if (targetArg.equals("all", ignoreCase = true)) {
             Bukkit.getOnlinePlayers().forEach { target ->
@@ -62,37 +61,26 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                     )
                 }
 
-                val kickMessages = plugin.messageHandler.getSmartMessage(
-                    "kick",
-                    "kick_message",
-                    mapOf("reason" to reason)
+                val placeholders = PunishmentCommandUtils.buildPlaceholders(
+                    player = target.name,
+                    operator = stack.sender.name,
+                    reason = reason,
+                    time = formattedTime,
+                    type = punishmentType
                 )
-                val kickMessageBuilder = Component.text()
-                kickMessages.forEach { line ->
-                    kickMessageBuilder.append(line).append(Component.newline())
-                }
-                target.kick(kickMessageBuilder.build())
-
-                plugin.messageHandler.getSmartMessage(
-                    "kick",
-                    "kick",
-                    mapOf("player" to target.name, "reason" to reason)
-                ).forEach { stack.sender.sendMessage(it) }
-
+                PunishmentCommandUtils.sendKickMessage(plugin, target, "kick", "kick_message", placeholders)
+                PunishmentCommandUtils.sendSenderMessages(plugin, stack, "kick", "kick", placeholders)
                 plugin.actionExecutor.executeAction("kicked", target.name, placeholders)
             }
 
-            val broadcastMessages = plugin.messageHandler.getSmartMessage(
-                "kick",
-                "broadcast",
-                mapOf("player" to "all", "reason" to reason)
+            val allPlaceholders = PunishmentCommandUtils.buildPlaceholders(
+                player = "all",
+                operator = stack.sender.name,
+                reason = reason,
+                time = formattedTime,
+                type = punishmentType
             )
-
-            plugin.server.onlinePlayers.forEach { onlinePlayer ->
-                if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_KICK)) {
-                    broadcastMessages.forEach { onlinePlayer.sendMessage(it) }
-                }
-            }
+            PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_KICK, "kick", "broadcast", allPlaceholders)
             return
         }
 
@@ -130,37 +118,17 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
             )
         }
 
-        if (targetPlayer != null) {
-            val kickMessages = plugin.messageHandler.getSmartMessage(
-                "kick",
-                "kick_message",
-                mapOf("reason" to reason)
-            )
-            val kickMessageBuilder = Component.text()
-            kickMessages.forEach { line ->
-                kickMessageBuilder.append(line).append(Component.newline())
-            }
-            targetPlayer.kick(kickMessageBuilder.build())
-        }
-
-        plugin.messageHandler.getSmartMessage(
-            "kick",
-            "kick",
-            mapOf("player" to targetArg, "reason" to reason)
-        ).forEach { stack.sender.sendMessage(it) }
-
-        plugin.actionExecutor.executeAction("kicked", targetArg, placeholders)
-
-        val broadcastMessages = plugin.messageHandler.getSmartMessage(
-            "kick",
-            "broadcast",
-            mapOf("player" to targetArg, "reason" to reason)
+        val placeholders = PunishmentCommandUtils.buildPlaceholders(
+            player = targetArg,
+            operator = stack.sender.name,
+            reason = reason,
+            time = formattedTime,
+            type = punishmentType
         )
-        plugin.server.onlinePlayers.forEach { onlinePlayer ->
-            if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_KICK)) {
-                broadcastMessages.forEach { onlinePlayer.sendMessage(it) }
-            }
-        }
+        PunishmentCommandUtils.sendKickMessage(plugin, targetPlayer, "kick", "kick_message", placeholders)
+        PunishmentCommandUtils.sendSenderMessages(plugin, stack, "kick", "kick", placeholders)
+        plugin.actionExecutor.executeAction("kicked", targetArg, placeholders)
+        PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_KICK, "kick", "broadcast", placeholders)
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {

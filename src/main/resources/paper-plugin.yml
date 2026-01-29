@@ -93,6 +93,10 @@ commands:
     description: Removes the last warning issued to a player.
     usage: /unwarn <player>
     permission: punisherx.cmd.unwarn
+  punish:
+    description: Issues a punishment using predefined templates.
+    usage: /punish <player> <template> (lvl)
+    permission: punisherx.cmd.punish
   clearall:
     description: Clears all active penalties for a player.
     usage: /clearall <player>
@@ -163,6 +167,9 @@ permissions:
     default: op
   punisherx.cmd.unwarn:
     description: Allows removing the last warning from a player.
+    default: op
+  punisherx.cmd.punish:
+    description: Allows punishing a player using templates.
     default: op
   punisherx.cmd.kick:
     description: Allows kicking a player from the server.

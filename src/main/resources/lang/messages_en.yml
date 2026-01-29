@@ -16,6 +16,7 @@ error:
   ip_not_found: "<gold>No player found with IP <ip>.</gold>"
   no_data: "<red>No data to display.</red>"
   db_error: "An error occurred while adding the punishment to the database. Using fallback method. Check console!"
+  db_not_ready: "<red>The database is still starting, please try again in a few seconds.</red>"
   console: "<red>Only a player can use this command.</red>"
   reload: "<red>An error occurred while reloading the configuration:</red>"
   bypass: "<red><b>WARNING!</b> Player <gold><player></gold> cannot be punished due to their permissions (OP or bypass).</red><newline><dark_gray>Maybe there is a way around this...</dark_gray>"
@@ -43,7 +44,7 @@ setunjail:
 
 # /jail command messages
 jail:
-  jail: "<green>You jailed player <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green>"
+  jail: "<green>You jailed player <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct usage: <gold>/jail <player_name> (time) <reason>"
   jail_message: "<red>You have been jailed for <b><reason></b> for <b><time></b></red>"
   teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
@@ -79,7 +80,7 @@ unjail:
 
 # /ban command messages
 ban:
-  ban: "<green>You banned <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green>"
+  ban: "<green>You banned <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct usage: <gold>/ban <player_name> (time) <reason>"
   kick_message:
     # You can freely customize the message shown to the banned player
@@ -111,7 +112,7 @@ ban:
 
 # /banip command messages
 banip:
-  ban: "<green>You banned a player's IP for <gold><reason></gold> for <gold><time></gold></green>"
+  ban: "<green>You banned a player's IP for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct usage: <gold>/banip <player|ip> (time) <reason>"
   kick_message:
     # You can freely customize the message shown to the banned player
@@ -140,7 +141,7 @@ unban:
 
 # /mute command messages
 mute:
-  mute: "<green>You muted player <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green>"
+  mute: "<green>You muted player <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct usage: <gold>/mute <player_name> (time) <reason>"
   mute_message: "<red>You have been muted for <b><reason></b> for <b><time></b></red>"
   mute_info_message: "<red>You are trying to speak, but you are still muted for <time>.</red>"
@@ -170,7 +171,7 @@ unmute:
 
 # /warn command messages
 warn:
-  warn: "<green>You warned (<warn_no> time) <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green>"
+  warn: "<green>You warned (<warn_no> time) <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct usage: <gold>/warn <player_name> (time) <reason>"
   warn_message: "<red>You received a <b><warn_no></b> warning!</red>"
   broadcast: "<dark_gray>Player <gray><player></gray> received a warning for <gray><reason></gray> for <gray><time></gray></dark_gray>"
@@ -189,6 +190,14 @@ warn:
     - "Spam"
     - "Player insult"
     - "Offensive language"
+
+# /punish command messages
+punish:
+  usage: "Correct usage: <gold>/punish <player_name> <template> (lvl)"
+  template_not_found: "<red>Template <gold><template></gold> not found.</red>"
+  invalid_level: "<red>Invalid template level: <gold><level></gold>.</red>"
+  invalid_time: "<red>Invalid template time: <gold><time></gold>.</red>"
+  invalid_type: "<red>Unsupported template punishment type: <gold><type></gold>.</red>"
 
 # /unwarn command messages
 unwarn:
@@ -407,7 +416,11 @@ placeholders:
   jail_remaining_time: "<gray>In jail until: <gold>"
   total_punishments: "<gray>Total punishments: <gold>"
   total_active_punishments: "<gray>Total active punishments: <gold>"
-
+  active_punishments_list: "<gray>Active punishments (last <gold><limit></gold>):</gray><newline><list>"
+  punishment_history_list: "<gray>Punishment history (last <gold><limit></gold>):</gray><newline><list>"
+  punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
+  punishment_list_empty: "<gray>No punishments found.</gray>"
+  punishment_list_permanent: "undefined"
 # Time formatting
 formatTime:
   undefined: "undefined"

@@ -63,21 +63,36 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
 
         val start = System.currentTimeMillis()
         val end = durationSec?.let { start + it * 1000 }
-
+        val formattedTime = plugin.timeHandler.formatTime(timeArg)
         var dbError = false
         val normalizedEnd = end ?: -1
+        val punishmentIds = mutableListOf<Long>()
         playerIPs.distinct().forEach { ip ->
-            val success = plugin.databaseHandler.addPunishment(rawTarget, ip, reason, stack.sender.name,
+            val punishmentId = plugin.databaseHandler.addPunishment(rawTarget, ip, reason, stack.sender.name,
                 "BANIP", start, normalizedEnd)
-            if (!success) {
+            if (punishmentId == null) {
                 plugin.logger.err("DB error ban-ip $ip")
                 dbError = true
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban-ip $ip")
+            } else {
+                punishmentIds.add(punishmentId)
             }
             plugin.databaseHandler.addPunishmentHistory(rawTarget, ip, reason, stack.sender.name,
                 "BANIP", start, normalizedEnd)
             plugin.proxyBridgeMessenger.notifyIpBan(ip, reason, normalizedEnd)
         }
+        val placeholders = mapOf(
+            "player" to rawTarget,
+            "operator" to stack.sender.name,
+            "reason" to reason,
+            "time" to formattedTime,
+            "type" to "BANIP",
+            "id" to when {
+                punishmentIds.isEmpty() -> "?"
+                punishmentIds.size == 1 -> punishmentIds.first().toString()
+                else -> punishmentIds.joinToString(",")
+            }
+        )
         clp.logCommand(stack.sender.name, "BANIP", rawTarget, reason)
         if (dbError) stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
 
@@ -85,21 +100,17 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
             val lines = plugin.messageHandler.getSmartMessage(
                 "banip",
                 "kick_message",
-                mapOf("reason" to reason, "time" to plugin.timeHandler.formatTime(timeArg))
+                placeholders
             )
             val builder = Component.text()
             lines.forEach { builder.append(it).append(Component.newline()) }
             targetPlayer.kick(builder.build())
         }
 
-        val placeholders = mapOf(
-            "reason" to reason,
-            "time" to plugin.timeHandler.formatTime(timeArg)
-        )
         val msgLines = plugin.messageHandler.getSmartMessage(
             "banip",
             "ban",
-            mapOf("player" to rawTarget) + placeholders
+            placeholders
         )
         msgLines.forEach { stack.sender.sendMessage(it) }
 
@@ -114,21 +125,10 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
         if (!PermissionChecker.hasWithLegacy(stack.sender as Player, PermissionChecker.PermissionKey.BANIP)) return emptyList()
         return when (args.size) {
-            1 -> plugin.server.onlinePlayers.map { it.name }
-            2 -> generateTimeSuggestions()
+            0, 1 -> plugin.server.onlinePlayers.map { it.name }
+            2 -> TimeSuggestionProvider.generateTimeSuggestions()
             3 -> plugin.messageHandler.getMessageStringList("banip", "reasons")
             else -> emptyList()
         }
-    }
-
-    private fun generateTimeSuggestions(): List<String> {
-        val units = listOf("s", "m", "h", "d")
-        val suggestions = mutableListOf<String>()
-        for (i in 1..999) {
-            for (unit in units) {
-                suggestions.add("$i$unit")
-            }
-        }
-        return suggestions
     }
 }

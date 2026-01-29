@@ -14,6 +14,7 @@ error:
   ip_not_found: "<gold>Nie znaleziono gracza o IP <ip>.</gold>"
   no_data: "<red>Brak danych do wyświetlenia.</red>"
   db_error: "Wystąpił błąd przy dodawaniu kary do bazy danych. Korzystanie z metody zapasowej. Sprawdź konsolę!"
+  db_not_ready: "<red>Baza danych wciąż się uruchamia, spróbuj ponownie za kilka sekund.</red>"
   console: "<red>Tylko gracz może użyć tej komendy.</red>"
   reload: "<red>Wystąpił błąd podczas przeładowania konfiguracji:</red>"
   bypass: "<red><b>UWAGA!</b> Gracz <gold><player></gold> nie może otrzymać kary ze względu na swoje uprawnienia (OP lub bypass).</red><newline><dark_gray>Może dałoby się to obejść...</dark_gray>"
@@ -34,7 +35,7 @@ setunjail:
 
 # Wiadomości komendy /jail
 jail:
-  jail: "<green>Zamknąłeś gracza <gold><player></gold> w więzieniu za <gold><reason></gold> na czas <gold><time></gold></green>"
+  jail: "<green>Zamknąłeś gracza <gold><player></gold> w więzieniu za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Poprawne użycie to: <gold>/jail <nazwa_gracza> (czas) <powód>"
   jail_message: "<red>Zostałeś/aś zesłany/a do więzienia za <b><reason></b> na czas <b><time></b></red>"
   teleport_failed: "<red>Teleportacja przerwana: skonfigurowana lokalizacja więzienia jest niebezpieczna.</red>"
@@ -70,7 +71,7 @@ unjail:
 
 # Wiadomości komendy /ban
 ban:
-  ban: "<green>Zbanowałeś <gold><player></gold> za <gold><reason></gold> na czas <gold><time></gold></green>"
+  ban: "<green>Zbanowałeś <gold><player></gold> za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Poprawne użycie to: <gold>/ban <nazwa_gracza> (czas) <powód>"
   kick_message:
     # Możesz dowolnie dostosować komunikat dla wyrzuconego gracza
@@ -102,7 +103,7 @@ ban:
 
 # Wiadomości komendy /banip
 banip:
-  ban: "<green>Zbanowałeś IP gracza za <gold><reason></gold> na czas <gold><time></gold></green>"
+  ban: "<green>Zbanowałeś IP gracza za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Poprawne użycie to: <gold>/banip <player|ip> (czas) <powód>"
   kick_message:
     # Możesz dowolnie dostosować komunikat dla wyrzuconego gracza
@@ -131,7 +132,7 @@ unban:
 
 # Wiadomości komendy /mute
 mute:
-  mute: "<green>Wyciszyłeś gracza <gold><player></gold> za <gold><reason></gold> na czas <gold><time></gold></green>"
+  mute: "<green>Wyciszyłeś gracza <gold><player></gold> za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Poprawne użycie to: <gold>/mute <nazwa_gracza> (time) <reason>"
   mute_message: "<red>Zostałeś/aś wyciszony/a za <b><reason></b> na czas <b><time></b></red>"
   mute_info_message: "<red>Próbujesz coś powiedzieć, ale jesteś wyciszony/a jeszcze przez <time>.</red>"
@@ -161,7 +162,7 @@ unmute:
 
 # Wiadomości komendy /warn
 warn:
-  warn: "<green>Ostrzegłeś (<warn_no> raz) <gold><player></gold> za <gold><reason></gold> na czas <gold><time></gold></green>"
+  warn: "<green>Ostrzegłeś (<warn_no> raz) <gold><player></gold> za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Poprawne użycie to: <gold>/warn <nazwa_gracza> (czas) <powód>"
   warn_message: "<red>Dostałeś/aś <b><warn_no></b> ostrzeżenie!</red>"
   broadcast: "<dark_gray>Gracz <gray><player></gray> otrzymał ostrzeżenie za <gray><reason></gray> na czas <gray><time></gray></dark_gray>"
@@ -180,6 +181,13 @@ warn:
     - "Spam"
     - "Obraza gracza"
     - "Wulgarny język"
+# Wiadomości komendy /punish
+punish:
+  usage: "Poprawne użycie to: <gold>/punish <nazwa_gracza> <szablon> (lvl)"
+  template_not_found: "<red>Nie znaleziono szablonu <gold><template></gold>.</red>"
+  invalid_level: "<red>Nieprawidłowy poziom szablonu: <gold><level></gold>.</red>"
+  invalid_time: "<red>Nieprawidłowy czas w szablonie: <gold><time></gold>.</red>"
+  invalid_type: "<red>Nieobsługiwany typ kary w szablonie: <gold><type></gold>.</red>"
 # Wiadomości komendy /unwarn
 unwarn:
   unwarn: "<green>Usunąłeś ostrzeżenie dla gracza <gold><player></gold></green>"
@@ -383,6 +391,11 @@ placeholders:
   jail_remaining_time: "<gray>W więzieniu do: <gold>"
   total_punishments: "<gray>Łącznie wszystkich kar: <gold>"
   total_active_punishments: "<gray>Łącznie aktywnych kar: <gold>"
+  active_punishments_list: "<gray>Aktywne kary (ostatnie <gold><limit></gold>):</gray><newline><list>"
+  punishment_history_list: "<gray>Historia kar (ostatnie <gold><limit></gold>):</gray><newline><list>"
+  punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
+  punishment_list_empty: "<gray>Brak znalezionych kar.</gray>"
+  punishment_list_permanent: "nieokreślony"
 
 # Formatowanie czasu
 formatTime:

@@ -2,7 +2,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.2.21"
+    kotlin("jvm") version "2.3.0"
     id("com.gradleup.shadow") version "9.3.0"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.6.1-DEV"
+version = "1.7.0-DEV"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val targetJavaVersion = 21
@@ -35,27 +35,31 @@ repositories {
     maven("https://repo.codemc.org/repository/maven-public/") // VaultUnlockedAPI
     maven("https://jitpack.io") // VaultAPI
     maven("https://repo.essentialsx.net/releases/") // EssentialsX
+    maven("https://repo.leavesmc.org/snapshots/") {
+        name = "leavesmc-repo"
+    }
 }
 
-val mockitoAgent by configurations.creating
+val mockitoAgent: Configuration by configurations.creating
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    //compileOnly("org.leavesmc.leaves:leaves-api:1.21.10-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
     //implementation(files("libs/SyntaxCore-1.2.6n-SNAPSHOT-all.jar"))
     compileOnly("pl.syntaxdevteam:core:1.2.7-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.0.0")
+    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.0.2-SNAPSHOT")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.5")
     compileOnly("com.google.code.gson:gson:2.13.2")
-    compileOnly("net.kyori:adventure-text-serializer-legacy:4.25.0")
-    compileOnly("net.kyori:adventure-text-minimessage:4.25.0")
-    compileOnly("net.kyori:adventure-text-serializer-gson:4.25.0")
-    compileOnly("net.kyori:adventure-text-serializer-plain:4.25.0")
-    compileOnly("net.kyori:adventure-text-serializer-ansi:4.25.0")
-    compileOnly("net.kyori:adventure-nbt:4.25.0")
-    compileOnly("com.maxmind.geoip2:geoip2:5.0.1")
+    compileOnly("net.kyori:adventure-text-serializer-legacy:4.26.1")
+    compileOnly("net.kyori:adventure-text-minimessage:4.26.1")
+    compileOnly("net.kyori:adventure-text-serializer-gson:4.26.1")
+    compileOnly("net.kyori:adventure-text-serializer-plain:4.26.1")
+    compileOnly("net.kyori:adventure-text-serializer-ansi:4.26.1")
+    compileOnly("net.kyori:adventure-nbt:4.26.1")
+    compileOnly("com.maxmind.geoip2:geoip2:5.0.2")
     compileOnly("org.apache.ant:ant:1.10.15")
     compileOnly("com.zaxxer:HikariCP:7.0.2")
     compileOnly("net.luckperms:api:5.5")
@@ -70,7 +74,7 @@ dependencies {
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
 
     testImplementation(kotlin("test"))
-    testImplementation("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
+    testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     testImplementation("org.mockito:mockito-core:5.20.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:6.1.0")

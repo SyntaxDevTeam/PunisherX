@@ -13,6 +13,7 @@ error:
   player_not_found: "<gold>Speler met bijnaam <player> niet gevonden.</gold>"
   ip_not_found: "<gold>Speler met IP <ip> niet gevonden.</gold>"
   player_not_punished: "<gold>Speler <player> heeft geen dergelijke straf.</gold>"
+  db_not_ready: "<red>De database wordt nog opgestart, probeer het over een paar seconden opnieuw.</red>"
   reload: "<red>Er is een fout opgetreden tijdens het herladen van de configuratie:</red> "
   bypass: "<red><b>WAARSCHUWING!</b> Speler <gold><player><gold/> <red>kan niet worden gestraft vanwege hun rechten (OP of bypass).</red><dark_gray>Dit kan misschien worden omzeild...</dark_gray>"
 
@@ -31,7 +32,7 @@ setjail:
 
 # /jail commando berichten
 jail:
-  jail: "<green>Je hebt speler <gold><player></gold> opgesloten voor <gold><reason></gold> voor <gold><time></gold></green>"
+  jail: "<green>Je hebt speler <gold><player></gold> opgesloten voor <gold><reason></gold> voor <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct gebruik is: <gold>/jail <speler_naam> (tijd) <reden>"
   jail_message: "<red>Je bent opgesloten voor <b><reason></b> voor <b><time></b></red>"
   teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
@@ -58,7 +59,7 @@ unjail:
 
 # /ban commando berichten
 ban:
-  ban: "<green>Je hebt <gold><player></gold> verbannen voor <gold><reason></gold> voor <gold><time></green>"
+  ban: "<green>Je hebt <gold><player></gold> verbannen voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct gebruik is: <gold>/ban <speler> (tijd) <reden>"
   kick_message:
     - 'Server Naam'
@@ -80,7 +81,7 @@ ban:
 
 # /banip commando berichten
 banip:
-  ban: "<green>Je hebt het IP van de speler verbannen voor <gold><reason></gold> voor <gold><time></green>"
+  ban: "<green>Je hebt het IP van de speler verbannen voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct gebruik is: <gold>/banip <speler|ip> (tijd) <reden>"
   kick_message:
     - 'Server Naam'
@@ -108,7 +109,7 @@ unban:
 
 # /mute commando berichten
 mute:
-  mute: "<green>Je hebt speler <gold><player></gold> gemute voor <gold><reason></gold> voor <gold><time></green>"
+  mute: "<green>Je hebt speler <gold><player></gold> gemute voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct gebruik is: <gold>/mute <speler> (tijd) <reden>"
   mute_message: "<red>Je bent gemute voor <b><reason></b> voor <b><time></b></red>"
   mute_info_message: "<red>Je probeert te spreken maar je bent gemute</red>"
@@ -129,7 +130,7 @@ unmute:
 
 # /warn commando berichten
 warn:
-  warn: "<green>Je hebt speler <gold><player></gold> gewaarschuwd (<warn_no> keer) voor <gold><reason></gold> voor <gold><time></green>"
+  warn: "<green>Je hebt speler <gold><player></gold> gewaarschuwd (<warn_no> keer) voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct gebruik is: <gold>/warn <speler> (tijd) <reden>"
   warn_message: "<red>Je hebt <b><warn_no></b> waarschuwing(en) ontvangen!</red>"
   broadcast: "<dark_gray>Speler <gray><player></gray> heeft een waarschuwing ontvangen voor <gray><reason></gray> voor <gray><time></gray></dark_gray>"
@@ -139,6 +140,14 @@ warn:
     - "Spam"
     - "Speler beledigen"
     - "Beledigende taal"
+
+# /punish commando berichten
+punish:
+  usage: "Correct gebruik is: <gold>/punish <speler> <sjabloon> (lvl)"
+  template_not_found: "<red>Sjabloon <gold><template></gold> niet gevonden.</red>"
+  invalid_level: "<red>Ongeldig sjabloonniveau: <gold><level></gold>.</red>"
+  invalid_time: "<red>Ongeldige sjabloontijd: <gold><time></gold>.</red>"
+  invalid_type: "<red>Niet-ondersteund straftype in sjabloon: <gold><type></gold>.</red>"
 
 # /unwarn commando berichten
 unwarn:
@@ -300,7 +309,11 @@ placeholders:
   warn_remaining_time: "<gray>Waarschuwing geldig tot: <gold>"
   total_punishments: "<gray>Totaal aantal straffen: <gold>"
   total_active_punishments: "<gray>Totaal actieve straffen: <gold>"
-
+  active_punishments_list: "<gray>Actieve straffen (laatste <gold><limit></gold>):</gray><newline><list>"
+  punishment_history_list: "<gray>Strafgeschiedenis (laatste <gold><limit></gold>):</gray><newline><list>"
+  punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
+  punishment_list_empty: "<gray>Geen straffen gevonden.</gray>"
+  punishment_list_permanent: "onbepaald"
 # Tijd formatering
 formatTime:
   undefined: "onbepaald"

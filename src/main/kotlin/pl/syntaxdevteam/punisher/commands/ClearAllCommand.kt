@@ -42,7 +42,7 @@ class ClearAllCommand(private val plugin: PunisherX) : BasicCommand {
             return emptyList()
         }
         return when (args.size) {
-            1 -> plugin.server.onlinePlayers.map { it.name }
+            0, 1 -> plugin.server.onlinePlayers.map { it.name }
             else -> emptyList()
         }
     }

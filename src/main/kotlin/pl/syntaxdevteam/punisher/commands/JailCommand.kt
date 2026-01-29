@@ -66,13 +66,23 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         plugin.logger.debug("<yellow>Jail location: ${jailLocation}</yellow>")
 
         val formattedTime = plugin.timeHandler.formatTime(gtime)
+        val basePlaceholders = mapOf(
+            "player" to playerName,
+            "operator" to stack.sender.name,
+            "reason" to reason,
+            "time" to formattedTime,
+            "type" to punishmentType
+        )
 
         fun finalizePunishment() {
-            plugin.databaseHandler.addPunishment(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+            val punishmentId = plugin.databaseHandler.addPunishment(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+            if (punishmentId == null) {
+                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
+                return
+            }
             plugin.databaseHandler.addPunishmentHistory(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
             plugin.cache.addOrUpdatePunishment(uuid, end ?: -1, previousLocation)
-
-            val placeholders = mapOf("reason" to reason, "time" to formattedTime)
+            val placeholders = basePlaceholders + ("id" to punishmentId.toString())
 
             targetPlayer?.sendMessage(
                 plugin.messageHandler.stringMessageToComponent(
@@ -83,7 +93,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
 
             val broadcastMessages = plugin.messageHandler.getSmartMessage(
                 "jail", "broadcast",
-                mapOf("player" to playerName) + placeholders
+                placeholders
             )
             plugin.server.onlinePlayers.forEach { onlinePlayer ->
                 if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_JAIL)) {
@@ -96,7 +106,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.messageHandler.getSmartMessage(
                 "jail",
                 "jail",
-                mapOf("player" to playerName) + placeholders
+                placeholders
             ).forEach { stack.sender.sendMessage(it) }
             plugin.actionExecutor.executeAction("jailed", playerName, placeholders)
         }
@@ -129,15 +139,10 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             return emptyList()
         }
         return when (args.size) {
-            1 -> plugin.server.onlinePlayers.map { it.name }
-            2 -> generateTimeSuggestions()
+            0, 1 -> plugin.server.onlinePlayers.map { it.name }
+            2 -> TimeSuggestionProvider.generateTimeSuggestions()
             3 -> plugin.messageHandler.getMessageStringList("jail", "reasons")
             else -> emptyList()
         }
-    }
-
-    private fun generateTimeSuggestions(): List<String> {
-        val units = listOf("s", "m", "h", "d")
-        return (1..999).flatMap { i -> units.map { unit -> "$i$unit" } }
     }
 }
