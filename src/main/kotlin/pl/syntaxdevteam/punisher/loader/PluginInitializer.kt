@@ -79,8 +79,7 @@ class PluginInitializer(private val plugin: PunisherX) {
      */
     private fun setupDatabase() {
         plugin.databaseHandler = DatabaseHandler(plugin)
-        plugin.logger.debug("Detected server: ${ServerEnvironment.platformName} (${ServerEnvironment.family})")
-        try {
+        val databaseSetupTask = Runnable {
             plugin.databaseHandler.openConnection()
             plugin.databaseHandler.createTables()
         }
