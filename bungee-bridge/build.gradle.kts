@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") version "2.3.0"
-    id("com.gradleup.shadow") version "9.3.0"
+    id("com.gradleup.shadow") version "9.3.1"
 }
 
 group = "pl.syntaxdevteam.punisher"

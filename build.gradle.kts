@@ -3,15 +3,15 @@ import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
     kotlin("jvm") version "2.3.0"
-    id("com.gradleup.shadow") version "9.3.0"
+    id("com.gradleup.shadow") version "9.3.1"
     `maven-publish`
-    id("io.papermc.hangar-publish-plugin") version "0.1.3"
+    id("io.papermc.hangar-publish-plugin") version "0.1.4"
     id("xyz.jpenilla.run-paper") version "3.0.2"
     id("pl.syntaxdevteam.plugindeployer") version "1.0.4"
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.7.0-DEV"
+version = "1.6.1-DEV"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val targetJavaVersion = 21
@@ -75,10 +75,10 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    testImplementation("org.mockito:mockito-core:5.20.0")
+    testImplementation("org.mockito:mockito-core:5.21.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:6.1.0")
-    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.2") {
+    testImplementation("org.mockito.kotlin:mockito-kotlin:6.2.3")
+    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.4") {
         isTransitive = false
     }
 }
