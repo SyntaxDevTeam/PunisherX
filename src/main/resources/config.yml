@@ -49,12 +49,17 @@ actions:
     - "eco take {player} 500"
   warn:
     count:
+      #1:  "kick {player} You have received your 1st warning."
+      #2:  "kick {player} You have received your 2nd warning."
       3:  "kick {player} You have received your 3rd warning."
       4:  "ban {player} 30m You have received your 4th warning."
       5:  "ban {player} 5h You have received your 5th warning."
       6:  "ban {player} 7d You have received your 6th warning."
       7:  "ban {player} 30d You have received your {warn_no}th warning."
+      #8:  "ban {player} 60d You have received your {warn_no}th warning."
+      #9:  "ban {player} 90d You have received your {warn_no}th warning."
       10: "ban {player} You have received your 10th warning."
+      # and more...
 
 # Settings for "mute" command
 mute:

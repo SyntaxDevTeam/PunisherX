@@ -115,22 +115,22 @@ class CommandManager(private val plugin: PunisherX) {
                 "clearall",
                 plugin.messageHandler.stringMessageToString("clear", "usage"),
                 ClearAllCommand(plugin)
-            )
+            )/*
             commands.register(
                 "panel",
                 "Opens the PunisherX GUI with lots of useful information and commands.",
                 PanelCommand(plugin)
-            )
+            )*/
             commands.register(
                 "langfix",
                 "Converts legacy translation placeholders from {} to <>",
                 PlaceholderFixCommand(plugin)
-            )
+            )/*
             commands.register(
                 "report",
                 "Report a player for breaking rules",
                 ReportCommand(plugin)
-            )
+            )*/
             val aliases = plugin.config.getConfigurationSection("aliases")
             aliases?.getKeys(false)?.forEach { key ->
                 val commandName = aliases.getString(key) ?: key
@@ -158,12 +158,12 @@ class CommandManager(private val plugin: PunisherX) {
                         plugin.messageHandler.stringMessageToString("warn", "usage"),
                         WarnCommand(plugin)
                     )
-
+/*
                     "punish" -> commands.register(
                         commandName,
                         plugin.messageHandler.stringMessageToString("punish", "usage"),
                         PunishCommand(plugin)
-                    )
+                    )*/
 
                     "unwarn" -> commands.register(
                         commandName,
@@ -235,11 +235,11 @@ class CommandManager(private val plugin: PunisherX) {
                         plugin.messageHandler.stringMessageToString("clear", "usage"),
                         ClearAllCommand(plugin)
                     )
-                    "panel" -> commands.register(
+                    /*"panel" -> commands.register(
                         commandName,
                         "Opens the PunisherX GUI with lots of useful information and commands.",
                         PanelCommand(plugin)
-                    )
+                    )*/
                 }
             }
         }
