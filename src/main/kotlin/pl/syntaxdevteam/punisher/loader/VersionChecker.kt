@@ -1,28 +1,31 @@
 package pl.syntaxdevteam.punisher.loader
 
 import org.bukkit.Bukkit
-import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.core.platform.ServerEnvironment
+import pl.syntaxdevteam.punisher.PunisherX
 
 class VersionChecker(private val plugin: PunisherX) {
 
     companion object {
-        private val SUPPORTED_VERSIONS: Set<String> = setOf(
-            "1.20.6",
-            "1.21",
-            "1.21.0",
-            "1.21.1",
-            "1.21.2",
-            "1.21.3",
-            "1.21.4",
-            "1.21.5",
-            "1.21.6",
-            "1.21.7",
-            "1.21.8",
-            "1.21.9",
-            "1.21.10",
-            "1.21.11"
+        private val SUPPORTED_VERSIONS: Set<SemanticVersion> = setOf(
+            SemanticVersion(1, 20, 6),
+            SemanticVersion(1, 21, 0),
+            SemanticVersion(1, 21, 1),
+            SemanticVersion(1, 21, 2),
+            SemanticVersion(1, 21, 3),
+            SemanticVersion(1, 21, 4),
+            SemanticVersion(1, 21, 5),
+            SemanticVersion(1, 21, 6),
+            SemanticVersion(1, 21, 7),
+            SemanticVersion(1, 21, 8),
+            SemanticVersion(1, 21, 9),
+            SemanticVersion(1, 21, 10),
+            SemanticVersion(1, 21, 11),
+            SemanticVersion(26, 1, 0)
         )
+
+        fun isVersionSupported(version: String): Boolean =
+            SUPPORTED_VERSIONS.contains(SemanticVersion.parse(version))
     }
 
     private fun getRawVersion(): String =
@@ -32,7 +35,7 @@ class VersionChecker(private val plugin: PunisherX) {
         getRawVersion().substringBefore("-")
 
     fun isSupported(): Boolean =
-        SUPPORTED_VERSIONS.contains(getServerVersion())
+        isVersionSupported(getServerVersion())
 
     fun checkAndLog(): Boolean {
         val version = getServerVersion()
