@@ -21,7 +21,7 @@ import java.time.Duration
 import java.util.Locale
 import java.util.UUID
 import java.nio.file.Path
-import javax.inject.Inject
+import com.google.inject.Inject
 
 private const val BRIDGE_VERSION: String = "1.6.2-SNAPSHOT" // Keep aligned with the root project version and velocity-plugin.json expansion
 
