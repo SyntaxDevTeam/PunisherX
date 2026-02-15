@@ -25,8 +25,9 @@ kotlin {
 }
 
 tasks.processResources {
+    val pluginVersion = project.version.toString()
     filesMatching("velocity-plugin.json") {
-        expand("version" to project.version)
+        expand("version" to pluginVersion)
     }
 }
 
