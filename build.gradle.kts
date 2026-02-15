@@ -2,7 +2,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.3.0"
+    kotlin("jvm") version "2.3.10"
     id("com.gradleup.shadow") version "9.3.1"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.4"
@@ -48,7 +48,7 @@ dependencies {
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
     //implementation(files("libs/SyntaxCore-1.2.6n-SNAPSHOT-all.jar"))
-    compileOnly("pl.syntaxdevteam:core:1.2.8-R0.1-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:core:1.2.8-R0.2-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:messageHandler-paper:1.1.0-R0.2-SNAPSHOT")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.5")
@@ -63,7 +63,7 @@ dependencies {
     compileOnly("org.apache.ant:ant:1.10.15")
     compileOnly("com.zaxxer:HikariCP:7.0.2")
     compileOnly("net.luckperms:api:5.5")
-    compileOnly("me.clip:placeholderapi:2.11.7")
+    compileOnly("me.clip:placeholderapi:2.12.2")
     compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.1.0")
     compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
     compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.15")
@@ -78,7 +78,7 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.21.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:6.2.3")
-    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.4") {
+    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.5") {
         isTransitive = false
     }
 }

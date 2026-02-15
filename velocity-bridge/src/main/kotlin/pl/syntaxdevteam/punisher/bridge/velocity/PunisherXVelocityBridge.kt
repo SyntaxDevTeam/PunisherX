@@ -23,7 +23,7 @@ import java.util.UUID
 import java.nio.file.Path
 import javax.inject.Inject
 
-private const val BRIDGE_VERSION: String = "1.6.0-DEV" // Keep aligned with the root project version and velocity-plugin.json expansion
+private const val BRIDGE_VERSION: String = "1.6.2-SNAPSHOT" // Keep aligned with the root project version and velocity-plugin.json expansion
 
 @Plugin(
     id = "punisherxbridge",
