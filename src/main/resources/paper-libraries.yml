@@ -1,7 +1,7 @@
 libraries:
   # Basic libraries
   - org.eclipse.aether:aether-api:1.1.0
-  - org.yaml:snakeyaml:2.5
+  - org.yaml:snakeyaml:2.6
   - com.google.code.gson:gson:2.13.2
   # Kyori Adventure libraries
   - net.kyori:adventure-text-minimessage:4.26.1
