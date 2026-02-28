@@ -15,6 +15,7 @@ class SafeTeleportServiceTest {
         override fun runSync(task: Runnable) = task.run()
         override fun runSyncLater(delayTicks: Long, task: Runnable) = task.run()
         override fun runRegionally(location: Location, task: Runnable) = task.run()
+        override fun isFoliaBased(): Boolean = false
     }
 
     @Test

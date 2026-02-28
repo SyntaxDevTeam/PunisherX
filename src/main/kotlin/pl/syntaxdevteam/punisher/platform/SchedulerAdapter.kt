@@ -9,6 +9,7 @@ interface SchedulerAdapter {
     fun runSync(task: Runnable)
     fun runSyncLater(delayTicks: Long, task: Runnable)
     fun runRegionally(location: Location, task: Runnable)
+    fun isFoliaBased(): Boolean
 }
 
 class BukkitSchedulerAdapter(
@@ -49,4 +50,6 @@ class BukkitSchedulerAdapter(
             runSync(task)
         }
     }
+
+    override fun isFoliaBased(): Boolean = foliaBased
 }
