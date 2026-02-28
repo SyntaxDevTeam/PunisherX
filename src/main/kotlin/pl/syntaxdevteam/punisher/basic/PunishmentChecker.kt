@@ -26,12 +26,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         val uuid      = player.uniqueId
         val radius    = plugin.config.getDouble("jail.radius", 10.0)
         val jailLoc   = JailUtils.getJailLocation(plugin.config)
-        val unjailLoc = JailUtils.getUnjailLocation(
-            plugin.config,
-            plugin.hookHandler,
-            player = player,
-            safeTeleportService = plugin.safeTeleportService
-        )
+        
         if (PermissionChecker.isAuthor(uuid)) {
             player.sendMessage(
                 plugin.messageHandler
@@ -39,6 +34,43 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                         TagResolver.empty())
             )
         }
+
+        if (plugin.schedulerAdapter.isFoliaBased()) {
+            plugin.schedulerAdapter.runSync {
+                val unjailLoc = JailUtils.getUnjailLocation(
+                    plugin.config,
+                    plugin.hookHandler,
+                    player = player,
+                    safeTeleportService = plugin.safeTeleportService
+                )
+                processPlayerJoinLocation(player, name, uuid, radius, jailLoc, unjailLoc)
+            }
+        } else {
+            val unjailLoc = JailUtils.getUnjailLocation(
+                plugin.config,
+                plugin.hookHandler,
+                player = player,
+                safeTeleportService = plugin.safeTeleportService
+            )
+            processPlayerJoinLocation(player, name, uuid, radius, jailLoc, unjailLoc)
+        }
+
+        if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.SEE_UPDATE)) {
+            updateChecker.checkForUpdatesForPlayer(player)
+            plugin.logger.debug("Checking for updates for player: $name")
+        } else {
+            plugin.logger.debug("Player $name does not have permission to see updates.")
+        }
+    }
+
+    private fun processPlayerJoinLocation(
+        player: org.bukkit.entity.Player,
+        name: String,
+        uuid: java.util.UUID,
+        radius: Double,
+        jailLoc: Location?,
+        unjailLoc: Location?
+    ) {
         val locationsConfigured = jailLoc != null && unjailLoc != null
         if (!locationsConfigured) {
             plugin.logger.warning("Jail or unjail location undefined!")
@@ -87,13 +119,6 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                     plugin.logger.debug("Scheduling teleport of $name to $targetLoc with gamemode $targetMode (jailed=$isJailed)")
                 }
             }
-        }
-
-        if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.SEE_UPDATE)) {
-            updateChecker.checkForUpdatesForPlayer(player)
-            plugin.logger.debug("Checking for updates for player: $name")
-        } else {
-            plugin.logger.debug("Player $name does not have permission to see updates.")
         }
     }
 
