@@ -67,7 +67,7 @@ class SafeTeleportService(
         if (foliaBased) {
             val world = location.world ?: return null
             if (!world.isChunkLoaded(location.blockX shr 4, location.blockZ shr 4)) {
-                return location.clone()
+                return null
             }
         }
         val base = location.clone()
