@@ -73,6 +73,8 @@ dependencies {
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.3")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
 
+    implementation(kotlin("stdlib"))
+
     testImplementation(kotlin("test"))
     testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     testImplementation("org.mockito:mockito-core:5.22.0")
@@ -86,6 +88,9 @@ dependencies {
 tasks {
     build {
         dependsOn(shadowJar)
+    }
+    jar {
+        archiveClassifier.set("thin")
     }
     test {
         useJUnitPlatform()
