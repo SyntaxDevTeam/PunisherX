@@ -26,6 +26,13 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         val uuid      = player.uniqueId
         val radius    = plugin.config.getDouble("jail.radius", 10.0)
         val jailLoc   = JailUtils.getJailLocation(plugin.config)
+
+        if (plugin.schedulerAdapter.isFoliaBased()) {
+            plugin.schedulerAdapter.runSyncLater(1) {
+                handlePlayerJoin(event)
+            }
+            return
+        }
         
         if (PermissionChecker.isAuthor(uuid)) {
             player.sendMessage(
@@ -35,25 +42,13 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             )
         }
 
-        if (plugin.schedulerAdapter.isFoliaBased()) {
-            plugin.schedulerAdapter.runSync {
-                val unjailLoc = JailUtils.getUnjailLocation(
-                    plugin.config,
-                    plugin.hookHandler,
-                    player = player,
-                    safeTeleportService = plugin.safeTeleportService
-                )
-                processPlayerJoinLocation(player, name, uuid, radius, jailLoc, unjailLoc)
-            }
-        } else {
-            val unjailLoc = JailUtils.getUnjailLocation(
-                plugin.config,
-                plugin.hookHandler,
-                player = player,
-                safeTeleportService = plugin.safeTeleportService
-            )
-            processPlayerJoinLocation(player, name, uuid, radius, jailLoc, unjailLoc)
-        }
+        val unjailLoc = JailUtils.getUnjailLocation(
+            plugin.config,
+            plugin.hookHandler,
+            player = player,
+            safeTeleportService = plugin.safeTeleportService
+        )
+        processPlayerJoinLocation(player, name, uuid, radius, jailLoc, unjailLoc)
 
         if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.SEE_UPDATE)) {
             updateChecker.checkForUpdatesForPlayer(player)
