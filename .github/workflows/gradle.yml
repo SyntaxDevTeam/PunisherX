@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - 1.7.0
+      - folia
   pull_request:
 
 jobs:
