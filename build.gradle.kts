@@ -47,7 +47,6 @@ dependencies {
     //compileOnly("org.leavesmc.leaves:leaves-api:1.21.10-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
-    //implementation(files("libs/SyntaxCore-1.2.6n-SNAPSHOT-all.jar"))
     compileOnly("pl.syntaxdevteam:core:1.2.8-R0.2-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:messageHandler-paper:1.1.0-R0.2-SNAPSHOT")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
@@ -179,5 +178,5 @@ hangarPublish {
 
 plugindeployer {
     paper { dir = "/home/debian/poligon/Paper/1.21.11/plugins" } //ostatnia wersja dla Paper
-    folia { dir = "/home/debian/poligon/Folia/1.21.8/plugins" } //ostatnia wersja dla Folia
+    folia { dir = "/home/debian/poligon/Folia/1.21.11/plugins" } //ostatnia wersja dla Folia
 }

@@ -88,6 +88,9 @@ object JailUtils {
             }
 
             if (resolved != null) {
+                if (safeTeleportService.isFoliaBased()) {
+                    return resolved
+                }
                 val safeLocation = safeTeleportService.findNearestSafeLocation(resolved)
                 if (safeLocation != null) {
                     return safeLocation
