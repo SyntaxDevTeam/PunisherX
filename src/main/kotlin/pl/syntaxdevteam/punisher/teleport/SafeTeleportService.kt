@@ -22,6 +22,8 @@ class SafeTeleportService(
 
     private val foliaBased: Boolean = foliaBasedOverride ?: ServerEnvironment.isFoliaBased()
 
+    fun isFoliaBased(): Boolean = foliaBased
+
     fun teleportSafely(
         player: Player,
         location: Location,
@@ -29,14 +31,12 @@ class SafeTeleportService(
     ) {
         val target = location.clone()
         if (foliaBased) {
-            scheduler.runSync {
-                if (!target.chunk.isLoaded) {
-                    target.chunk.load()
-                }
+            scheduler.runRegionally(target) {
+                chunkLoader(target)
                 val safeLocation = findNearestSafeLocation(target)
                 if (safeLocation == null) {
                     callback(false)
-                    return@runSync
+                    return@runRegionally
                 }
                 player.teleportAsync(safeLocation).thenAccept { result ->
                     callback(result)
