@@ -2,7 +2,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.3.10"
+    kotlin("jvm") version "2.3.20-RC"
     id("com.gradleup.shadow") version "9.3.2"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.4"
@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.6.2-DEV"
+version = "1.6.2-SNAPSHOT"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val targetJavaVersion = 21
@@ -48,7 +48,7 @@ dependencies {
     //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:core:1.2.8-R0.2-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.1.0-R0.2-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.1.1-R0.1-SNAPSHOT")
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.6")
     compileOnly("com.google.code.gson:gson:2.13.2")
@@ -77,7 +77,7 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.22.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:6.2.3")
-    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.6-jdk6-jdk5") {
+    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.7") {
         isTransitive = false
     }
 }
