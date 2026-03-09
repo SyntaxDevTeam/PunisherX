@@ -76,7 +76,7 @@ class ConfigManager(private val plugin: PunisherX) {
             config.save()
             plugin.logger.success("[Config] Done. Current version: ${config.getInt(VERSION_KEY)}")
         } else {
-            plugin.logger.success("[Config] Loaded without update (version ${config.getInt(VERSION_KEY)})")
+            plugin.logger.info("[Config] Loaded without update (version ${config.getInt(VERSION_KEY)})")
         }
     }
 
