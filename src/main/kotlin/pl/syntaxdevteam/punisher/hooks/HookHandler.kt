@@ -9,6 +9,7 @@ import net.milkbowl.vault.permission.Permission
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import pl.syntaxdevteam.dscbridgeapi.external.api.BridgeGateway
 import pl.syntaxdevteam.punisher.PunisherX
 
 /**
@@ -26,6 +27,7 @@ class HookHandler(private val plugin: PunisherX) {
     private var chat: Chat? = null
     private var permission: Permission? = null
     private var essentialsSpawn: IEssentialsSpawn? = null
+    private var gateway: BridgeGateway? = null
 
     /**
      * Initializes the HookHandler by checking if the required services are available on the server.
@@ -41,6 +43,7 @@ class HookHandler(private val plugin: PunisherX) {
             checkVaultUnlocked()
         }*/
         checkEssentialsX()
+        checkDscBridgeAPI()
     }
 
     /**
@@ -78,6 +81,24 @@ class HookHandler(private val plugin: PunisherX) {
         } else {
             plugin.logger.debug("Vault plugin not found on server!")
         }
+    }
+
+    private fun checkDscBridgeAPI(): Boolean {
+        if (Bukkit.getPluginManager().isPluginEnabled("DscBridgeAPI")) {
+            plugin.logger.debug("Hooked into DscBridgeAPI!")
+            gateway = plugin.server.servicesManager.getRegistration(BridgeGateway::class.java)?.provider
+            return true
+        } else {
+            plugin.logger.debug("DscBridgeAPI plugin not found on server!")
+            return false
+        }
+    }
+
+    fun getDscBridgeGateway(): BridgeGateway? {
+        if (gateway == null) {
+            plugin.logger.warning("DscBridgeAPI hook is not available while attempting to access the gateway.")
+        }
+        return gateway
     }
 
     /**

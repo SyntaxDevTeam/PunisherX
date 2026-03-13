@@ -34,10 +34,12 @@ import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
 import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import pl.syntaxdevteam.core.platform.ServerEnvironment
+import pl.syntaxdevteam.punisher.hooks.DiscordBridge
 import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
 import java.io.File
-import java.util.*
 
+
+import java.util.*
 class PunisherX : JavaPlugin(), Listener {
     @Volatile
     var commandsRegistered: Boolean = false
@@ -75,7 +77,7 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var proxyBridgeMessenger: ProxyBridgeMessenger
     lateinit var onlinePunishmentWatcher: OnlinePunishmentWatcher
     lateinit var punishTemplateManager: PunishTemplateManager
-
+    lateinit var discordBridge: DiscordBridge
 
     /**
      * Called when the plugin is enabled.

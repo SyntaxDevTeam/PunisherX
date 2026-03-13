@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.6.2-SNAPSHOT"
+version = "1.6.3-DEV"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val targetJavaVersion = 21
@@ -71,6 +71,7 @@ dependencies {
     }
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.3")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
+    compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.3-SNAPSHOT")
 
     testImplementation(kotlin("test"))
     testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")

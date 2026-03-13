@@ -17,6 +17,7 @@ import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigManager
 import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import pl.syntaxdevteam.core.platform.ServerEnvironment
+import pl.syntaxdevteam.dscbridgeapi.external.api.BridgeGateway
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
@@ -33,6 +34,7 @@ import pl.syntaxdevteam.punisher.platform.BukkitSchedulerAdapter
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
 import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
+import pl.syntaxdevteam.punisher.hooks.DiscordBridge
 import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
 import java.io.File
 import java.util.Locale
@@ -122,6 +124,8 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.proxyBridgeMessenger = ProxyBridgeMessenger(plugin).also { it.registerChannel() }
         plugin.onlinePunishmentWatcher = OnlinePunishmentWatcher(plugin).also { it.start() }
         checkLegacyPlaceholders()
+        plugin.discordBridge = DiscordBridge(plugin)
+        plugin.discordBridge.startDscBridge()
     }
 
     /**

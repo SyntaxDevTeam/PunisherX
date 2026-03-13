@@ -46,6 +46,9 @@ dependencies:
     EssentialsSpawn:
       load: BEFORE
       required: false
+    DscBridgeAPI:
+      load: BEFORE
+      required: false
 
 
 commands:
