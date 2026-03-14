@@ -27,7 +27,7 @@ class DiscordBridge(var plugin: PunisherX) {
 
     fun startDscBridge(){
         if (gateway == null) {
-            plugin.logger.severe("BridgeGateway niedostępne — DscBridgeAPI nie działa lub nie zostało załadowane.")
+            plugin.logger.warning("BridgeGateway niedostępne — funkcje sterowania botem wyłączone.")
             //plugin.server.pluginManager.disablePlugin(this)
             return
         }
@@ -39,7 +39,7 @@ class DiscordBridge(var plugin: PunisherX) {
                 description = "Pokaż panel moderacyjny dla wskazanego gracza",
                 options = listOf(
                     BridgeSlashCommandOption(
-                        name = "nick",
+                        name = "nickname",
                         description = "Nick gracza do ukarania"
                     )
                 )
@@ -80,7 +80,7 @@ class DiscordBridge(var plugin: PunisherX) {
                 title = "👤 PROFIL GRACZA: $nick",
                 description = "Panel moderacyjny PunisherX",
                 thumbnailUrl = "https://visage.surgeplay.com/face/128/$nick",
-                imageUrl = "https://starlightskins.lunareclipse.studio/render/default/$nick/full",
+                imageUrl = "https://mc-heads.net/body/$nick",
                 colorHex = "#00E5FF",
                 footer = "PunisherX • Paper",
                 fields = listOf(
@@ -112,7 +112,7 @@ class DiscordBridge(var plugin: PunisherX) {
                         createdAtMs = nowMs()
                     )
                     purgeExpiredContexts()
-                    plugin.logger.info("Panel moderacyjny utworzony, correlationId=${submission.correlationId}, nick=$nick")
+                    plugin.logger.debug("Panel moderacyjny utworzony, correlationId=${submission.correlationId}, nick=$nick")
                 }
 
                 is BridgeSubmitResult.Rejected -> plugin.logger.warning("Nie udało się utworzyć panelu: ${submission.error.code}")
