@@ -2,7 +2,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.3.20-RC"
+    kotlin("jvm") version "2.3.20-RC3"
     id("com.gradleup.shadow") version "9.3.2"
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.4"
@@ -75,7 +75,7 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    testImplementation("org.mockito:mockito-core:5.22.0")
+    testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:6.2.3")
     mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.7") {
