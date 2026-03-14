@@ -28,6 +28,7 @@ class HookHandler(private val plugin: PunisherX) {
     private var permission: Permission? = null
     private var essentialsSpawn: IEssentialsSpawn? = null
     private var gateway: BridgeGateway? = null
+    private var placeholderApiAvailable: Boolean? = null
 
     /**
      * Initializes the HookHandler by checking if the required services are available on the server.
@@ -35,7 +36,6 @@ class HookHandler(private val plugin: PunisherX) {
      * If the services are not found, warning messages are logged.
      */
     init {
-        checkPlaceholderAPI()
         //checkLuckPerms()
         //checkVault()
         /*
@@ -143,13 +143,17 @@ class HookHandler(private val plugin: PunisherX) {
      * If the service is not found, a warning message is logged.
      */
     fun checkPlaceholderAPI(): Boolean {
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+        placeholderApiAvailable?.let { return it }
+
+        val isAvailable = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")
+        if (isAvailable) {
             plugin.logger.debug("Hooked into PlaceholderAPI!")
-            return true
         } else {
             plugin.logger.warning("PlaceholderAPI plugin not found on server!")
-            return false
         }
+
+        placeholderApiAvailable = isAvailable
+        return isAvailable
     }
 
     /**
