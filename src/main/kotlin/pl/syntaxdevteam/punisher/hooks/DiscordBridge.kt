@@ -8,11 +8,13 @@ import org.bukkit.entity.Player
 import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeButton
 import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeEmbed
 import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeEmbedField
+import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeEmbedPlaceholderField
 import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeMessageRequest
 import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeSlashCommand
 import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeSlashCommandOption
 import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeSubmitResult
 import pl.syntaxdevteam.dscbridgeapi.external.model.ButtonStyle
+import pl.syntaxdevteam.dscbridgeapi.external.model.render
 import pl.syntaxdevteam.punisher.PunisherX
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
@@ -39,7 +41,7 @@ class DiscordBridge(var plugin: PunisherX) {
                 description = "Pokaż panel moderacyjny dla wskazanego gracza",
                 options = listOf(
                     BridgeSlashCommandOption(
-                        name = "nickname",
+                        name = "nick",
                         description = "Nick gracza do ukarania"
                     )
                 )
@@ -60,33 +62,60 @@ class DiscordBridge(var plugin: PunisherX) {
             }
 
             val snapshot = loadPlayerSnapshot(nick)
-            val statsField = buildString {
-                appendLine("❤️ Zdrowie: ${snapshot.health}")
-                appendLine("🍗 Głód: ${snapshot.food}")
-                appendLine("⭐ Poziom XP: ${snapshot.level}")
-            }.trim()
 
-            val locationField = buildString {
-                appendLine("🗺️ Świat: ${snapshot.world}")
-                appendLine("📍 ${snapshot.location}")
-            }.trim()
-
-            val connectionField = buildString {
-                appendLine("📶 Ping: ${snapshot.ping}")
-                appendLine("🆔 UUID: `${snapshot.uuid}`")
-            }.trim()
-
-            val panelEmbed = BridgeEmbed(
-                title = "👤 PROFIL GRACZA: $nick",
+            // Szablon embeda używa placeholder_fields i nowych pól: url/timestamp/author/color.
+            val panelTemplate = BridgeEmbed(
+                title = "👤 PROFIL GRACZA: {nick}",
                 description = "Panel moderacyjny PunisherX",
-                thumbnailUrl = "https://visage.surgeplay.com/face/128/$nick",
-                imageUrl = "https://mc-heads.net/body/$nick",
-                colorHex = "#00E5FF",
+                url = "https://example.com/cases/{nick}",
+                timestamp = "now",
+                thumbnailUrl = "{nick}", // nick/UUID/url/base64 wspierane przez bridge
+                imageUrl = "https://mc-heads.net/body/{nick}",
+                authorName = "{operator}",
                 footer = "PunisherX • Paper",
+                color = "9447935",
+                placeholderFields = listOf(
+                    BridgeEmbedPlaceholderField(
+                        name = "statsField",
+                        value = listOf(
+                            "❤️ Zdrowie: {health}",
+                            "🍗 Głód: {food}",
+                            "⭐ Poziom XP: {level}"
+                        )
+                    ),
+                    BridgeEmbedPlaceholderField(
+                        name = "locationField",
+                        value = listOf(
+                            "🗺️ Świat: {world}",
+                            "📍 {location}"
+                        )
+                    ),
+                    BridgeEmbedPlaceholderField(
+                        name = "connectionField",
+                        value = listOf(
+                            "📶 Ping: {ping}",
+                            "🆔 UUID: `{uuid}`"
+                        )
+                    )
+                ),
                 fields = listOf(
-                    BridgeEmbedField(name = "📊 STATYSTYKI LIVE", value = statsField, inline = true),
-                    BridgeEmbedField(name = "📍 LOKALIZACJA", value = locationField, inline = true),
-                    BridgeEmbedField(name = "📡 POŁĄCZENIE", value = connectionField, inline = false)
+                    BridgeEmbedField(name = "📊 STATYSTYKI LIVE", value = "{statsField}", inline = true),
+                    BridgeEmbedField(name = "📍 LOKALIZACJA", value = "{locationField}", inline = true),
+                    BridgeEmbedField(name = "📡 POŁĄCZENIE", value = "{connectionField}", inline = false)
+                )
+            )
+
+            val renderedEmbed = panelTemplate.render(
+                mapOf(
+                    "nick" to nick,
+                    "operator" to event.userId,
+                    "health" to snapshot.health,
+                    "food" to snapshot.food,
+                    "level" to snapshot.level,
+                    "world" to snapshot.world,
+                    "location" to snapshot.location,
+                    "ping" to snapshot.ping,
+                    "uuid" to snapshot.uuid
                 )
             )
 
@@ -95,7 +124,7 @@ class DiscordBridge(var plugin: PunisherX) {
                     pluginNamespace = namespace,
                     channelId = event.channelId,
                     content = "Panel karny dla $nick",
-                    embed = panelEmbed,
+                    embed = renderedEmbed,
                     buttons = listOf(
                         BridgeButton(customId = "$namespace.ban", label = "BANUJ", style = ButtonStyle.DANGER),
                         BridgeButton(customId = "$namespace.kick", label = "WYRZUĆ", style = ButtonStyle.PRIMARY),
@@ -112,7 +141,7 @@ class DiscordBridge(var plugin: PunisherX) {
                         createdAtMs = nowMs()
                     )
                     purgeExpiredContexts()
-                    plugin.logger.debug("Panel moderacyjny utworzony, correlationId=${submission.correlationId}, nick=$nick")
+                    plugin.logger.info("Panel moderacyjny utworzony, correlationId=${submission.correlationId}, nick=$nick")
                 }
 
                 is BridgeSubmitResult.Rejected -> plugin.logger.warning("Nie udało się utworzyć panelu: ${submission.error.code}")
@@ -126,9 +155,9 @@ class DiscordBridge(var plugin: PunisherX) {
             }
 
             when (interaction.customId) {
-                "$namespace.ban" -> dispatchServerCommand("ban ${context.nick} 1h Złamanie regulaminu serwera. --force")
-                "$namespace.kick" -> dispatchServerCommand("kick ${context.nick} Naruszenie zasad serwera. --force")
-                "$namespace.mute" -> dispatchServerCommand("mute ${context.nick} 30m Toksyczne zachowanie. --force")
+                "$namespace.ban" -> dispatchServerCommand("ban ${context.nick} 1h Złamanie regulaminu serwera.")
+                "$namespace.kick" -> dispatchServerCommand("kick ${context.nick} Naruszenie zasad serwera.")
+                "$namespace.mute" -> dispatchServerCommand("mute ${context.nick} 30m Toksyczne zachowanie.")
             }
         }
     }
