@@ -1,10 +1,5 @@
-plugins {
-    kotlin("jvm") version "2.3.20-RC3"
-    id("com.gradleup.shadow") version "9.4.0"
-}
-
-group = "pl.syntaxdevteam.punisher"
-version = rootProject.version
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
 repositories {
     mavenCentral()
@@ -20,7 +15,7 @@ dependencies {
     implementation("com.mysql:mysql-connector-j:9.6.0")
 }
 
-kotlin {
+extensions.configure<KotlinJvmProjectExtension> {
     jvmToolchain(21)
 }
 
@@ -31,12 +26,12 @@ tasks.processResources {
     }
 }
 
-tasks.shadowJar {
+tasks.named<ShadowJar>("shadowJar") {
     archiveBaseName.set("PunisherX-Velocity-Bridge")
     archiveClassifier.set("")
     archiveVersion.set(project.version.toString())
 }
 
-tasks.build {
-    dependsOn(tasks.shadowJar)
+tasks.named("build") {
+    dependsOn(tasks.named("shadowJar"))
 }

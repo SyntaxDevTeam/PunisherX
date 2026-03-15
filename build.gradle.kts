@@ -1,9 +1,11 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
     kotlin("jvm") version "2.3.20-RC3"
     id("com.gradleup.shadow") version "9.4.0"
+    id("org.jetbrains.dokka-javadoc") version "2.2.0-Beta" apply false
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.4"
     id("xyz.jpenilla.run-paper") version "3.0.2"
@@ -13,6 +15,16 @@ plugins {
 group = "pl.syntaxdevteam.punisher"
 version = "1.6.3-DEV"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
+
+subprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "com.gradleup.shadow")
+    apply(plugin = "maven-publish")
+    apply(plugin = "org.jetbrains.dokka-javadoc")
+
+    group = rootProject.group
+    version = rootProject.version
+}
 
 val targetJavaVersion = 21
 kotlin {
@@ -110,7 +122,7 @@ tasks.processResources {
     }
 }
 
-tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+tasks.named<ShadowJar>("shadowJar") {
     archiveBaseName.set("PunisherX")
     archiveClassifier.set("")
     archiveVersion.set(project.version.toString())
