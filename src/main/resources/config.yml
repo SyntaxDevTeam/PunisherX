@@ -1,4 +1,4 @@
-config-version: 161
+config-version: 170
 
 # /********************************************/
 #    Global settings
@@ -236,6 +236,76 @@ webhook:
         - name: "ID"
           value: "{id}"
           inline: true
+
+
+# DscBridgeAPI slash-command settings.
+dscbridge:
+  discord:
+    command_name: punish
+    command_description: "Pokaż panel moderacyjny dla wskazanego gracza"
+    command_options:
+      - name: "nick"
+        description: "Nick gracza do ukarania"
+    role_ids:
+      - "123456789012345678"
+      - "987654321098765432"
+    channel_id: "112233445566778899"
+    username: "SyntaxDevBot"
+    avatar-url: "{nick}" # URL, Minecraft nick/UUID (mc-heads), or base64 PNG data
+    content: "Panel karny dla {nick}"
+    buttons:
+      - id: "ban"
+        label: "BANUJ"
+        style: "DANGER" # PRIMARY, SECONDARY, SUCCESS, DANGER
+        command: "ban {nick} 1h Złamanie regulaminu serwera."
+      - id: "kick"
+        label: "WYRZUĆ"
+        style: "PRIMARY"
+        command: "kick {nick} Naruszenie zasad serwera."
+      - id: "mute"
+        label: "WYCISZ"
+        style: "SECONDARY"
+        command: "mute {nick} 30m Toksyczne zachowanie."
+    # Accepts integers (Discord decimal), hex with #/0x, or common names like red/orange/blue/black/white.
+    colors: 9447935
+    embed:
+      title: "👤 PROFIL GRACZA: {nick}"
+      description: "Panel moderacyjny PunisherX"
+      url: "https://example.com/cases/{nick}"
+      timestamp: "now" # ISO-8601 or "now" for current time
+      thumbnail-url: "{nick}" # URL, Minecraft nick/UUID, or base64 PNG data
+      image-url: "https://mc-heads.net/body/{nick}" # URL, Minecraft nick/UUID, or base64 PNG data
+      author:
+        name: "{operator}"
+        icon-url: "" # URL, Minecraft nick/UUID, or base64 PNG data
+      footer:
+        text: "PunisherX • Paper"
+        icon-url: "" # URL, Minecraft nick/UUID, or base64 PNG data
+      fields:
+        - name: "📊 STATYSTYKI LIVE"
+          value: "{statsField}"
+          inline: true
+        - name: "📍 LOKALIZACJA"
+          value: "{locationField}"
+          inline: true
+        - name: "📡 POŁĄCZENIE"
+          value: "{connectionField}"
+          inline: false
+      placeholder_fields:
+        - name: "statsField"
+          value:
+            - "❤️ Zdrowie: {health}"
+            - "🍗 Głód: {food}"
+            - "⭐ Poziom XP: {level}"
+        - name: "locationField"
+          value:
+            - "🗺️ Świat: {world}"
+            - "📍 {location}"
+        - name: "connectionField"
+          value:
+            - "📶 Ping: {ping}"
+            - "🆔 UUID: `{uuid}`"
+
 
 # Placeholder settings for PlaceholderAPI.
 # The list of available placeholders can be found at https://github.com/SyntaxDevTeam/PunisherX/wiki/Placeholders#full-set-of-available-placeholders
