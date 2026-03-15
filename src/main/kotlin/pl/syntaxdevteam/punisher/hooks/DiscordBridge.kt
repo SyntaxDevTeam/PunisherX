@@ -44,7 +44,9 @@ class DiscordBridge(var plugin: PunisherX) {
                         name = "nick",
                         description = "Nick gracza do ukarania"
                     )
-                )
+                ),
+                allowedRoleIds = listOf("123456789012345678", "987654321098765432"),
+                allowedChannelId = "112233445566778899"
             )
         )
 
@@ -54,6 +56,18 @@ class DiscordBridge(var plugin: PunisherX) {
 
         gateway.registerSlashCommandHandler(namespace) { event ->
             if (event.commandName != "punish") return@registerSlashCommandHandler
+
+            // Runtime guard (defense-in-depth): API już filtruje po rolach/kanałach,
+            // ale plugin może chcieć własny audit/fallback.
+            val allowedRoles = setOf("123456789012345678", "987654321098765432")
+            val isAllowedRole = event.memberRoleIds.any { it in allowedRoles }
+            val isAllowedChannel = event.channelId == "112233445566778899"
+            if (!isAllowedRole || !isAllowedChannel) {
+                plugin.logger.warning(
+                    "Odrzucono /punish: userId=${event.userId}, channelId=${event.channelId}, roles=${event.memberRoleIds}"
+                )
+                return@registerSlashCommandHandler
+            }
 
             val nick = event.options["nick"]?.trim().orEmpty()
             if (nick.isBlank()) {
