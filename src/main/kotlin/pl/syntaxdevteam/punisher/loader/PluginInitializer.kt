@@ -17,7 +17,6 @@ import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigManager
 import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import pl.syntaxdevteam.core.platform.ServerEnvironment
-import pl.syntaxdevteam.dscbridgeapi.external.api.BridgeGateway
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
@@ -124,8 +123,12 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.proxyBridgeMessenger = ProxyBridgeMessenger(plugin).also { it.registerChannel() }
         plugin.onlinePunishmentWatcher = OnlinePunishmentWatcher(plugin).also { it.start() }
         checkLegacyPlaceholders()
-        plugin.discordBridge = DiscordBridge(plugin)
-        plugin.discordBridge.startDscBridge()
+        if (plugin.hookHandler.isDscBridgeAvailable()) {
+            plugin.discordBridge = DiscordBridge(plugin)
+            plugin.discordBridge.startDscBridge()
+        } else {
+            plugin.logger.debug("DscBridgeAPI unavailable, skipping DiscordBridge initialization.")
+        }
     }
 
     /**
