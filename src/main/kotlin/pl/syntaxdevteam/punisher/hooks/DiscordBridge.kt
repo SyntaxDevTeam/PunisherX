@@ -31,14 +31,13 @@ class DiscordBridge(var plugin: PunisherX) {
 
     fun startDscBridge() {
         if (gateway == null) {
-            plugin.logger.warning("BridgeGateway niedostępne — funkcje sterowania botem wyłączone.")
+            plugin.logger.debug("BridgeGateway niedostępne — funkcje sterowania botem wyłączone.")
             //plugin.server.pluginManager.disablePlugin(this)
             return
         }
 
         val commandName = discordConfig?.getString("command_name")?.trim().orEmpty().ifBlank { "punish" }
-        val commandDescription = discordConfig?.getString("command_description")?.trim().orEmpty()
-            .ifBlank { "Pokaż panel moderacyjny dla wskazanego gracza" }
+        val commandDescription = discordConfig?.getString("command_description")?.trim().orEmpty().ifBlank { "Pokaż panel moderacyjny dla wskazanego gracza" }
         val commandOptions = loadCommandOptions()
         val targetOptionName = commandOptions.firstOrNull()?.name ?: "nick"
         val allowedRoleIds = readStringList(discordConfig, "role_ids", listOf("123456789012345678", "987654321098765432"))

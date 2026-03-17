@@ -83,7 +83,7 @@ dependencies {
     }
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.3")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
-    compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.6-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
 
     testImplementation(kotlin("test"))
     testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
