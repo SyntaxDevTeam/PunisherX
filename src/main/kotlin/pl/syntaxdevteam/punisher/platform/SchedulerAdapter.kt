@@ -21,7 +21,7 @@ class BukkitSchedulerAdapter(
 
     override fun runAsync(task: Runnable) {
         if (foliaBased) {
-            plugin.server.globalRegionScheduler.execute(plugin, task)
+            plugin.server.asyncScheduler.runNow(plugin) { _ -> task.run() }
         } else {
             plugin.server.scheduler.runTaskAsynchronously(plugin, task)
         }
@@ -37,7 +37,7 @@ class BukkitSchedulerAdapter(
 
     override fun runSyncLater(delayTicks: Long, task: Runnable) {
         if (foliaBased) {
-            plugin.server.globalRegionScheduler.runDelayed(plugin, { task.run() }, delayTicks)
+            plugin.server.globalRegionScheduler.runDelayed(plugin, { task.run() }, delayTicks.coerceAtLeast(1))
         } else {
             plugin.server.scheduler.runTaskLater(plugin, task, delayTicks)
         }
