@@ -3,13 +3,13 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.3.20-RC3"
-    id("com.gradleup.shadow") version "9.4.0"
+    kotlin("jvm") version "2.3.20"
+    id("com.gradleup.shadow") version "9.4.1"
     id("org.jetbrains.dokka-javadoc") version "2.2.0-Beta" apply false
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.4"
     id("xyz.jpenilla.run-paper") version "3.0.2"
-    id("pl.syntaxdevteam.plugindeployer") version "1.0.4"
+    id("pl.syntaxdevteam.plugindeployer") version "1.0.5-R0.1-SNAPSHOT"
 }
 
 group = "pl.syntaxdevteam.punisher"

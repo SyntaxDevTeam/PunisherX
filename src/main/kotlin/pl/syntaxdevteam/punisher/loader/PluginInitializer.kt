@@ -166,7 +166,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         if (plugin.hookHandler.checkPlaceholderAPI()) {
             PlaceholderHandler(plugin).register()
         }
-        plugin.server.pluginManager.registerEvents(GUIHandler(plugin), plugin)
+        //plugin.server.pluginManager.registerEvents(GUIHandler(plugin), plugin)
     }
 
     /**
