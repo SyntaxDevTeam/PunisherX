@@ -2,15 +2,14 @@
 ![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/SyntaxDevTeam/PunisherX/latest/main) [![Hangar Downloads](https://img.shields.io/hangar/dt/PunisherX?style=flat)](https://hangar.papermc.io/SyntaxDevTeam/PunisherX)
 # Proudly Introducing PunisherX
 
-PunisherX is a comprehensive punishment system offering commands like `kick`, `warn`, `mute`, `jail`, `ban`, and `ban-ip` — with both temporary and permanent options.
-With support commands like `/check`, `/history`, and `/banlist`, administrators can quickly review a player's current punishment status or browse a full list of banned users.
+PunisherX is an advanced moderation plugin for Paper/Folia servers focused on punishments, investigation tools, and admin workflow automation.
+It provides complete punishment coverage (`/ban`, `/banip`, `/mute`, `/jail`, `/warn`, `/kick`) with temporary/permanent durations, plus direct recovery commands (`/unban`, `/unmute`, `/unjail`, `/unwarn`, `/clearall`).
 
-Designed for speed and convenience, PunisherX includes customizable templates for punishment reasons, allowing quick and consistent enforcement.
-It also offers a complete message file for full translation and customization, supporting **MiniMessage**, Legacy, and plain Minecraft formatting.
-A detailed configuration file, an automatic migration system that preserves custom settings, and support for various database types (MySQL/MariaDB, PostgreSQL for multi-server sync, and SQLite/H2 for high-performance standalone use) make it flexible and production-ready.
+The plugin also includes operator tools such as `/check`, `/history`, `/banlist`, `/change-reason`, and `/punish` templates, as well as GUI panels for moderators and report handling.
+PunisherX supports message customization with MiniMessage/Legacy/plain formats, config auto-migration between versions, and multiple database backends (SQLite, H2, MySQL, MariaDB, PostgreSQL) for both standalone and network environments.
 
 ## ✅ Key Features
-* [x] Built for Paper 1.20.6–1.21.11 and compatible forks, including improved Folia support.
+* [x] Built for Paper 1.20.6, 1.21 - 1.21.11, 26.1-26.1.1 and compatible forks, including improved Folia support.
 * [x] Actively maintained with up-to-date APIs and backward compatibility.
 * [x] Language files with full **MiniMessage** and Legacy formatting support, plus new translations.
 * [x] Support for Discord webhook integration.
