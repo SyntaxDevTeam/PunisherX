@@ -5,6 +5,7 @@
 PunisherX is an advanced moderation plugin for Paper/Folia servers focused on punishments, investigation tools, and admin workflow automation.
 It provides complete punishment coverage (`/ban`, `/banip`, `/mute`, `/jail`, `/warn`, `/kick`) with temporary/permanent durations, plus direct recovery commands (`/unban`, `/unmute`, `/unjail`, `/unwarn`, `/clearall`).
 
+
 The plugin also includes operator tools such as `/check`, `/history`, `/banlist`, `/change-reason`, and `/punish` templates, as well as GUI panels for moderators and report handling.
 PunisherX supports message customization with MiniMessage/Legacy/plain formats, config auto-migration between versions, and multiple database backends (SQLite, H2, MySQL, MariaDB, PostgreSQL) for both standalone and network environments.
 
