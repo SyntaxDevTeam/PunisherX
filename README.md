@@ -33,7 +33,7 @@ If you have questions or need help, feel free to join our [Discord](https://disc
 ## 📦 Download
 
 * Always up-to-date stable version available for download on:
-  * Modrinth ![Modrinth Downloads](https://img.shields.io/modrinth/dt/VCNRcwC2)
+  * Modrinth [![Modrinth Downloads](https://img.shields.io/modrinth/dt/VCNRcwC2)](https://modrinth.com/plugin/punisherx)
   * Hangar   [![Available on Hangar](https://img.shields.io/hangar/dt/PunisherX)](https://hangar.papermc.io/SyntaxDevTeam/PunisherX)
 * SNAPSHOT and DEV versions available immediately on Github [![GitHub Release Date](https://img.shields.io/github/release-date/SyntaxDevTeam/PunisherX)](https://github.com/SyntaxDevTeam/PunisherX/releases)
 * You can also build the development version yourself [![Available on GitHub](https://img.shields.io/badge/GitHub.com-PunisherX-green)](https://github.com/SyntaxDevTeam/PunisherX) or download the last valid build [![Build Plugin](https://github.com/SyntaxDevTeam/PunisherX/actions/workflows/gradle.yml/badge.svg?branch=main)](https://github.com/SyntaxDevTeam/PunisherX/actions/workflows/gradle.yml)
