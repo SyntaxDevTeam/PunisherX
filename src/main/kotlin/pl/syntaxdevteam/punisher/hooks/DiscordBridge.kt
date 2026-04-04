@@ -2,6 +2,7 @@ package pl.syntaxdevteam.punisher.hooks
 
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.configuration.file.YamlConfiguration
 //import org.bukkit.OfflinePlayer
 import org.bukkit.Statistic
 import org.bukkit.attribute.Attribute
@@ -19,6 +20,7 @@ import pl.syntaxdevteam.dscbridgeapi.external.model.render
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
 import java.time.Duration
+import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.set
 import kotlin.text.trim
@@ -27,23 +29,23 @@ class DiscordBridge(var plugin: PunisherX) {
     private val namespace = "punisherx"
     private val correlationContext = ConcurrentHashMap<String, ModerationContext>()
     private val gateway = plugin.hookHandler.getDscBridgeGateway()
-    private val discordConfig = plugin.config.getConfigurationSection("dscbridge.discord")
+    private val discordConfig = loadDbApiConfig().getConfigurationSection("dscbridge.discord")
 
     fun startDscBridge() {
         if (gateway == null) {
-            plugin.logger.debug("BridgeGateway niedostępne — funkcje sterowania botem wyłączone.")
+            plugin.logger.debug("BridgeGateway unavailable — bot control features are disabled.")
             //plugin.server.pluginManager.disablePlugin(this)
             return
         }
 
         val commandName = discordConfig?.getString("command_name")?.trim().orEmpty().ifBlank { "punish" }
-        val commandDescription = discordConfig?.getString("command_description")?.trim().orEmpty().ifBlank { "Pokaż panel moderacyjny dla wskazanego gracza" }
+        val commandDescription = discordConfig?.getString("command_description")?.trim().orEmpty().ifBlank { "Show moderation panel for selected player" }
         val commandOptions = loadCommandOptions()
         val targetOptionName = commandOptions.firstOrNull()?.name ?: "nick"
         val allowedRoleIds = readStringList(discordConfig, "role_ids", listOf("123456789012345678", "987654321098765432"))
         val allowedChannelId = discordConfig?.getString("channel_id")?.trim().orEmpty().ifBlank { "112233445566778899" }
         val panelTemplate = loadEmbedTemplate()
-        val messageContentTemplate = discordConfig?.getString("content") ?: "Panel karny dla {nick}"
+        val messageContentTemplate = discordConfig?.getString("content") ?: "Punishment panel for {nick}"
         val configuredButtons = loadButtons()
         val interactionCommands = configuredButtons.associate { button ->
             "$namespace.${button.id}" to button.commandTemplate
@@ -61,7 +63,7 @@ class DiscordBridge(var plugin: PunisherX) {
         )
 
         if (!slashRegistered) {
-            plugin.logger.warning("Nie udało się zarejestrować /$commandName (kolizja nazwy, błąd walidacji lub problem transportu).")
+            plugin.logger.warning("Failed to register /$commandName (name collision, validation error, or transport issue).")
         }
 
         gateway.registerSlashCommandHandler(namespace) { event ->
@@ -71,14 +73,14 @@ class DiscordBridge(var plugin: PunisherX) {
             val isAllowedChannel = event.channelId == allowedChannelId
             if (!isAllowedRole || !isAllowedChannel) {
                 plugin.logger.warning(
-                    "Odrzucono /$commandName: userId=${event.userId}, channelId=${event.channelId}, roles=${event.memberRoleIds}"
+                    "Rejected /$commandName: userId=${event.userId}, channelId=${event.channelId}, roles=${event.memberRoleIds}"
                 )
                 return@registerSlashCommandHandler
             }
 
             val nick = event.options[targetOptionName]?.trim().orEmpty()
             if (nick.isBlank()) {
-                plugin.logger.warning("/$commandName bez parametru $targetOptionName od userId=${event.userId}")
+                plugin.logger.warning("/$commandName without required option $targetOptionName from userId=${event.userId}")
                 return@registerSlashCommandHandler
             }
 
@@ -125,22 +127,22 @@ class DiscordBridge(var plugin: PunisherX) {
                         createdAtMs = nowMs()
                     )
                     purgeExpiredContexts()
-                    plugin.logger.debug("Panel moderacyjny utworzony, correlationId=${submission.correlationId}, nick=$nick")
+                    plugin.logger.debug("Moderation panel created, correlationId=${submission.correlationId}, nick=$nick")
                 }
 
-                is BridgeSubmitResult.Rejected -> plugin.logger.warning("Nie udało się utworzyć panelu: ${submission.error.code}")
+                is BridgeSubmitResult.Rejected -> plugin.logger.warning("Failed to create panel: ${submission.error.code}")
             }
         }
 
         gateway.registerInteractionHandler(namespace) { interaction ->
             val context = resolveContext(interaction.correlationId) ?: run {
-                plugin.logger.warning("Brak kontekstu dla correlationId=${interaction.correlationId}; odrzucam akcję ${interaction.customId}")
+                plugin.logger.warning("Missing context for correlationId=${interaction.correlationId}; rejecting action ${interaction.customId}")
                 return@registerInteractionHandler
             }
 
             val commandTemplate = interactionCommands[interaction.customId]
             if (commandTemplate == null) {
-                plugin.logger.warning("Nieznany customId interakcji: ${interaction.customId}")
+                plugin.logger.warning("Unknown interaction customId: ${interaction.customId}")
                 return@registerInteractionHandler
             }
 
@@ -160,6 +162,14 @@ class DiscordBridge(var plugin: PunisherX) {
 
     private fun dispatchServerCommand(command: String) {
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command)
+    }
+
+    private fun loadDbApiConfig(): YamlConfiguration {
+        val dbApiConfigFile = File(plugin.dataFolder, DBAPI_CONFIG_FILE_NAME)
+        if (!dbApiConfigFile.exists()) {
+            plugin.saveResource(DBAPI_CONFIG_FILE_NAME, false)
+        }
+        return YamlConfiguration.loadConfiguration(dbApiConfigFile)
     }
 
     private fun loadCommandOptions(): List<BridgeSlashCommandOption> {
@@ -253,8 +263,8 @@ class DiscordBridge(var plugin: PunisherX) {
             ?: defaultPlaceholderFields
 
         return BridgeEmbed(
-            title = embedSection?.getString("title") ?: "👤 PROFIL GRACZA: {nick}",
-            description = embedSection?.getString("description") ?: "Panel moderacyjny PunisherX",
+            title = embedSection?.getString("title") ?: "👤 PLAYER PROFILE: {nick}",
+            description = embedSection?.getString("description") ?: "PunisherX moderation panel",
             url = embedSection?.getString("url") ?: "https://example.com/cases/{nick}",
             timestamp = embedSection?.getString("timestamp") ?: "now",
             thumbnailUrl = embedSection?.getString("thumbnail-url") ?: "{nick}",
@@ -390,27 +400,28 @@ class DiscordBridge(var plugin: PunisherX) {
     )
 
     private companion object {
+        private const val DBAPI_CONFIG_FILE_NAME = "DBAPI_config.yml"
         val contextTtl: Duration = Duration.ofHours(6)
 
         val defaultFields = listOf(
-            BridgeEmbedField(name = "📊 STATYSTYKI LIVE", value = "{statsField}", inline = true),
-            BridgeEmbedField(name = "📍 LOKALIZACJA", value = "{locationField}", inline = true),
-            BridgeEmbedField(name = "📡 POŁĄCZENIE", value = "{connectionField}", inline = false)
+            BridgeEmbedField(name = "📊 LIVE STATS", value = "{statsField}", inline = true),
+            BridgeEmbedField(name = "📍 LOCATION", value = "{locationField}", inline = true),
+            BridgeEmbedField(name = "📡 CONNECTION", value = "{connectionField}", inline = false)
         )
 
         val defaultPlaceholderFields = listOf(
             BridgeEmbedPlaceholderField(
                 name = "statsField",
                 value = listOf(
-                    "❤️ Zdrowie: {health}",
-                    "🍗 Głód: {food}",
-                    "⭐ Poziom XP: {level}"
+                    "❤️ Health: {health}",
+                    "🍗 Hunger: {food}",
+                    "⭐ XP Level: {level}"
                 )
             ),
             BridgeEmbedPlaceholderField(
                 name = "locationField",
                 value = listOf(
-                    "🗺️ Świat: {world}",
+                    "🗺️ World: {world}",
                     "📍 {location}"
                 )
             ),
@@ -426,28 +437,28 @@ class DiscordBridge(var plugin: PunisherX) {
         val defaultCommandOptions = listOf(
             BridgeSlashCommandOption(
                 name = "nick",
-                description = "Nick gracza do ukarania"
+                description = "Player nickname to punish"
             )
         )
 
         val defaultButtons = listOf(
             ConfiguredButton(
                 id = "ban",
-                label = "BANUJ",
+                label = "BAN",
                 style = ButtonStyle.DANGER,
-                commandTemplate = "ban {nick} 1h Złamanie regulaminu serwera."
+                commandTemplate = "ban {nick} 1h Server rules violation."
             ),
             ConfiguredButton(
                 id = "kick",
-                label = "WYRZUĆ",
+                label = "KICK",
                 style = ButtonStyle.PRIMARY,
-                commandTemplate = "kick {nick} Naruszenie zasad serwera."
+                commandTemplate = "kick {nick} Server rules violation."
             ),
             ConfiguredButton(
                 id = "mute",
-                label = "WYCISZ",
+                label = "MUTE",
                 style = ButtonStyle.SECONDARY,
-                commandTemplate = "mute {nick} 30m Toksyczne zachowanie."
+                commandTemplate = "mute {nick} 30m Toxic behavior."
             )
         )
     }

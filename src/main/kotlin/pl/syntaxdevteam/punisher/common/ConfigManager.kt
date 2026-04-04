@@ -19,7 +19,7 @@ class ConfigManager(private val plugin: PunisherX) {
         private const val V_141 = 141
         private const val V_160 = 160
         private const val V_161 = 161
-        private const val V_170 = 170
+        // private const val V_170 = 170 // Reserved for future stable release (DscBridgeAPI config migration).
     }
 
     lateinit var config: YamlDocument
@@ -44,7 +44,7 @@ class ConfigManager(private val plugin: PunisherX) {
 
         val sourceVersion = detectSourceVersion(rawUserDoc)
 
-        if (sourceVersion < V_170 && dataFile.exists()) {
+        if (sourceVersion < V_161 && dataFile.exists()) {
             val bak = File(dataFile.parentFile, "$FILE_NAME.$sourceVersion.bak")
             try {
                 Files.copy(dataFile.toPath(), bak.toPath(), StandardCopyOption.REPLACE_EXISTING)
@@ -54,7 +54,7 @@ class ConfigManager(private val plugin: PunisherX) {
             }
         }
 
-        val shouldUpdate = !dataFile.exists() || sourceVersion < V_170
+        val shouldUpdate = !dataFile.exists() || sourceVersion < V_161
 
         config = YamlDocument.create(
             dataFile,
@@ -73,7 +73,7 @@ class ConfigManager(private val plugin: PunisherX) {
             migrateFrom(sourceVersion)
             applyWarnCountOverrides()
 
-            config.set(VERSION_KEY, V_170)
+            config.set(VERSION_KEY, V_161)
             config.save()
             plugin.logger.success("[Config] Done. Current version: ${config.getInt(VERSION_KEY)}")
         } else {
@@ -95,11 +95,11 @@ class ConfigManager(private val plugin: PunisherX) {
         val guessed = guessVersionFromComment()
         if (guessed != null) return guessed
 
-        return if (doc == null) V_170 else V_141
+        return if (doc == null) V_161 else V_141
     }
 
     private fun migrateFrom(sourceVersion: Int) {
-        if (sourceVersion >= V_170) return
+        if (sourceVersion >= V_161) return
 
         if (sourceVersion <= V_104) {
             plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_104 …")
@@ -113,8 +113,9 @@ class ConfigManager(private val plugin: PunisherX) {
             plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_161 …")
             migrate160to161()
         }
-        plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_170 …")
-        migrate161to170()
+        // Experimental DscBridgeAPI migration stays disabled until full release.
+        // plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_170 …")
+        // migrate161to170()
     }
 
     private fun migrate104to160() {
