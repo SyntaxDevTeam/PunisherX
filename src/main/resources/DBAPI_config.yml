@@ -1,0 +1,67 @@
+# DscBridgeAPI slash-command settings.
+dscbridge:
+  discord:
+    command_name: punish
+    command_description: "Show moderation panel for selected player"
+    command_options:
+      - name: "nick"
+        description: "Player nickname to punish"
+    role_ids:
+      - "123456789012345678"
+      - "987654321098765432"
+    channel_id: "112233445566778899"
+    username: "SyntaxDevBot"
+    avatar-url: "{nick}" # URL, Minecraft nickname/UUID (mc-heads), or base64 PNG data
+    content: "Punishment panel for {nick}"
+    buttons:
+      - id: "ban"
+        label: "BAN"
+        style: "DANGER" # PRIMARY, SECONDARY, SUCCESS, DANGER
+        command: "ban {nick} 1h Server rules violation."
+      - id: "kick"
+        label: "KICK"
+        style: "PRIMARY"
+        command: "kick {nick} Server rules violation."
+      - id: "mute"
+        label: "MUTE"
+        style: "SECONDARY"
+        command: "mute {nick} 30m Toxic behavior."
+    # Accepts integers (Discord decimal), hex with #/0x, or common names like red/orange/blue/black/white.
+    colors: 9447935
+    embed:
+      title: "👤 PLAYER PROFILE: {nick}"
+      description: "PunisherX moderation panel"
+      url: "https://example.com/cases/{nick}"
+      timestamp: "now" # ISO-8601 or "now" for current time
+      thumbnail-url: "{nick}" # URL, Minecraft nickname/UUID, or base64 PNG data
+      image-url: "https://starlightskins.lunareclipse.studio/render/default/{nick}/full" # URL, Minecraft nickname/UUID, or base64 PNG data
+      author:
+        name: "{operator}"
+        icon-url: "" # URL, Minecraft nickname/UUID, or base64 PNG data
+      footer:
+        text: "PunisherX • Paper"
+        icon-url: "" # URL, Minecraft nickname/UUID, or base64 PNG data
+      fields:
+        - name: "📊 LIVE STATS"
+          value: "{statsField}"
+          inline: true
+        - name: "📍 LOCATION"
+          value: "{locationField}"
+          inline: true
+        - name: "📡 CONNECTION"
+          value: "{connectionField}"
+          inline: false
+      placeholder_fields:
+        - name: "statsField"
+          value:
+            - "❤️ Health: {health}"
+            - "🍗 Hunger: {food}"
+            - "⭐ XP Level: {level}"
+        - name: "locationField"
+          value:
+            - "🗺️ World: {world}"
+            - "📍 {location}"
+        - name: "connectionField"
+          value:
+            - "📶 Ping: {ping}"
+            - "🆔 UUID: `{uuid}`"

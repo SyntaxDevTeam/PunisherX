@@ -28,6 +28,7 @@ class HookHandler(private val plugin: PunisherX) {
     private var permission: Permission? = null
     private var essentialsSpawn: IEssentialsSpawn? = null
     private var gateway: BridgeGateway? = null
+    private var dscBridgeAvailable: Boolean = false
     private var placeholderApiAvailable: Boolean? = null
 
     /**
@@ -84,7 +85,8 @@ class HookHandler(private val plugin: PunisherX) {
     }
 
     private fun checkDscBridgeAPI(): Boolean {
-        if (Bukkit.getPluginManager().isPluginEnabled("DscBridgeAPI")) {
+        dscBridgeAvailable = Bukkit.getPluginManager().isPluginEnabled("DscBridgeAPI")
+        if (dscBridgeAvailable) {
             plugin.logger.debug("Hooked into DscBridgeAPI!")
             gateway = plugin.server.servicesManager.getRegistration(BridgeGateway::class.java)?.provider
             return true
@@ -100,6 +102,8 @@ class HookHandler(private val plugin: PunisherX) {
         }
         return gateway
     }
+
+    fun isDscBridgeAvailable(): Boolean = dscBridgeAvailable
 
     /**
      * Checks if the VaultUnlocked service is available on the server.

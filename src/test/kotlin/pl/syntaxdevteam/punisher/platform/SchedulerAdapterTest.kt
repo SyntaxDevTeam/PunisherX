@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.platform
 
+import io.papermc.paper.threadedregions.scheduler.AsyncScheduler
 import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler
 import io.papermc.paper.threadedregions.scheduler.RegionScheduler
 import org.bukkit.Server
@@ -35,6 +36,25 @@ class SchedulerAdapterTest {
     }
 
     @Test
+    fun `runAsync uses async scheduler on folia`() {
+        val plugin = mock<Plugin>(defaultAnswer = Answers.RETURNS_DEEP_STUBS)
+        val server = mock<Server>(defaultAnswer = Answers.RETURNS_DEEP_STUBS)
+        val asyncScheduler = mock<AsyncScheduler>(defaultAnswer = Answers.RETURNS_DEEP_STUBS)
+
+        whenever(plugin.server).thenReturn(server)
+        whenever(server.asyncScheduler).thenReturn(asyncScheduler)
+
+        whenever(asyncScheduler.runNow(eq(plugin), any())).thenReturn(mock())
+
+        val adapter = BukkitSchedulerAdapter(plugin, foliaBasedOverride = true)
+        val task = mock<Runnable>()
+
+        adapter.runAsync(task)
+
+        verify(asyncScheduler).runNow(eq(plugin), any())
+    }
+
+    @Test
     fun `runSync uses global scheduler on folia`() {
         val plugin = mock<Plugin>()
         val server = mock<Server>()
@@ -42,6 +62,7 @@ class SchedulerAdapterTest {
 
         whenever(plugin.server).thenReturn(server)
         whenever(server.globalRegionScheduler).thenReturn(globalScheduler)
+
 
         val adapter = BukkitSchedulerAdapter(plugin, foliaBasedOverride = true)
         val task = mock<Runnable>()
@@ -60,6 +81,7 @@ class SchedulerAdapterTest {
 
         whenever(plugin.server).thenReturn(server)
         whenever(server.regionScheduler).thenReturn(regionScheduler)
+
 
         val adapter = BukkitSchedulerAdapter(plugin, foliaBasedOverride = true)
         val task = mock<Runnable>()

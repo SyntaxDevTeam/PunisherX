@@ -19,6 +19,7 @@ class ConfigManager(private val plugin: PunisherX) {
         private const val V_141 = 141
         private const val V_160 = 160
         private const val V_161 = 161
+        // private const val V_170 = 170 // Reserved for future stable release (DscBridgeAPI config migration).
     }
 
     lateinit var config: YamlDocument
@@ -53,7 +54,7 @@ class ConfigManager(private val plugin: PunisherX) {
             }
         }
 
-        val shouldUpdate = !dataFile.exists() || sourceVersion < V_160
+        val shouldUpdate = !dataFile.exists() || sourceVersion < V_161
 
         config = YamlDocument.create(
             dataFile,
@@ -72,7 +73,7 @@ class ConfigManager(private val plugin: PunisherX) {
             migrateFrom(sourceVersion)
             applyWarnCountOverrides()
 
-            config.set(VERSION_KEY, V_160)
+            config.set(VERSION_KEY, V_161)
             config.save()
             plugin.logger.success("[Config] Done. Current version: ${config.getInt(VERSION_KEY)}")
         } else {
@@ -108,8 +109,13 @@ class ConfigManager(private val plugin: PunisherX) {
             plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_160 …")
             migrate141to160()
         }
-        plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_161 …")
-        migrate160to161()
+        if (sourceVersion <= V_160) {
+            plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_161 …")
+            migrate160to161()
+        }
+        // Experimental DscBridgeAPI migration stays disabled until full release.
+        // plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_170 …")
+        // migrate161to170()
     }
 
     private fun migrate104to160() {
@@ -286,6 +292,100 @@ class ConfigManager(private val plugin: PunisherX) {
             fields.add(mapOf("name" to "ID", "value" to "{id}", "inline" to true))
             config.set("webhook.discord.embed.fields", fields)
         }
+    }
+
+    private fun migrate161to170() {
+        fun setIfMissing(path: String, value: Any) {
+            if (!config.contains(path)) {
+                config.set(path, value)
+            }
+        }
+
+        setIfMissing("dscbridge.discord.command_name", "punish")
+        setIfMissing("dscbridge.discord.command_description", "Pokaż panel moderacyjny dla wskazanego gracza")
+        setIfMissing(
+            "dscbridge.discord.command_options",
+            listOf(
+                mapOf(
+                    "name" to "nick",
+                    "description" to "Nick gracza do ukarania"
+                )
+            )
+        )
+        setIfMissing("dscbridge.discord.role_ids", listOf("123456789012345678", "987654321098765432"))
+        setIfMissing("dscbridge.discord.channel_id", "112233445566778899")
+        setIfMissing("dscbridge.discord.username", "SyntaxDevBot")
+        setIfMissing("dscbridge.discord.avatar-url", "{nick}")
+        setIfMissing("dscbridge.discord.content", "Panel karny dla {nick}")
+        setIfMissing(
+            "dscbridge.discord.buttons",
+            listOf(
+                mapOf(
+                    "id" to "ban",
+                    "label" to "BANUJ",
+                    "style" to "DANGER",
+                    "command" to "ban {nick} 1h Złamanie regulaminu serwera."
+                ),
+                mapOf(
+                    "id" to "kick",
+                    "label" to "WYRZUĆ",
+                    "style" to "PRIMARY",
+                    "command" to "kick {nick} Naruszenie zasad serwera."
+                ),
+                mapOf(
+                    "id" to "mute",
+                    "label" to "WYCISZ",
+                    "style" to "SECONDARY",
+                    "command" to "mute {nick} 30m Toksyczne zachowanie."
+                )
+            )
+        )
+        setIfMissing("dscbridge.discord.colors", 9447935)
+        setIfMissing("dscbridge.discord.embed.title", "👤 PROFIL GRACZA: {nick}")
+        setIfMissing("dscbridge.discord.embed.description", "Panel moderacyjny PunisherX")
+        setIfMissing("dscbridge.discord.embed.url", "https://example.com/cases/{nick}")
+        setIfMissing("dscbridge.discord.embed.timestamp", "now")
+        setIfMissing("dscbridge.discord.embed.thumbnail-url", "{nick}")
+        setIfMissing("dscbridge.discord.embed.image-url", "https://mc-heads.net/body/{nick}")
+        setIfMissing("dscbridge.discord.embed.author.name", "{operator}")
+        setIfMissing("dscbridge.discord.embed.author.icon-url", "")
+        setIfMissing("dscbridge.discord.embed.footer.text", "PunisherX • Paper")
+        setIfMissing("dscbridge.discord.embed.footer.icon-url", "")
+        setIfMissing(
+            "dscbridge.discord.embed.fields",
+            listOf(
+                mapOf("name" to "📊 STATYSTYKI LIVE", "value" to "{statsField}", "inline" to true),
+                mapOf("name" to "📍 LOKALIZACJA", "value" to "{locationField}", "inline" to true),
+                mapOf("name" to "📡 POŁĄCZENIE", "value" to "{connectionField}", "inline" to false)
+            )
+        )
+        setIfMissing(
+            "dscbridge.discord.embed.placeholder_fields",
+            listOf(
+                mapOf(
+                    "name" to "statsField",
+                    "value" to listOf(
+                        "❤️ Zdrowie: {health}",
+                        "🍗 Głód: {food}",
+                        "⭐ Poziom XP: {level}"
+                    )
+                ),
+                mapOf(
+                    "name" to "locationField",
+                    "value" to listOf(
+                        "🗺️ Świat: {world}",
+                        "📍 {location}"
+                    )
+                ),
+                mapOf(
+                    "name" to "connectionField",
+                    "value" to listOf(
+                        "📶 Ping: {ping}",
+                        "🆔 UUID: `{uuid}`"
+                    )
+                )
+            )
+        )
     }
 
     // ================= HELPERS =================

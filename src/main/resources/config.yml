@@ -237,6 +237,7 @@ webhook:
           value: "{id}"
           inline: true
 
+
 # Placeholder settings for PlaceholderAPI.
 # The list of available placeholders can be found at https://github.com/SyntaxDevTeam/PunisherX/wiki/Placeholders#full-set-of-available-placeholders
 placeholders:
