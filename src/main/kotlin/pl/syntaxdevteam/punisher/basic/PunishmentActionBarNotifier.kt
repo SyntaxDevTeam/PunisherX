@@ -70,6 +70,7 @@ class PunishmentActionBarNotifier(private val plugin: PunisherX) {
             }
         }.onFailure { error ->
             plugin.logger.warning("Failed to refresh action bar notifications: ${error.message}")
+            plugin.reportError(error)
         }
 
         isRunning.set(false)

@@ -51,6 +51,7 @@ class ConfigManager(private val plugin: PunisherX) {
                 plugin.logger.debug("[Config] Backup before migration: ${bak.name}")
             } catch (t: Throwable) {
                 plugin.logger.warning("[Config] Failed to create backup: ${t.message}")
+                plugin.reportError(t)
             }
         }
 

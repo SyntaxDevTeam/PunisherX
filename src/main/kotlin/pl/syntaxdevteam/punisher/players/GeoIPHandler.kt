@@ -39,6 +39,7 @@ class GeoIPHandler(private val plugin: PunisherX) {
                 initializationFuture.complete(Unit)
             } catch (e: Exception) {
                 plugin.logger.severe("Failed to prepare GeoIP database: ${e.message}")
+                plugin.reportError(e)
                 initializationFuture.completeExceptionally(e)
             }
         })
@@ -50,6 +51,7 @@ class GeoIPHandler(private val plugin: PunisherX) {
         }
         if (!cityDatabaseFile.exists()) {
             plugin.logger.severe("GeoIP database file is missing after initialization.")
+            plugin.reportError(IllegalStateException("GeoIP database file is missing after initialization"))
             return
         }
         databaseReader = DatabaseReader.Builder(cityDatabaseFile).build()
@@ -83,11 +85,13 @@ class GeoIPHandler(private val plugin: PunisherX) {
                                     plugin.logger.debug("Extracted file size: ${cityDatabaseFile.length()} bytes")
                                     if (cityDatabaseFile.length() == 0L) {
                                         plugin.logger.severe("[GeoLite2] Extracted MMDB file is empty!")
+                                        plugin.reportError(IllegalStateException("Extracted GeoLite2 MMDB file is empty"))
                                     } else {
                                         plugin.logger.debug("MMDB file saved successfully.")
                                     }
                                 } catch (e: IOException) {
                                     plugin.logger.severe("[GeoLite2] Failed to write MMDB file: ${e.message}")
+                                    plugin.reportError(e)
                                     throw e
                                 }
                             }
@@ -99,8 +103,10 @@ class GeoIPHandler(private val plugin: PunisherX) {
         } catch (e: IOException) {
             if (connection.responseCode == 401) {
                 plugin.logger.severe("[GeoLite2] Unauthorized access. Please check your license key.")
+                plugin.reportError(IllegalStateException("[GeoLite2] Unauthorized access while downloading database"))
             } else {
                 plugin.logger.severe("[GeoLite2] Failed to download GeoIP database: ${e.message}")
+                plugin.reportError(e)
                 throw e
             }
         }
@@ -116,9 +122,11 @@ class GeoIPHandler(private val plugin: PunisherX) {
             "Unknown country"
         } catch (e: Exception) {
             plugin.logger.severe("Failed to get country for IP $ip: ${e.message} [Exception]")
+            plugin.reportError(e)
             "Unknown country"
         } catch (e: UnknownHostException) {
             plugin.logger.severe("Failed to get country for IP $ip: ${e.message} [UnknownHostException]")
+            plugin.reportError(e)
             "Unknown country"
         }
     }
@@ -133,9 +141,11 @@ class GeoIPHandler(private val plugin: PunisherX) {
             "Unknown city"
         } catch (e: Exception) {
             plugin.logger.severe("Failed to get city for IP $ip: ${e.message} [Exception]")
+            plugin.reportError(e)
             "Unknown city"
         } catch (e: UnknownHostException) {
             plugin.logger.severe("Failed to get city for IP $ip: ${e.message} [UnknownHostException]")
+            plugin.reportError(e)
             "Unknown city"
         }
     }

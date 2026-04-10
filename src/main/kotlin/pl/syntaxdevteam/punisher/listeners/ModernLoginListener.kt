@@ -59,6 +59,7 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
             }
         } catch (ex: Exception) {
             plugin.logger.severe("Error during async login check for $playerName: ${ex.message}")
+            plugin.reportError(ex)
             ex.printStackTrace()
             plugin.logger.debug("ModernLogin(pre): exception encountered → leaving result ${event.loginResult}")
         }

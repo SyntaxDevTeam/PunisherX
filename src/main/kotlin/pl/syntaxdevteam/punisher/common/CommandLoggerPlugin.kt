@@ -39,6 +39,7 @@ class CommandLoggerPlugin(private val plugin: PunisherX) {
             }
         } catch (e: Exception) {
             plugin.logger.warning("Nie można odczytać commands.json: ${e.message}")
+            plugin.reportError(e)
             emptyList()
         }
     }
@@ -50,6 +51,7 @@ class CommandLoggerPlugin(private val plugin: PunisherX) {
             }
         } catch (e: Exception) {
             plugin.logger.warning("Błąd zapisu commands.json: ${e.message}")
+            plugin.reportError(e)
         }
     }
 

@@ -17,6 +17,7 @@ class ReloadListener(private val plugin: PunisherX) : Listener {
             }
             .onFailure { throwable ->
                 plugin.logger.err("[Reload] Failed to reload PunisherX: ${throwable.message ?: throwable.javaClass}")
+                plugin.reportError(throwable)
             }
     }
 }

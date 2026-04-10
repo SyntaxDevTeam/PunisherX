@@ -156,6 +156,7 @@ class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion()
         return runCatching { MessageHandler.MessageFormat.valueOf(configured) }
             .getOrElse {
                 plugin.logger.warning("Unknown placeholders.message_format '$configured'. Using default MessageHandler formatting.")
+                plugin.reportError(IllegalArgumentException("Unknown placeholders.message_format: $configured"))
                 null
             }
     }

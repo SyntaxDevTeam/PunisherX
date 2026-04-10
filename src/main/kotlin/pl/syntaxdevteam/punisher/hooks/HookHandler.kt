@@ -99,6 +99,7 @@ class HookHandler(private val plugin: PunisherX) {
     fun getDscBridgeGateway(): BridgeGateway? {
         if (gateway == null) {
             plugin.logger.warning("DscBridgeAPI hook is not available while attempting to access the gateway.")
+            plugin.reportError(IllegalStateException("DscBridgeAPI hook is not available while fetching gateway"))
         }
         return gateway
     }
@@ -129,6 +130,7 @@ class HookHandler(private val plugin: PunisherX) {
         val pluginManager = Bukkit.getPluginManager()
         if (!pluginManager.isPluginEnabled("Essentials")) {
             plugin.logger.warning("EssentialsX plugin not found on server!")
+            plugin.reportError(IllegalStateException("EssentialsX plugin not found on server"))
             return
         }
 
@@ -138,6 +140,7 @@ class HookHandler(private val plugin: PunisherX) {
             plugin.logger.debug("Hooked into EssentialsX Spawn!")
         } else {
             plugin.logger.warning("EssentialsX Spawn plugin not found or not enabled on server!")
+            plugin.reportError(IllegalStateException("EssentialsX Spawn plugin not found or not enabled"))
         }
     }
 
@@ -154,6 +157,7 @@ class HookHandler(private val plugin: PunisherX) {
             plugin.logger.debug("Hooked into PlaceholderAPI!")
         } else {
             plugin.logger.warning("PlaceholderAPI plugin not found on server!")
+            plugin.reportError(IllegalStateException("PlaceholderAPI plugin not found on server"))
         }
 
         placeholderApiAvailable = isAvailable
@@ -171,6 +175,7 @@ class HookHandler(private val plugin: PunisherX) {
             return true
         } else {
             plugin.logger.warning("MiniPlaceholders plugin not found on server!")
+            plugin.reportError(IllegalStateException("MiniPlaceholders plugin not found on server"))
             return false
         }
 
@@ -251,11 +256,13 @@ class HookHandler(private val plugin: PunisherX) {
         val spawn = essentialsSpawn
         if (spawn == null) {
             plugin.logger.warning("EssentialsX Spawn hook is not available while attempting to fetch spawn location.")
+            plugin.reportError(IllegalStateException("EssentialsX Spawn hook is unavailable while fetching spawn location"))
             return null
         }
 
         return runCatching { spawn.getSpawn(group)?.clone() }.onFailure {
             plugin.logger.warning("Failed to obtain EssentialsX spawn location: ${it.message}")
+            plugin.reportError(it)
         }.getOrNull()
     }
 }

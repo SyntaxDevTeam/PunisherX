@@ -201,10 +201,12 @@ class PluginInitializer(private val plugin: PunisherX) {
             if (!legacyPattern.containsMatchIn(content)) return
         } catch (e: Exception) {
             plugin.logger.warning("Could not check language file placeholders: ${e.message}")
+            plugin.reportError(e)
             return
         }
 
         plugin.logger.warning(warnMsg)
+        plugin.reportError(IllegalStateException(warnMsg))
 
         val delay = 20L * 10L
         if (ServerEnvironment.isFoliaBased()) {
@@ -216,11 +218,12 @@ class PluginInitializer(private val plugin: PunisherX) {
                     } else {
                         task.cancel()
                     }
-                } catch (e: Exception) {
-                    plugin.logger.warning("Could not check language file placeholders: ${e.message}")
-                    task.cancel()
-                }
-            }, delay, delay)
+                    } catch (e: Exception) {
+                        plugin.logger.warning("Could not check language file placeholders: ${e.message}")
+                        plugin.reportError(e)
+                        task.cancel()
+                    }
+                }, delay, delay)
         } else {
             object : BukkitRunnable() {
                 override fun run() {
@@ -233,6 +236,7 @@ class PluginInitializer(private val plugin: PunisherX) {
                         }
                     } catch (e: Exception) {
                         plugin.logger.warning("Could not check language file placeholders: ${e.message}")
+                        plugin.reportError(e)
                         cancel()
                     }
                 }
