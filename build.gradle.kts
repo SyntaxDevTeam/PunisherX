@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.7.1-SNAPSHOT"
+version = "1.7.2-DEV"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 subprojects {
