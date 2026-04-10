@@ -35,12 +35,17 @@ import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import pl.syntaxdevteam.core.platform.ServerEnvironment
 import pl.syntaxdevteam.punisher.hooks.DiscordBridge
+import pl.syntaxdevteam.punisher.stats.FastStatsBridge
 import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
 import java.io.File
 
 
 import java.util.*
 class PunisherX : JavaPlugin(), Listener {
+    private val fastStatsBridge: FastStatsBridge by lazy {
+        FastStatsBridge(this, "f32783ff0554d455034d573bfef0e6c2")
+    }
+
     @Volatile
     var commandsRegistered: Boolean = false
     private lateinit var pluginInitializer: PluginInitializer
@@ -92,6 +97,7 @@ class PunisherX : JavaPlugin(), Listener {
         pluginInitializer = PluginInitializer(this)
         pluginInitializer.onEnable()
         versionChecker.checkAndLog()
+        fastStatsBridge.ready()
     }
 
     /**
@@ -107,6 +113,7 @@ class PunisherX : JavaPlugin(), Listener {
      * Closes the database connection and unregisters events.
      */
     override fun onDisable() {
+        fastStatsBridge.shutdown()
         databaseHandler.closeConnection()
         AsyncChatEvent.getHandlerList().unregister(this as Plugin)
         pluginInitializer.onDisable()
@@ -149,6 +156,7 @@ class PunisherX : JavaPlugin(), Listener {
             val scheduler = server.javaClass.getMethod(methodName).invoke(server) ?: return
             scheduler.javaClass.getMethod("cancelTasks", Plugin::class.java).invoke(scheduler, this)
         } catch (_: Throwable) {
+            reportError(Throwable("Failed to cancel tasks using $methodName, falling back to standard cancellation."))
         }
     }
 
@@ -172,5 +180,9 @@ class PunisherX : JavaPlugin(), Listener {
             logger.debug("The server.properties file does not exist.")
         }
         return "Unknown Server"
+    }
+
+    fun reportError(throwable: Throwable) {
+        fastStatsBridge.trackError(throwable)
     }
 }

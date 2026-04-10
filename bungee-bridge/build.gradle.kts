@@ -31,7 +31,7 @@ tasks.processResources {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
-    archiveBaseName.set("PunisherX-Bridge")
+    archiveBaseName.set("PunisherX-BungeeCord-Bridge")
     archiveClassifier.set("")
     archiveVersion.set(project.version.toString())
 }

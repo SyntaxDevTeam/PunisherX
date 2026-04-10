@@ -13,8 +13,10 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.7.2-DEV"
+version = property("punisherxVersion") as String
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
+
+val bridgeVersion = property("bridgeVersion") as String
 
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
@@ -23,7 +25,7 @@ subprojects {
     apply(plugin = "org.jetbrains.dokka-javadoc")
 
     group = rootProject.group
-    version = rootProject.version
+    version = bridgeVersion
 }
 
 val targetJavaVersion = 21
@@ -49,6 +51,9 @@ repositories {
     maven("https://repo.essentialsx.net/releases/") // EssentialsX
     maven("https://repo.leavesmc.org/snapshots/") {
         name = "leavesmc-repo"
+    }
+    maven("https://repo.faststats.dev/releases") {
+        name = "faststatsReleases"
     }
 }
 
@@ -84,6 +89,8 @@ dependencies {
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.3")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
     compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
+
+    compileOnly("dev.faststats.metrics:bukkit:0.21.0")
 
     testImplementation(kotlin("test"))
     testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
