@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.7.0-SNAPSHOT"
+version = "1.7.1-SNAPSHOT"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 subprojects {
@@ -26,7 +26,7 @@ subprojects {
     version = rootProject.version
 }
 
-val targetJavaVersion = 25
+val targetJavaVersion = 21
 kotlin {
     jvmToolchain(targetJavaVersion)
 }
@@ -55,9 +55,9 @@ repositories {
 val mockitoAgent: Configuration by configurations.creating
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:26.1.1.build.+")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     //compileOnly("org.leavesmc.leaves:leaves-api:1.21.10-R0.1-SNAPSHOT")
-    //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
+    //compileOnly("dev.folia:folia-api:1.21.11-R0.1-SNAPSHOT")
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:core:1.3.0-R0.2-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:messageHandler-paper:1.1.2-R0.1-SNAPSHOT")
@@ -75,7 +75,7 @@ dependencies {
     compileOnly("com.zaxxer:HikariCP:7.0.2")
     compileOnly("net.luckperms:api:5.5")
     compileOnly("me.clip:placeholderapi:2.12.2")
-    compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.2.0")
+    compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.1.0")
     compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
     compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.15")
     compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2"){
@@ -86,7 +86,7 @@ dependencies {
     compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
 
     testImplementation(kotlin("test"))
-    testImplementation("io.papermc.paper:paper-api:26.1.1.build.+")
+    testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:6.3.0")
@@ -104,7 +104,7 @@ tasks {
         jvmArgs("-javaagent:${mockitoAgent.singleFile}")
     }
     runServer {
-        minecraftVersion("1.21.10")
+        minecraftVersion("26.1.1")
         runDirectory(file("run/paper"))
     }
     runPaper.folia.registerTask()

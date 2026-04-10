@@ -1,6 +1,140 @@
 # Changelog
 
-## [1.6.0-SNAPSHOT] - 2025-12-08
+## [1.7.1] - 2026-04-10
+* Added backward compatibility with Java and Minecraft
+
+## [1.7.0] - 2026-04-06
+## Changelog
+### Functional changes:
+* Added support for Minecraft 26.1-26.1.1
+* Requires Java 25 or higher
+
+### Technical changes:
+* Added FoliaRunnable class
+* Refactored VersionChecker to use SemanticVersion for supported versions and add unit tests
+* Updated broadcastUnban method to include command sender name
+* Experimental elements will now remain only in developer versions to avoid confusing users.
+    * ~~Added support for DscBridgeAPI (experimental)~~
+    * ~~The moderation panel's functionality has been expanded~~
+    * ~~Added support for allowed roles and channels~~
+    * ~~Move DscBridge slash/embed template settings to config~~
+    * ~~Minor fixes + DscBridgeAPI version update~~
+* Updated all dependencies and libraries
+
+### Bug fixes:
+* HOTFIX: Resolve Folia thread safety issues for chunk access **by @technot80**
+    * Fixes IllegalStateException when loading chunks on non-main thread.
+* HOTFIX: Avoid global scheduler hop in Folia join handling
+* FIX: Fixed Folia async scheduling
+* FIX: Fixed Gradle deprecation in bridge resource processing
+* FIX: Update Velocity API dependency to 3.5.0-SNAPSHOT and change import statement for Inject
+* FIX: Fixed duplicate PlaceholderAPI hook log
+* FIX: Fixed annoying no loading messages notifications for GUI
+* Minor fixes and updates
+
+
+
+## [1.6.2] - 2026-03-09
+### Technical changes:
+* Added support for the new version numbering system for Minecraft.
+* Updated Velocity API dependency to 3.5.0-SNAPSHOT
+* Updated all dependencies and libraries
+
+### Bug fixes:
+* Fixed duplicate player unban messages
+* Fixed Gradle deprecation in bridge resource processing
+* Resolved Folia thread safety issues for chunk access by @technot80
+* Avoid global scheduler hop in Folia join handling
+* 
+
+## [1.6.1] - 2026-01-30
+### Functional changes
+* Added 2 new placeholders `punishment_history_list` and `active_punishments_list`
+* Added support for /reload and /minecraft:reload commands
+* Added customization for Discord Webhook ([#62](https://github.com/SyntaxDevTeam/PunisherX/issues/62))
+```YAML
+# Discord webhook settings.
+webhook:
+  discord:
+    enabled: false
+    url: "YOUR_WEBHOOK_URL_HERE"
+    username: ""
+    avatar-url: "" # URL, Minecraft nick/UUID (mc-heads), or base64 PNG data
+    colors:
+      # Accepts integers (Discord decimal), hex with #/0x, or common names like red/orange/blue/black/white.
+      ban: 9447935
+      mute: 15158332
+      warn: 16753920
+      kick: 16776960
+      jail: 9447935
+      default: 8421504
+    embed:
+      title: "Event Title"
+      description: "Administrator {operator} {type} {player} for {reason} for {time}"
+      url: "https://example.com"
+      timestamp: "" # ISO-8601 or "now" for current time
+      thumbnail-url: "" # URL, Minecraft nick/UUID, or base64 PNG data
+      image-url: "" # URL, Minecraft nick/UUID, or base64 PNG data
+      author:
+        name: "Author Name"
+        icon-url: "" # URL, Minecraft nick/UUID, or base64 PNG data
+      footer:
+        text: "Footer text"
+        icon-url: "" # URL, Minecraft nick/UUID, or base64 PNG data
+      fields:
+        - name: "Player"
+          value: "{player}"
+          inline: true
+        - name: "Operator"
+          value: "{operator}"
+          inline: true
+        - name: "Type"
+          value: "{type}"
+          inline: true
+        - name: "Reason"
+          value: "{reason}"
+          inline: false
+        - name: "Time"
+          value: "{time}"
+          inline: true
+        - name: "ID"
+          value: "{id}"
+          inline: true
+```
+* Added basics placeholders to Discord webhooks
+* Added penalty ID to notification message
+* Added server-scoped punishment filtering - full support
+```YAML
+# If your server is on a server network, such as Velocity,
+# set the mode name to associate any penalties issued with that specific server.
+# This means that a penalty received on a server like Survival will not be applied to games like SkyBlock, etc.
+# The default setting is "network" and means that the penalty received will apply to all servers on the network.
+server: "network"
+```
+
+### Technical changes:
+* Added LeavesMC support
+* Added the ability to restore cache entries for jail from the database.
+* Added backup for MC-Head without access
+* Refactor duplicated code in command files
+* Added protection against unfinished database connection
+* Fixed `addPunishment` argument in DatabaseHandler
+* Updated all dependencies and libraries
+
+### Bug fixes:
+* **HOTFIX: Fixed jail system unjailing issue ([#65](https://github.com/SyntaxDevTeam/PunisherX/issues/65))**
+* **HOTFIX: Fixed warning limit configuration ([#66](https://github.com/SyntaxDevTeam/PunisherX/issues/66))**
+* **HOTFIX: Fixed IllegalStateException error**
+* HOTFIX: Fixed unexpected error on `/prx reload`
+* HOTFIX: Fixed issue with command re-registration after `/prx reload`
+* HOTFIX: Fixed `/prx reload` command on Folia
+* HOTFIX: Fixed webhook<->permissions correlations
+* Fixed argument suggestions for punishes commands
+* Fixed permission key for panel command access
+### Experimental:
+* Access to experimental commands has been completely removed until further work is done.
+
+## [1.6.0] - 2025-12-08
 ### Functional changes:
 - [x] Added full support for Minecraft 1.21.11.
 - [x] Extended configuration for releasing players after a sentence.
