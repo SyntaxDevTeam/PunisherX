@@ -1,8 +1,5 @@
 package pl.syntaxdevteam.punisher.compatibility
 
-import pl.syntaxdevteam.punisher.loader.SemanticVersion
-import pl.syntaxdevteam.punisher.loader.VersionChecker
-
 /**
  * Handles runtime compatibility between different Minecraft versions.
  *

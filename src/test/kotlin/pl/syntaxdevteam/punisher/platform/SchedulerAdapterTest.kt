@@ -12,6 +12,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.Answers
+import pl.syntaxdevteam.punisher.compatibility.platform.BukkitSchedulerAdapter
 import kotlin.test.Test
 
 class SchedulerAdapterTest {

@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.platform
+package pl.syntaxdevteam.punisher.compatibility.platform
 
 import org.bukkit.Location
 import org.bukkit.plugin.Plugin

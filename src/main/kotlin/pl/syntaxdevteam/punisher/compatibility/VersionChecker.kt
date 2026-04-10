@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.loader
+package pl.syntaxdevteam.punisher.compatibility
 
 import org.bukkit.Bukkit
 import pl.syntaxdevteam.core.platform.ServerEnvironment

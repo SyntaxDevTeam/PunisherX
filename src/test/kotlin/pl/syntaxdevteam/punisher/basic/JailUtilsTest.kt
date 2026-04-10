@@ -4,7 +4,7 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.configuration.file.YamlConfiguration
 import org.mockito.kotlin.mock
-import pl.syntaxdevteam.punisher.platform.SchedulerAdapter
+import pl.syntaxdevteam.punisher.compatibility.platform.SchedulerAdapter
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import kotlin.test.Test
 import kotlin.test.assertEquals

@@ -20,7 +20,6 @@ import pl.syntaxdevteam.core.platform.ServerEnvironment
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
-import pl.syntaxdevteam.punisher.gui.interfaces.GUIHandler
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
 import pl.syntaxdevteam.punisher.listeners.ReloadListener
@@ -29,10 +28,11 @@ import pl.syntaxdevteam.punisher.listeners.ModernLoginListener
 import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
 import pl.syntaxdevteam.punisher.placeholders.PlaceholderHandler
 import pl.syntaxdevteam.punisher.players.*
-import pl.syntaxdevteam.punisher.platform.BukkitSchedulerAdapter
+import pl.syntaxdevteam.punisher.compatibility.platform.BukkitSchedulerAdapter
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
 import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
+import pl.syntaxdevteam.punisher.compatibility.VersionChecker
 import pl.syntaxdevteam.punisher.hooks.DiscordBridge
 import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
 import java.io.File

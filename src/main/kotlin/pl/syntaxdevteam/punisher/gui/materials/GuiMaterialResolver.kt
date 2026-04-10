@@ -1,8 +1,8 @@
 package pl.syntaxdevteam.punisher.gui.materials
 
 import org.bukkit.Material
-import pl.syntaxdevteam.punisher.loader.SemanticVersion
-import pl.syntaxdevteam.punisher.loader.isBetween
+import pl.syntaxdevteam.punisher.compatibility.SemanticVersion
+import pl.syntaxdevteam.punisher.compatibility.isBetween
 
 /**
  * Resolves GUI materials that differ across Minecraft versions.

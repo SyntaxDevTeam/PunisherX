@@ -4,13 +4,14 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.plugin.Plugin
 import org.mockito.kotlin.mock
+import pl.syntaxdevteam.punisher.compatibility.platform.SchedulerAdapter
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class SafeTeleportServiceTest {
 
-    private class ImmediateSchedulerAdapter : pl.syntaxdevteam.punisher.platform.SchedulerAdapter {
+    private class ImmediateSchedulerAdapter : SchedulerAdapter {
         override fun runAsync(task: Runnable) = task.run()
         override fun runSync(task: Runnable) = task.run()
         override fun runSyncLater(delayTicks: Long, task: Runnable) = task.run()

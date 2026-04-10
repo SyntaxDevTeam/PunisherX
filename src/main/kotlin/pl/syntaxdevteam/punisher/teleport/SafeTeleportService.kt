@@ -6,7 +6,7 @@ import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.core.platform.ServerEnvironment
-import pl.syntaxdevteam.punisher.platform.SchedulerAdapter
+import pl.syntaxdevteam.punisher.compatibility.platform.SchedulerAdapter
 import kotlin.math.abs
 
 class SafeTeleportService(
