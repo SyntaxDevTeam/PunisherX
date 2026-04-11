@@ -25,3 +25,5 @@ libraries:
   # SyntaxDevTeam libraries
   - pl.syntaxdevteam:core:1.3.0-R0.2-SNAPSHOT
   - pl.syntaxdevteam:messageHandler-paper:1.1.2-R0.2-SNAPSHOT
+  # FastStats dependencies
+  - dev.faststats.metrics:bukkit:0.22.0
