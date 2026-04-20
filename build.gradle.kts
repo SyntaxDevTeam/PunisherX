@@ -64,8 +64,9 @@ dependencies {
     //compileOnly("org.leavesmc.leaves:leaves-api:1.21.10-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.11-R0.1-SNAPSHOT")
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:core:1.3.0-R0.2-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.1.2-R0.1-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:core:1.3.0-R0.3-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.2.0-R0.2-SNAPSHOT")
+
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.6")
     compileOnly("com.google.code.gson:gson:2.13.2")
@@ -134,7 +135,16 @@ tasks.named<ShadowJar>("shadowJar") {
     archiveClassifier.set("")
     archiveVersion.set(project.version.toString())
     mergeServiceFiles()
+    dependencies {
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-reflect"))
+        exclude(dependency("org.jetbrains.kotlinx:kotlinx-coroutines-core"))
+        exclude(dependency("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8"))
+    }
 }
+
 
 publishing {
     publications {
@@ -197,6 +207,6 @@ hangarPublish {
 }
 
 plugindeployer {
-    paper { dir = "/home/debian/server/Paper/26.1.1/plugins" } //ostatnia wersja dla Paper
+    paper { dir = "/home/debian/server/Paper/26.1.2/plugins" } //ostatnia wersja dla Paper
     folia { dir = "/home/debian/server/Folia/1.21.11/plugins" } //ostatnia wersja dla Folia
 }

@@ -1,15 +1,19 @@
+repositories:
+  syntaxdevteam-snapshots: "https://nexus.syntaxdevteam.pl/repository/maven-snapshots/"
+  syntaxdevteam-releases: "https://nexus.syntaxdevteam.pl/repository/maven-releases/"
+  paper: "https://repo.papermc.io/repository/maven-public/"
+  central-mirror: "https://repo.papermc.io/repository/maven-central/"
+  jitpack: "https://jitpack.io/"
+  codemc-snapshots: "https://repo.codemc.io/repository/maven-snapshots/"
+  faststatsReleases: "https://repo.faststats.dev/releases"
+
 libraries:
   # Basic libraries
+  - org.jetbrains.kotlin:kotlin-stdlib:2.4.0-Beta1
+#  - org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2
   - org.eclipse.aether:aether-api:1.1.0
   - org.yaml:snakeyaml:2.6
   - com.google.code.gson:gson:2.13.2
-  # Kyori Adventure libraries
-  - net.kyori:adventure-text-minimessage:4.26.1
-  - net.kyori:adventure-text-serializer-gson:4.26.1
-  - net.kyori:adventure-text-serializer-legacy:4.26.1
-  - net.kyori:adventure-text-serializer-plain:4.26.1
-  - net.kyori:adventure-text-serializer-ansi:4.26.1
-  - net.kyori:adventure-nbt:4.26.1
   # Additional libraries
   - com.maxmind.geoip2:geoip2:5.0.1
   - org.apache.ant:ant:1.10.16
@@ -22,8 +26,11 @@ libraries:
   # Caching and utility libraries
   - com.github.ben-manes.caffeine:caffeine:3.2.3
   - dev.dejvokep:boosted-yaml:1.3.7
-  # SyntaxDevTeam libraries
-  - pl.syntaxdevteam:core:1.3.0-R0.2-SNAPSHOT
-  - pl.syntaxdevteam:messageHandler-paper:1.1.2-R0.2-SNAPSHOT
   # FastStats dependencies
-  - dev.faststats.metrics:bukkit:0.22.0
+  - coordinate: dev.faststats.metrics:bukkit:0.22.0
+    repository: faststatsReleases
+  # SyntaxDevTeam libraries
+  - coordinate: pl.syntaxdevteam:core:1.3.0-R0.3-SNAPSHOT
+    repository: syntaxdevteam-snapshots
+  - coordinate: pl.syntaxdevteam:messageHandler-paper:1.2.0-R0.2-SNAPSHOT
+    repository: syntaxdevteam-snapshots

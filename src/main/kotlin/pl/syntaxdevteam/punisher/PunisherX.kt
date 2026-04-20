@@ -43,7 +43,7 @@ import java.io.File
 import java.util.*
 class PunisherX : JavaPlugin(), Listener {
     private val fastStatsBridge: FastStatsBridge by lazy {
-        FastStatsBridge(this, "f32783ff0554d455034d573bfef0e6c2")
+        FastStatsBridge(this, "face5edae5524c9d98184b87d9f48aeb")
     }
 
     @Volatile
