@@ -43,7 +43,7 @@ class FastStatsBridge(
             metrics = invokeCompatible(builderClass, factory, "create", plugin)
             available = true
         } catch (exception: Exception) {
-            plugin.logger.warning("[CleanerX] FastStats is unavailable, metrics disabled: ${exception::class.java.simpleName}: ${exception.message}")
+            plugin.logger.warning("[PunisherX] FastStats is unavailable, metrics disabled: ${exception::class.java.simpleName}: ${exception.message}")
         }
     }
 
