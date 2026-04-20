@@ -123,6 +123,18 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         }
     }
 
+
+    fun getLatestDecryptedRecords(): List<PlayerInfo> {
+        val latestByUuid = linkedMapOf<String, PlayerInfo>()
+
+        readLines().asReversed().forEach { line ->
+            val info = parsePlayerInfo(decrypt(line)) ?: return@forEach
+            latestByUuid.putIfAbsent(info.playerUUID.lowercase(Locale.ROOT), info)
+        }
+
+        return latestByUuid.values.toList()
+    }
+
     fun getPlayerIPByName(playerName: String): String? {
         plugin.logger.debug("Fetching IP for player: $playerName")
         val ip = getPlayerInfoByName(playerName)?.playerIP
