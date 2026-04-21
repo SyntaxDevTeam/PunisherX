@@ -2,7 +2,7 @@
 
 > Praktyczny przewodnik dla właścicieli serwerów i młodszej kadry moderatorskiej: od instalacji, przez konfigurację, aż po debug i rozwiązywanie problemów.
 
-![Logo PunisherX](../../../assets/PunisherX.png)
+<img width="25%" height="25%" alt="PunisherX" src="../../../assets/PunisherX.png" />
 
 ---
 
@@ -50,7 +50,7 @@ Dla małego serwera wystarczy SQLite/H2.
 Dla sieci lub większego ruchu przejdź na MySQL/MariaDB/PostgreSQL.
 
 > Sprawdź nasz dodatek dla proxy [PunisherX-Proxy-Bridge](https://modrinth.com/plugin/punisherx-proxy-bridge), jeśli masz sieć i chcesz synchronizować bany między serwerami.
-![PunisherX_Velocity_Bridge_mini.png](../../../assets/PunisherX_Velocity_Bridge_mini.png)
+<img width="25%" height="25%" alt="PunisherX_Velocity_Bridge" src="../../../assets/PunisherX_Velocity_Bridge_mini.png" />
 
 ### 3.3 Uprawnienia (najczęstszy błąd)
 Nie dawaj `*` każdemu moderatorowi. Rozdziel role! Przykładowo:
