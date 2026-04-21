@@ -256,7 +256,7 @@ update:
   github: true
   modrinth: true
 
-
+# Debug mode provides more detailed console logs.
 # Debug level: off | info | diag | dev
 debug: off
 
