@@ -71,7 +71,7 @@ dependencies {
     compileOnly("org.yaml:snakeyaml:2.6")
     compileOnly("com.google.code.gson:gson:2.13.2")
     compileOnly("com.maxmind.geoip2:geoip2:5.0.2")
-    compileOnly("org.apache.ant:ant:1.10.16")
+    compileOnly("org.apache.ant:ant:1.10.17")
     compileOnly("com.zaxxer:HikariCP:7.0.2")
     compileOnly("net.luckperms:api:5.5")
     compileOnly("me.clip:placeholderapi:2.12.2")

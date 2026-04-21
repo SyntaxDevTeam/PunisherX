@@ -19,6 +19,7 @@ class ConfigManager(private val plugin: PunisherX) {
         private const val V_141 = 141
         private const val V_160 = 160
         private const val V_161 = 161
+        private const val V_162 = 162
         // private const val V_170 = 170 // Reserved for future stable release (DscBridgeAPI config migration).
     }
 
@@ -44,7 +45,7 @@ class ConfigManager(private val plugin: PunisherX) {
 
         val sourceVersion = detectSourceVersion(rawUserDoc)
 
-        if (sourceVersion < V_161 && dataFile.exists()) {
+        if (sourceVersion < V_162 && dataFile.exists()) {
             val bak = File(dataFile.parentFile, "$FILE_NAME.$sourceVersion.bak")
             try {
                 Files.copy(dataFile.toPath(), bak.toPath(), StandardCopyOption.REPLACE_EXISTING)
@@ -55,7 +56,7 @@ class ConfigManager(private val plugin: PunisherX) {
             }
         }
 
-        val shouldUpdate = !dataFile.exists() || sourceVersion < V_161
+        val shouldUpdate = !dataFile.exists() || sourceVersion < V_162
 
         config = YamlDocument.create(
             dataFile,
@@ -74,7 +75,7 @@ class ConfigManager(private val plugin: PunisherX) {
             migrateFrom(sourceVersion)
             applyWarnCountOverrides()
 
-            config.set(VERSION_KEY, V_161)
+            config.set(VERSION_KEY, V_162)
             config.save()
             plugin.logger.success("[Config] Done. Current version: ${config.getInt(VERSION_KEY)}")
         } else {
@@ -96,11 +97,11 @@ class ConfigManager(private val plugin: PunisherX) {
         val guessed = guessVersionFromComment()
         if (guessed != null) return guessed
 
-        return if (doc == null) V_161 else V_141
+        return if (doc == null) V_162 else V_141
     }
 
     private fun migrateFrom(sourceVersion: Int) {
-        if (sourceVersion >= V_161) return
+        if (sourceVersion >= V_162) return
 
         if (sourceVersion <= V_104) {
             plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_104 …")
@@ -113,6 +114,10 @@ class ConfigManager(private val plugin: PunisherX) {
         if (sourceVersion <= V_160) {
             plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_161 …")
             migrate160to161()
+        }
+        if (sourceVersion <= V_161) {
+            plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_162 …")
+            migrate161to162()
         }
         // Experimental DscBridgeAPI migration stays disabled until full release.
         // plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_170 …")
@@ -292,6 +297,32 @@ class ConfigManager(private val plugin: PunisherX) {
             fields.add(mapOf("name" to "Time", "value" to "{time}", "inline" to true))
             fields.add(mapOf("name" to "ID", "value" to "{id}", "inline" to true))
             config.set("webhook.discord.embed.fields", fields)
+        }
+    }
+
+
+    private fun migrate161to162() {
+        val rawDebug = rawUserDoc?.get("debug")
+        when (rawDebug) {
+            is Boolean -> {
+                val mapped = if (rawDebug) "diag" else "off"
+                config.set("debug", mapped)
+                plugin.logger.debug("[Config] debug (Boolean) → debug = $mapped (server)")
+            }
+            is String -> {
+                val normalized = rawDebug.trim().lowercase()
+                val mapped = when (normalized) {
+                    "off", "info", "diag", "dev" -> normalized
+                    "false", "0", "no", "none", "disabled" -> "off"
+                    "true", "1", "yes", "enabled", "on" -> "diag"
+                    else -> "off"
+                }
+                config.set("debug", mapped)
+                plugin.logger.debug("[Config] debug (String) normalized → debug = $mapped (server)")
+            }
+            else -> if (!config.contains("debug")) {
+                config.set("debug", "off")
+            }
         }
     }
 

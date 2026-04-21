@@ -1,4 +1,4 @@
-config-version: 161
+config-version: 162
 
 # /********************************************/
 #    Global settings
@@ -257,8 +257,8 @@ update:
   modrinth: true
 
 
-# Debug mode: when true, provides more detailed console logs.
-debug: false
+# Debug level: off | info | diag | dev
+debug: off
 
 # Should StatsCollector be enabled? Recommended: true.
 stats:

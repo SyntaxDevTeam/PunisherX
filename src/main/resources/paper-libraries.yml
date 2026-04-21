@@ -16,7 +16,7 @@ libraries:
   - com.google.code.gson:gson:2.13.2
   # Additional libraries
   - com.maxmind.geoip2:geoip2:5.0.1
-  - org.apache.ant:ant:1.10.16
+  - org.apache.ant:ant:1.10.17
   # Database libraries
   - com.zaxxer:HikariCP:7.0.2
   - org.mariadb.jdbc:mariadb-java-client:3.5.5
