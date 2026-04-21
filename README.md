@@ -10,7 +10,7 @@ The plugin also includes operator tools such as `/check`, `/history`, `/banlist`
 PunisherX supports message customization with MiniMessage/Legacy/plain formats, config auto-migration between versions, and multiple database backends (SQLite, H2, MySQL, MariaDB, PostgreSQL) for both standalone and network environments.
 
 ## ✅ Key Features
-* [x] Built for Paper 1.20.6, 1.21 - 1.21.11, 26.1-26.1.1 and compatible forks, including improved Folia support.
+* [x] Built for Paper 1.20.6, 1.21 - 1.21.11, 26.1-26.1.2 and compatible forks, including improved Folia support.
 * [x] Actively maintained with up-to-date APIs and backward compatibility.
 * [x] Language files with full **MiniMessage** and Legacy formatting support, plus new translations.
 * [x] Support for Discord webhook integration.
