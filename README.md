@@ -61,6 +61,12 @@ PunisherX groups permissions by their purpose:
 A full list of commands and permissions is available in the **[Wiki](https://github.com/SyntaxDevTeam/PunisherX/wiki)**.
 
 ---
+## 📚 Documentation
+
+Looking for a practical setup and operations walkthrough? Start with:
+
+* **Admin Guide (EN)**: [docs/WIKI/EN/ADMIN-GUIDE.md](docs/WIKI/EN/ADMIN-GUIDE.md)
+* **Admin Guide (PL)**: [docs/WIKI/PL/ADMIN-GUIDE.md](docs/WIKI/PL/ADMIN-GUIDE.md)
 
 ## 📞 Contact
 

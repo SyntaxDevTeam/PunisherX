@@ -34,6 +34,10 @@ Masz pytania? Dołącz do naszego [Discorda](https://discord.gg/Zk6mxv7eMh).
 5. Zrestartuj serwer Minecraft
 6. Gotowe.
 
+### Dokumentacja
+- Praktyczny poradnik dla administracji i moderatorów:
+  - [ADMIN-GUIDE (PL)](ADMIN-GUIDE.md)
+
 ## Kontakt
 Potrzebujesz pomocy lub masz pytania? Napisz na [Discordzie](https://discord.gg/Zk6mxv7eMh).
 
