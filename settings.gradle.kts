@@ -1,6 +1,7 @@
 rootProject.name = "PunisherX"
 include("PunisherX-BungeeCord-Bridge")
 include("PunisherX-Velocity-Bridge")
+include("example")
 
 project(":PunisherX-BungeeCord-Bridge").projectDir = file("bungee-bridge")
 project(":PunisherX-Velocity-Bridge").projectDir = file("velocity-bridge")
@@ -18,3 +19,5 @@ pluginManagement {
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
+
+project(":example").projectDir = file("example")

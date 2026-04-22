@@ -26,6 +26,22 @@ subprojects {
 
     group = rootProject.group
     version = bridgeVersion
+
+    repositories {
+        maven("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/")
+        maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
+        gradlePluginPortal()
+        mavenCentral()
+        maven("https://repo.papermc.io/repository/maven-public/")
+        maven("https://oss.sonatype.org/content/groups/public/")
+        maven("https://repo.menthamc.org/repository/maven-public/")
+        maven("https://repo.extendedclip.com/releases/")
+        maven("https://repo.codemc.org/repository/maven-public/")
+        maven("https://jitpack.io")
+        maven("https://repo.essentialsx.net/releases/")
+        maven("https://repo.leavesmc.org/snapshots/")
+        maven("https://repo.faststats.dev/releases")
+    }
 }
 
 val targetJavaVersion = 21
@@ -88,10 +104,11 @@ dependencies {
     compileOnly("dev.faststats.metrics:bukkit:0.22.0")
 
     testImplementation(kotlin("test"))
-    testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    testImplementation("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:6.3.0")
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.133.2")
     mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.8") {
         isTransitive = false
     }

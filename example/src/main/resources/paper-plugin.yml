@@ -1,0 +1,6 @@
+name: PunisherXExample
+version: ${version}
+main: pl.syntaxdevteam.punisher.example.ExamplePaperAdapterPlugin
+api-version: '1.21'
+authors: [SyntaxDevTeam]
+description: Example plugin module showing PaperGuiAdapter wiring.
