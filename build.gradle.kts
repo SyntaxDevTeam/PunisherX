@@ -64,8 +64,9 @@ dependencies {
     //compileOnly("org.leavesmc.leaves:leaves-api:1.21.10-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.11-R0.1-SNAPSHOT")
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:core:1.3.0-R0.4-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:syntaxcore:1.3.0")
     compileOnly("pl.syntaxdevteam:messageHandler-paper:1.2.0-R0.2-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:syntaxgui-api:0.1.0-R0.1-SNAPSHOT")
 
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.6")
@@ -167,14 +168,22 @@ publishing {
     }
     repositories {
         maven {
-            name = "Nexus"
+            name = "NexusSnapshots"
+            url = uri("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/")
+            credentials {
+                username = findProperty("nexusUser")?.toString()
+                password = findProperty("nexusPassword")?.toString()
+            }
+            mavenContent { snapshotsOnly() }
+        }
+        maven {
+            name = "NexusReleases"
             url = uri("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
             credentials {
                 username = findProperty("nexusUser")?.toString()
-                    ?: throw GradleException("Właściwość 'nexusUser' nie jest ustawiona w gradle.properties")
                 password = findProperty("nexusPassword")?.toString()
-                    ?: throw GradleException("Właściwość 'nexusPassword' nie jest ustawiona w gradle.properties")
             }
+            mavenContent { releasesOnly() }
         }
     }
 }

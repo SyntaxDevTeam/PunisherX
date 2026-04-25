@@ -30,7 +30,9 @@ libraries:
   - coordinate: dev.faststats.metrics:bukkit:0.22.0
     repository: faststatsReleases
   # SyntaxDevTeam libraries
-  - coordinate: pl.syntaxdevteam:core:1.3.0-R0.4-SNAPSHOT
-    repository: syntaxdevteam-snapshots
+  - coordinate: pl.syntaxdevteam:SyntaxCore:1.3.0
+    repository: syntaxdevteam-releases
   - coordinate: pl.syntaxdevteam:messageHandler-paper:1.2.0-R0.2-SNAPSHOT
+    repository: syntaxdevteam-snapshots
+  - coordinate: pl.syntaxdevteam:syntaxgui-api:0.1.0-R0.1-SNAPSHOT
     repository: syntaxdevteam-snapshots
