@@ -37,6 +37,7 @@ import pl.syntaxdevteam.core.platform.ServerEnvironment
 import pl.syntaxdevteam.punisher.hooks.DiscordBridge
 import pl.syntaxdevteam.punisher.stats.FastStatsBridge
 import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
+import pl.syntaxdevteam.punisher.gui.syntax.PunisherMainGuiController
 import java.io.File
 
 
@@ -83,6 +84,7 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var onlinePunishmentWatcher: OnlinePunishmentWatcher
     lateinit var punishTemplateManager: PunishTemplateManager
     lateinit var discordBridge: DiscordBridge
+    lateinit var punisherMainGuiController: PunisherMainGuiController
 
     /**
      * Called when the plugin is enabled.

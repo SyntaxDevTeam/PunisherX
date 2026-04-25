@@ -17,7 +17,6 @@ import pl.syntaxdevteam.punisher.gui.player.action.PunishTypeGUI
 import pl.syntaxdevteam.punisher.gui.punishments.BanListGUI
 import pl.syntaxdevteam.punisher.gui.punishments.JailListGUI
 import pl.syntaxdevteam.punisher.gui.punishments.PunishedListGUI
-import pl.syntaxdevteam.punisher.gui.PunisherMain
 import pl.syntaxdevteam.punisher.gui.report.ReportOfflineGUI
 import pl.syntaxdevteam.punisher.gui.report.ReportPlayerGUI
 import pl.syntaxdevteam.punisher.gui.report.ReportReasonGUI
@@ -26,7 +25,6 @@ import pl.syntaxdevteam.punisher.gui.report.ReportSelectorGUI
 class GUIHandler(private val plugin: PunisherX) : Listener {
 
     private val guiHandlers: List<Pair<Component, (InventoryClickEvent) -> Unit>> = listOf(
-        guiHandler("PunisherMain.title") { PunisherMain(plugin).handleClick(it) },
         guiHandler("PunisherMain.playerOnline.title") { PlayerListGUI(plugin).handleClick(it) },
         guiHandler("PunisherMain.adminOnline.title") { AdminListGUI(plugin).handleClick(it) },
         guiHandler("PunisherMain.playerOffline.title") { OfflinePlayerListGUI(plugin).handleClick(it) },

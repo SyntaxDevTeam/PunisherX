@@ -34,5 +34,5 @@ libraries:
     repository: syntaxdevteam-releases
   - coordinate: pl.syntaxdevteam:messageHandler-paper:1.2.0-R0.2-SNAPSHOT
     repository: syntaxdevteam-snapshots
-  - coordinate: pl.syntaxdevteam:syntaxgui-api:0.1.0-R0.1-SNAPSHOT
+  - coordinate: pl.syntaxdevteam:syntaxgui-api:0.1.0-R0.2-SNAPSHOT
     repository: syntaxdevteam-snapshots

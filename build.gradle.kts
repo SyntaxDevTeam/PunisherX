@@ -66,7 +66,7 @@ dependencies {
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:syntaxcore:1.3.0")
     compileOnly("pl.syntaxdevteam:messageHandler-paper:1.2.0-R0.2-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:syntaxgui-api:0.1.0-R0.1-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:syntaxgui-api:0.1.0-R0.2-SNAPSHOT")
 
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.6")
