@@ -7,7 +7,6 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.gui.admin.ConfigGUI
-import pl.syntaxdevteam.punisher.gui.player.action.PlayerActionGUI
 import pl.syntaxdevteam.punisher.gui.punishments.BanListGUI
 import pl.syntaxdevteam.punisher.gui.punishments.JailListGUI
 import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
@@ -43,13 +42,18 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
     fun openAdminList(player: Player, page: Int = 0) = renderer.open(player, AdminPlayersScreen(plugin, this, page))
     fun openPunishedMenu(player: Player) = renderer.open(player, PunishedMenuScreen(plugin, this))
 
+    fun openPlayerAction(player: Player, target: OfflinePlayer) = renderer.open(player, PlayerActionScreen(plugin, this, target.uniqueId))
+    fun openPunishType(player: Player, target: OfflinePlayer) = renderer.open(player, PunishTypeScreen(plugin, this, target.uniqueId))
+    fun openPunishTime(player: Player, target: OfflinePlayer, type: String) = renderer.open(player, PunishTimeScreen(plugin, this, target.uniqueId, type))
+    fun openPunishReason(player: Player, target: OfflinePlayer, type: String, time: String) = renderer.open(player, PunishReasonScreen(plugin, this, target.uniqueId, type, time))
+    fun openConfirmDelete(player: Player, target: OfflinePlayer) = renderer.open(player, ConfirmDeleteScreen(plugin, this, target.uniqueId))
+
     private interface SelectableScreen { fun handleSelection(index: Int, player: Player) }
     private interface BackNavigableScreen { fun onBack(player: Player) }
 
-    private class MainScreen(private val plugin: PunisherX, private val controller: PunisherMainGuiController) :
-        GuiBase(plain(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunisherMain.title")), 45),
-        SelectableScreen {
-
+    private class MainScreen(private val plugin: PunisherX, private val controller: PunisherMainGuiController) : GuiBase(
+        plain(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunisherMain.title")), 45,
+    ), SelectableScreen {
         private val entries = listOf(
             MenuEntry(4, GuiMaterial.PAPER, message("PunisherMain.serwerInfo.title"), { listOf(serverNameLine(), dailyLine(), tpsLine()) }) { _, _ -> },
             MenuEntry(10, GuiMaterial.PLAYER_HEAD, message("PunisherMain.playerOnline.title"), { listOf(playerOnlineLine(), message("PunisherMain.playerOnline.clickToView")) }) { _, p -> controller.openPlayerList(p) },
@@ -85,11 +89,9 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
         }
     }
 
-    private class OnlinePlayersScreen(
-        private val plugin: PunisherX,
-        private val controller: PunisherMainGuiController,
-        private val pageIndex: Int,
-    ) : GuiBase(plain(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunisherMain.playerOnline.title")), 45), SelectableScreen, BackNavigableScreen {
+    private class OnlinePlayersScreen(private val plugin: PunisherX, private val controller: PunisherMainGuiController, private val pageIndex: Int) : GuiBase(
+        plain(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunisherMain.playerOnline.title")), 45,
+    ), SelectableScreen, BackNavigableScreen {
         private val players = plugin.server.onlinePlayers.sortedBy { it.name.lowercase() }
         private val perPage = 27
         private val maxPage = if (players.isEmpty()) 0 else (players.size - 1) / perPage
@@ -113,7 +115,7 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             else -> GuiAction.None
         }
 
-        override fun handleSelection(index: Int, player: Player) { players.getOrNull(index)?.let { PlayerActionGUI(plugin).open(player, it) } }
+        override fun handleSelection(index: Int, player: Player) { players.getOrNull(index)?.let { controller.openPlayerAction(player, it) } }
         override fun onBack(player: Player) { controller.open(player) }
 
         private fun lore(uuid: UUID, name: String): List<String> {
@@ -143,12 +145,9 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
         }
     }
 
-    private class OfflinePlayersScreen(
-        private val plugin: PunisherX,
-        private val controller: PunisherMainGuiController,
-        private val pageIndex: Int,
-        private val sortMode: SortMode,
-    ) : GuiBase(plain(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunisherMain.playerOffline.title")), 45), SelectableScreen, BackNavigableScreen {
+    private class OfflinePlayersScreen(private val plugin: PunisherX, private val controller: PunisherMainGuiController, private val pageIndex: Int, private val sortMode: SortMode) : GuiBase(
+        plain(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunisherMain.playerOffline.title")), 45,
+    ), SelectableScreen, BackNavigableScreen {
         private val perPage = 27
         private val allRecords = plugin.playerIPManager.getAllDecryptedRecords()
         private val players = allRecords
@@ -193,8 +192,8 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
                 return
             }
             players.getOrNull(index)?.let {
-                val off: OfflinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(it.playerUUID))
-                PlayerActionGUI(plugin).open(player, off)
+                val off = Bukkit.getOfflinePlayer(UUID.fromString(it.playerUUID))
+                controller.openPlayerAction(player, off)
             }
         }
 
@@ -240,11 +239,235 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
         private fun line(key: String, vars: Map<String, String>) = plain(plugin.messageHandler.formatMixedTextToMiniMessage(plugin.messageHandler.stringMessageToStringNoPrefix("GUI", key, vars)))
     }
 
-    private class AdminPlayersScreen(
-        private val plugin: PunisherX,
-        private val controller: PunisherMainGuiController,
-        private val pageIndex: Int,
-    ) : GuiBase(plain(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunisherMain.adminOnline.title")), 45), BackNavigableScreen {
+    private class PlayerActionScreen(private val plugin: PunisherX, private val controller: PunisherMainGuiController, private val targetId: UUID) : GuiBase(
+        plain(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PlayerAction.title")), 45,
+    ), SelectableScreen, BackNavigableScreen {
+        private val target by lazy { Bukkit.getOfflinePlayer(targetId) }
+        private val entries = listOf(
+            MenuEntry(11, GuiMaterial.MACE, msg("PlayerAction.punish")) { _, p -> controller.openPunishType(p, target) },
+            MenuEntry(13, GuiMaterial.TRIAL_KEY, msg("PlayerAction.undo")) { _, p -> undoPunishments(p) },
+            MenuEntry(15, GuiMaterial.BOOK, msg("PlayerAction.history")) { _, p -> p.closeInventory(); p.performCommand("history ${target.name ?: return@MenuEntry}") },
+            MenuEntry(29, GuiMaterial.PAPER, msg("PlayerAction.active")) { _, p -> p.closeInventory(); p.performCommand("check ${target.name ?: return@MenuEntry} all") },
+            MenuEntry(31, GuiMaterial.WIND_CHARGE, msg("PlayerAction.teleport")) { _, p -> teleportToTarget(p) },
+            MenuEntry(33, GuiMaterial.BARRIER, msg("PlayerAction.delete")) { _, p -> controller.openConfirmDelete(p, target) },
+        )
+
+        override fun buildLayout(page: Int): GuiLayout {
+            val slots = filledSlots(size)
+            entries.forEach { slots[it.slot] = GuiIcon(it.key, it.title, emptyList(), it.material) }
+            slots[40] = NavigationComponents.back(msg("Nav.back"))
+            return GuiLayout(title, size, slots)
+        }
+
+        override fun onClick(slot: Int): GuiAction {
+            val idx = entries.indexOfFirst { it.slot == slot }
+            return when {
+                idx >= 0 -> GuiAction.SelectElement(idx)
+                slot == 40 -> GuiAction.Back
+                else -> GuiAction.None
+            }
+        }
+
+        override fun handleSelection(index: Int, player: Player) { entries.getOrNull(index)?.onClick?.invoke(index, player) }
+        override fun onBack(player: Player) {
+            if (target.isOnline) controller.openPlayerList(player) else controller.openOfflinePlayerList(player)
+        }
+
+        private fun undoPunishments(player: Player) {
+            player.closeInventory()
+            val name = target.name ?: return
+            val punishments = plugin.databaseHandler.getPunishments(target.uniqueId.toString())
+            if (punishments.isEmpty()) {
+                player.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_data"))
+                return
+            }
+            punishments.forEach { punishment ->
+                val command = when (punishment.type) {
+                    "BAN", "BANIP" -> "unban $name"
+                    "MUTE" -> "unmute $name"
+                    "WARN" -> "unwarn $name"
+                    "JAIL" -> "unjail $name"
+                    else -> null
+                }
+                if (command != null) player.performCommand(command)
+            }
+        }
+
+        private fun teleportToTarget(player: Player) {
+            player.closeInventory()
+            val online = target.player
+            if (online != null) {
+                plugin.safeTeleportService.teleportSafely(player, online.location)
+                return
+            }
+            val loc = PlayerStatsService.getLastLocation(target.uniqueId)
+            if (loc != null) {
+                plugin.safeTeleportService.teleportSafely(player, loc)
+            } else {
+                player.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_data"))
+            }
+        }
+
+        private fun msg(key: String): String = plugin.messageHandler.stringMessageToStringNoPrefix("GUI", key)
+    }
+
+    private class PunishTypeScreen(private val plugin: PunisherX, private val controller: PunisherMainGuiController, private val targetId: UUID) : GuiBase(
+        plain(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunishType.title")), 27,
+    ), SelectableScreen, BackNavigableScreen {
+        private val target by lazy { Bukkit.getOfflinePlayer(targetId) }
+        private val force = plugin.config.getBoolean("gui.punish.use_force", false)
+        private val entries = listOf(
+            MenuEntry(10, GuiMaterial.MACE, msg("PunishType.ban")) { _, p -> controller.openPunishTime(p, target, "ban") },
+            MenuEntry(11, GuiMaterial.BARRIER, msg("PunishType.banip")) { _, p -> p.closeInventory(); p.performCommand(build("banip", target.name, plugin.messageHandler.stringMessageToString("banip", "no_reasons"))) },
+            MenuEntry(12, GuiMaterial.WIND_CHARGE, msg("PunishType.kick")) { _, p ->
+                val online = target.player ?: return@MenuEntry
+                p.closeInventory(); p.performCommand(build("kick", online.name, plugin.messageHandler.stringMessageToString("kick", "no_reasons")))
+            },
+            MenuEntry(14, GuiMaterial.TRIAL_KEY, msg("PunishType.jail")) { _, p -> controller.openPunishTime(p, target, "jail") },
+            MenuEntry(15, GuiMaterial.BOOK, msg("PunishType.mute")) { _, p -> controller.openPunishTime(p, target, "mute") },
+            MenuEntry(16, GuiMaterial.PAPER, msg("PunishType.warn")) { _, p -> controller.openPunishTime(p, target, "warn") },
+        )
+
+        override fun buildLayout(page: Int): GuiLayout {
+            val slots = filledSlots(size)
+            entries.forEach { slots[it.slot] = GuiIcon(it.key, it.title, emptyList(), it.material) }
+            slots[22] = NavigationComponents.back(msg("Nav.back"))
+            return GuiLayout(title, size, slots)
+        }
+
+        override fun onClick(slot: Int): GuiAction {
+            val idx = entries.indexOfFirst { it.slot == slot }
+            return when {
+                idx >= 0 -> GuiAction.SelectElement(idx)
+                slot == 22 -> GuiAction.Back
+                else -> GuiAction.None
+            }
+        }
+
+        override fun handleSelection(index: Int, player: Player) { entries.getOrNull(index)?.onClick?.invoke(index, player) }
+        override fun onBack(player: Player) { controller.openPlayerAction(player, target) }
+
+        private fun build(command: String, targetName: String?, reason: String): String {
+            val targetValue = targetName ?: return command
+            return buildString {
+                append(command).append(' ').append(targetValue).append(' ').append(reason)
+                if (force) append(" --force")
+            }
+        }
+
+        private fun msg(key: String): String = plugin.messageHandler.stringMessageToStringNoPrefix("GUI", key)
+    }
+
+    private class PunishTimeScreen(private val plugin: PunisherX, private val controller: PunisherMainGuiController, private val targetId: UUID, private val type: String) : GuiBase(
+        plain(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunishTime.title")), 27,
+    ), SelectableScreen, BackNavigableScreen {
+        private val target by lazy { Bukkit.getOfflinePlayer(targetId) }
+        private val times = plugin.config.getStringList("gui.punish.times")
+
+        override fun buildLayout(page: Int): GuiLayout {
+            val slots = filledSlots(size)
+            times.take(9).forEachIndexed { idx, time ->
+                slots[10 + idx] = GuiIcon("time_${idx}", time, emptyList(), GuiMaterial.PAPER)
+            }
+            slots[22] = NavigationComponents.back(msg("Nav.back"))
+            return GuiLayout(title, size, slots)
+        }
+
+        override fun onClick(slot: Int): GuiAction = when {
+            slot in 10 until 10 + times.take(9).size -> GuiAction.SelectElement(slot - 10)
+            slot == 22 -> GuiAction.Back
+            else -> GuiAction.None
+        }
+
+        override fun handleSelection(index: Int, player: Player) {
+            times.getOrNull(index)?.let { controller.openPunishReason(player, target, type, it) }
+        }
+
+        override fun onBack(player: Player) { controller.openPunishType(player, target) }
+        private fun msg(key: String): String = plugin.messageHandler.stringMessageToStringNoPrefix("GUI", key)
+    }
+
+    private class PunishReasonScreen(private val plugin: PunisherX, private val controller: PunisherMainGuiController, private val targetId: UUID, private val type: String, private val time: String) : GuiBase(
+        plain(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunishReason.title")), reasonSize(plugin),
+    ), SelectableScreen, BackNavigableScreen {
+        private val target by lazy { Bukkit.getOfflinePlayer(targetId) }
+        private val reasons = plugin.config.getStringList("gui.punish.reasons")
+        private val force = plugin.config.getBoolean("gui.punish.use_force", false)
+
+        override fun buildLayout(page: Int): GuiLayout {
+            val slots = filledSlots(size)
+            reasons.take(size - 9).forEachIndexed { idx, reason ->
+                slots[idx] = GuiIcon("reason_$idx", reason, emptyList(), GuiMaterial.PAPER)
+            }
+            slots[size - 5] = NavigationComponents.back(msg("Nav.back"))
+            return GuiLayout(title, size, slots)
+        }
+
+        override fun onClick(slot: Int): GuiAction = when {
+            slot in 0 until reasons.take(size - 9).size -> GuiAction.SelectElement(slot)
+            slot == size - 5 -> GuiAction.Back
+            else -> GuiAction.None
+        }
+
+        override fun handleSelection(index: Int, player: Player) {
+            val reason = reasons.getOrNull(index) ?: return
+            val name = target.name ?: return
+            player.closeInventory()
+            val command = if (time.equals("perm", true)) {
+                "$type $name $reason"
+            } else {
+                "$type $name $time $reason"
+            } + if (force) " --force" else ""
+            player.performCommand(command)
+        }
+
+        override fun onBack(player: Player) { controller.openPunishTime(player, target, type) }
+
+        private fun msg(key: String): String = plugin.messageHandler.stringMessageToStringNoPrefix("GUI", key)
+
+        companion object {
+            private fun reasonSize(plugin: PunisherX): Int {
+                val reasons = plugin.config.getStringList("gui.punish.reasons")
+                val raw = ((reasons.size / 9) + 1) * 9
+                return raw.coerceIn(27, 54)
+            }
+        }
+    }
+
+    private class ConfirmDeleteScreen(private val plugin: PunisherX, private val controller: PunisherMainGuiController, private val targetId: UUID) : GuiBase(
+        plain(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PlayerAction.confirmDelete.title")), 27,
+    ), SelectableScreen, BackNavigableScreen {
+        private val target by lazy { Bukkit.getOfflinePlayer(targetId) }
+
+        override fun buildLayout(page: Int): GuiLayout {
+            val slots = filledSlots(size)
+            slots[11] = GuiIcon("confirm", msg("PlayerAction.confirmDelete.confirm"), emptyList(), GuiMaterial.TRIAL_KEY)
+            slots[15] = GuiIcon("cancel", msg("PlayerAction.confirmDelete.cancel"), emptyList(), GuiMaterial.BARRIER)
+            return GuiLayout(title, size, slots)
+        }
+
+        override fun onClick(slot: Int): GuiAction = when (slot) {
+            11 -> GuiAction.SelectElement(0)
+            15 -> GuiAction.Back
+            else -> GuiAction.None
+        }
+
+        override fun handleSelection(index: Int, player: Player) {
+            if (index != 0) return
+            player.closeInventory()
+            target.player?.kick(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PlayerAction.deleteMessage"))
+            plugin.databaseHandler.deletePlayerData(target.uniqueId.toString())
+            plugin.playerIPManager.deletePlayerInfo(target.uniqueId)
+        }
+
+        override fun onBack(player: Player) { controller.openPlayerAction(player, target) }
+
+        private fun msg(key: String): String = plugin.messageHandler.stringMessageToStringNoPrefix("GUI", key)
+    }
+
+    private class AdminPlayersScreen(private val plugin: PunisherX, private val controller: PunisherMainGuiController, private val pageIndex: Int) : GuiBase(
+        plain(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunisherMain.adminOnline.title")), 45,
+    ), BackNavigableScreen {
         private val admins = plugin.server.onlinePlayers.filter { PermissionChecker.hasPermissionStartingWith(it, "punisherx") }.sortedBy { it.name.lowercase() }
         private val perPage = 27
         private val maxPage = if (admins.isEmpty()) 0 else (admins.size - 1) / perPage
@@ -271,11 +494,9 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
         private fun message(key: String) = plugin.messageHandler.stringMessageToStringNoPrefix("GUI", key)
     }
 
-    private class PunishedMenuScreen(private val plugin: PunisherX, private val controller: PunisherMainGuiController) :
-        GuiBase(plain(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunishedList.title")), 45),
-        SelectableScreen,
-        BackNavigableScreen {
-
+    private class PunishedMenuScreen(private val plugin: PunisherX, private val controller: PunisherMainGuiController) : GuiBase(
+        plain(plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunishedList.title")), 45,
+    ), SelectableScreen, BackNavigableScreen {
         private val entries = listOf(
             MenuEntry(20, GuiMaterial.MACE, message("PunishedList.banned")) { _, p -> BanListGUI(plugin).open(p) },
             MenuEntry(24, GuiMaterial.TRIAL_KEY, message("PunishedList.jailed")) { _, p -> JailListGUI(plugin).open(p) },
