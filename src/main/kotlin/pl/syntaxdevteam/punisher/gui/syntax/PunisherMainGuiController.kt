@@ -108,9 +108,7 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             players.drop(pageIndex * perPage).take(perPage).forEachIndexed { i, target ->
                 slots[i] = GuiIcon("online_${target.uniqueId}", target.name, lore(target.uniqueId, target.name), GuiMaterial.PLAYER_HEAD, target.uniqueId)
             }
-            if (pageIndex > 0) slots[36] = NavigationComponents.previous(message("Nav.previous"))
-            slots[40] = NavigationComponents.back(message("Nav.back"))
-            if (pageIndex < maxPage) slots[44] = NavigationComponents.next(message("Nav.next"))
+            applyPagedNavigation(slots, pageIndex, pageIndex < maxPage, ::message)
             return GuiLayout(title, size, slots)
         }
 
@@ -177,10 +175,8 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
                 val uuid = UUID.fromString(info.playerUUID)
                 slots[i] = GuiIcon("offline_${info.playerUUID}", info.playerName, offlineLore(info, uuid), GuiMaterial.PLAYER_HEAD, uuid)
             }
-            if (pageIndex > 0) slots[36] = NavigationComponents.previous(message("Nav.previous"))
             slots[sortSlot] = GuiIcon("sort", sortLabel(), emptyList(), GuiMaterial.BOOK)
-            slots[40] = NavigationComponents.back(message("Nav.back"))
-            if (pageIndex < maxPage) slots[44] = NavigationComponents.next(message("Nav.next"))
+            applyPagedNavigation(slots, pageIndex, pageIndex < maxPage, ::message)
             return GuiLayout(title, size, slots)
         }
 
@@ -485,9 +481,7 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             admins.drop(pageIndex * perPage).take(perPage).forEachIndexed { i, admin ->
                 slots[i] = GuiIcon("admin_${admin.uniqueId}", admin.name, emptyList(), GuiMaterial.PLAYER_HEAD, admin.uniqueId)
             }
-            if (pageIndex > 0) slots[36] = NavigationComponents.previous(message("Nav.previous"))
-            slots[40] = NavigationComponents.back(message("Nav.back"))
-            if (pageIndex < maxPage) slots[44] = NavigationComponents.next(message("Nav.next"))
+            applyPagedNavigation(slots, pageIndex, pageIndex < maxPage, ::message)
             return GuiLayout(title, size, slots)
         }
 
@@ -558,9 +552,7 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
                     Bukkit.getOfflinePlayer(punishment.name).uniqueId,
                 )
             }
-            if (pageIndex > 0) slots[36] = NavigationComponents.previous(msg("Nav.previous"))
-            slots[40] = NavigationComponents.back(msg("Nav.back"))
-            if (hasNext) slots[44] = NavigationComponents.next(msg("Nav.next"))
+            applyPagedNavigation(slots, pageIndex, hasNext, ::msg)
             return GuiLayout(title, size, slots)
         }
 
@@ -602,9 +594,7 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
                     Bukkit.getOfflinePlayer(punishment.name).uniqueId,
                 )
             }
-            if (pageIndex > 0) slots[36] = NavigationComponents.previous(msg("Nav.previous"))
-            slots[40] = NavigationComponents.back(msg("Nav.back"))
-            if (hasNext) slots[44] = NavigationComponents.next(msg("Nav.next"))
+            applyPagedNavigation(slots, pageIndex, hasNext, ::msg)
             return GuiLayout(title, size, slots)
         }
 
@@ -691,9 +681,7 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             players.drop(pageIndex * perPage).take(perPage).forEachIndexed { i, target ->
                 slots[centerSlots[i]] = GuiIcon("report_online_${target.uniqueId}", target.name, listOf(msg("Report.lore.clickToReport")), GuiMaterial.PLAYER_HEAD, target.uniqueId)
             }
-            if (pageIndex > 0) slots[36] = NavigationComponents.previous(msg("Nav.previous"))
-            slots[40] = NavigationComponents.back(msg("Nav.back"))
-            if (pageIndex < maxPage) slots[44] = NavigationComponents.next(msg("Nav.next"))
+            applyPagedNavigation(slots, pageIndex, pageIndex < maxPage, ::msg)
             return GuiLayout(title, size, slots)
         }
 
@@ -736,9 +724,7 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
                     slots[centerSlots[i]] = GuiIcon("report_offline_${target.uniqueId}", target.name ?: target.uniqueId.toString(), listOf(msg("Report.lore.clickToReport")), GuiMaterial.PLAYER_HEAD, target.uniqueId)
                 }
             }
-            if (pageIndex > 0) slots[36] = NavigationComponents.previous(msg("Nav.previous"))
-            slots[40] = NavigationComponents.back(msg("Nav.back"))
-            if (pageIndex < maxPage) slots[44] = NavigationComponents.next(msg("Nav.next"))
+            applyPagedNavigation(slots, pageIndex, pageIndex < maxPage, ::msg)
             return GuiLayout(title, size, slots)
         }
 
@@ -772,9 +758,7 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             reasons.drop(pageIndex * perPage).take(perPage).forEachIndexed { i, reason ->
                 slots[centerSlots[i]] = GuiIcon("report_reason_$i", reason, listOf(msg("Report.lore.clickToChoose")), GuiMaterial.BOOK)
             }
-            if (pageIndex > 0) slots[36] = NavigationComponents.previous(msg("Nav.previous"))
-            slots[40] = NavigationComponents.back(msg("Nav.back"))
-            if (pageIndex < maxPage) slots[44] = NavigationComponents.next(msg("Nav.next"))
+            applyPagedNavigation(slots, pageIndex, pageIndex < maxPage, ::msg)
             return GuiLayout(title, size, slots)
         }
 
@@ -817,6 +801,17 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
     companion object {
         private val serializer = PlainTextComponentSerializer.plainText()
         private fun plain(component: Component): String = serializer.serialize(component)
+        private fun applyPagedNavigation(
+            slots: MutableMap<Int, GuiIcon>,
+            pageIndex: Int,
+            hasNextPage: Boolean,
+            message: (String) -> String,
+        ) {
+            if (pageIndex > 0) slots[36] = NavigationComponents.previous(message("Nav.previous"))
+            slots[40] = NavigationComponents.back(message("Nav.back"))
+            if (hasNextPage) slots[44] = NavigationComponents.next(message("Nav.next"))
+        }
+
         private fun filledSlots(size: Int): MutableMap<Int, GuiIcon> {
             val slots = mutableMapOf<Int, GuiIcon>()
             for (i in 0 until size) slots[i] = NavigationComponents.filler(" ")
