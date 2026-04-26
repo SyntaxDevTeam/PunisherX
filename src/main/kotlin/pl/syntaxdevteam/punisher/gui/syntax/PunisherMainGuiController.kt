@@ -114,11 +114,11 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             return GuiLayout(title, size, slots)
         }
 
-        override fun onClick(slot: Int): GuiAction = when {
-            slot in 0 until perPage -> GuiAction.SelectElement(pageIndex * perPage + slot)
-            slot == 36 && pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
-            slot == 44 && pageIndex < maxPage -> GuiAction.OpenPage(pageIndex + 1)
-            slot == 40 -> GuiAction.Back
+        override fun onClick(slot: Int): GuiAction = when (slot) {
+            in 0 until perPage -> GuiAction.SelectElement(pageIndex * perPage + slot)
+            36 if pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
+            44 if pageIndex < maxPage -> GuiAction.OpenPage(pageIndex + 1)
+            40 -> GuiAction.Back
             else -> GuiAction.None
         }
 
@@ -184,12 +184,12 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             return GuiLayout(title, size, slots)
         }
 
-        override fun onClick(slot: Int): GuiAction = when {
-            slot in 0 until perPage -> GuiAction.SelectElement(pageIndex * perPage + slot)
-            slot == 36 && pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
-            slot == sortSlot -> GuiAction.SelectElement(Int.MAX_VALUE)
-            slot == 44 && pageIndex < maxPage -> GuiAction.OpenPage(pageIndex + 1)
-            slot == 40 -> GuiAction.Back
+        override fun onClick(slot: Int): GuiAction = when (slot) {
+            in 0 until perPage -> GuiAction.SelectElement(pageIndex * perPage + slot)
+            36 if pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
+            sortSlot -> GuiAction.SelectElement(Int.MAX_VALUE)
+            44 if pageIndex < maxPage -> GuiAction.OpenPage(pageIndex + 1)
+            40 -> GuiAction.Back
             else -> GuiAction.None
         }
 
@@ -237,6 +237,7 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
         }
 
         private fun ipHistory(playerUuid: String): String = allRecords
+            .asSequence()
             .filter { it.playerUUID == playerUuid }
             .sortedByDescending { plugin.timeHandler.parseDate(it.lastUpdated) ?: 0L }
             .map { it.playerIP }
@@ -380,9 +381,9 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             return GuiLayout(title, size, slots)
         }
 
-        override fun onClick(slot: Int): GuiAction = when {
-            slot in 10 until 10 + times.take(9).size -> GuiAction.SelectElement(slot - 10)
-            slot == 22 -> GuiAction.Back
+        override fun onClick(slot: Int): GuiAction = when (slot) {
+            in 10 until 10 + times.take(9).size -> GuiAction.SelectElement(slot - 10)
+            22 -> GuiAction.Back
             else -> GuiAction.None
         }
 
@@ -410,9 +411,9 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             return GuiLayout(title, size, slots)
         }
 
-        override fun onClick(slot: Int): GuiAction = when {
-            slot in 0 until reasons.take(size - 9).size -> GuiAction.SelectElement(slot)
-            slot == size - 5 -> GuiAction.Back
+        override fun onClick(slot: Int): GuiAction = when (slot) {
+            in reasons.take(size - 9).indices -> GuiAction.SelectElement(slot)
+            size - 5 -> GuiAction.Back
             else -> GuiAction.None
         }
 
@@ -490,10 +491,10 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             return GuiLayout(title, size, slots)
         }
 
-        override fun onClick(slot: Int): GuiAction = when {
-            slot == 36 && pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
-            slot == 44 && pageIndex < maxPage -> GuiAction.OpenPage(pageIndex + 1)
-            slot == 40 -> GuiAction.Back
+        override fun onClick(slot: Int): GuiAction = when (slot) {
+            36 if pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
+            44 if pageIndex < maxPage -> GuiAction.OpenPage(pageIndex + 1)
+            40 -> GuiAction.Back
             else -> GuiAction.None
         }
 
@@ -563,10 +564,10 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             return GuiLayout(title, size, slots)
         }
 
-        override fun onClick(slot: Int): GuiAction = when {
-            slot == 36 && pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
-            slot == 44 && hasNext -> GuiAction.OpenPage(pageIndex + 1)
-            slot == 40 -> GuiAction.Back
+        override fun onClick(slot: Int): GuiAction = when (slot) {
+            36 if pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
+            44 if hasNext -> GuiAction.OpenPage(pageIndex + 1)
+            40 -> GuiAction.Back
             else -> GuiAction.None
         }
 
@@ -607,10 +608,10 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             return GuiLayout(title, size, slots)
         }
 
-        override fun onClick(slot: Int): GuiAction = when {
-            slot == 36 && pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
-            slot == 44 && hasNext -> GuiAction.OpenPage(pageIndex + 1)
-            slot == 40 -> GuiAction.Back
+        override fun onClick(slot: Int): GuiAction = when (slot) {
+            36 if pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
+            44 if hasNext -> GuiAction.OpenPage(pageIndex + 1)
+            40 -> GuiAction.Back
             else -> GuiAction.None
         }
 
@@ -696,11 +697,11 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             return GuiLayout(title, size, slots)
         }
 
-        override fun onClick(slot: Int): GuiAction = when {
-            slot in centerSlots -> GuiAction.SelectElement(pageIndex * perPage + centerSlots.indexOf(slot))
-            slot == 36 && pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
-            slot == 44 && pageIndex < maxPage -> GuiAction.OpenPage(pageIndex + 1)
-            slot == 40 -> GuiAction.Back
+        override fun onClick(slot: Int): GuiAction = when (slot) {
+            in centerSlots -> GuiAction.SelectElement(pageIndex * perPage + centerSlots.indexOf(slot))
+            36 if pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
+            44 if pageIndex < maxPage -> GuiAction.OpenPage(pageIndex + 1)
+            40 -> GuiAction.Back
             else -> GuiAction.None
         }
 
@@ -741,11 +742,11 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             return GuiLayout(title, size, slots)
         }
 
-        override fun onClick(slot: Int): GuiAction = when {
-            slot in centerSlots -> GuiAction.SelectElement(pageIndex * perPage + centerSlots.indexOf(slot))
-            slot == 36 && pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
-            slot == 44 && pageIndex < maxPage -> GuiAction.OpenPage(pageIndex + 1)
-            slot == 40 -> GuiAction.Back
+        override fun onClick(slot: Int): GuiAction = when (slot) {
+            in centerSlots -> GuiAction.SelectElement(pageIndex * perPage + centerSlots.indexOf(slot))
+            36 if pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
+            44 if pageIndex < maxPage -> GuiAction.OpenPage(pageIndex + 1)
+            40 -> GuiAction.Back
             else -> GuiAction.None
         }
 
@@ -777,11 +778,11 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             return GuiLayout(title, size, slots)
         }
 
-        override fun onClick(slot: Int): GuiAction = when {
-            slot in centerSlots -> GuiAction.SelectElement(pageIndex * perPage + centerSlots.indexOf(slot))
-            slot == 36 && pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
-            slot == 44 && pageIndex < maxPage -> GuiAction.OpenPage(pageIndex + 1)
-            slot == 40 -> GuiAction.Back
+        override fun onClick(slot: Int): GuiAction = when (slot) {
+            in centerSlots -> GuiAction.SelectElement(pageIndex * perPage + centerSlots.indexOf(slot))
+            36 if pageIndex > 0 -> GuiAction.OpenPage(pageIndex - 1)
+            44 if pageIndex < maxPage -> GuiAction.OpenPage(pageIndex + 1)
+            40 -> GuiAction.Back
             else -> GuiAction.None
         }
 
@@ -792,7 +793,7 @@ class PunisherMainGuiController(private val plugin: PunisherX) {
             if (success) {
                 player.sendMessage(plugin.messageHandler.stringMessageToComponent("reports", "report-sent", mapOf("target" to (target.name ?: target.uniqueId.toString()), "reason" to reason)))
                 plugin.server.onlinePlayers
-                    .filter { pl.syntaxdevteam.punisher.permissions.PermissionChecker.hasWithSee(it, pl.syntaxdevteam.punisher.permissions.PermissionChecker.PermissionKey.SEE_REPORTS) }
+                    .filter { PermissionChecker.hasWithSee(it, PermissionChecker.PermissionKey.SEE_REPORTS) }
                     .forEach { staff ->
                         staff.sendMessage(plugin.messageHandler.stringMessageToComponentNoPrefix("reports", "admin-notify", mapOf("reporter" to player.name, "target" to (target.name ?: target.uniqueId.toString()), "reason" to reason)))
                     }
