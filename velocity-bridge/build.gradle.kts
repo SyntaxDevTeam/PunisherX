@@ -30,6 +30,7 @@ tasks.named<ShadowJar>("shadowJar") {
     archiveBaseName.set("PunisherX-Velocity-Bridge")
     archiveClassifier.set("")
     archiveVersion.set(project.version.toString())
+    mergeServiceFiles()
 }
 
 tasks.named("build") {
