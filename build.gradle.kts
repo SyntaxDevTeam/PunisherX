@@ -3,7 +3,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.4.0-Beta2"
+    kotlin("jvm") version "2.4.0-RC"
     id("com.gradleup.shadow") version "9.4.1"
     id("org.jetbrains.dokka-javadoc") version "2.2.0" apply false
     `maven-publish`
@@ -69,8 +69,8 @@ dependencies {
 
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.6")
-    compileOnly("com.google.code.gson:gson:2.13.2")
-    compileOnly("com.maxmind.geoip2:geoip2:5.0.2")
+    compileOnly("com.google.code.gson:gson:2.14.0")
+    compileOnly("com.maxmind.geoip2:geoip2:5.1.0")
     compileOnly("org.apache.ant:ant:1.10.17")
     compileOnly("com.zaxxer:HikariCP:7.0.2")
     compileOnly("net.luckperms:api:5.5")
@@ -85,7 +85,7 @@ dependencies {
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
     compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
 
-    compileOnly("dev.faststats.metrics:bukkit:0.22.0")
+    compileOnly("dev.faststats.metrics:bukkit:0.22.1")
 
     testImplementation(kotlin("test"))
     testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")

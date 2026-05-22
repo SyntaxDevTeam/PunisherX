@@ -9,13 +9,13 @@ repositories:
 
 libraries:
   # Basic libraries
-  - org.jetbrains.kotlin:kotlin-stdlib:2.4.0-Beta1
+  - org.jetbrains.kotlin:kotlin-stdlib:2.4.0-RC
 #  - org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2
   - org.eclipse.aether:aether-api:1.1.0
   - org.yaml:snakeyaml:2.6
-  - com.google.code.gson:gson:2.13.2
+  - com.google.code.gson:gson:2.14.0
   # Additional libraries
-  - com.maxmind.geoip2:geoip2:5.0.1
+  - com.maxmind.geoip2:geoip2:5.1.0
   - org.apache.ant:ant:1.10.17
   # Database libraries
   - com.zaxxer:HikariCP:7.0.2
@@ -27,7 +27,7 @@ libraries:
   - com.github.ben-manes.caffeine:caffeine:3.2.3
   - dev.dejvokep:boosted-yaml:1.3.7
   # FastStats dependencies
-  - coordinate: dev.faststats.metrics:bukkit:0.22.0
+  - coordinate: dev.faststats.metrics:bukkit:0.22.1
     repository: faststatsReleases
   # SyntaxDevTeam libraries
   - coordinate: pl.syntaxdevteam:core:1.3.0-R0.4-SNAPSHOT
