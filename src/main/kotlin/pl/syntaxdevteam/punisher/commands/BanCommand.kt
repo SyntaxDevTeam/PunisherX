@@ -90,10 +90,11 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN)) {
             return emptyList()
         }
+        val input = args.lastOrNull().orEmpty()
         return when (args.size) {
-            0, 1 -> plugin.server.onlinePlayers.map { it.name }
-            2 -> TimeSuggestionProvider.generateTimeSuggestions()
-            3 -> plugin.messageHandler.getMessageStringList("ban", "reasons")
+            0, 1 -> plugin.server.onlinePlayers.map { it.name }.filter { it.startsWith(input, ignoreCase = true) }
+            2 -> TimeSuggestionProvider.generateTimeSuggestions().filter { it.startsWith(input, ignoreCase = true) }
+            3 -> plugin.messageHandler.getMessageStringList("ban", "reasons").filter { it.startsWith(input, ignoreCase = true) }
             else -> emptyList()
         }
     }

@@ -3,7 +3,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.4.0-Beta1"
+    kotlin("jvm") version "2.4.0-Beta2"
     id("com.gradleup.shadow") version "9.4.1"
     id("org.jetbrains.dokka-javadoc") version "2.2.0" apply false
     `maven-publish`
@@ -202,5 +202,5 @@ hangarPublish {
 
 plugindeployer {
     paper { dir = "/home/debian/server/Paper/26.1.2/plugins" } //ostatnia wersja dla Paper
-    folia { dir = "/home/debian/server/Folia/1.21.11/plugins" } //ostatnia wersja dla Folia
+    folia { dir = "/home/debian/server/Folia/26.1.2/plugins" } //ostatnia wersja dla Folia
 }

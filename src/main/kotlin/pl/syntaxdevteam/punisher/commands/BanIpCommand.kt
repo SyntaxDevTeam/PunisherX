@@ -124,10 +124,11 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
         if (!PermissionChecker.hasWithLegacy(stack.sender as Player, PermissionChecker.PermissionKey.BANIP)) return emptyList()
+        val input = args.lastOrNull().orEmpty()
         return when (args.size) {
-            0, 1 -> plugin.server.onlinePlayers.map { it.name }
-            2 -> TimeSuggestionProvider.generateTimeSuggestions()
-            3 -> plugin.messageHandler.getMessageStringList("banip", "reasons")
+            0, 1 -> plugin.server.onlinePlayers.map { it.name }.filter { it.startsWith(input, ignoreCase = true) }
+            2 -> TimeSuggestionProvider.generateTimeSuggestions().filter { it.startsWith(input, ignoreCase = true) }
+            3 -> plugin.messageHandler.getMessageStringList("banip", "reasons").filter { it.startsWith(input, ignoreCase = true) }
             else -> emptyList()
         }
     }

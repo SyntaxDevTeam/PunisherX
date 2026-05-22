@@ -135,9 +135,10 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.KICK)) {
             return emptyList()
         }
+        val input = args.lastOrNull().orEmpty()
         return when (args.size) {
-            0, 1 -> listOf("all") + plugin.server.onlinePlayers.map { it.name }
-            2 -> plugin.messageHandler.getMessageStringList("kick", "reasons")
+            0, 1 -> (listOf("all") + plugin.server.onlinePlayers.map { it.name }).filter { it.startsWith(input, ignoreCase = true) }
+            2 -> plugin.messageHandler.getMessageStringList("kick", "reasons").filter { it.startsWith(input, ignoreCase = true) }
             else -> emptyList()
         }
     }

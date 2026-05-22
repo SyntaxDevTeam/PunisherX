@@ -6,6 +6,7 @@ import io.papermc.paper.plugin.loader.library.impl.MavenLibraryResolver;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.jspecify.annotations.NonNull;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
@@ -20,7 +21,7 @@ import java.util.Map;
 public final class SyntaxLoader implements PluginLoader {
 
     @Override
-    public void classloader(final PluginClasspathBuilder pluginClasspath) {
+    public void classloader(final @NonNull PluginClasspathBuilder pluginClasspath) {
         final LibraryConfig libraryConfig = resolveLibraries();
         final Map<String, MavenLibraryResolver> resolvers = new HashMap<>();
 
