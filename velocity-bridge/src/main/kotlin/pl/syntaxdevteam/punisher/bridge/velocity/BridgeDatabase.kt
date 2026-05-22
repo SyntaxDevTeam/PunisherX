@@ -94,6 +94,7 @@ class BridgeDatabase(
     private fun buildHikariConfig(): HikariConfig {
         return HikariConfig().apply {
             jdbcUrl = config.jdbcUrl
+            driverClassName = "com.mysql.cj.jdbc.Driver"
             username = config.username
             password = config.password
             maximumPoolSize = 4
