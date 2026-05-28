@@ -52,14 +52,30 @@ jobs:
           name: gradle-build-results
           path: build/reports/gradle-actions/build-results.json
           retention-days: 1
-      - name: Prepare artifact name
-        run: echo "ARTIFACT_NAME=PunisherX-${GITHUB_REF_NAME//\//-}-latest-DEV.jar" >> "$GITHUB_ENV"
-      - name: Upload JAR
+      - name: Prepare artifact suffix
+        run: echo "ARTIFACT_SUFFIX=${GITHUB_REF_NAME//\//-}-latest-DEV" >> "$GITHUB_ENV"
+
+      - name: Upload core JAR
+
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.ARTIFACT_NAME }}
+          name: PunisherX-${{ env.ARTIFACT_SUFFIX }}.jar
           path: build/libs/*.jar
           retention-days: 7
+      - name: Upload bungee-bridge JAR
+        uses: actions/upload-artifact@v7
+        with:
+          name: PunisherX-bungee-bridge-${{ env.ARTIFACT_SUFFIX }}.jar
+          path: bungee-bridge/build/libs/*.jar
+          retention-days: 7
+
+      - name: Upload velocity-bridge JAR
+        uses: actions/upload-artifact@v7
+        with:
+          name: PunisherX-velocity-bridge-${{ env.ARTIFACT_SUFFIX }}.jar
+          path: velocity-bridge/build/libs/*.jar
+          retention-days: 7
+          
 
   dependency-submission:
     runs-on: ubuntu-latest
