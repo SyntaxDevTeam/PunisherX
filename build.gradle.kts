@@ -3,8 +3,8 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.4.0-RC"
-    id("com.gradleup.shadow") version "9.4.1"
+    kotlin("jvm") version "2.4.0-RC2"
+    id("com.gradleup.shadow") version "9.4.2"
     id("org.jetbrains.dokka-javadoc") version "2.2.0" apply false
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.4"
@@ -81,11 +81,11 @@ dependencies {
     compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2"){
         isTransitive = false
     }
-    compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.3")
+    compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.4")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
     compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
 
-    compileOnly("dev.faststats.metrics:bukkit:0.22.1")
+    compileOnly("dev.faststats.metrics:bukkit:0.23.0")
 
     testImplementation(kotlin("test"))
     testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
