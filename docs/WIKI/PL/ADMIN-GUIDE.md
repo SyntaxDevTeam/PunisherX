@@ -94,6 +94,11 @@ Format czasu: `Xs`, `Xm`, `Xh`, `Xd` (sekundy/minuty/godziny/dni).
 
 Szablony dają powtarzalność i szybkość działania. Dzięki nim młodszy moderator nie „wymyśla” kary samodzielnie za każdym razem.
 
+### Przygotuj swoje templatki
+- Zapoznaj się z przykłami w pliku `punish-templates.yml`
+- Edytuj zgodnie z własnymi potrzebami, zapisz na serwerze i zrestartuj serwer.
+- Sprawdź działanie w praktyce używając `/punish <gracz> <nazwa_templatki>`
+
 ### Dobre praktyki dla templatek
 - Jeden szablon = jeden konkretny typ naruszenia.
 - Nazwy krótkie i jednoznaczne (np. `spam_1`, `cheaty_perm`).
@@ -101,10 +106,13 @@ Szablony dają powtarzalność i szybkość działania. Dzięki nim młodszy mod
 - Rozdziel poziomy eskalacji (1h → 1d → 7d → perm).
 
 ### Przykładowa logika progresji
-- Pierwsze wykroczenie: `/warn`
-- Drugie wykroczenie: `/mute 1h`
-- Trzecie wykroczenie: `/mute 1d`
-- Czwarte wykroczenie: `/ban 7d`
+- Pierwsze wykroczenie: `punish: warn`
+- Drugie wykroczenie: `punish: mute` `time: 1h`
+- Trzecie wykroczenie: `punish: mute` `time: 1d`
+- Czwarte wykroczenie: `punish: ban` `time: 7d`
+
+### Użycie `/punish` w praktyce
+- Dzięki z góry ustalonym szablonom kar możesz w szybko sposób wymierzać kary oraz ich stopien eskalacji `/punish <gracz> <nazwa_templatki> <poziom_eskalacji>`
 
 Największa wartość templatek: jednolita polityka kar między zmianami moderatorów.
 
@@ -113,7 +121,7 @@ Największa wartość templatek: jednolita polityka kar między zmianami moderat
 # Planowane:
 ## 6) Panel GUI i praca „klikana”
 
-PunisherX oferuje GUI, które przyspiesza codzienną moderację:
+PunisherX oferuje GUI, które przyspiesza codzienną moderację czyli /punish ale graficznie:
 - wybór gracza,
 - wybór typu kary,
 - wybór czasu i powodu,
