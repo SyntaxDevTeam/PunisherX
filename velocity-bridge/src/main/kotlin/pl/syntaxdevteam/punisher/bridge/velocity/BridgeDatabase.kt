@@ -4,6 +4,12 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.slf4j.Logger
 import java.sql.ResultSet
+import java.util.UUID
+
+data class ActiveBan(
+    val reason: String,
+    val endTime: Long
+)
 
 class BridgeDatabase(
     private val logger: Logger,
@@ -78,6 +84,38 @@ class BridgeDatabase(
             }
         }.onFailure { ex ->
             logger.error("Failed to mark bridge event $id as processed", ex)
+        }
+    }
+
+    fun findActiveBan(uuid: UUID, now: Long = System.currentTimeMillis()): ActiveBan? {
+        return runCatching {
+            dataSource.connection.use { connection ->
+                connection.prepareStatement(
+                    """
+                    SELECT reason, endTime
+                    FROM punishments
+                    WHERE uuid = ?
+                      AND punishmentType = 'BAN'
+                      AND server = 'network'
+                      AND (endTime = -1 OR endTime > ?)
+                    ORDER BY start DESC
+                    LIMIT 1
+                    """.trimIndent()
+                ).use { statement ->
+                    statement.setString(1, uuid.toString())
+                    statement.setLong(2, now)
+                    statement.executeQuery().use { resultSet ->
+                        if (!resultSet.next()) return@use null
+                        ActiveBan(
+                            reason = resultSet.getString("reason") ?: "",
+                            endTime = resultSet.getLong("endTime")
+                        )
+                    }
+                }
+            }
+        }.getOrElse { ex ->
+            logger.error("Failed to read active BAN for $uuid", ex)
+            null
         }
     }
 

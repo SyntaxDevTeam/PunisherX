@@ -11,6 +11,8 @@ repositories {
 
 dependencies {
     compileOnly("net.md-5:bungeecord-api:1.21-R0.4")
+    implementation("com.zaxxer:HikariCP:7.0.2")
+    implementation("com.mysql:mysql-connector-j:9.7.0")
 }
 
 configurations.configureEach {
@@ -34,6 +36,7 @@ tasks.named<ShadowJar>("shadowJar") {
     archiveBaseName.set("PunisherX-BungeeCord-Bridge")
     archiveClassifier.set("")
     archiveVersion.set(project.version.toString())
+    mergeServiceFiles()
 }
 
 tasks.named("build") {
