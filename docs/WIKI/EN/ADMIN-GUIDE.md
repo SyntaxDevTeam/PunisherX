@@ -95,6 +95,11 @@ Time format: `Xs`, `Xm`, `Xh`, `Xd` (seconds/minutes/hours/days).
 
 Templates provide consistency and speed. They help junior moderators avoid “inventing” punishments manually each time.
 
+### Prepare your templates
+- Review the examples in `punish-templates.yml`.
+- Edit them to match your needs, save them on the server, and restart the server.
+- Test them in practice with `/punish <player> <template_name>`.
+
 ### Best practices for templates
 - One template = one specific violation type.
 - Keep names short and clear (e.g., `spam_1`, `cheats_perm`).
@@ -102,10 +107,13 @@ Templates provide consistency and speed. They help junior moderators avoid “in
 - Separate escalation levels (1h → 1d → 7d → perm).
 
 ### Example escalation logic
-- First offense: `/warn`
-- Second offense: `/mute 1h`
-- Third offense: `/mute 1d`
-- Fourth offense: `/ban 7d`
+- First offense: `punish: warn`
+- Second offense: `punish: mute` `time: 1h`
+- Third offense: `punish: mute` `time: 1d`
+- Fourth offense: `punish: ban` `time: 7d`
+
+### Using `/punish` in practice
+- With predefined punishment templates, you can quickly apply punishments and their escalation level: `/punish <player> <template_name> <escalation_level>`.
 
 The biggest value of templates: consistent punishment policy across moderator shifts.
 
@@ -114,7 +122,7 @@ The biggest value of templates: consistent punishment policy across moderator sh
 # Planned:
 ## 6) GUI panel and click-based workflow
 
-PunisherX offers a GUI that speeds up daily moderation:
+PunisherX offers a GUI that speeds up daily moderation — effectively `/punish`, but graphical:
 - player selection,
 - punishment type selection,
 - time and reason selection,
