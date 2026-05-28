@@ -60,7 +60,6 @@ public final class SyntaxLoader implements PluginLoader {
                 return LibraryConfig.empty();
             }
 
-            @SuppressWarnings("unchecked")
             final Map<String, Object> data = yaml.load(inputStream);
             if (data == null) {
                 return LibraryConfig.empty();
