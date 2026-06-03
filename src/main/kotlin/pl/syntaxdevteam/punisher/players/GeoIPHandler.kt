@@ -18,7 +18,7 @@ import kotlin.jvm.Volatile
 
 class GeoIPHandler(private val plugin: PunisherX) {
 
-    private val licenseKey = plugin.config.getString("geoDatabase.licenseKey") ?: throw IllegalArgumentException("License key not found in config.yml. GeoIP functionality will be disabled.")
+    private val licenseKey = plugin.config.getString("geoDatabase.licenseKey")
     private val pluginFolder = "${plugin.dataFolder.path}/geodata/"
 
     private val cityDatabaseFile = File(pluginFolder, "GeoLite2-City.mmdb")
@@ -33,16 +33,21 @@ class GeoIPHandler(private val plugin: PunisherX) {
         if (!folder.exists()) {
             folder.mkdirs()
         }
-        plugin.schedulerAdapter.runAsync(Runnable {
-            try {
-                prepareDatabase()
-                initializationFuture.complete(Unit)
-            } catch (e: Exception) {
-                plugin.logger.severe("Failed to prepare GeoIP database: ${e.message}")
-                plugin.reportError(e)
-                initializationFuture.completeExceptionally(e)
+        if (licenseKey.isNullOrBlank()) {
+            plugin.logger.warning("[GeoIP] License key is not set in config.yml — GeoIP functionality is disabled.")
+            initializationFuture.complete(Unit)
+        } else {
+            plugin.schedulerAdapter.runAsync {
+                try {
+                    prepareDatabase()
+                    initializationFuture.complete(Unit)
+                } catch (e: Exception) {
+                    plugin.logger.severe("Failed to prepare GeoIP database: ${e.message}")
+                    plugin.reportError(e)
+                    initializationFuture.completeExceptionally(e)
+                }
             }
-        })
+        }
     }
 
     private fun prepareDatabase() {
@@ -64,6 +69,8 @@ class GeoIPHandler(private val plugin: PunisherX) {
         val cityUri = URI("https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=$licenseKey&suffix=tar.gz")
 
         val connection = cityUri.toURL().openConnection() as HttpURLConnection
+        connection.connectTimeout = 10_000
+        connection.readTimeout = 30_000
         try {
             connection.inputStream.use { input ->
                 GZIPInputStream(input).use { gzip ->
@@ -118,7 +125,7 @@ class GeoIPHandler(private val plugin: PunisherX) {
         return try {
             val response = reader.city(InetAddress.getByName(ip))
             response.country()?.names()?.get("en")
-        } catch (e: AddressNotFoundException) {
+        } catch (_: AddressNotFoundException) {
             "Unknown country"
         } catch (e: Exception) {
             plugin.logger.severe("Failed to get country for IP $ip: ${e.message} [Exception]")
@@ -137,7 +144,7 @@ class GeoIPHandler(private val plugin: PunisherX) {
         return try {
             val response = reader.city(InetAddress.getByName(ip))
             response.city()?.names()?.get("en")
-        } catch (e: AddressNotFoundException) {
+        } catch (_: AddressNotFoundException) {
             "Unknown city"
         } catch (e: Exception) {
             plugin.logger.severe("Failed to get city for IP $ip: ${e.message} [Exception]")
