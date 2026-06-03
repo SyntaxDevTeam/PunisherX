@@ -1,5 +1,7 @@
 package pl.syntaxdevteam.punisher.commands
 
+import com.mojang.brigadier.arguments.IntegerArgumentType
+import com.mojang.brigadier.arguments.StringArgumentType
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
@@ -47,11 +49,55 @@ class CommandManager(private val plugin: PunisherX) {
                 plugin.messageHandler.stringMessageToString("warn", "usage"),
                 WarnCommand(plugin)
             )
-            commands.register(
-                "punish",
-                plugin.messageHandler.stringMessageToString("punish", "usage"),
-                PunishCommand(plugin)
-            )
+            // Register /punish with Brigadier — word() for player, string() for template (supports spaces via quotes)
+            val punishCmd = PunishCommand(plugin)
+            val punishNode = Commands.literal("punish")
+                .requires { src -> pl.syntaxdevteam.punisher.permissions.PermissionChecker
+                    .hasWithLegacy(src.sender, pl.syntaxdevteam.punisher.permissions.PermissionChecker.PermissionKey.PUNISH) }
+                .then(
+                    Commands.argument("player", StringArgumentType.word())
+                        .suggests { _, builder ->
+                            plugin.server.onlinePlayers.forEach { builder.suggest(it.name) }
+                            builder.buildFuture()
+                        }
+                        .then(
+                            Commands.argument("template", StringArgumentType.string())
+                                .suggests { _, builder ->
+                                    plugin.punishTemplateManager.getTemplateNames().forEach { name ->
+                                        builder.suggest("\"$name\"")
+                                    }
+                                    builder.buildFuture()
+                                }
+                                .executes { ctx ->
+                                    val player = StringArgumentType.getString(ctx, "player")
+                                    val template = StringArgumentType.getString(ctx, "template")
+                                        .trim('"')
+                                    punishCmd.execute(ctx.source, arrayOf(player, template))
+                                    com.mojang.brigadier.Command.SINGLE_SUCCESS
+                                }
+                                .then(
+                                    Commands.argument("level", IntegerArgumentType.integer(1))
+                                        .suggests { ctx, builder ->
+                                            val tmplName = StringArgumentType.getString(ctx, "template")
+                                                .trim('"')
+                                            plugin.punishTemplateManager.getTemplate(tmplName)
+                                                ?.levels?.keys?.sorted()
+                                                ?.forEach { builder.suggest(it) }
+                                            builder.buildFuture()
+                                        }
+                                        .executes { ctx ->
+                                            val player = StringArgumentType.getString(ctx, "player")
+                                            val template = StringArgumentType.getString(ctx, "template")
+                                                .trim('"')
+                                            val level = IntegerArgumentType.getInteger(ctx, "level")
+                                            punishCmd.execute(ctx.source, arrayOf(player, template, level.toString()))
+                                            com.mojang.brigadier.Command.SINGLE_SUCCESS
+                                        }
+                                )
+                        )
+                )
+                .build()
+            commands.register(punishNode, plugin.messageHandler.stringMessageToString("punish", "usage"), emptyList())
             commands.register(
                 "unwarn",
                 plugin.messageHandler.stringMessageToString("unwarn", "usage"),

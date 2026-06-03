@@ -3,6 +3,7 @@ package pl.syntaxdevteam.punisher.templates
 import dev.dejvokep.boostedyaml.YamlDocument
 import dev.dejvokep.boostedyaml.block.implementation.Section
 import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings
+import dev.dejvokep.boostedyaml.route.RouteFactory
 import dev.dejvokep.boostedyaml.settings.general.GeneralSettings
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings
 import pl.syntaxdevteam.punisher.PunisherX
@@ -41,7 +42,7 @@ class PunishTemplateManager(private val plugin: PunisherX) {
         if (dataFile.exists()) {
             config = YamlDocument.create(
                 dataFile,
-                GeneralSettings.builder().setUseDefaults(false).build(),
+                GeneralSettings.builder().setUseDefaults(false).setRouteSeparator('\u0000').build(),
                 LoaderSettings.builder().setAutoUpdate(false).build(),
                 DumperSettings.builder().setIndentation(2).build()
             )
@@ -53,7 +54,7 @@ class PunishTemplateManager(private val plugin: PunisherX) {
         config = YamlDocument.create(
             dataFile,
             defaults,
-            GeneralSettings.builder().setUseDefaults(true).build(),
+            GeneralSettings.builder().setUseDefaults(true).setRouteSeparator('\u0000').build(),
             LoaderSettings.builder().setAutoUpdate(true).build(),
             DumperSettings.builder().setIndentation(2).build()
         )

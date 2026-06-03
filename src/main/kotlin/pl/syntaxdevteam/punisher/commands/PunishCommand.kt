@@ -82,26 +82,6 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         applyTemplatePunishment(stack, targetName, uuid, template, templateLevel)
     }
 
-    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
-        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.PUNISH)) {
-            return emptyList()
-        }
-        val current = args.lastOrNull().orEmpty()
-        return when (args.size) {
-            0, 1 -> plugin.server.onlinePlayers
-                .map { it.name }
-                .filter { it.startsWith(current, ignoreCase = true) }
-            2 -> plugin.punishTemplateManager.getTemplateNames()
-                .filter { it.startsWith(current, ignoreCase = true) }
-            3 -> {
-                val template = plugin.punishTemplateManager.getTemplate(args[1]) ?: return emptyList()
-                template.levels.keys.sorted()
-                    .map { it.toString() }
-                    .filter { it.startsWith(current, ignoreCase = true) }
-            }
-            else -> emptyList()
-        }
-    }
 
     private fun applyTemplatePunishment(
         stack: CommandSourceStack,

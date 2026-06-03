@@ -41,13 +41,21 @@ import java.util.Locale
 class PluginInitializer(private val plugin: PunisherX) {
 
     fun onEnable() {
+        val t0 = System.currentTimeMillis()
         setUpLogger()
+        plugin.logger.diag("[TIMING] after setUpLogger: ${System.currentTimeMillis() - t0}ms")
         setupConfig()
+        plugin.logger.diag("[TIMING] after setupConfig: ${System.currentTimeMillis() - t0}ms")
         setupDatabase()
+        plugin.logger.diag("[TIMING] after setupDatabase: ${System.currentTimeMillis() - t0}ms")
         setupHandlers()
+        plugin.logger.diag("[TIMING] after setupHandlers: ${System.currentTimeMillis() - t0}ms")
         registerEvents()
+        plugin.logger.diag("[TIMING] after registerEvents: ${System.currentTimeMillis() - t0}ms")
         registerCommands()
+        plugin.logger.diag("[TIMING] after registerCommands: ${System.currentTimeMillis() - t0}ms")
         checkForUpdates()
+        plugin.logger.diag("[TIMING] onEnable complete: ${System.currentTimeMillis() - t0}ms")
     }
 
     fun onDisable() {
@@ -85,7 +93,15 @@ class PluginInitializer(private val plugin: PunisherX) {
             plugin.databaseHandler.createTables()
         }
         plugin.logger.debug("Detected server: ${ServerEnvironment.platformName}")
-        if (ServerEnvironment.isFoliaBased()) {
+        // SQLite and H2 are local file-based — no network I/O, safe to run synchronously.
+        // Running them async caused a race: players could connect before ready=true was set.
+        val dbTypeName = plugin.databaseHandler.databaseType().name
+        val isLocalDb = dbTypeName == "SQLITE" || dbTypeName == "H2"
+        plugin.logger.diag("[TIMING] dbTypeName=$dbTypeName isLocalDb=$isLocalDb")
+        if (isLocalDb) {
+            plugin.logger.debug("Local database ($dbTypeName) — running setup synchronously.")
+            databaseSetupTask.run()
+        } else if (ServerEnvironment.isFoliaBased()) {
             plugin.logger.debug("Detected Folia server, using async database connection handling.")
             plugin.server.globalRegionScheduler.execute(plugin, databaseSetupTask)
         } else if (ServerEnvironment.isPaperBased()) {
@@ -100,19 +116,31 @@ class PluginInitializer(private val plugin: PunisherX) {
     /**
      * Initializes various handlers used by the plugin.
      */
+    private fun t(label: String) {
+        plugin.logger.diag("[TIMING] $label @ ${System.currentTimeMillis()}")
+    }
+
     private fun setupHandlers() {
+        t("before SyntaxMessages.initialize")
         SyntaxMessages.initialize(plugin)
+        t("after SyntaxMessages.initialize")
         plugin.messageHandler = SyntaxMessages.messages
+        t("after SyntaxMessages.messages")
         plugin.pluginsManager = SyntaxCore.pluginManagerx
+        t("after pluginsManager")
         plugin.timeHandler = TimeHandler(plugin)
         plugin.punishmentManager = PunishmentManager()
         plugin.schedulerAdapter = BukkitSchedulerAdapter(plugin)
         plugin.safeTeleportService = SafeTeleportService(plugin.schedulerAdapter)
+        t("before GeoIPHandler")
         plugin.geoIPHandler = GeoIPHandler(plugin)
+        t("after GeoIPHandler")
         plugin.cache = PunishmentCache(plugin)
         plugin.punishmentActionBarNotifier = PunishmentActionBarNotifier(plugin).also { it.start() }
         plugin.punisherXApi = PunisherXApiImpl(plugin.databaseHandler)
+        t("before HookHandler")
         plugin.hookHandler = HookHandler(plugin)
+        t("after HookHandler")
         plugin.discordWebhook = DiscordWebhook(plugin)
         plugin.playerIPManager = PlayerIPManager(plugin, plugin.geoIPHandler)
         plugin.punishmentChecker = PunishmentChecker(plugin)
