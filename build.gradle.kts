@@ -65,7 +65,7 @@ dependencies {
     //compileOnly("dev.folia:folia-api:1.21.11-R0.1-SNAPSHOT")
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:syntaxcore:1.3.0-R0.5-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.2.0-R0.2-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.2.0-R0.3-SNAPSHOT")
 
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.6")
@@ -82,7 +82,7 @@ dependencies {
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.4")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
 
-    compileOnly("dev.faststats.metrics:bukkit:0.23.0")
+    compileOnly("dev.faststats.metrics:bukkit:0.24.1")
 
     compileOnly("net.luckperms:api:5.5")
     compileOnly("me.clip:placeholderapi:2.12.2")
@@ -95,10 +95,11 @@ dependencies {
     compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
 
     testImplementation(kotlin("test"))
+    testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:6.3.0")
-    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.8") {
+    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.10") {
         isTransitive = false
     }
 }
