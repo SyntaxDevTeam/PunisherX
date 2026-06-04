@@ -82,8 +82,6 @@ dependencies {
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.4")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
 
-    compileOnly("dev.faststats.metrics:bukkit:0.25.0")
-
     compileOnly("net.luckperms:api:5.5")
     compileOnly("me.clip:placeholderapi:2.12.2")
     compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.1.0")
@@ -93,6 +91,8 @@ dependencies {
         isTransitive = false
     }
     compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
+
+    compileOnly("dev.faststats.metrics:bukkit:0.25.0")
 
     testImplementation(kotlin("test"))
     testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")

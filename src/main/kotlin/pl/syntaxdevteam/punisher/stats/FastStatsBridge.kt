@@ -1,82 +1,56 @@
 package pl.syntaxdevteam.punisher.stats
 
-
+import dev.faststats.ErrorTracker
+import dev.faststats.Metrics
+import dev.faststats.bukkit.BukkitContext
 import org.bukkit.plugin.java.JavaPlugin
-import java.lang.reflect.Method
+import java.nio.file.Path
 
 class FastStatsBridge(
     private val plugin: JavaPlugin,
     private val token: String
 ) {
-    private var errorTracker: Any? = null
-    private var metrics: Any? = null
-    private var available = false
+    private var errorTracker: ErrorTracker? = null
+    private var context: BukkitContext? = null
 
     fun ready() {
-        ensureInitialized()
-        invokeNoArg(metrics, "ready")
-    }
-
-    fun shutdown() {
-        invokeNoArg(metrics, "shutdown")
-    }
-
-    fun trackError(throwable: Throwable) {
-        invokeOneArg(errorTracker, "trackError", Throwable::class.java, throwable)
-    }
-
-    private fun ensureInitialized() {
-        if (available || metrics != null) {
+        if (context != null) {
             return
         }
 
         try {
-            val errorTrackerClass = Class.forName("dev.faststats.core.ErrorTracker")
-            val contextAware = errorTrackerClass.getMethod("contextAware")
-            errorTracker = contextAware.invoke(null)
+            FastStatsConfigMigrator.migrate(fastStatsConfigPath())
 
-            val bukkitMetricsClass = Class.forName("dev.faststats.bukkit.BukkitMetrics")
-            val factory = bukkitMetricsClass.getMethod("factory").invoke(null)
-            val builderClass = factory.javaClass
-            invokeCompatible(builderClass, factory, "token", token)
-            invokeCompatible(builderClass, factory, "errorTracker", errorTracker!!)
-            metrics = invokeCompatible(builderClass, factory, "create", plugin)
-            available = true
+            val tracker = ErrorTracker.contextAware()
+            val fastStatsContext = BukkitContext.Factory(plugin, token)
+                .errorTrackerService(tracker)
+                .metrics(Metrics.Factory::create)
+                .create()
+
+            errorTracker = tracker
+            context = fastStatsContext
+            fastStatsContext.ready()
         } catch (exception: Exception) {
             plugin.logger.warning("[PunisherX] FastStats is unavailable, metrics disabled: ${exception::class.java.simpleName}: ${exception.message}")
         }
     }
 
-    private fun invokeNoArg(target: Any?, methodName: String) {
-        if (!available || target == null) {
-            return
+    private fun fastStatsConfigPath(): Path {
+        val pluginsFolder = try {
+            plugin.server.pluginsFolder.toPath()
+        } catch (_: NoSuchMethodError) {
+            plugin.dataFolder.parentFile.toPath()
         }
-        try {
-            target.javaClass.getMethod(methodName).invoke(target)
-        } catch (_: Exception) {
-            // no-op
-        }
+        return pluginsFolder.resolve("faststats").resolve("config.properties")
     }
 
-    private fun invokeOneArg(target: Any?, methodName: String, paramType: Class<*>, argument: Any) {
-        if (!available || target == null) {
-            return
-        }
-        try {
-            target.javaClass.getMethod(methodName, paramType).invoke(target, argument)
-        } catch (_: Exception) {
-            // no-op
-        }
+    fun shutdown() {
+        context?.shutdown()
+        context = null
+        errorTracker = null
     }
 
-    private fun invokeCompatible(targetClass: Class<*>, target: Any, methodName: String, argument: Any): Any? {
-        val candidate: Method = targetClass.methods.firstOrNull { method ->
-            method.name == methodName &&
-                    method.parameterCount == 1 &&
-                    method.parameters[0].type.isAssignableFrom(argument.javaClass)
-        } ?: throw NoSuchMethodException("No compatible '$methodName' method found in ${targetClass.name}")
-
-        candidate.isAccessible = true
-        return candidate.invoke(target, argument)
+    fun trackError(throwable: Throwable) {
+        errorTracker?.trackError(throwable)
     }
 }
