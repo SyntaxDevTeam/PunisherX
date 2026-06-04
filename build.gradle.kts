@@ -77,7 +77,7 @@ dependencies {
     compileOnly("com.zaxxer:HikariCP:7.0.2")
     compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.5")
     compileOnly("org.xerial:sqlite-jdbc:3.50.3.0")
-    compileOnly("org.postgresql:postgresql:42.7.7")
+    compileOnly("org.postgresql:postgresql:42.7.11")
     compileOnly("com.h2database:h2:2.3.232")
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.4")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
