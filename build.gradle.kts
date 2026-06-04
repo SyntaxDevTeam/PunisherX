@@ -3,7 +3,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.4.0-RC2"
+    kotlin("jvm") version "2.4.0"
     id("com.gradleup.shadow") version "9.4.2"
     id("org.jetbrains.dokka-javadoc") version "2.2.0" apply false
     `maven-publish`
@@ -64,15 +64,24 @@ dependencies {
     //compileOnly("org.leavesmc.leaves:leaves-api:1.21.10-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.11-R0.1-SNAPSHOT")
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:core:1.3.0-R0.4-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.2.0-R0.2-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:syntaxcore:1.3.0-R0.5-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.2.0-R0.3-SNAPSHOT")
 
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.6")
     compileOnly("com.google.code.gson:gson:2.14.0")
+
     compileOnly("com.maxmind.geoip2:geoip2:5.1.0")
     compileOnly("org.apache.ant:ant:1.10.17")
+
     compileOnly("com.zaxxer:HikariCP:7.0.2")
+    compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.5")
+    compileOnly("org.xerial:sqlite-jdbc:3.50.3.0")
+    compileOnly("org.postgresql:postgresql:42.7.7")
+    compileOnly("com.h2database:h2:2.3.232")
+    compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.4")
+    compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
+
     compileOnly("net.luckperms:api:5.5")
     compileOnly("me.clip:placeholderapi:2.12.2")
     compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.1.0")
@@ -81,18 +90,16 @@ dependencies {
     compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2"){
         isTransitive = false
     }
-    compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.4")
-    compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
     compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
 
-    compileOnly("dev.faststats.metrics:bukkit:0.23.0")
+    compileOnly("dev.faststats.metrics:bukkit:0.25.0")
 
     testImplementation(kotlin("test"))
     testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:6.3.0")
-    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.8") {
+    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.10") {
         isTransitive = false
     }
 }
