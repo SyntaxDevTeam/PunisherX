@@ -40,7 +40,7 @@ class BanListCommand(private val plugin: PunisherX) : BasicCommand {
 
         if (punishments.isEmpty()) {
             stack.sender.sendMessage(mh.stringMessageToComponent("banlist", "no_punishments"))
-            plugin.logger.success(mh.stringMessageToString("banlist", "no_punishments"))
+            plugin.logger.success(mh.stringMessageToStringNoPrefix("banlist", "no_punishments"))
             return
         }
 

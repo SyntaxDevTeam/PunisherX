@@ -82,7 +82,7 @@ dependencies {
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.4")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
 
-    compileOnly("dev.faststats.metrics:bukkit:0.24.1")
+    compileOnly("dev.faststats.metrics:bukkit:0.25.0")
 
     compileOnly("net.luckperms:api:5.5")
     compileOnly("me.clip:placeholderapi:2.12.2")
