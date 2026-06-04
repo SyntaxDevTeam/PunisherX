@@ -41,8 +41,9 @@ class UnMuteCommand(private val plugin: PunisherX) : BasicCommand {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNMUTE)) {
             return emptyList()
         }
+        val input = args.lastOrNull().orEmpty()
         return when (args.size) {
-            1 -> plugin.server.onlinePlayers.map { it.name }
+            1 -> plugin.server.onlinePlayers.map { it.name }.filter { it.startsWith(input, ignoreCase = true) }
             else -> emptyList()
         }
     }

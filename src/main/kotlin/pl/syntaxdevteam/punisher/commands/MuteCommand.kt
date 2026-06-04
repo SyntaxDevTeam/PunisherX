@@ -71,10 +71,11 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.MUTE)) {
             return emptyList()
         }
+        val input = args.lastOrNull().orEmpty()
         return when (args.size) {
-            0, 1 -> plugin.server.onlinePlayers.map { it.name }
-            2 -> TimeSuggestionProvider.generateTimeSuggestions()
-            3 -> plugin.messageHandler.getMessageStringList("mute", "reasons")
+            0, 1 -> plugin.server.onlinePlayers.map { it.name }.filter { it.startsWith(input, ignoreCase = true) }
+            2 -> TimeSuggestionProvider.generateTimeSuggestions().filter { it.startsWith(input, ignoreCase = true) }
+            3 -> plugin.messageHandler.getMessageStringList("mute", "reasons").filter { it.startsWith(input, ignoreCase = true) }
             else -> emptyList()
         }
     }

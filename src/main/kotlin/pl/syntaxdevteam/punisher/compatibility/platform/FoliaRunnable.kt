@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.platform
+package pl.syntaxdevteam.punisher.compatibility.platform
 
 import io.papermc.paper.threadedregions.scheduler.AsyncScheduler
 import io.papermc.paper.threadedregions.scheduler.EntityScheduler

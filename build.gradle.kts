@@ -3,8 +3,8 @@ import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    kotlin("jvm") version "2.4.0-Beta1"
-    id("com.gradleup.shadow") version "9.4.1"
+    kotlin("jvm") version "2.4.0"
+    id("com.gradleup.shadow") version "9.4.2"
     id("org.jetbrains.dokka-javadoc") version "2.2.0" apply false
     `maven-publish`
     id("io.papermc.hangar-publish-plugin") version "0.1.4"
@@ -13,8 +13,10 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.7.1-SNAPSHOT"
+version = property("punisherxVersion") as String
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
+
+val bridgeVersion = property("bridgeVersion") as String
 
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
@@ -23,7 +25,7 @@ subprojects {
     apply(plugin = "org.jetbrains.dokka-javadoc")
 
     group = rootProject.group
-    version = rootProject.version
+    version = bridgeVersion
 }
 
 val targetJavaVersion = 21
@@ -50,6 +52,9 @@ repositories {
     maven("https://repo.leavesmc.org/snapshots/") {
         name = "leavesmc-repo"
     }
+    maven("https://repo.faststats.dev/releases") {
+        name = "faststatsReleases"
+    }
 }
 
 val mockitoAgent: Configuration by configurations.creating
@@ -59,20 +64,24 @@ dependencies {
     //compileOnly("org.leavesmc.leaves:leaves-api:1.21.10-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.11-R0.1-SNAPSHOT")
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:core:1.3.0-R0.2-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.1.2-R0.1-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:syntaxcore:1.3.0-R0.5-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.2.0-R0.3-SNAPSHOT")
+
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.6")
-    compileOnly("com.google.code.gson:gson:2.13.2")
-    compileOnly("net.kyori:adventure-text-serializer-legacy:4.26.1")
-    compileOnly("net.kyori:adventure-text-minimessage:4.26.1")
-    compileOnly("net.kyori:adventure-text-serializer-gson:4.26.1")
-    compileOnly("net.kyori:adventure-text-serializer-plain:4.26.1")
-    compileOnly("net.kyori:adventure-text-serializer-ansi:4.26.1")
-    compileOnly("net.kyori:adventure-nbt:4.26.1")
-    compileOnly("com.maxmind.geoip2:geoip2:5.0.2")
-    compileOnly("org.apache.ant:ant:1.10.16")
+    compileOnly("com.google.code.gson:gson:2.14.0")
+
+    compileOnly("com.maxmind.geoip2:geoip2:5.1.0")
+    compileOnly("org.apache.ant:ant:1.10.17")
+
     compileOnly("com.zaxxer:HikariCP:7.0.2")
+    compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.5")
+    compileOnly("org.xerial:sqlite-jdbc:3.50.3.0")
+    compileOnly("org.postgresql:postgresql:42.7.7")
+    compileOnly("com.h2database:h2:2.3.232")
+    compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.4")
+    compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
+
     compileOnly("net.luckperms:api:5.5")
     compileOnly("me.clip:placeholderapi:2.12.2")
     compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.1.0")
@@ -81,16 +90,16 @@ dependencies {
     compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2"){
         isTransitive = false
     }
-    compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.3")
-    compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
     compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
+
+    compileOnly("dev.faststats.metrics:bukkit:0.25.0")
 
     testImplementation(kotlin("test"))
     testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:6.3.0")
-    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.8") {
+    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.10") {
         isTransitive = false
     }
 }
@@ -127,7 +136,16 @@ tasks.named<ShadowJar>("shadowJar") {
     archiveClassifier.set("")
     archiveVersion.set(project.version.toString())
     mergeServiceFiles()
+    dependencies {
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-reflect"))
+        exclude(dependency("org.jetbrains.kotlinx:kotlinx-coroutines-core"))
+        exclude(dependency("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8"))
+    }
 }
+
 
 publishing {
     publications {
@@ -190,6 +208,6 @@ hangarPublish {
 }
 
 plugindeployer {
-    paper { dir = "/home/debian/server/Paper/26.1.1/plugins" } //ostatnia wersja dla Paper
-    folia { dir = "/home/debian/server/Folia/1.21.11/plugins" } //ostatnia wersja dla Folia
+    paper { dir = "/home/debian/server/Paper/26.1.2/plugins" } //ostatnia wersja dla Paper
+    folia { dir = "/home/debian/server/Folia/26.1.2/plugins" } //ostatnia wersja dla Folia
 }

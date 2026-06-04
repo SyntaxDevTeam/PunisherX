@@ -96,9 +96,10 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        val input = args.lastOrNull().orEmpty()
         return when (args.size) {
-            0, 1 -> plugin.server.onlinePlayers.map { it.name }
-            2 -> listOf("all", "warn", "mute", "jail", "ban")
+            0, 1 -> plugin.server.onlinePlayers.map { it.name }.filter { it.startsWith(input, ignoreCase = true) }
+            2 -> listOf("all", "warn", "mute", "jail", "ban").filter { it.startsWith(input, ignoreCase = true) }
             else -> emptyList()
         }
     }

@@ -147,6 +147,7 @@ class PunishmentCache(private val plugin: PunisherX) {
                 cache.put(UUID.fromString(key), value)
             } else {
                 plugin.logger.warning("Invalid UUID in cache: $key. Skipping this entry.")
+                plugin.reportError(IllegalArgumentException("Invalid UUID in cache entry: $key"))
             }
         }
         plugin.logger.debug("Loaded ${cache.asMap().size} entries into cache.")
@@ -168,6 +169,7 @@ class PunishmentCache(private val plugin: PunisherX) {
             plugin.logger.debug("Saved punishment for player $uuid.")
         } catch (e: IOException) {
             plugin.logger.severe("Error saving punishment to file: ${e.message}")
+            plugin.reportError(e)
         }
     }
 
@@ -180,6 +182,7 @@ class PunishmentCache(private val plugin: PunisherX) {
             plugin.logger.debug("Removed punishment for player $uuid from file.")
         } catch (e: IOException) {
             plugin.logger.severe("Error removing punishment from file: ${e.message}")
+            plugin.reportError(e)
         }
     }
 
@@ -190,6 +193,7 @@ class PunishmentCache(private val plugin: PunisherX) {
             cacheFile.readText()
         } catch (e: IOException) {
             plugin.logger.severe("Error reading punishment cache: ${e.message}")
+            plugin.reportError(e)
             return mutableMapOf()
         }
 

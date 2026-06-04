@@ -1,6 +1,10 @@
 rootProject.name = "PunisherX"
-include("bungee-bridge")
-include("velocity-bridge")
+include("PunisherX-BungeeCord-Bridge")
+include("PunisherX-Velocity-Bridge")
+
+project(":PunisherX-BungeeCord-Bridge").projectDir = file("bungee-bridge")
+project(":PunisherX-Velocity-Bridge").projectDir = file("velocity-bridge")
+
 pluginManagement {
     repositories {
         // Twoje repozytoria z pluginami:

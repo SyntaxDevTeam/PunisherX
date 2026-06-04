@@ -123,8 +123,9 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        val input = args.lastOrNull().orEmpty()
         return if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNBAN) && args.size == 1) {
-            plugin.server.onlinePlayers.map { it.name }
+            plugin.server.onlinePlayers.map { it.name }.filter { it.startsWith(input, ignoreCase = true) }
         } else {
             emptyList()
         }

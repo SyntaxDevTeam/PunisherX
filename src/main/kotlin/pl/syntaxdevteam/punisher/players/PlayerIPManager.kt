@@ -94,6 +94,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
 
         if (data.length % 2 != 0) {
             plugin.logger.err("Failed to decrypt data: invalid hex length -> $data")
+            plugin.reportError(IllegalArgumentException("Invalid encrypted hex length in player cache line"))
             return ""
         }
 
@@ -104,6 +105,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
             String(cipher.doFinal(bytes), UTF_8)
         } catch (e: Exception) {
             plugin.logger.err("Failed to decrypt data: $data -> $e")
+            plugin.reportError(e)
             ""
         }
     }
@@ -115,9 +117,22 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
                 parsePlayerInfo(decrypted)
             } catch (e: Exception) {
                 plugin.logger.err("Error decrypting line: $line -> $e")
+                plugin.reportError(e)
                 null
             }
         }
+    }
+
+
+    fun getLatestDecryptedRecords(): List<PlayerInfo> {
+        val latestByUuid = linkedMapOf<String, PlayerInfo>()
+
+        readLines().asReversed().forEach { line ->
+            val info = parsePlayerInfo(decrypt(line)) ?: return@forEach
+            latestByUuid.putIfAbsent(info.playerUUID.lowercase(Locale.ROOT), info)
+        }
+
+        return latestByUuid.values.toList()
     }
 
     fun getPlayerIPByName(playerName: String): String? {
@@ -207,6 +222,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
             )
         } else {
             plugin.logger.err("Invalid record format: $decryptedLine")
+            plugin.reportError(IllegalArgumentException("Invalid player cache record format"))
             null
         }
     }

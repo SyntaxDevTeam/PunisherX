@@ -3,8 +3,8 @@
 PunisherX is a comprehensive punishment system for Paper/Folia-based Minecraft servers. It covers commands such as `kick`, `warn`, `mute`, `jail`, `ban`, and `ban-ip` (temporary or permanent), plus utilities like `/check`, `/history`, and `/banlist` for quick monitoring. Customizable punishment templates ensure consistent enforcement, and a fully translatable message file supports MiniMessage, Legacy, and plain Minecraft formatting. The plugin includes a rich configuration file and supports MySQL/MariaDB or PostgreSQL for multi-server synchronization, with SQLite or H2 available for lightweight standalone use.
 
 ## Technical information
-- Designed for compatibility with Minecraft 1.20.6 - 1.21+, optimized for Paper, Pufferfish, Purple, and Leaves forks (while maintaining full compatibility with Folia and its forks!)
-- Written in modern Kotlin requires Java 21 or newer
+- Designed for compatibility with Minecraft 1.20.6 - 26.1+, optimized for Paper, Pufferfish, Purple, and Leaves forks (while maintaining full compatibility with Folia and its forks!)
+- Written in modern Kotlin requires Java 21 or newer
 - Language file with full MiniMessage and Legacy formatting support
 - Supports MySQL/MariaDB, MSSQL, PostgreSQL, SQLite, and H2 databases
 - Extensive configuration file [see the default settings here](https://github.com/SyntaxDevTeam/PunisherX/blob/main/src/main/resources/config.yml)
@@ -34,6 +34,14 @@ If you have questions, join our [Discord](https://discord.gg/Zk6mxv7eMh).
 5. Restart your Minecraft server
 6. Enjoy.
 
+## Documentation
+
+Looking for a practical setup and operations walkthrough? Start with:
+
+* **Admin Guide (EN)**: [ADMIN-GUIDE.md](ADMIN-GUIDE.md)
+
+
+---
 ## Contact
 Need help or have questions? Reach out on our [Discord](https://discord.gg/Zk6mxv7eMh).
 

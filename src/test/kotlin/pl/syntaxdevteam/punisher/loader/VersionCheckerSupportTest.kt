@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.loader
 
+import pl.syntaxdevteam.punisher.compatibility.VersionChecker
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

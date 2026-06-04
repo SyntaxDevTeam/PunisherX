@@ -1,7 +1,7 @@
 package pl.syntaxdevteam.punisher.gui.materials
 
 import org.bukkit.Material
-import pl.syntaxdevteam.punisher.loader.SemanticVersion
+import pl.syntaxdevteam.punisher.compatibility.SemanticVersion
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

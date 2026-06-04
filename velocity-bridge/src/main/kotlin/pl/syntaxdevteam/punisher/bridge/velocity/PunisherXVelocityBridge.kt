@@ -2,6 +2,8 @@ package pl.syntaxdevteam.punisher.bridge.velocity
 
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.PluginMessageEvent
+import com.velocitypowered.api.event.connection.LoginEvent
+import com.velocitypowered.api.event.player.ServerPreConnectEvent
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent
 import com.velocitypowered.api.plugin.Plugin
@@ -23,7 +25,7 @@ import java.util.UUID
 import java.nio.file.Path
 import com.google.inject.Inject
 
-private const val BRIDGE_VERSION: String = "1.6.2-SNAPSHOT" // Keep aligned with the root project version and velocity-plugin.json expansion
+private const val BRIDGE_VERSION: String = "1.0.3-R0.1-SNAPSHOT" // Keep aligned with the root project version and velocity-plugin.json expansion
 
 @Plugin(
     id = "punisherxbridge",
@@ -73,6 +75,16 @@ class PunisherXVelocityBridge @Inject constructor(
             "BANIP" -> handleBanIp(target, reason, end)
             else -> logger.warn("Received unsupported PunisherX bridge action: $action")
         }
+    }
+
+    @Subscribe
+    fun onLogin(event: LoginEvent) {
+        disconnectIfBanned(event.player)
+    }
+
+    @Subscribe
+    fun onServerPreConnect(event: ServerPreConnectEvent) {
+        disconnectIfBanned(event.player)
     }
 
     @Subscribe
@@ -132,6 +144,11 @@ class PunisherXVelocityBridge @Inject constructor(
 
         val message = Component.join(JoinConfiguration.newlines(), lines)
         player.disconnect(message)
+    }
+
+    private fun disconnectIfBanned(player: Player) {
+        val activeBan = bridgeDatabase.findActiveBan(player.uniqueId) ?: return
+        disconnect(player, "BAN", activeBan.reason, activeBan.endTime)
     }
 
     private fun formatDuration(end: Long): String {

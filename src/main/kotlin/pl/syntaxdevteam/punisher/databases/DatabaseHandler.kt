@@ -1,11 +1,11 @@
 package pl.syntaxdevteam.punisher.databases
 
 import org.bukkit.configuration.file.YamlConfiguration
+import org.mariadb.jdbc.DatabaseMetaData
 import pl.syntaxdevteam.core.database.*
 import pl.syntaxdevteam.punisher.PunisherX
 import java.io.File
 import java.io.IOException
-import java.sql.DatabaseMetaData
 import java.sql.Statement
 import java.time.Instant
 import java.time.LocalDate
@@ -203,37 +203,80 @@ class DatabaseHandler(private val plugin: PunisherX) {
     }
 
     private fun ensureServerScopeColumns() {
-        val alterStatement = "ALTER TABLE %s ADD COLUMN server VARCHAR(64) DEFAULT '$NETWORK_SCOPE'"
         val tables = listOf("punishments", "punishmenthistory")
-        runCatching {
-            db.getConnection().use { connection ->
-                val metadata = connection.metaData
-                tables.forEach { table ->
-                    val columnExists = hasColumn(metadata, table, "server")
-                    if (!columnExists) {
-                        runCatching {
-                            execute(alterStatement.format(table))
-                        }.onFailure { exception ->
-                            logger.debug("Skipping server column migration on $table: ${exception.message}")
-                        }
+
+        tables.forEach { table ->
+            runCatching {
+                val columnExists = when (dbType) {
+                    DatabaseType.SQLITE -> hasColumnSqlite(table, "server")
+                    DatabaseType.POSTGRESQL -> db.getConnection().use { connection ->
+                        hasColumnPostgres(connection.metaData as DatabaseMetaData, table, "server")
+                    }
+                    else -> db.getConnection().use { connection ->
+                        hasColumnJdbc(connection.metaData as DatabaseMetaData, table, "server")
                     }
                 }
+                if (!columnExists) {
+                    runCatching {
+                        execute("ALTER TABLE $table ADD COLUMN server VARCHAR(64) DEFAULT '$NETWORK_SCOPE'")
+                    }.onFailure { exception ->
+                        logger.debug("Skipping server column migration on $table: ${exception.message}")
+                    }
+                }
+            }.onFailure { exception ->
+                logger.debug("Could not check columns for $table: ${exception.message}")
             }
         }
-        runCatching { execute("UPDATE punishments SET server = ? WHERE server IS NULL", NETWORK_SCOPE) }
-        runCatching { execute("UPDATE punishmenthistory SET server = ? WHERE server IS NULL", NETWORK_SCOPE) }
+
+        runCatching {
+            execute("UPDATE punishments SET server = ? WHERE server IS NULL", NETWORK_SCOPE)
+        }.onFailure { exception ->
+            logger.debug("Could not backfill server column on punishments: ${exception.message}")
+        }
+
+        runCatching {
+            execute("UPDATE punishmenthistory SET server = ? WHERE server IS NULL", NETWORK_SCOPE)
+        }.onFailure { exception ->
+            logger.debug("Could not backfill server column on punishmenthistory: ${exception.message}")
+        }
     }
 
-    private fun hasColumn(meta: DatabaseMetaData, table: String, column: String): Boolean {
+    private fun hasColumnSqlite(table: String, column: String): Boolean {
+        return db.query("PRAGMA table_info($table)") { rs ->
+            rs.getString("name")
+        }.any { it.equals(column, ignoreCase = true) }
+    }
+
+    private fun hasColumnJdbc(
+        metadata: DatabaseMetaData,
+        table: String,
+        column: String
+    ): Boolean {
         fun check(tableName: String, columnName: String): Boolean {
-            meta.getColumns(null, null, tableName, columnName).use { result ->
+            metadata.getColumns(null, null, tableName, columnName).use { result ->
                 return result.next()
             }
         }
 
         return check(table, column)
-            || check(table.lowercase(), column.lowercase())
-            || check(table.uppercase(), column.uppercase())
+                || check(table.lowercase(), column.lowercase())
+                || check(table.uppercase(), column.uppercase())
+    }
+
+    private fun hasColumnPostgres(
+        metadata: DatabaseMetaData,
+        table: String,
+        column: String
+    ): Boolean {
+        metadata.getColumns(null, "public", table, column).use { result ->
+            if (result.next()) return true
+        }
+
+        metadata.getColumns(null, "public", table.lowercase(), column.lowercase()).use { result ->
+            if (result.next()) return true
+        }
+
+        return false
     }
 
     // ---------------------------------------------------------------------

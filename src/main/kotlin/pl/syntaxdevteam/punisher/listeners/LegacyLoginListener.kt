@@ -68,6 +68,7 @@ class LegacyLoginListener(private val plugin: PunisherX) : Listener {
             }
         } catch (e: Exception) {
             plugin.logger.severe("Error in onPlayerPreLogin, report it urgently to the plugin author with the message: ${event.player.name}: ${e.message}")
+            plugin.reportError(e)
             e.printStackTrace()
         }
     }

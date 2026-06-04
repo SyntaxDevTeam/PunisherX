@@ -52,9 +52,10 @@ class ChangeReasonCommand(private val plugin: PunisherX) : BasicCommand {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.CHANGE_REASON)) {
             return emptyList()
         }
+        val input = args.lastOrNull().orEmpty()
         return when (args.size) {
-            0, 1 -> plugin.server.onlinePlayers.map { it.name }
-            2 -> TimeSuggestionProvider.generateTimeSuggestions()
+            0, 1 -> plugin.server.onlinePlayers.map { it.name }.filter { it.startsWith(input, ignoreCase = true) }
+            2 -> TimeSuggestionProvider.generateTimeSuggestions().filter { it.startsWith(input, ignoreCase = true) }
             else -> emptyList()
         }
     }

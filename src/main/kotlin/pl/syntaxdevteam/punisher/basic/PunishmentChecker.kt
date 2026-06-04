@@ -62,6 +62,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         val locationsConfigured = jailLoc != null && unjailLoc != null
         if (!locationsConfigured) {
             plugin.logger.warning("Jail or unjail location undefined!")
+            plugin.reportError(IllegalStateException("Jail or unjail location is undefined"))
         } else {
             plugin.schedulerAdapter.runAsync {
                 val punishments = plugin.databaseHandler.getPunishments(uuid.toString())
@@ -93,6 +94,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
                     if (targetLoc.world == null) {
                         plugin.logger.warning("Missing world for $targetLoc")
+                        plugin.reportError(IllegalStateException("Missing world for teleport target: $targetLoc"))
                         return@runSync
                     }
 
@@ -157,6 +159,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             }
         } catch (e: Exception) {
             plugin.logger.severe("Error in onPlayerChat, report it urgently to the plugin author: ${e.message}")
+            plugin.reportError(e)
             e.printStackTrace()
         }
     }
@@ -233,6 +236,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             }
         } catch (e: Exception) {
             plugin.logger.severe("Error in onPlayerCommand, report it urgently to the plugin author with the message: ${event.player.name}: ${e.message}")
+            plugin.reportError(e)
             e.printStackTrace()
         }
     }

@@ -1,4 +1,4 @@
-package pl.syntaxdevteam.punisher.loader
+package pl.syntaxdevteam.punisher.compatibility
 
 data class SemanticVersion(
     val major: Int,

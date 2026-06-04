@@ -16,15 +16,17 @@ class CacheCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         val playerIPManager = plugin.playerIPManager
+        val latestRecords = playerIPManager.getLatestDecryptedRecords()
         val allRecords = playerIPManager.getAllDecryptedRecords()
 
-        if (allRecords.isEmpty()) {
+        if (latestRecords.isEmpty()) {
             plugin.logger.info("Cache is empty.")
         } else {
-            plugin.logger.info("Cache Contents:")
-            allRecords.forEach { record ->
+            plugin.logger.info("Cache Contents (latest per UUID):")
+            latestRecords.forEach { record ->
                 plugin.logger.info(record.toString())
             }
+            plugin.logger.info("Displayed ${latestRecords.size} latest record(s) from ${allRecords.size} total cache line(s).")
         }
     }
 }
