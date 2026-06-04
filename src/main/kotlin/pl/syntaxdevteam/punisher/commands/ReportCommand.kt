@@ -4,7 +4,6 @@ import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.punisher.gui.report.ReportSelectorGUI
 
 class ReportCommand(private val plugin: PunisherX) : BasicCommand {
 
@@ -17,7 +16,7 @@ class ReportCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        ReportSelectorGUI(plugin).open(sender)
+        plugin.punisherMainGuiController.openReportSelector(sender)
     }
 
     override fun suggest(stack: CommandSourceStack, args: Array<String>): List<String> = emptyList()

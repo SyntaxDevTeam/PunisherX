@@ -174,14 +174,22 @@ publishing {
     }
     repositories {
         maven {
-            name = "Nexus"
+            name = "NexusSnapshots"
+            url = uri("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/")
+            credentials {
+                username = findProperty("nexusUser")?.toString()
+                password = findProperty("nexusPassword")?.toString()
+            }
+            mavenContent { snapshotsOnly() }
+        }
+        maven {
+            name = "NexusReleases"
             url = uri("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
             credentials {
                 username = findProperty("nexusUser")?.toString()
-                    ?: throw GradleException("Właściwość 'nexusUser' nie jest ustawiona w gradle.properties")
                 password = findProperty("nexusPassword")?.toString()
-                    ?: throw GradleException("Właściwość 'nexusPassword' nie jest ustawiona w gradle.properties")
             }
+            mavenContent { releasesOnly() }
         }
     }
 }
