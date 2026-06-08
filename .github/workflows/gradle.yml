@@ -60,7 +60,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: PunisherX-${{ env.ARTIFACT_SUFFIX }}.jar
-          path: build/libs/*.jar
+          path: punisherx-paper/build/libs/*.jar
           retention-days: 7
       - name: Upload bungee-bridge JAR
         uses: actions/upload-artifact@v7

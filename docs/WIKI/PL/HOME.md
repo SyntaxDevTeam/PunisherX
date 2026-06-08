@@ -7,7 +7,7 @@ PunisherX to rozbudowany system kar dla serwerów Minecraft opartych o Paper/Fol
 - Napisany we współczesnym Kotlinie, wymaga Java 21 lub nowszej
 - Plik językowy z pełnym wsparciem formatowania MiniMessage i Legacy
 - Obsługuje bazy MySQL/MariaDB, MSSQL, PostgreSQL, SQLite i H2
-- Rozbudowany plik konfiguracyjny [sprawdź domyślne ustawienia tutaj](https://github.com/SyntaxDevTeam/PunisherX/blob/main/src/main/resources/config.yml)
+- Rozbudowany plik konfiguracyjny [sprawdź domyślne ustawienia tutaj](https://github.com/SyntaxDevTeam/PunisherX/blob/main/punisherx-paper/src/main/resources/config.yml)
 - **Automatyczne migracje** przy zmianach w konfiguracji — zawsze masz najnowszą wersję bez utraty bieżących ustawień
 - Opcjonalny checker aktualizacji z automatycznym pobieraniem update’ów pluginu
 - Geolokalizacja IP (wymaga darmowego klucza licencji MaxMind)

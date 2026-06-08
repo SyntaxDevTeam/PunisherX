@@ -1,0 +1,123 @@
+# Example punishment templates for /punish command.
+templates:
+  Griefing:
+    reason: "Griefing (property damage)"
+    1:
+      punish: warn
+      time: "1d"
+    2:
+      punish: ban
+      time: "1d"
+    3:
+      punish: ban
+      time: "7d"
+  Spam:
+    reason: "Chat spam"
+    1:
+      punish: mute
+      time: "10m"
+    2:
+      punish: mute
+      time: "1h"
+    3:
+      punish: mute
+      time: "12h"
+  CapsFlood:
+    reason: "Caps flood (excessive caps)"
+    1:
+      punish: mute
+      time: "5m"
+    2:
+      punish: mute
+      time: "30m"
+    3:
+      punish: mute
+      time: "2h"
+  Advertising:
+    reason: "Advertising other servers"
+    1:
+      punish: mute
+      time: "1h"
+    2:
+      punish: ban
+      time: "1d"
+    3:
+      punish: ban
+      time: "7d"
+  Insults:
+    reason: "Insults or harassment"
+    1:
+      punish: mute
+      time: "30m"
+    2:
+      punish: mute
+      time: "6h"
+    3:
+      punish: ban
+      time: "3d"
+  HateSpeech:
+    reason: "Hate speech/discrimination"
+    1:
+      punish: mute
+      time: "6h"
+    2:
+      punish: ban
+      time: "3d"
+    3:
+      punish: ban
+      time: "14d"
+  Cheating:
+    reason: "Cheating or unfair mods"
+    1:
+      punish: ban
+      time: "7d"
+    2:
+      punish: ban
+      time: "30d"
+    3:
+      punish: ban
+      time: "permanent"
+  Exploiting:
+    reason: "Bug exploiting"
+    1:
+      punish: ban
+      time: "3d"
+    2:
+      punish: ban
+      time: "14d"
+    3:
+      punish: ban
+      time: "permanent"
+  Scamming:
+    reason: "Scamming or fraud"
+    1:
+      punish: ban
+      time: "7d"
+    2:
+      punish: ban
+      time: "30d"
+    3:
+      punish: ban
+      time: "permanent"
+  InappropriateSkin:
+    reason: "Inappropriate name or skin"
+    1:
+      punish: warn
+      time: "1d"
+    2:
+      punish: ban
+      time: "1d"
+    3:
+      punish: ban
+      time: "7d"
+  AbuseOfReports:
+    reason: "Report abuse/false reports"
+    1:
+      punish: warn
+      time: "1d"
+    2:
+      punish: mute
+      time: "1h"
+    3:
+      punish: mute
+      time: "12h"

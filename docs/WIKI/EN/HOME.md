@@ -7,7 +7,7 @@ PunisherX is a comprehensive punishment system for Paper/Folia-based Minecraft s
 - Written in modern Kotlin requires Java 21 or newer
 - Language file with full MiniMessage and Legacy formatting support
 - Supports MySQL/MariaDB, MSSQL, PostgreSQL, SQLite, and H2 databases
-- Extensive configuration file [see the default settings here](https://github.com/SyntaxDevTeam/PunisherX/blob/main/src/main/resources/config.yml)
+- Extensive configuration file [see the default settings here](https://github.com/SyntaxDevTeam/PunisherX/blob/main/punisherx-paper/src/main/resources/config.yml)
 - **Automatic migrations** in case of changes in the config file - you always have the latest version without losing your current settings
 - Optional update checker with automatic plugin updates
 - IP geolocation lookup (requires a free MaxMind license key)

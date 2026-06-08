@@ -1,4 +1,6 @@
 rootProject.name = "PunisherX"
+include("punisherx-paper")
+include("punisherx-spigot")
 include("PunisherX-BungeeCord-Bridge")
 include("PunisherX-Velocity-Bridge")
 

@@ -9,6 +9,14 @@ It provides complete punishment coverage (`/ban`, `/banip`, `/mute`, `/jail`, `/
 The plugin also includes operator tools such as `/check`, `/history`, `/banlist`, `/change-reason`, and `/punish` templates, as well as GUI panels for moderators and report handling.
 PunisherX supports message customization with MiniMessage/Legacy/plain formats, config auto-migration between versions, and multiple database backends (SQLite, H2, MySQL, MariaDB, PostgreSQL) for both standalone and network environments.
 
+## 🧩 Modules
+
+* `punisherx-paper` – the production Paper/Folia plugin implementation.
+* `punisherx-spigot` – the Spigot platform module prepared for a native implementation.
+* `bungee-bridge` and `velocity-bridge` – proxy synchronization bridges.
+
+The Paper implementation uses Paper-only APIs and is therefore not copied into the Spigot module. Shared logic must be extracted behind platform adapters before native Spigot support can be completed.
+
 ## ✅ Key Features
 * [x] Built for Paper 1.20.6, 1.21 - 1.21.11, 26.1-26.1.2 and compatible forks, including improved Folia support.
 * [x] Actively maintained with up-to-date APIs and backward compatibility.

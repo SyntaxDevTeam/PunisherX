@@ -1,0 +1,177 @@
+### Config version 1.4.1
+
+# /********************************************/
+#    Settings for connecting to the database
+# /********************************************/
+database:
+  # Available options: mariadb, mysql, postgresql, sqlite, h2
+  type: "sqlite"
+  sql:
+    host: "localhost"
+    port: 3306          # 5432 if you use PostgreSQL; Default for MySQL is 3306.
+    dbname: "my_database"
+    username: "root"
+    password: "password"
+
+playerCache:
+  # Choose where player IP information is stored: "file" or "database"
+  storage: "file"
+
+
+# /********************************************/
+#    Settings for main commands
+# /********************************************/
+
+# Should the "kick" command be recorded in the player's penalty history? Default: false.
+kick:
+  history: false
+
+# Settings for actions triggered by a certain number of warnings.
+warn:
+  actions:
+    3:  "kick {player} You have received your 3rd warning."
+    4:  "ban {player} 30m You have received your 4th warning."
+    5:  "ban {player} 5h You have received your 5th warning."
+    6:  "ban {player} 7d You have received your 6th warning."
+    7:  "ban {player} 30d You have received your {warn_no}th warning."
+    10: "ban {player} You have received your 10th warning."
+
+# Settings for "mute" command
+mute:
+  # Should private messages also be blocked when the MUTE penalty is applied?
+  pm: false
+  # If you set pm to true, you can edit which private-message commands should be blocked here.
+  cmd:
+    - "me"
+    - "say"
+    - "action"
+    - "eaction"
+    - "describe"
+    - "edescribe"
+    - "eme"
+    - "w"
+    - "m"
+    - "pm"
+    - "whisper"
+    - "ewhisper"
+    - "emsg"
+    - "msg"
+    - "etell"
+    - "tell"
+    - "er"
+    - "r"
+    - "reply"
+    - "ereply"
+    - "ac"
+    - "eac"
+    - "amsg"
+    - "eamsg"
+    - "ehelpop"
+    - "p msg"
+
+# Settings for the prison location and its radius.
+jail:
+  location:
+    world: "world"
+    x: 100.0
+    y: 64.0
+    z: 200.0
+    yaw: 0.0
+    pitch: 0.0
+  radius: 5
+  # Commands that jailed players are allowed to use (without the leading slash).
+  # Use "*" to allow all commands while jailed.
+  allowed_commands: []
+
+spawn:
+  # Location of the spawn point after the player is unjailed.
+  location:
+    world: "world"
+    x: 0.0
+    y: 64.0
+    z: 0.0
+    yaw: 0.0
+    pitch: 0.0
+  # Experimental setting (may not work properly).
+  use_external_set:
+    enabled: false
+    # Available options: essx (EssentialsX), world (default world spawn point).
+    set: world
+
+# /********************************************/
+#    GUI settings
+# /********************************************/
+
+gui:
+  punish:
+    times:
+      - "10m"
+      - "20m"
+      - "30m"
+      - "1h"
+      - "2h"
+      - "6h"
+      - "1d"
+      - "perm"
+    reasons:
+      - "Cheating"
+      - "Griefing"
+      - "Spamming"
+      - "Offensive language"
+    # Should I add the "--force" parameter to the end of commands?
+    #This bypasses the "bypass" permissions most often granted to administrators.
+    use_force: true
+
+# /********************************************/
+#    Internal settings
+# /********************************************/
+
+# Plugin language selection. Possible values: EN, PL, NL, ES, FR, DE, RU, UK, IT, PT.
+# To add your own language file, please contact us on Discord: https://discord.gg/Zk6mxv7eMh
+language: "EN"
+
+# Custom aliases for commands.
+aliases:
+  check:    "cx"
+  history:  "hx"
+  kick:     "kx"
+  warn:     "wx"
+  unwarn:   "uw"
+  mute:     "mx"
+  unmute:   "um"
+  jail:     "j"
+  unjail:   "uj"
+  ban:      "bx"
+  banip:    "bip"   # For security reasons, do not use "ban-ip" for this alias.
+  unban:    "ub"
+  clearall: "ca"
+  setjail:  "sjail"
+  setspawn: "sspawn"
+  panel:    "px"
+
+geoDatabase:
+  # To use GeoIP functionality, you need a MaxMind license key.
+  # Obtain a free key at: https://www.maxmind.com/en/geolite2/signup
+  licenseKey: "LICENSEKEY"
+
+# Discord webhook settings.
+webhook:
+  discord:
+    enabled: false
+    url: "YOUR_WEBHOOK_URL_HERE"
+
+# Update check and auto-download settings.
+update:
+  check-for-updates: true
+  auto-download: false
+  hangar: true
+  github: true
+  modrinth: true
+
+
+# Debug mode: when true, provides more detailed console logs.
+debug: false
+
+# Should StatsCollector be enabled? Recommended: true.
+stats:
+  enabled: true

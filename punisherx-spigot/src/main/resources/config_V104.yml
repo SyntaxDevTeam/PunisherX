@@ -1,0 +1,110 @@
+### Config version 1.0.4
+
+# Settings for connecting to the database
+database:
+  # Available options: mariadb, mysql, postgresql, sqlite, h2
+  type: "sqlite"
+  sql:
+    host: "localhost"
+    port: 3306 # 5432 if you use PostgreSQL default for MySQL is 3306
+    dbname: "my_database"
+    username: "root"
+    password: "password"
+
+# Plugin language selection. Possible values:  EN, PL, NL, ES, FR, DE, RU
+# If you would like to add your own language file, please contact us on Discord (https://discord.gg/Zk6mxv7eMh).
+language: "EN"
+
+# Should private messages also be blocked when MUTE penalty is applied?
+mute_pm: false
+# If you set mute_pm to TRUE, you can edit which commands for private messages should be blocked here
+mute_cmd:
+  - 'me'
+  - 'say'
+  - 'action'
+  - 'eaction'
+  - 'describe'
+  - 'edescribe'
+  - 'eme'
+  - 'w'
+  - 'm'
+  - 'pm'
+  - 'whisper'
+  - 'ewhisper'
+  - 'emsg'
+  - 'msg'
+  - 'etell'
+  - 'tell'
+  - 'er'
+  - 'r'
+  - 'reply'
+  - 'ereply'
+  - 'ac'
+  - 'eac'
+  - 'amsg'
+  - 'eamsg'
+  - 'ehelpop'
+  - 'p msg'
+
+# Settings for reactions to the number of received warnings
+WarnActions:
+  3: "kick {player} You have received your 3rd warning!"
+  4: "ban {player} 30m You have received your 4th warning!"
+  5: "ban {player} 5h You have received your 5th warning!"
+  6: "ban {player} 7d You have received your 6th warning!"
+  7: "ban {player} 30d You have received your {warn_no}th warning!"
+  10: "ban {player} You have received your 10th warning!"
+
+# Settings for the location of the prison center along with the radius of that prison.
+jail:
+  location:
+    world: "world"
+    x: 100.0
+    y: 64.0
+    z: 200.0
+  radius: 5
+
+spawn:
+  # Location of the spawn point after the player is unjailed
+  location:
+    world: "world"
+    x: 0.0
+    y: 64.0
+    z: 0.0
+
+# You can set your own aliases for the commands below
+aliases:
+  check: "cx"
+  history: "hx"
+  kick: "kx"
+  warn: "wx"
+  unwarn: "uw"
+  mute: "mx"
+  unmute: "um"
+  ban: "bx"
+  banip: "bip" # Don't use "ban-ip" for this alias
+  unban: "ub"
+  clearall: "ca"
+
+geoDatabase:
+  # To use GeoIP functionality, you need a MaxMind license key.
+  # You can obtain a free license key by creating an account at MaxMind:
+  # https://www.maxmind.com/en/geolite2/signup
+  licenseKey: "LICENSEKEY"
+
+# Discord webhook settings
+webhook:
+  discord:
+    enabled: false
+    url: "YOUR_WEBHOOK_URL_HERE"
+
+# Update check and auto-update settings
+checkForUpdates: true
+autoDownloadUpdates: false
+
+# Debug mode set to true provides more detailed logs in the console
+debug: false
+
+# Should StatsCollector be enabled? Recommended setting: true
+stats:
+  enabled: true
