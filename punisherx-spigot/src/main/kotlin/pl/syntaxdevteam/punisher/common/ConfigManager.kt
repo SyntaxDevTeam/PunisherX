@@ -1,0 +1,512 @@
+package pl.syntaxdevteam.punisher.common
+import pl.syntaxdevteam.punisher.compatibility.*
+
+import dev.dejvokep.boostedyaml.YamlDocument
+import dev.dejvokep.boostedyaml.block.implementation.Section
+import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings
+import dev.dejvokep.boostedyaml.settings.general.GeneralSettings
+import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings
+import pl.syntaxdevteam.punisher.PunisherX
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+
+class ConfigManager(private val plugin: PunisherX) {
+
+    companion object {
+        private const val FILE_NAME = "config.yml"
+        private const val VERSION_KEY = "config-version"
+        private const val V_104 = 104
+        private const val V_141 = 141
+        private const val V_160 = 160
+        private const val V_161 = 161
+        private const val V_162 = 162
+        // private const val V_170 = 170 // Reserved for future stable release (DscBridgeAPI config migration).
+    }
+
+    lateinit var config: YamlDocument
+    private var rawUserDoc: YamlDocument? = null
+    private val dataFile: File get() = File(plugin.dataFolder, FILE_NAME)
+
+    fun load() {
+        if (!plugin.dataFolder.exists()) plugin.dataFolder.mkdirs()
+
+        val defaultsStream = plugin.getResource(FILE_NAME)
+            ?: error("Missing $FILE_NAME in resources (template 1.6.0 with comments required).")
+
+        plugin.logger.debug("[Config] Loading $FILE_NAME (round-trip, auto-update)…")
+        rawUserDoc = if (dataFile.exists()) {
+            YamlDocument.create(
+                dataFile,
+                GeneralSettings.builder().setUseDefaults(false).build(),
+                LoaderSettings.builder().setAutoUpdate(false).build(),
+                DumperSettings.builder().setIndentation(2).build()
+            )
+        } else null
+
+        val sourceVersion = detectSourceVersion(rawUserDoc)
+
+        if (sourceVersion < V_162 && dataFile.exists()) {
+            val bak = File(dataFile.parentFile, "$FILE_NAME.$sourceVersion.bak")
+            try {
+                Files.copy(dataFile.toPath(), bak.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                plugin.logger.debug("[Config] Backup before migration: ${bak.name}")
+            } catch (t: Throwable) {
+                plugin.logger.warning("[Config] Failed to create backup: ${t.message}")
+                plugin.reportError(t)
+            }
+        }
+
+        val shouldUpdate = !dataFile.exists() || sourceVersion < V_162
+
+        config = YamlDocument.create(
+            dataFile,
+            defaultsStream,
+            GeneralSettings.builder().setUseDefaults(true).build(),
+            LoaderSettings.builder().setAutoUpdate(shouldUpdate).build(),
+            DumperSettings.builder().setIndentation(2).build()
+        )
+
+        if (!config.contains(VERSION_KEY)) {
+            plugin.logger.debug("[Config] config-version not found – treating as 1.4.1")
+            config.set(VERSION_KEY, V_141)
+        }
+
+        if (shouldUpdate) {
+            migrateFrom(sourceVersion)
+            applyWarnCountOverrides()
+
+            config.set(VERSION_KEY, V_162)
+            config.save()
+            plugin.logger.success("[Config] Done. Current version: ${config.getInt(VERSION_KEY)}")
+        } else {
+            plugin.logger.info("[Config] Loaded without update (version ${config.getInt(VERSION_KEY)})")
+        }
+    }
+
+    fun reload() {
+        plugin.logger.debug("[Config] Reload…")
+        load()
+    }
+
+    // ================= VERSIONS AND MIGRATIONS =================
+
+    private fun detectSourceVersion(doc: YamlDocument?): Int {
+        val fromKey = doc?.get(VERSION_KEY)?.let { parseVersionValue(it) }
+        if (fromKey != null) return fromKey
+
+        val guessed = guessVersionFromComment()
+        if (guessed != null) return guessed
+
+        return if (doc == null) V_162 else V_141
+    }
+
+    private fun migrateFrom(sourceVersion: Int) {
+        if (sourceVersion >= V_162) return
+
+        if (sourceVersion <= V_104) {
+            plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_104 …")
+            migrate104to160()
+        }
+        if (sourceVersion <= V_141) {
+            plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_160 …")
+            migrate141to160()
+        }
+        if (sourceVersion <= V_160) {
+            plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_161 …")
+            migrate160to161()
+        }
+        if (sourceVersion <= V_161) {
+            plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_162 …")
+            migrate161to162()
+        }
+        // Experimental DscBridgeAPI migration stays disabled until full release.
+        // plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_170 …")
+        // migrate161to170()
+    }
+
+    private fun migrate104to160() {
+        val oldWarn = readSectionMapRaw(rawUserDoc, "WarnActions")
+        if (!oldWarn.isNullOrEmpty()) {
+            val dst = "actions.warn.count"
+            val it = oldWarn.entries.iterator()
+            while (it.hasNext()) {
+                val e = it.next()
+                val keyStr = e.key
+                config.set("$dst.$keyStr", e.value)
+            }
+            config.remove("WarnActions")
+            plugin.logger.debug("[Config] WarnActions → $dst (server values overwrote defaults)")
+        }
+
+        if (rawUserDoc?.contains("mute_pm") == true) {
+            val mutePm = rawUserDoc?.getBoolean("mute_pm") ?: false
+            config.set("mute.pm", mutePm)
+            plugin.logger.debug("[Config] mute_pm → mute.pm = $mutePm (server)")
+            config.remove("mute_pm")
+        }
+
+        val muteCmdRaw = rawUserDoc?.get("mute_cmd")
+        if (muteCmdRaw is List<*>) {
+            config.set("mute.cmd", muteCmdRaw)
+            plugin.logger.debug("[Config] mute_cmd → mute.cmd (server values overwrote defaults)")
+            config.remove("mute_cmd")
+        }
+
+        val checkForUpdates = rawUserDoc?.getBoolean("checkForUpdates")
+        if (checkForUpdates != null) {
+            config.set("update.check-for-updates", checkForUpdates)
+            plugin.logger.debug("[Config] checkForUpdates → update.check-for-updates = $checkForUpdates (server)")
+            config.remove("checkForUpdates")
+        }
+
+        val autoDownloadUpdates = rawUserDoc?.getBoolean("autoDownloadUpdates")
+        if (autoDownloadUpdates != null) {
+            config.set("update.auto-download", autoDownloadUpdates)
+            plugin.logger.debug("[Config] autoDownloadUpdates → update.auto-download = $autoDownloadUpdates (server)")
+            config.remove("autoDownloadUpdates")
+        }
+    }
+
+    private fun migrate141to160() {
+
+        var oldWarn = readSectionMapRaw(rawUserDoc, "warn.actions")
+
+        if (oldWarn.isNullOrEmpty()) {
+            oldWarn = readSectionMapRaw(rawUserDoc, "actions.warn.count")
+        }
+
+        if (!oldWarn.isNullOrEmpty()) {
+            val dst = "actions.warn.count"
+
+            val it = oldWarn.entries.iterator()
+            while (it.hasNext()) {
+                val e = it.next()
+                val keyStr = e.key
+                config.set("$dst.$keyStr", e.value)
+            }
+
+            plugin.logger.debug("[Config] warn/actions → $dst (server values overwrote defaults)")
+        }
+
+        if (config.contains("warn.actions")) {
+            config.set("warn.actions", null)
+        }
+
+        val oldSpawnLoc = readSectionMapRaw(rawUserDoc, "spawn.location")
+        if (!oldSpawnLoc.isNullOrEmpty()) {
+            config.set("unjail.unjail_location", oldSpawnLoc)
+            plugin.logger.debug("[Config] spawn.location → unjail.unjail_location (server)")
+        }
+
+        val hadUseExternal =
+            rawUserDoc?.contains("spawn.use_external_set.enabled") == true ||
+                    rawUserDoc?.contains("spawn.use_external_set.set") == true
+
+        if (hadUseExternal) {
+            val enabled = rawUserDoc?.getBoolean("spawn.use_external_set.enabled") ?: false
+            val setRaw = rawUserDoc?.getString("spawn.use_external_set.set")
+            val mapped: String = if (!enabled) {
+                "unjail"
+            } else {
+                val sr = setRaw?.trim()?.lowercase() ?: ""
+                when (sr) {
+                    "essx" -> "essx"
+                    "world" -> "world"
+                    else -> "world"
+                }
+            }
+            config.set("unjail.spawn_type_select.set", mapped)
+            plugin.logger.debug("[Config] spawn.use_external_set → unjail.spawn_type_select.set = $mapped (server)")
+        }
+
+        if (config.contains("spawn.location")) config.set("spawn.location", null)
+        if (config.contains("spawn.use_external_set")) config.set("spawn.use_external_set", null)
+
+        val spawn = readSectionMap("spawn")
+        if (spawn != null && spawn.isEmpty()) config.set("spawn", null)
+
+        if (!config.contains("server")) {
+            config.set("server", "network")
+            plugin.logger.debug("[Config] server = \"network\" set (default)")
+        }
+    }
+
+    private fun migrate160to161() {
+        if (!config.contains("placeholders.punishment_list_limit")) {
+            config.set("placeholders.punishment_list_limit", 5)
+        }
+        if (!config.contains("placeholders.message_format")) {
+            config.set("placeholders.message_format", "LEGACY_AMPERSAND")
+        }
+        fun setIfMissing(path: String, value: Any) {
+            if (!config.contains(path)) {
+                config.set(path, value)
+            }
+        }
+
+        setIfMissing("webhook.discord.username", "")
+        setIfMissing("webhook.discord.avatar-url", "")
+
+        setIfMissing("webhook.discord.colors.ban", 9447935)
+        setIfMissing("webhook.discord.colors.mute", 15158332)
+        setIfMissing("webhook.discord.colors.warn", 16753920)
+        setIfMissing("webhook.discord.colors.kick", 16776960)
+        setIfMissing("webhook.discord.colors.default", 8421504)
+
+        setIfMissing("webhook.discord.embed.title", "Event Title")
+        setIfMissing("webhook.discord.embed.description", "Administrator {operator} {type} {player} for {reason} for {time}")
+        setIfMissing("webhook.discord.embed.url", "https://example.com")
+        setIfMissing("webhook.discord.embed.timestamp", "")
+        setIfMissing("webhook.discord.embed.thumbnail-url", "")
+        setIfMissing("webhook.discord.embed.image-url", "")
+        setIfMissing("webhook.discord.embed.author.name", "")
+        setIfMissing("webhook.discord.embed.author.icon-url", "")
+        setIfMissing("webhook.discord.embed.footer.text", "")
+        setIfMissing("webhook.discord.embed.footer.icon-url", "")
+
+        val existingFields = config.get("webhook.discord.embed.fields")
+        if (existingFields is Section) {
+            val fields = mutableListOf<Map<String, Any>>()
+            if (existingFields.getBoolean("player", true)) {
+                fields.add(mapOf("name" to "Player", "value" to "{player}", "inline" to true))
+            }
+            if (existingFields.getBoolean("operator", true)) {
+                fields.add(mapOf("name" to "Operator", "value" to "{operator}", "inline" to true))
+            }
+            if (existingFields.getBoolean("type", true)) {
+                fields.add(mapOf("name" to "Type", "value" to "{type}", "inline" to true))
+            }
+            if (existingFields.getBoolean("reason", true)) {
+                fields.add(mapOf("name" to "Reason", "value" to "{reason}", "inline" to false))
+            }
+            if (existingFields.getBoolean("time", true)) {
+                fields.add(mapOf("name" to "Time", "value" to "{time}", "inline" to true))
+            }
+            if (existingFields.getBoolean("id", true)) {
+                fields.add(mapOf("name" to "ID", "value" to "{id}", "inline" to true))
+            }
+            if (fields.isNotEmpty()) {
+                config.set("webhook.discord.embed.fields", fields)
+            }
+        } else if (existingFields == null) {
+            val fields = mutableListOf<Map<String, Any>>()
+            fields.add(mapOf("name" to "Player", "value" to "{player}", "inline" to true))
+            fields.add(mapOf("name" to "Operator", "value" to "{operator}", "inline" to true))
+            fields.add(mapOf("name" to "Type", "value" to "{type}", "inline" to true))
+            fields.add(mapOf("name" to "Reason", "value" to "{reason}", "inline" to false))
+            fields.add(mapOf("name" to "Time", "value" to "{time}", "inline" to true))
+            fields.add(mapOf("name" to "ID", "value" to "{id}", "inline" to true))
+            config.set("webhook.discord.embed.fields", fields)
+        }
+    }
+
+
+    private fun migrate161to162() {
+        val rawDebug = rawUserDoc?.get("debug")
+        when (rawDebug) {
+            is Boolean -> {
+                val mapped = if (rawDebug) "diag" else "off"
+                config.set("debug", mapped)
+                plugin.logger.debug("[Config] debug (Boolean) → debug = $mapped (server)")
+            }
+            is String -> {
+                val normalized = rawDebug.trim().lowercase()
+                val mapped = when (normalized) {
+                    "off", "info", "diag", "dev" -> normalized
+                    "false", "0", "no", "none", "disabled" -> "off"
+                    "true", "1", "yes", "enabled", "on" -> "diag"
+                    else -> "off"
+                }
+                config.set("debug", mapped)
+                plugin.logger.debug("[Config] debug (String) normalized → debug = $mapped (server)")
+            }
+            else -> if (!config.contains("debug")) {
+                config.set("debug", "off")
+            }
+        }
+    }
+
+    private fun migrate161to170() {
+        fun setIfMissing(path: String, value: Any) {
+            if (!config.contains(path)) {
+                config.set(path, value)
+            }
+        }
+
+        setIfMissing("dscbridge.discord.command_name", "punish")
+        setIfMissing("dscbridge.discord.command_description", "Pokaż panel moderacyjny dla wskazanego gracza")
+        setIfMissing(
+            "dscbridge.discord.command_options",
+            listOf(
+                mapOf(
+                    "name" to "nick",
+                    "description" to "Nick gracza do ukarania"
+                )
+            )
+        )
+        setIfMissing("dscbridge.discord.role_ids", listOf("123456789012345678", "987654321098765432"))
+        setIfMissing("dscbridge.discord.channel_id", "112233445566778899")
+        setIfMissing("dscbridge.discord.username", "SyntaxDevBot")
+        setIfMissing("dscbridge.discord.avatar-url", "{nick}")
+        setIfMissing("dscbridge.discord.content", "Panel karny dla {nick}")
+        setIfMissing(
+            "dscbridge.discord.buttons",
+            listOf(
+                mapOf(
+                    "id" to "ban",
+                    "label" to "BANUJ",
+                    "style" to "DANGER",
+                    "command" to "ban {nick} 1h Złamanie regulaminu serwera."
+                ),
+                mapOf(
+                    "id" to "kick",
+                    "label" to "WYRZUĆ",
+                    "style" to "PRIMARY",
+                    "command" to "kick {nick} Naruszenie zasad serwera."
+                ),
+                mapOf(
+                    "id" to "mute",
+                    "label" to "WYCISZ",
+                    "style" to "SECONDARY",
+                    "command" to "mute {nick} 30m Toksyczne zachowanie."
+                )
+            )
+        )
+        setIfMissing("dscbridge.discord.colors", 9447935)
+        setIfMissing("dscbridge.discord.embed.title", "👤 PROFIL GRACZA: {nick}")
+        setIfMissing("dscbridge.discord.embed.description", "Panel moderacyjny PunisherX")
+        setIfMissing("dscbridge.discord.embed.url", "https://example.com/cases/{nick}")
+        setIfMissing("dscbridge.discord.embed.timestamp", "now")
+        setIfMissing("dscbridge.discord.embed.thumbnail-url", "{nick}")
+        setIfMissing("dscbridge.discord.embed.image-url", "https://mc-heads.net/body/{nick}")
+        setIfMissing("dscbridge.discord.embed.author.name", "{operator}")
+        setIfMissing("dscbridge.discord.embed.author.icon-url", "")
+        setIfMissing("dscbridge.discord.embed.footer.text", "PunisherX • Spigot")
+        setIfMissing("dscbridge.discord.embed.footer.icon-url", "")
+        setIfMissing(
+            "dscbridge.discord.embed.fields",
+            listOf(
+                mapOf("name" to "📊 STATYSTYKI LIVE", "value" to "{statsField}", "inline" to true),
+                mapOf("name" to "📍 LOKALIZACJA", "value" to "{locationField}", "inline" to true),
+                mapOf("name" to "📡 POŁĄCZENIE", "value" to "{connectionField}", "inline" to false)
+            )
+        )
+        setIfMissing(
+            "dscbridge.discord.embed.placeholder_fields",
+            listOf(
+                mapOf(
+                    "name" to "statsField",
+                    "value" to listOf(
+                        "❤️ Zdrowie: {health}",
+                        "🍗 Głód: {food}",
+                        "⭐ Poziom XP: {level}"
+                    )
+                ),
+                mapOf(
+                    "name" to "locationField",
+                    "value" to listOf(
+                        "🗺️ Świat: {world}",
+                        "📍 {location}"
+                    )
+                ),
+                mapOf(
+                    "name" to "connectionField",
+                    "value" to listOf(
+                        "📶 Ping: {ping}",
+                        "🆔 UUID: `{uuid}`"
+                    )
+                )
+            )
+        )
+    }
+
+    // ================= HELPERS =================
+
+    private fun applyWarnCountOverrides() {
+        if (rawUserDoc == null) return
+        val warnOverrides =
+            readSectionMapRaw(rawUserDoc, "actions.warn.count")
+                ?: readSectionMapRaw(rawUserDoc, "warn.actions")
+                ?: readSectionMapRaw(rawUserDoc, "WarnActions")
+                ?: return
+
+        val normalized = LinkedHashMap<String, Any?>()
+        warnOverrides.forEach { (key, value) ->
+            normalized[key] = value
+        }
+        config.set("actions.warn.count", normalized)
+        plugin.logger.debug("[Config] warn.count overrides applied from user config")
+    }
+
+    private fun parseVersionValue(raw: Any?): Int? {
+        return when (raw) {
+            is Number -> raw.toInt()
+            is String -> raw.toIntOrNull() ?: raw.filter(Char::isDigit).toIntOrNull()
+            else -> null
+        }
+    }
+
+    private fun guessVersionFromComment(): Int? {
+        if (!dataFile.exists()) return null
+        return try {
+            dataFile.useLines { lines ->
+                val firstMeaningful = lines.firstOrNull { it.isNotBlank() } ?: return@useLines null
+                val match = Regex("(\\d+\\.(?:\\d+\\.)*\\d+)").find(firstMeaningful)
+                val number = match?.value?.filter(Char::isDigit) ?: return@useLines null
+                number.toIntOrNull()
+            }
+        } catch (_: Throwable) {
+            null
+        }
+    }
+
+    private fun readSectionMap(path: String): Map<String, Any?>? {
+        val raw = config.get(path) ?: return null
+        if (raw is Map<*, *>) {
+            return raw.asLinkedStringMap()
+        }
+        if (raw is Section) {
+            return raw.asLinkedStringMap()
+        }
+        val section = config.getOptionalSection(path).orElse(null)
+        return section?.asLinkedStringMap()
+    }
+
+    private fun readSectionMapRaw(doc: YamlDocument?, path: String): Map<String, Any?>? {
+        if (doc == null) return null
+        val section = doc.getOptionalSection(path).orElse(null)
+        if (section != null) {
+            return section.asLinkedStringMap()
+        }
+        val raw = doc.get(path) ?: return null
+        if (raw is Map<*, *>) {
+            return raw.asLinkedStringMap()
+        }
+        if (raw is Section) {
+            return raw.asLinkedStringMap()
+        }
+        return null
+    }
+
+    private fun Section.asLinkedStringMap(): Map<String, Any?> {
+        val out = LinkedHashMap<String, Any?>()
+        for (key in this.keys) {
+            if (key == null) continue
+            val keyStr = key.toString()
+            out[keyStr] = this.get(keyStr)
+        }
+        return out
+    }
+
+    private fun Map<*, *>.asLinkedStringMap(): Map<String, Any?> {
+        val out = LinkedHashMap<String, Any?>()
+        val it = this.entries.iterator()
+        while (it.hasNext()) {
+            val e = it.next()
+            val k = e.key ?: continue
+            out[k.toString()] = e.value
+        }
+        return out
+    }
+}

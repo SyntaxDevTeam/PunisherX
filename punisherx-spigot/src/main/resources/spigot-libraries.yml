@@ -1,15 +1,12 @@
 repositories:
   syntaxdevteam-snapshots: "https://nexus.syntaxdevteam.pl/repository/maven-snapshots/"
   syntaxdevteam-releases: "https://nexus.syntaxdevteam.pl/repository/maven-releases/"
-  paper: "https://repo.papermc.io/repository/maven-public/"
-  central-mirror: "https://repo.papermc.io/repository/maven-central/"
   jitpack: "https://jitpack.io/"
   codemc-snapshots: "https://repo.codemc.io/repository/maven-snapshots/"
   faststatsReleases: "https://repo.faststats.dev/releases"
 
 libraries:
   # Basic libraries
-  - org.jetbrains.kotlin:kotlin-stdlib:2.4.0
 #  - org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2
   - org.eclipse.aether:aether-api:1.1.0
   - org.yaml:snakeyaml:2.6
@@ -21,7 +18,7 @@ libraries:
   # All databases libraries is implemented in SyntaxCore
 
   # FastStats dependencies
-  - coordinate: dev.faststats.metrics:bukkit:0.25.0
+  - coordinate: dev.faststats.metrics:bukkit:0.26.1
     repository: faststatsReleases
   # SyntaxDevTeam libraries
   - coordinate: pl.syntaxdevteam:syntaxcore:1.3.0-R0.5-SNAPSHOT

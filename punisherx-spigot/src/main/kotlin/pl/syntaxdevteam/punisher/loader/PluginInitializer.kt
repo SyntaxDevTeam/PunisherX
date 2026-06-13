@@ -1,0 +1,241 @@
+package pl.syntaxdevteam.punisher.loader
+import pl.syntaxdevteam.punisher.compatibility.*
+
+import org.bukkit.plugin.ServicePriority
+import org.bukkit.scheduler.BukkitRunnable
+import pl.syntaxdevteam.core.SyntaxCore
+import pl.syntaxdevteam.message.SyntaxMessages
+import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.api.PunisherXApi
+import pl.syntaxdevteam.punisher.api.PunisherXApiImpl
+import pl.syntaxdevteam.punisher.basic.PunishmentActionBarNotifier
+import pl.syntaxdevteam.punisher.basic.PunishmentCache
+import pl.syntaxdevteam.punisher.basic.PunishmentChecker
+import pl.syntaxdevteam.punisher.basic.PunishmentManager
+import pl.syntaxdevteam.punisher.basic.TimeHandler
+import pl.syntaxdevteam.punisher.commands.CommandManager
+import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
+import pl.syntaxdevteam.punisher.common.ConfigManager
+import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
+import pl.syntaxdevteam.punisher.databases.DatabaseHandler
+import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
+import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
+import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
+import pl.syntaxdevteam.punisher.hooks.HookHandler
+import pl.syntaxdevteam.punisher.listeners.ReloadListener
+import pl.syntaxdevteam.punisher.listeners.ModernLoginListener
+import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
+import pl.syntaxdevteam.punisher.placeholders.PlaceholderHandler
+import pl.syntaxdevteam.punisher.players.*
+import pl.syntaxdevteam.punisher.compatibility.platform.BukkitSchedulerAdapter
+import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
+import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
+import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
+import pl.syntaxdevteam.punisher.compatibility.VersionChecker
+import pl.syntaxdevteam.punisher.hooks.DiscordBridge
+import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
+import java.io.File
+import java.util.Locale
+
+class PluginInitializer(private val plugin: PunisherX) {
+
+    fun onEnable() {
+        val t0 = System.currentTimeMillis()
+        setUpLogger()
+        plugin.logger.diag("[TIMING] after setUpLogger: ${System.currentTimeMillis() - t0}ms")
+        setupConfig()
+        plugin.logger.diag("[TIMING] after setupConfig: ${System.currentTimeMillis() - t0}ms")
+        setupDatabase()
+        plugin.logger.diag("[TIMING] after setupDatabase: ${System.currentTimeMillis() - t0}ms")
+        setupHandlers()
+        plugin.logger.diag("[TIMING] after setupHandlers: ${System.currentTimeMillis() - t0}ms")
+        registerEvents()
+        plugin.logger.diag("[TIMING] after registerEvents: ${System.currentTimeMillis() - t0}ms")
+        registerCommands()
+        plugin.logger.diag("[TIMING] after registerCommands: ${System.currentTimeMillis() - t0}ms")
+        checkForUpdates()
+        plugin.logger.diag("[TIMING] onEnable complete: ${System.currentTimeMillis() - t0}ms")
+    }
+
+    fun onDisable() {
+        runCatching { plugin.onlinePunishmentWatcher.stop() }
+        runCatching { plugin.punishmentActionBarNotifier.stop() }
+        plugin.databaseHandler.closeConnection()
+        plugin.logger.err("${plugin.description.name} ${plugin.description.version} has been disabled")
+    }
+
+    private fun setUpLogger() {
+        plugin.pluginConfig = plugin.config
+        plugin.logger = SyntaxCore.logger
+    }
+
+    /**
+     * Sets up the plugin configuration.
+     */
+    fun setupConfig() {
+        // val confFile = File(plugin.dataFolder, "config.yml")
+        //        val version = plugin.config.getInt("config-version")
+        //        plugin.cfg = ConfigManager(plugin, plugin.logger, confFile.toString(), version.toString(), 141, 150, true)
+        plugin.cfg = ConfigManager(plugin)
+        plugin.cfg.load()
+        plugin.punishTemplateManager = PunishTemplateManager(plugin)
+        plugin.punishTemplateManager.load()
+    }
+
+    /**
+     * Sets up the database connection and creates necessary tables.
+     */
+    private fun setupDatabase() {
+        plugin.databaseHandler = DatabaseHandler(plugin)
+        val databaseSetupTask = Runnable {
+            plugin.databaseHandler.openConnection()
+            plugin.databaseHandler.createTables()
+        }
+        plugin.logger.debug("Detected server: ${plugin.server.name} ${plugin.server.version}")
+        // SQLite and H2 are local file-based — no network I/O, safe to run synchronously.
+        // Running them async caused a race: players could connect before ready=true was set.
+        val dbTypeName = plugin.databaseHandler.databaseType().name
+        val isLocalDb = dbTypeName == "SQLITE" || dbTypeName == "H2"
+        plugin.logger.diag("[TIMING] dbTypeName=$dbTypeName isLocalDb=$isLocalDb")
+        if (isLocalDb) {
+            plugin.logger.debug("Local database ($dbTypeName) — running setup synchronously.")
+            databaseSetupTask.run()
+        } else {
+            plugin.logger.debug("Remote database detected, using Bukkit async scheduler.")
+            plugin.server.scheduler.runTaskAsynchronously(plugin, databaseSetupTask)
+        }
+    }
+
+    /**
+     * Initializes various handlers used by the plugin.
+     */
+    private fun t(label: String) {
+        plugin.logger.diag("[TIMING] $label @ ${System.currentTimeMillis()}")
+    }
+
+    private fun setupHandlers() {
+        t("before SyntaxMessages.initialize")
+        SyntaxMessages.initialize(plugin)
+        t("after SyntaxMessages.initialize")
+        plugin.messageHandler = SyntaxMessages.messages
+        t("after SyntaxMessages.messages")
+        plugin.pluginsManager = SyntaxCore.pluginManagerx
+        t("after pluginsManager")
+        plugin.timeHandler = TimeHandler(plugin)
+        plugin.punishmentManager = PunishmentManager()
+        plugin.schedulerAdapter = BukkitSchedulerAdapter(plugin)
+        plugin.safeTeleportService = SafeTeleportService(plugin.schedulerAdapter)
+        t("before GeoIPHandler")
+        plugin.geoIPHandler = GeoIPHandler(plugin)
+        t("after GeoIPHandler")
+        plugin.cache = PunishmentCache(plugin)
+        plugin.punishmentActionBarNotifier = PunishmentActionBarNotifier(plugin).also { it.start() }
+        plugin.punisherXApi = PunisherXApiImpl(plugin.databaseHandler)
+        t("before HookHandler")
+        plugin.hookHandler = HookHandler(plugin)
+        t("after HookHandler")
+        plugin.discordWebhook = DiscordWebhook(plugin)
+        plugin.playerIPManager = PlayerIPManager(plugin, plugin.geoIPHandler)
+        plugin.punishmentChecker = PunishmentChecker(plugin)
+        plugin.versionChecker = VersionChecker(plugin)
+        plugin.versionCompatibility = VersionCompatibility(plugin.versionChecker)
+        plugin.guiMaterialResolver = GuiMaterialResolver(plugin.versionChecker.getSemanticVersion())
+        plugin.actionExecutor = PunishmentActionExecutor(plugin)
+        plugin.proxyBridgeMessenger = ProxyBridgeMessenger(plugin).also { it.registerChannel() }
+        plugin.onlinePunishmentWatcher = OnlinePunishmentWatcher(plugin).also { it.start() }
+        checkLegacyPlaceholders()
+        if (plugin.hookHandler.isDscBridgeAvailable()) {
+            plugin.discordBridge = DiscordBridge(plugin)
+            plugin.discordBridge.startDscBridge()
+        } else {
+            plugin.logger.debug("DscBridgeAPI unavailable, skipping DiscordBridge initialization.")
+        }
+    }
+
+    /**
+     * Registers the plugin commands.
+     */
+    private fun registerCommands(){
+        plugin.commandLoggerPlugin = CommandLoggerPlugin(plugin)
+        plugin.commandManager = CommandManager(plugin)
+        if (plugin.commandsRegistered) return
+
+        plugin.commandManager.registerCommands()
+        plugin.commandsRegistered = true
+    }
+
+    /**
+     * Registers the plugin events.
+     */
+    private fun registerEvents() {
+        plugin.playerJoinListener = PlayerJoinListener(plugin.playerIPManager, plugin.punishmentChecker)
+        plugin.server.pluginManager.registerEvents(plugin.playerJoinListener, plugin)
+        plugin.server.pluginManager.registerEvents(plugin.punishmentChecker, plugin)
+        plugin.server.pluginManager.registerEvents(ModernLoginListener(plugin), plugin)
+        plugin.logger.debug("Registered Spigot AsyncPlayerPreLoginEvent listener")
+        plugin.server.pluginManager.registerEvents(ReloadListener(plugin), plugin)
+        plugin.server.servicesManager.register(PunisherXApi::class.java, plugin.punisherXApi, plugin, ServicePriority.Normal)
+        if (plugin.hookHandler.checkPlaceholderAPI()) {
+            PlaceholderHandler(plugin).register()
+        }
+        //plugin.server.pluginManager.registerEvents(GUIHandler(plugin), plugin)
+    }
+
+    /**
+     * Checks for updates to the plugin.
+     */
+    private fun checkForUpdates() {
+        plugin.statsCollector = SyntaxCore.statsCollector
+        SyntaxCore.updateChecker.checkAsync()
+    }
+
+
+    /**
+     * Checks the selected language file for legacy placeholders formatted with curly braces.
+     * If found, logs a warning and periodically reminds the console to run the placeholder
+     * conversion command or regenerate the file.
+     */
+    private fun checkLegacyPlaceholders() {
+        val lang = plugin.config.getString("language")?.lowercase(Locale.getDefault()) ?: "en"
+        val langDir = File(plugin.dataFolder, "lang")
+        val candidates = listOf(
+            File(langDir, "messages_$lang.yml"),
+            File(langDir, "message_$lang.yml")
+        )
+        val langFile = candidates.firstOrNull { it.exists() } ?: return
+
+        val legacyPattern = Regex("\\{\\w+}")
+        val warnMsg =
+            "Language file ${langFile.name} uses legacy placeholders with {}. Run /langfix or delete the file to regenerate."
+
+        try {
+            val content = langFile.readText(Charsets.UTF_8)
+            if (!legacyPattern.containsMatchIn(content)) return
+        } catch (e: Exception) {
+            plugin.logger.warning("Could not check language file placeholders: ${e.message}")
+            plugin.reportError(e)
+            return
+        }
+
+        plugin.logger.warning(warnMsg)
+        plugin.reportError(IllegalStateException(warnMsg))
+
+        val delay = 20L * 10L
+        object : BukkitRunnable() {
+            override fun run() {
+                try {
+                    val content = langFile.readText(Charsets.UTF_8)
+                    if (legacyPattern.containsMatchIn(content)) {
+                        plugin.logger.warning(warnMsg)
+                    } else {
+                        cancel()
+                    }
+                } catch (e: Exception) {
+                    plugin.logger.warning("Could not check language file placeholders: ${e.message}")
+                    plugin.reportError(e)
+                    cancel()
+                }
+            }
+        }.runTaskTimer(plugin, delay, delay)
+    }
+}

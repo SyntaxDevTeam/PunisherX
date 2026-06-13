@@ -1,0 +1,183 @@
+package pl.syntaxdevteam.punisher
+import pl.syntaxdevteam.punisher.compatibility.*
+
+import org.bukkit.Bukkit
+import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.event.HandlerList
+import org.bukkit.event.Listener
+import org.bukkit.plugin.Plugin
+import org.bukkit.plugin.java.JavaPlugin
+import pl.syntaxdevteam.core.SyntaxCore
+import pl.syntaxdevteam.core.manager.PluginManagerX
+import pl.syntaxdevteam.core.logging.Logger
+import pl.syntaxdevteam.core.stats.StatsCollector
+import pl.syntaxdevteam.core.update.GitHubSource
+import pl.syntaxdevteam.core.update.ModrinthSource
+import pl.syntaxdevteam.message.MessageHandler
+import pl.syntaxdevteam.punisher.api.PunisherXApi
+import pl.syntaxdevteam.punisher.basic.*
+import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
+import pl.syntaxdevteam.punisher.commands.CommandManager
+import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
+import pl.syntaxdevteam.punisher.common.ConfigManager
+import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
+import pl.syntaxdevteam.punisher.databases.*
+import pl.syntaxdevteam.punisher.players.*
+import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
+import pl.syntaxdevteam.punisher.hooks.HookHandler
+import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
+import pl.syntaxdevteam.punisher.loader.PluginInitializer
+import pl.syntaxdevteam.punisher.inits.loader.LibraryLoader
+import pl.syntaxdevteam.punisher.compatibility.VersionChecker
+import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
+import pl.syntaxdevteam.punisher.compatibility.platform.SchedulerAdapter
+import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
+import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
+import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
+import pl.syntaxdevteam.punisher.hooks.DiscordBridge
+import pl.syntaxdevteam.punisher.stats.FastStatsBridge
+import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
+import java.io.File
+import java.util.logging.Level
+import java.util.*
+class PunisherX : JavaPlugin(), Listener {
+    private lateinit var libraryLoader: LibraryLoader
+
+    private val fastStatsBridge: FastStatsBridge by lazy {
+        FastStatsBridge(this, "face5edae5524c9d98184b87d9f48aeb")
+    }
+
+    @Volatile
+    var commandsRegistered: Boolean = false
+    private lateinit var pluginInitializer: PluginInitializer
+
+    lateinit var logger: Logger
+    lateinit var messageHandler: MessageHandler
+    lateinit var pluginsManager: PluginManagerX
+
+    lateinit var pluginConfig: FileConfiguration
+    lateinit var statsCollector: StatsCollector
+
+    lateinit var punishmentChecker: PunishmentChecker
+    lateinit var playerJoinListener: PlayerJoinListener
+
+    lateinit var databaseHandler: DatabaseHandler
+    lateinit var timeHandler: TimeHandler
+    lateinit var geoIPHandler: GeoIPHandler
+    lateinit var punishmentManager: PunishmentManager
+    lateinit var cache: PunishmentCache
+    lateinit var punishmentActionBarNotifier: PunishmentActionBarNotifier
+    lateinit var punisherXApi: PunisherXApi
+    lateinit var hookHandler: HookHandler
+    lateinit var discordWebhook: DiscordWebhook
+    lateinit var commandLoggerPlugin: CommandLoggerPlugin
+    lateinit var commandManager: CommandManager
+    lateinit var playerIPManager: PlayerIPManager
+    lateinit var versionChecker: VersionChecker
+    lateinit var versionCompatibility: VersionCompatibility
+    lateinit var guiMaterialResolver: GuiMaterialResolver
+    lateinit var actionExecutor: PunishmentActionExecutor
+    lateinit var schedulerAdapter: SchedulerAdapter
+    lateinit var safeTeleportService: SafeTeleportService
+    lateinit var cfg: ConfigManager
+    lateinit var proxyBridgeMessenger: ProxyBridgeMessenger
+    lateinit var onlinePunishmentWatcher: OnlinePunishmentWatcher
+    lateinit var punishTemplateManager: PunishTemplateManager
+    lateinit var discordBridge: DiscordBridge
+
+    override fun onLoad() {
+        libraryLoader = LibraryLoader(this)
+        try {
+            libraryLoader.loadRuntimeLibraries()
+        } catch (exception: Exception) {
+            reportError(exception)
+            throw exception
+        }
+    }
+
+    /**
+     * Called when the plugin is enabled.
+     * Initializes the configuration, database, handlers, events, and commands.
+     */
+    override fun onEnable() {
+        SyntaxCore.registerUpdateSources(
+            GitHubSource("SyntaxDevTeam/PunisherX"),
+            ModrinthSource("VCNRcwC2")
+        )
+        SyntaxCore.init(this, versionType = "spigot")
+        pluginInitializer = PluginInitializer(this)
+        pluginInitializer.onEnable()
+        versionChecker.checkAndLog()
+        fastStatsBridge.ready()
+    }
+
+    /**
+     * Called when the plugin is reloaded.
+     * Reloads the configuration and reinitializes the database connection.
+     */
+    fun onReload() {
+        reloadMyConfig()
+    }
+
+    /**
+     * Called when the plugin is disabled.
+     * Closes the database connection and unregisters events.
+     */
+    override fun onDisable() {
+        fastStatsBridge.shutdown()
+        databaseHandler.closeConnection()
+        pluginInitializer.onDisable()
+        runCatching { proxyBridgeMessenger.unregisterChannel() }
+    }
+
+    fun resolvePlayerUuid(identifier: String): UUID {
+        runCatching { UUID.fromString(identifier) }.getOrNull()?.let { return it }
+        Bukkit.getPlayerExact(identifier)?.uniqueId?.let { return it }
+        return Bukkit.getOfflinePlayer(identifier).uniqueId
+    }
+
+
+    /**
+     * Reloads the plugin configuration and reinitializes the database connection.
+     */
+    private fun reloadMyConfig() {
+        pluginInitializer.onDisable()
+        cancelPluginTasks()
+        runCatching { proxyBridgeMessenger.unregisterChannel() }
+        HandlerList.unregisterAll(this as Plugin)
+        reloadConfig()
+        pluginInitializer = PluginInitializer(this)
+        pluginInitializer.onEnable()
+    }
+
+    private fun cancelPluginTasks() {
+        server.scheduler.cancelTasks(this)
+    }
+
+    /**
+     * Retrieves the server name from the server.properties file.
+     *
+     * @return The server name, or "Unknown Server" if not found.
+     */
+    fun getServerName(): String {
+        val properties = Properties()
+        val file = File("server.properties")
+        if (file.exists()) {
+            properties.load(file.inputStream())
+            val serverName = properties.getProperty("server-name")
+            if (serverName != null) {
+                return serverName
+            } else {
+                logger.debug("Property 'server-name' not found in server.properties file.")
+            }
+        } else {
+            logger.debug("The server.properties file does not exist.")
+        }
+        return "Unknown Server"
+    }
+
+    fun reportError(throwable: Throwable) {
+        runCatching { fastStatsBridge.trackError(throwable) }
+        super.getLogger().log(Level.SEVERE, throwable.message, throwable)
+    }
+}

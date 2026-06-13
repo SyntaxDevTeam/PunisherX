@@ -2,53 +2,13 @@ name: PunisherX
 version: ${version}
 description: ${description}
 api-version: '1.20'
-folia-supported: true
 
 authors: [SyntaxDevTeam]
 website: github.com/SyntaxDevTeam/PunisherX
-support:
-  issues: https://github.com/SyntaxDevTeam/PunisherX/issues
-  updates: https://github.com/SyntaxDevTeam/PunisherX/releases
-
-localization:
-  available: [en_US, pl_PL, fr_FR, es_ES, de_DE]
-  default: en_US
 
 main: pl.syntaxdevteam.punisher.PunisherX
-loader: pl.syntaxdevteam.punisher.init.loader.SyntaxLoader
-has-open-classloader: false
 
-softdepend: [Folia, PlaceholderAPI, MiniPlaceholders,LuckPerms, Vault, VaultUnlocked, Essentials, EssentialsSpawn, DscBridgeAPI]
-
-features:
-  debug: true
-
-dependencies:
-  server:
-    PlaceholderAPI:
-      load: BEFORE
-      required: false
-    MiniPlaceholders:
-      load: BEFORE
-      required: false
-    LuckPerms:
-      load: BEFORE
-      required: false
-    Vault:
-      load: BEFORE
-      required: false
-    VaultUnlocked:
-      load: BEFORE
-      required: false
-    Essentials:
-      load: BEFORE
-      required: false
-    EssentialsSpawn:
-      load: BEFORE
-      required: false
-    DscBridgeAPI:
-      load: BEFORE
-      required: false
+softdepend: [PlaceholderAPI, MiniPlaceholders, LuckPerms, Vault, VaultUnlocked, Essentials, EssentialsSpawn, DscBridgeAPI]
 
 
 commands:
