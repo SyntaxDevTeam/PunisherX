@@ -1,5 +1,4 @@
 package pl.syntaxdevteam.punisher.teleport
-import pl.syntaxdevteam.punisher.compatibility.*
 
 import org.bukkit.Location
 import org.bukkit.Material
