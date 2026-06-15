@@ -18,10 +18,14 @@ libraries:
   # All databases libraries is implemented in SyntaxCore
 
   # FastStats dependencies
+  - coordinate: dev.faststats.metrics:core:0.26.1
+    repository: faststatsReleases
+  - coordinate: dev.faststats.metrics:config:0.26.1
+    repository: faststatsReleases
   - coordinate: dev.faststats.metrics:bukkit:0.26.1
     repository: faststatsReleases
   # SyntaxDevTeam libraries
   - coordinate: pl.syntaxdevteam:syntaxcore:1.3.0-R0.5-SNAPSHOT
     repository: syntaxdevteam-snapshots
-  - coordinate: pl.syntaxdevteam:messageHandler-paper:1.2.0-R0.3-SNAPSHOT
+  - coordinate: pl.syntaxdevteam:messageHandler-spigot:1.2.0-R0.3-SNAPSHOT
     repository: syntaxdevteam-snapshots

@@ -1,6 +1,12 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
+plugins {
+    id("io.papermc.hangar-publish-plugin")
+    id("xyz.jpenilla.run-paper")
+    id("pl.syntaxdevteam.plugindeployer")
+}
+
 description = "Advanced punishment system for Spigot servers with commands like warn, mute, jail, ban, kick and more."
 
 repositories {
@@ -27,7 +33,7 @@ dependencies {
     implementation("net.byteflux:libby-bukkit:1.3.1")
 
     compileOnly("pl.syntaxdevteam:syntaxcore:1.3.0-R0.5-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.2.0-R0.3-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:messageHandler-spigot:1.2.0-R0.3-SNAPSHOT")
 
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.6")
@@ -93,4 +99,9 @@ tasks.named<ShadowJar>("shadowJar") {
         include(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7"))
         include(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8"))
     }
+}
+plugindeployer {
+    paper { dir = "/home/debian/server/Paper/26.1.2/plugins" } //ostatnia wersja dla Paper
+    folia { dir = "/home/debian/server/Folia/26.1.2/plugins" } //ostatnia wersja dla Folia
+    spigot { dir = "/home/debian/server/Spigot/26.1.2/plugins" } //ostatnia wersja dla Spigot
 }

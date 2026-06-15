@@ -35,7 +35,7 @@ class GeoIPHandler(private val plugin: PunisherX) {
             folder.mkdirs()
         }
         if (licenseKey.isNullOrBlank()) {
-            plugin.logger.warning("[GeoIP] License key is not set in config.yml — GeoIP functionality is disabled.")
+            plugin.logger.warning("[GeoIP] License key is not set in config.yml; GeoIP functionality is disabled.")
             initializationFuture.complete(Unit)
         } else {
             plugin.schedulerAdapter.runAsync {
@@ -43,7 +43,7 @@ class GeoIPHandler(private val plugin: PunisherX) {
                     prepareDatabase()
                     initializationFuture.complete(Unit)
                 } catch (e: Exception) {
-                    plugin.logger.severe("Failed to prepare GeoIP database: ${e.message}")
+                    plugin.logger.severe("[GeoIP] Functionality disabled: ${e.message}")
                     plugin.reportError(e)
                     initializationFuture.completeExceptionally(e)
                 }
@@ -117,6 +117,8 @@ class GeoIPHandler(private val plugin: PunisherX) {
                 plugin.reportError(e)
                 throw e
             }
+        } finally {
+            connection.disconnect()
         }
     }
 

@@ -31,8 +31,11 @@ class FastStatsBridge(
             errorTracker = tracker
             context = fastStatsContext
             fastStatsContext.ready()
-        } catch (exception: Exception) {
-            plugin.logger.warning("[PunisherX] FastStats is unavailable, metrics disabled: ${exception::class.java.simpleName}: ${exception.message}")
+        } catch (throwable: Throwable) {
+            plugin.logger.warning(
+                "[PunisherX] FastStats is unavailable, metrics disabled: " +
+                    "${throwable::class.java.simpleName}: ${throwable.message}"
+            )
         }
     }
 

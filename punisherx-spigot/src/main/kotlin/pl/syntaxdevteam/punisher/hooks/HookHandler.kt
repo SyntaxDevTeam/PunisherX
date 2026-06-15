@@ -12,6 +12,7 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.dscbridgeapi.external.api.BridgeGateway
 import pl.syntaxdevteam.punisher.PunisherX
+import java.util.Locale
 
 /**
  * The [HookHandler] class is responsible for hooking into external services such as LuckPerms, Vault, and VaultUnlocked.
@@ -130,8 +131,7 @@ class HookHandler(private val plugin: PunisherX) {
     private fun checkEssentialsX() {
         val pluginManager = Bukkit.getPluginManager()
         if (!pluginManager.isPluginEnabled("Essentials")) {
-            plugin.logger.warning("EssentialsX plugin not found on server!")
-            plugin.reportError(IllegalStateException("EssentialsX plugin not found on server"))
+            reportMissingEssentialsSpawn("EssentialsX plugin not found on server")
             return
         }
 
@@ -140,9 +140,36 @@ class HookHandler(private val plugin: PunisherX) {
             essentialsSpawn = spawnPlugin
             plugin.logger.debug("Hooked into EssentialsX Spawn!")
         } else {
-            plugin.logger.warning("EssentialsX Spawn plugin not found or not enabled on server!")
-            plugin.reportError(IllegalStateException("EssentialsX Spawn plugin not found or not enabled"))
+            reportMissingEssentialsSpawn("EssentialsX Spawn plugin not found or not enabled on server")
         }
+    }
+
+    private fun reportMissingEssentialsSpawn(message: String) {
+        if (isEssentialsSpawnConfigured()) {
+            plugin.logger.warning("$message, but unjail.spawn_type_select.set requires it!")
+            plugin.reportError(IllegalStateException(message))
+        } else {
+            plugin.logger.debug("$message; optional hook disabled.")
+        }
+    }
+
+    private fun isEssentialsSpawnConfigured(): Boolean {
+        val selectedSources = when (val configured = plugin.config.get("unjail.spawn_type_select.set")) {
+            is String -> listOf(configured)
+            is List<*> -> configured.filterIsInstance<String>()
+            else -> emptyList()
+        }
+
+        if (selectedSources.any(::isEssentialsSource)) {
+            return true
+        }
+
+        return plugin.config.getBoolean("spawn.use_external_set.enabled") &&
+            isEssentialsSource(plugin.config.getString("spawn.use_external_set.set").orEmpty())
+    }
+
+    private fun isEssentialsSource(source: String): Boolean {
+        return source.lowercase(Locale.ROOT) in setOf("essx", "essentials", "foliessentials")
     }
 
     /**
@@ -158,12 +185,13 @@ class HookHandler(private val plugin: PunisherX) {
             plugin.logger.debug("Hooked into PlaceholderAPI!")
         } else {
             plugin.logger.warning("PlaceholderAPI plugin not found on server!")
-            plugin.reportError(IllegalStateException("PlaceholderAPI plugin not found on server"))
         }
 
         placeholderApiAvailable = isAvailable
         return isAvailable
     }
+
+    fun isEssentialsSpawnAvailable(): Boolean = essentialsSpawn != null
 
     /**
      * Checks if the MiniPlaceholders service is available on the server.
@@ -176,7 +204,6 @@ class HookHandler(private val plugin: PunisherX) {
             return true
         } else {
             plugin.logger.warning("MiniPlaceholders plugin not found on server!")
-            plugin.reportError(IllegalStateException("MiniPlaceholders plugin not found on server"))
             return false
         }
 

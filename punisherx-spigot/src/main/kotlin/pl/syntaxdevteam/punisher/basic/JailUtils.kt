@@ -84,7 +84,10 @@ object JailUtils {
                 UnjailLocationSource.CONFIGURED -> getConfiguredUnjailLocation(config)
                 UnjailLocationSource.LAST_LOCATION -> cloneIfValid(lastLocation)
                 UnjailLocationSource.BED -> cloneIfValid(getBedSpawnLocation(player))
-                UnjailLocationSource.ESSENTIALS -> hookHandler?.getEssentialsSpawnLocation()?.clone()
+                UnjailLocationSource.ESSENTIALS ->
+                    hookHandler?.takeIf { it.isEssentialsSpawnAvailable() }
+                        ?.getEssentialsSpawnLocation()
+                        ?.clone()
                 UnjailLocationSource.WORLD -> Bukkit.getWorlds().firstOrNull()?.spawnLocation?.clone()
             }
 
