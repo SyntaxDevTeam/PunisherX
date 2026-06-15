@@ -22,3 +22,15 @@ subprojects {
     group = rootProject.group
     version = if (name.endsWith("Bridge")) bridgeVersion else rootProject.version
 }
+
+tasks.register("buildAll") {
+    group = "build"
+    description = "Builds both Paper and Spigot versions of the plugin"
+    dependsOn(":punisherx-paper:build", ":punisherx-spigot:build")
+}
+
+tasks.register("deploySpigotOnly") {
+    group = "deployment"
+    description = "Deploys only the Spigot module artifact"
+    dependsOn(":punisherx-spigot:deployPluginToSpigot")
+}

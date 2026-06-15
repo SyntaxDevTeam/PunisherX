@@ -57,7 +57,7 @@ class GeoIPHandler(private val plugin: PunisherX) {
         }
         if (!cityDatabaseFile.exists()) {
             plugin.logger.severe("GeoIP database file is missing after initialization.")
-            plugin.reportError(IllegalStateException("GeoIP database file is missing after initialization"))
+            //plugin.reportError(IllegalStateException("GeoIP database file is missing after initialization"))
             return
         }
         databaseReader = DatabaseReader.Builder(cityDatabaseFile).build()
@@ -111,10 +111,10 @@ class GeoIPHandler(private val plugin: PunisherX) {
         } catch (e: IOException) {
             if (connection.responseCode == 401) {
                 plugin.logger.severe("[GeoLite2] Unauthorized access. Please check your license key.")
-                plugin.reportError(IllegalStateException("[GeoLite2] Unauthorized access while downloading database"))
+                //plugin.reportError(IllegalStateException("[GeoLite2] Unauthorized access while downloading database"))
             } else {
                 plugin.logger.severe("[GeoLite2] Failed to download GeoIP database: ${e.message}")
-                plugin.reportError(e)
+                //plugin.reportError(e)
                 throw e
             }
         } finally {
@@ -132,11 +132,11 @@ class GeoIPHandler(private val plugin: PunisherX) {
             "Unknown country"
         } catch (e: Exception) {
             plugin.logger.severe("Failed to get country for IP $ip: ${e.message} [Exception]")
-            plugin.reportError(e)
+            //plugin.reportError(e)
             "Unknown country"
         } catch (e: UnknownHostException) {
             plugin.logger.severe("Failed to get country for IP $ip: ${e.message} [UnknownHostException]")
-            plugin.reportError(e)
+            //plugin.reportError(e)
             "Unknown country"
         }
     }
@@ -151,11 +151,11 @@ class GeoIPHandler(private val plugin: PunisherX) {
             "Unknown city"
         } catch (e: Exception) {
             plugin.logger.severe("Failed to get city for IP $ip: ${e.message} [Exception]")
-            plugin.reportError(e)
+            //plugin.reportError(e)
             "Unknown city"
         } catch (e: UnknownHostException) {
             plugin.logger.severe("Failed to get city for IP $ip: ${e.message} [UnknownHostException]")
-            plugin.reportError(e)
+            //plugin.reportError(e)
             "Unknown city"
         }
     }
