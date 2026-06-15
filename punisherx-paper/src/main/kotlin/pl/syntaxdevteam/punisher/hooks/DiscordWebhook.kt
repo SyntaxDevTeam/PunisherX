@@ -24,7 +24,7 @@ class DiscordWebhook(plugin: PunisherX) {
     private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
     private val log = plugin.logger
     private val mh = plugin.messageHandler
-
+    private val synchronousDelivery = plugin.config.getString("debug", "off").equals("diag", ignoreCase = true)
     private val namedColors = mapOf(
         "black" to 0x000000,
         "white" to 0xFFFFFF,
@@ -71,74 +71,95 @@ class DiscordWebhook(plugin: PunisherX) {
         type: String,
         duration: Long
     ) {
-        log.debug("Sending webhook...")
-        log.debug("Webhook URL: $webhookUrl")
-        log.debug("Webhook enabled: $enabled")
+        log.debug("[DiscordWebhook] Received a webhook delivery request.")
+        log.debug("[DiscordWebhook] Validating webhook configuration (enabled=$enabled, URL configured=${webhookUrl.isNotBlank()}).")
 
         if (!enabled || webhookUrl.isEmpty()) {
-            log.debug("Webhook is disabled or URL is empty")
+            log.debug("[DiscordWebhook] Aborting delivery because the webhook is disabled or its URL is empty.")
             return
         }
 
-        CompletableFuture.runAsync {
-            val placeholders = buildPlaceholders(playerId, playerName, adminName, reason, type, duration)
-            val fields = resolveFields(placeholders)
+        val deliveryMode = if (synchronousDelivery) "synchronous" else "asynchronous"
+        log.debug("[DiscordWebhook] Configuration is valid; selected $deliveryMode delivery because debug=${if (synchronousDelivery) "diag" else "not diag"}.")
 
-            val embed = JsonObject().apply {
-                resolveString("title", mh.stringMessageToStringNoPrefix("webhook", "title"), placeholders)
-                    ?.let { addProperty("title", it) }
-                resolveString("description", null, placeholders)
-                    ?.let { addProperty("description", it) }
-                resolveString("id", null, placeholders)
-                    ?.let { addProperty("description", it) }
-                resolveString("url", null, placeholders)
-                    ?.let { addProperty("url", it) }
-                addProperty("color", getColorForPunishmentType(type))
-                resolveTimestamp()?.let { addProperty("timestamp", it) }
-                if (fields.size() > 0) {
-                    add("fields", fields)
-                }
-                add("footer", JsonObject().apply {
-                    val defaultFooter = "${mh.stringMessageToStringNoPrefix("webhook", "app_name")}${LocalDateTime.now().format(formatter)}"
-                    val footerRaw = embedSection?.getString("footer.text")
-                    val footerText = when {
-                        footerRaw != null -> footerRaw.takeIf { it.isNotBlank() }?.let { applyPlaceholders(it, placeholders) }
-                        else -> applyPlaceholders(defaultFooter, placeholders)
+
+        val deliveryTask = Runnable {
+            log.debug("[DiscordWebhook] Starting $deliveryMode webhook processing.")
+            try {
+                log.debug("[DiscordWebhook] Building webhook placeholders.")
+                val placeholders = buildPlaceholders(playerId, playerName, adminName, reason, type, duration)
+                log.debug("[DiscordWebhook] Resolving webhook embed fields.")
+                val fields = resolveFields(placeholders)
+
+                log.debug("[DiscordWebhook] Building the Discord embed payload.")
+                val embed = JsonObject().apply {
+                    resolveString("title", mh.stringMessageToStringNoPrefix("webhook", "title"), placeholders)
+                        ?.let { addProperty("title", it) }
+                    resolveString("description", null, placeholders)
+                        ?.let { addProperty("description", it) }
+                    resolveString("id", null, placeholders)
+                        ?.let { addProperty("description", it) }
+                    resolveString("url", null, placeholders)
+                        ?.let { addProperty("url", it) }
+                    addProperty("color", getColorForPunishmentType(type))
+                    resolveTimestamp()?.let { addProperty("timestamp", it) }
+                    if (fields.size() > 0) {
+                        add("fields", fields)
                     }
-                    footerText?.let { addProperty("text", it) }
-                    resolveImageUrl(embedSection?.getString("footer.icon-url"), placeholders)
-                        ?.let { iconUrl -> addProperty("icon_url", iconUrl) }
-                })
+                    add("footer", JsonObject().apply {
+                        val defaultFooter = "${mh.stringMessageToStringNoPrefix("webhook", "app_name")}${LocalDateTime.now().format(formatter)}"
+                        val footerRaw = embedSection?.getString("footer.text")
+                        val footerText = when {
+                            footerRaw != null -> footerRaw.takeIf { it.isNotBlank() }?.let { applyPlaceholders(it, placeholders) }
+                            else -> applyPlaceholders(defaultFooter, placeholders)
+                        }
+                        footerText?.let { addProperty("text", it) }
+                        resolveImageUrl(embedSection?.getString("footer.icon-url"), placeholders)
+                            ?.let { iconUrl -> addProperty("icon_url", iconUrl) }
+                    })
 
-                embedSection?.getConfigurationSection("author")?.let { authorSection ->
-                    val authorObject = JsonObject()
+                    embedSection?.getConfigurationSection("author")?.let { authorSection ->
+                        val authorObject = JsonObject()
 
-                    resolveString("author.name", null, placeholders)
-                        ?.let { authorObject.addProperty("name", it) }
-                    resolveImageUrl(authorSection.getString("icon-url"), placeholders)
-                        ?.let { authorObject.addProperty("icon_url", it) }
-                    if (authorObject.entrySet().isNotEmpty()) {
-                        add("author", authorObject)
+                        resolveString("author.name", null, placeholders)
+                            ?.let { authorObject.addProperty("name", it) }
+                        resolveImageUrl(authorSection.getString("icon-url"), placeholders)
+                            ?.let { authorObject.addProperty("icon_url", it) }
+                        if (authorObject.entrySet().isNotEmpty()) {
+                            add("author", authorObject)
+                        }
                     }
+                    resolveImageUrl(embedSection?.getString("thumbnail-url"), placeholders)
+                        ?.let { url -> add("thumbnail", JsonObject().apply { addProperty("url", url) }) }
+                    resolveImageUrl(embedSection?.getString("image-url"), placeholders)
+                        ?.let { url -> add("image", JsonObject().apply { addProperty("url", url) }) }
                 }
 
-                resolveImageUrl(embedSection?.getString("thumbnail-url"), placeholders)
-                    ?.let { url -> add("thumbnail", JsonObject().apply { addProperty("url", url) }) }
-                resolveImageUrl(embedSection?.getString("image-url"), placeholders)
-                    ?.let { url -> add("image", JsonObject().apply { addProperty("url", url) }) }
-            }
+                log.debug("[DiscordWebhook] Building the final Discord webhook request body.")
+                val json = JsonObject().apply {
+                    webhookSection?.getString("username")?.takeIf { it.isNotBlank() }?.let { addProperty("username", it) }
+                    resolveImageUrl(webhookSection?.getString("avatar-url"), placeholders)
+                        ?.let { addProperty("avatar_url", it) }
+                    add("embeds", JsonArray().apply {
+                        add(embed)
+                    })
+                }
 
-            val json = JsonObject().apply {
-                webhookSection?.getString("username")?.takeIf { it.isNotBlank() }?.let { addProperty("username", it) }
-                resolveImageUrl(webhookSection?.getString("avatar-url"), placeholders)
-                    ?.let { addProperty("avatar_url", it) }
-                add("embeds", JsonArray().apply {
-                    add(embed)
-                })
+                log.debug("[DiscordWebhook] Request body is ready: $json")
+                sendWebhook(json.toString(), deliveryMode)
+                log.debug("[DiscordWebhook] Finished $deliveryMode webhook processing.")
+            } catch (exception: Exception) {
+                log.debug("[DiscordWebhook] Failed during $deliveryMode webhook processing: ${exception.message}")
+                exception.printStackTrace()
             }
-
-            log.debug("Sending JSON: $json")
-            sendWebhook(json.toString())
+        }
+        if (synchronousDelivery) {
+            log.debug("[DiscordWebhook] Executing webhook delivery on the current thread.")
+            deliveryTask.run()
+        } else {
+            log.debug("[DiscordWebhook] Scheduling webhook delivery with CompletableFuture.runAsync.")
+            CompletableFuture.runAsync(deliveryTask)
+            log.debug("[DiscordWebhook] Asynchronous webhook delivery has been scheduled.")
         }
     }
 
@@ -330,34 +351,41 @@ class DiscordWebhook(plugin: PunisherX) {
         }
     }
 
-    private fun sendWebhook(content: String) {
+    private fun sendWebhook(content: String, deliveryMode: String) {
+        var connection: HttpURLConnection? = null
         try {
-            log.debug("Attempting to send webhook asynchronously...")
+            log.debug("[DiscordWebhook] Preparing the HTTP connection for $deliveryMode delivery.")
             val uri = URI(webhookUrl)
-            val connection = uri.toURL().openConnection() as HttpURLConnection
+            connection = uri.toURL().openConnection() as HttpURLConnection
             connection.requestMethod = "POST"
             connection.setRequestProperty("Content-Type", "application/json")
             connection.connectTimeout = webhookTimeoutMs
             connection.readTimeout = webhookTimeoutMs
             connection.doOutput = true
-
+            log.debug("[DiscordWebhook] Writing the JSON payload to the HTTP request.")
             OutputStreamWriter(connection.outputStream).use { writer ->
                 writer.write(content)
             }
+            log.debug("[DiscordWebhook] Waiting for the Discord webhook HTTP response.")
 
             val responseCode = connection.responseCode
-            log.debug("Response code: $responseCode")
+            log.debug("[DiscordWebhook] Discord responded with HTTP status $responseCode.")
 
             if (responseCode != 204) {
-                log.debug("Error sending webhook. Response code: $responseCode")
+                log.debug("[DiscordWebhook] Webhook delivery was rejected; reading the error response.")
                 val errorStream = connection.errorStream?.bufferedReader()?.use { it.readText() }
-                log.debug("Error content: $errorStream")
+                log.debug("[DiscordWebhook] Discord error response: $errorStream")
+            } else {
+                log.debug("[DiscordWebhook] Webhook delivery completed successfully.")
             }
 
             connection.disconnect()
         } catch (e: Exception) {
-            log.debug("Error occurred while sending webhook: ${e.message}")
+            log.debug("[DiscordWebhook] HTTP delivery failed: ${e.message}")
             e.printStackTrace()
+        } finally {
+            connection?.disconnect()
+            log.debug("[DiscordWebhook] HTTP connection closed.")
         }
     }
 }

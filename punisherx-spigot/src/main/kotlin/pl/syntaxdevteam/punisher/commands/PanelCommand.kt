@@ -18,6 +18,6 @@ class PanelCommand(private val plugin: PunisherX) : BasicCommand {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
-        PunisherMain(plugin).open(stack.sender as Player)
+        PunisherMain(plugin).open(stack.sender)
     }
 }

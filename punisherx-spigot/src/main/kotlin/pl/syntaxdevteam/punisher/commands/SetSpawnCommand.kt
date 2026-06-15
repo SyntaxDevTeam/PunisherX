@@ -20,7 +20,7 @@ class SetSpawnCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        val player = stack.sender as Player
+        val player = stack.sender
         val location = player.location
 
         val world = location.world?.name ?: "world"
