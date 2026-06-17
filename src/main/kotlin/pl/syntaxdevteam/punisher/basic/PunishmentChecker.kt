@@ -112,8 +112,12 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
     fun onPlayerChat(event: AsyncChatEvent) {
+        if (event.isCancelled) {
+            return
+        }
+        
         val player = event.player
         val playerName = player.name
         try {
