@@ -1,5 +1,5 @@
 The plugin offers a comprehensive set of permissions to manage access to its various features. Below is a categorized list of available permissions along with their descriptions.
-
+Recommended permissions plugin: [LuckPerms](https://luckperms.net/)
 
 ### Command permissions
 
