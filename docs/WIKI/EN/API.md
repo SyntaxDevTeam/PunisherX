@@ -14,7 +14,7 @@ repositories {
     }
 }
 dependencies {
-    compileOnly("pl.syntaxdevteam.punisher:PunisherX:1.6.0") // use latest release
+    compileOnly("pl.syntaxdevteam.punisher:PunisherX:1.7.0") // use latest release
 }
 ```
 
