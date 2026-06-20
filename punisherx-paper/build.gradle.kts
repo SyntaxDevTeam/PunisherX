@@ -116,7 +116,7 @@ tasks.processResources {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
-    archiveBaseName.set("PunisherX")
+    archiveBaseName.set("PunisherX-Paper")
     archiveClassifier.set("")
     archiveVersion.set(project.version.toString())
     mergeServiceFiles()
@@ -192,7 +192,7 @@ hangarPublish {
 }
 
 plugindeployer {
-    paper { dir = "/home/debian/server/Paper/26.1.2/plugins" } //ostatnia wersja dla Paper
+    paper { dir = "/home/debian/server/Paper/26.2/plugins" } //ostatnia wersja dla Paper
     folia { dir = "/home/debian/server/Folia/26.1.2/plugins" } //ostatnia wersja dla Folia
-    spigot { dir = "/home/debian/server/Spigot/26.1.2/plugins" } //ostatnia wersja dla Spigot
+    spigot { dir = "/home/debian/server/Spigot/26.2/plugins" } //ostatnia wersja dla Spigot
 }

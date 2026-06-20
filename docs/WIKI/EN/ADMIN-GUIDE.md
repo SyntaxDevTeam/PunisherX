@@ -27,7 +27,7 @@ If you are advanced, jump to **Debug** and **Known issues**.
 - access to the `plugins/` folder.
 
 ### Steps
-1. Download the latest PunisherX release.
+1. Download the [latest PunisherX release](https://github.com/SyntaxDevTeam/PunisherX/blob/main/README.md#-download).
 2. Upload the `.jar` file to `plugins/`.
 3. Start the server and wait until the plugin generates files.
 4. Configure `plugins/PunisherX/config.yml`.
