@@ -23,6 +23,68 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Detect affected components
+        id: changes
+        shell: bash
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+
+          core=false
+          bungee=false
+          velocity=false
+
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            core=true
+            bungee=true
+            velocity=true
+          else
+            zero_sha="0000000000000000000000000000000000000000"
+            if [[ -n "$BEFORE_SHA" && "$BEFORE_SHA" != "$zero_sha" ]] && git cat-file -e "$BEFORE_SHA^{commit}" 2>/dev/null; then
+              commit_range="$BEFORE_SHA..$GITHUB_SHA"
+            elif git rev-parse "$GITHUB_SHA^" >/dev/null 2>&1; then
+              commit_range="$GITHUB_SHA^..$GITHUB_SHA"
+            else
+              commit_range="$GITHUB_SHA"
+            fi
+
+            git diff-tree --no-commit-id --name-only -r "$commit_range" > build-changed-files.txt
+
+            while IFS= read -r file; do
+              case "$file" in
+                src/*)
+                  core=true
+                  ;;
+                bungee-bridge/*)
+                  bungee=true
+                  ;;
+                velocity-bridge/*)
+                  velocity=true
+                  ;;
+                build.gradle.kts|settings.gradle.kts|gradle.properties|gradlew|gradlew.bat|gradle/*|buildSrc/*)
+                  core=true
+                  bungee=true
+                  velocity=true
+                  ;;
+              esac
+            done < build-changed-files.txt
+          fi
+
+          any=false
+          if [[ "$core" == true || "$bungee" == true || "$velocity" == true ]]; then
+            any=true
+          fi
+
+          {
+            echo "core=$core"
+            echo "bungee=$bungee"
+            echo "velocity=$velocity"
+            echo "any=$any"
+          } >> "$GITHUB_OUTPUT"
+
+          printf 'Affected components: core=%s bungee=%s velocity=%s\n' "$core" "$bungee" "$velocity"
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
@@ -63,23 +125,23 @@ jobs:
 
           plugin_version=$(sed -n 's/^punisherxVersion=//p' gradle.properties | head -n 1)
           bridge_version=$(sed -n 's/^bridgeVersion=//p' gradle.properties | head -n 1)
-          short_sha="${GITHUB_SHA::7}"
+          short_sha=$(printf '%s' "$GITHUB_SHA" | cut -c1-7)
 
           test -n "$plugin_version"
           test -n "$bridge_version"
 
-          core_source="build/libs/PunisherX-${plugin_version}.jar"
-          bungee_source="bungee-bridge/build/libs/PunisherX-BungeeCord-Bridge-${bridge_version}.jar"
-          velocity_source="velocity-bridge/build/libs/PunisherX-Velocity-Bridge-${bridge_version}.jar"
+          core_source=$(printf 'build/libs/PunisherX-%s.jar' "$plugin_version")
+          bungee_source=$(printf 'bungee-bridge/build/libs/PunisherX-BungeeCord-Bridge-%s.jar' "$bridge_version")
+          velocity_source=$(printf 'velocity-bridge/build/libs/PunisherX-Velocity-Bridge-%s.jar' "$bridge_version")
 
           test -f "$core_source"
           test -f "$bungee_source"
           test -f "$velocity_source"
 
           mkdir -p build/ci-artifacts
-          core_name="PunisherX-Paper-${plugin_version}-${short_sha}.jar"
-          bungee_name="PunisherX-BungeeCord-Bridge-${bridge_version}.jar"
-          velocity_name="PunisherX-Velocity-Bridge-${bridge_version}.jar"
+          core_name=$(printf 'PunisherX-Paper-%s-%s.jar' "$plugin_version" "$short_sha")
+          bungee_name=$(printf 'PunisherX-BungeeCord-Bridge-%s.jar' "$bridge_version")
+          velocity_name=$(printf 'PunisherX-Velocity-Bridge-%s.jar' "$bridge_version")
 
           cp "$core_source" "build/ci-artifacts/$core_name"
           cp "$bungee_source" "build/ci-artifacts/$bungee_name"
@@ -96,6 +158,7 @@ jobs:
 
       - name: Upload core JAR
         id: core_artifact
+        if: github.event_name == 'pull_request' || steps.changes.outputs.core == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.jars.outputs.core_name }}
@@ -105,6 +168,8 @@ jobs:
           if-no-files-found: error
 
       - name: Upload bungee-bridge JAR
+        id: bungee_artifact
+        if: github.event_name == 'pull_request' || steps.changes.outputs.bungee == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.jars.outputs.bungee_name }}
@@ -114,6 +179,8 @@ jobs:
           if-no-files-found: error
 
       - name: Upload velocity-bridge JAR
+        id: velocity_artifact
+        if: github.event_name == 'pull_request' || steps.changes.outputs.velocity == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.jars.outputs.velocity_name }}
@@ -122,14 +189,23 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
-      - name: Prepare Build Explorer payload
-        if: github.event_name == 'push'
+      - name: Prepare Build Explorer payloads
+        if: github.event_name == 'push' && steps.changes.outputs.any == 'true'
         shell: bash
         env:
           BEFORE_SHA: ${{ github.event.before }}
+          CORE_CHANGED: ${{ steps.changes.outputs.core }}
+          BUNGEE_CHANGED: ${{ steps.changes.outputs.bungee }}
+          VELOCITY_CHANGED: ${{ steps.changes.outputs.velocity }}
           CORE_ARTIFACT_URL: ${{ steps.core_artifact.outputs.artifact-url }}
+          BUNGEE_ARTIFACT_URL: ${{ steps.bungee_artifact.outputs.artifact-url }}
+          VELOCITY_ARTIFACT_URL: ${{ steps.velocity_artifact.outputs.artifact-url }}
           CORE_PATH: ${{ steps.jars.outputs.core_path }}
+          BUNGEE_PATH: ${{ steps.jars.outputs.bungee_path }}
+          VELOCITY_PATH: ${{ steps.jars.outputs.velocity_path }}
           CORE_NAME: ${{ steps.jars.outputs.core_name }}
+          BUNGEE_NAME: ${{ steps.jars.outputs.bungee_name }}
+          VELOCITY_NAME: ${{ steps.jars.outputs.velocity_name }}
         run: |
           set -euo pipefail
 
@@ -142,67 +218,123 @@ jobs:
             commit_range="$GITHUB_SHA"
           fi
 
-          : > build/ci-commits.ndjson
-          while IFS= read -r -d '' sha \
-            && IFS= read -r -d '' commit_time \
-            && IFS= read -r -d '' message; do
-            jq -cn \
-              --arg sha "$sha" \
-              --arg time "$commit_time" \
-              --arg message "$message" \
-              '{sha: $sha, time: $time, message: $message}' \
-              >> build/ci-commits.ndjson
-          done < <(git log --reverse --format='%H%x00%cI%x00%B%x00' "$commit_range")
+          write_commits() {
+            output=$1
+            shift
+            ndjson="$output.ndjson"
+            : > "$ndjson"
 
-          jq -s '.' build/ci-commits.ndjson > build/ci-commits.json
+            while IFS= read -r -d '' sha \
+              && IFS= read -r -d '' commit_time \
+              && IFS= read -r -d '' message; do
+              jq -cn \
+                --arg sha "$sha" \
+                --arg time "$commit_time" \
+                --arg message "$message" \
+                '{sha: $sha, time: $time, message: $message}' \
+                >> "$ndjson"
+            done < <(git log --reverse --format='%H%x00%cI%x00%B%x00' "$commit_range" -- "$@")
 
-          core_sha256=$(sha256sum "$CORE_PATH" | cut -d ' ' -f 1)
-          core_size=$(stat -c '%s' "$CORE_PATH")
-          build_time=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+            jq -s '.' "$ndjson" > "$output"
+            rm "$ndjson"
+          }
 
-          jq -n \
-            --argjson id "$GITHUB_RUN_NUMBER" \
-            --arg time "$build_time" \
-            --arg channel "DEV" \
-            --slurpfile commits build/ci-commits.json \
-            --arg name "$CORE_NAME" \
-            --arg sha256 "$core_sha256" \
-            --argjson size "$core_size" \
-            --arg url "$CORE_ARTIFACT_URL" \
-            '{
-              id: $id,
-              time: $time,
-              channel: $channel,
-              commits: $commits[0],
-              downloads: {
-                "server:paper": {
-                  name: $name,
-                  checksums: {sha256: $sha256},
-                  size: $size,
-                  url: $url
+          write_payload() {
+            output=$1
+            artifact_name=$2
+            artifact_path=$3
+            artifact_url=$4
+            server=$5
+            commits_file=$6
+
+            test -n "$artifact_url"
+            sha256=$(sha256sum "$artifact_path" | cut -d ' ' -f 1)
+            size=$(stat -c '%s' "$artifact_path")
+            build_time=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+
+            jq -n \
+              --argjson id "$GITHUB_RUN_NUMBER" \
+              --arg time "$build_time" \
+              --arg channel "DEV" \
+              --slurpfile commits "$commits_file" \
+              --arg server "$server" \
+              --arg name "$artifact_name" \
+              --arg sha256 "$sha256" \
+              --argjson size "$size" \
+              --arg url "$artifact_url" \
+              '{
+                id: $id,
+                time: $time,
+                channel: $channel,
+                commits: $commits[0],
+                downloads: {
+                  ("server:" + $server): {
+                    name: $name,
+                    checksums: {sha256: $sha256},
+                    size: $size,
+                    url: $url
+                  }
                 }
-              }
-            }' > build/build-info.json
+              }' > "$output"
+          }
 
-      - name: Publish DEV build to Build Explorer
-        if: github.event_name == 'push'
+          if [[ "$CORE_CHANGED" == true ]]; then
+            write_commits build/core-commits.json \
+              src build.gradle.kts settings.gradle.kts gradle.properties gradle gradlew gradlew.bat buildSrc
+            write_payload build/punisherx.json "$CORE_NAME" "$CORE_PATH" "$CORE_ARTIFACT_URL" paper build/core-commits.json
+          fi
+
+          if [[ "$BUNGEE_CHANGED" == true ]]; then
+            write_commits build/bungee-commits.json \
+              bungee-bridge build.gradle.kts settings.gradle.kts gradle.properties gradle gradlew gradlew.bat buildSrc
+            write_payload build/punisherx-bungeecord-bridge.json \
+              "$BUNGEE_NAME" "$BUNGEE_PATH" "$BUNGEE_ARTIFACT_URL" bungeecord build/bungee-commits.json
+          fi
+
+          if [[ "$VELOCITY_CHANGED" == true ]]; then
+            write_commits build/velocity-commits.json \
+              velocity-bridge build.gradle.kts settings.gradle.kts gradle.properties gradle gradlew gradlew.bat buildSrc
+            write_payload build/punisherx-velocity-bridge.json \
+              "$VELOCITY_NAME" "$VELOCITY_PATH" "$VELOCITY_ARTIFACT_URL" velocity build/velocity-commits.json
+          fi
+
+      - name: Publish affected DEV builds to Build Explorer
+        if: github.event_name == 'push' && steps.changes.outputs.any == 'true'
         shell: bash
         env:
           BUILD_CI_TOKEN: ${{ secrets.BUILD_CI_TOKEN }}
+          CORE_CHANGED: ${{ steps.changes.outputs.core }}
+          BUNGEE_CHANGED: ${{ steps.changes.outputs.bungee }}
+          VELOCITY_CHANGED: ${{ steps.changes.outputs.velocity }}
         run: |
           set -euo pipefail
           test -n "$BUILD_CI_TOKEN"
 
-          curl --fail-with-body \
-            --retry 3 \
-            --retry-all-errors \
-            --connect-timeout 10 \
-            --max-time 60 \
-            -X POST \
-            -H 'Content-Type: application/json' \
-            -H "X-Build-Token: $BUILD_CI_TOKEN" \
-            --data-binary @build/build-info.json \
-            https://new.syntaxdevteam.pl/api/builds/ci/punisherx
+          publish() {
+            slug=$1
+            payload=$2
+
+            curl --fail-with-body \
+              --retry 3 \
+              --retry-all-errors \
+              --connect-timeout 10 \
+              --max-time 60 \
+              -X POST \
+              -H 'Content-Type: application/json' \
+              -H "X-Build-Token: $BUILD_CI_TOKEN" \
+              --data-binary "@$payload" \
+              "https://new.syntaxdevteam.pl/api/builds/ci/$slug"
+          }
+
+          if [[ "$CORE_CHANGED" == true ]]; then
+            publish punisherx build/punisherx.json
+          fi
+          if [[ "$BUNGEE_CHANGED" == true ]]; then
+            publish punisherx-bungeecord-bridge build/punisherx-bungeecord-bridge.json
+          fi
+          if [[ "$VELOCITY_CHANGED" == true ]]; then
+            publish punisherx-velocity-bridge build/punisherx-velocity-bridge.json
+          fi
 
   dependency-submission:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
