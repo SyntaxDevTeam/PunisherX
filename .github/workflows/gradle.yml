@@ -49,7 +49,7 @@ jobs:
               commit_range="$GITHUB_SHA"
             fi
 
-            git diff-tree --no-commit-id --name-only -r "$commit_range" > build-changed-files.txt
+            git diff --name-only "$commit_range" > build-changed-files.txt
 
             while IFS= read -r file; do
               case "$file" in
