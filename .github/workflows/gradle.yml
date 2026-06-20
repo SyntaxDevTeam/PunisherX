@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: ["**"]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,9 +16,12 @@ jobs:
       NEXUS_USER: ${{ secrets.NEXUS_USER }}
       NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
       AES_KEY: ${{ secrets.AES_KEY }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -29,21 +35,16 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v5
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
       - name: Build with Gradle
         run: ./gradlew clean build
 
-      - name: Zapisz raport Gradle Actions
+      - name: Save Gradle Actions report
+        shell: bash
         run: |
+          set -euo pipefail
           mkdir -p build/reports/gradle-actions
-          latest_report=$(ls /home/runner/work/_temp/.gradle-actions/build-results/__run_* | tail -n 1)
+          latest_report=$(find /home/runner/work/_temp/.gradle-actions/build-results -type f -name '__run_*' | sort | tail -n 1)
+          test -n "$latest_report"
           cp "$latest_report" build/reports/gradle-actions/build-results.json
 
       - name: Upload build results
@@ -52,32 +53,159 @@ jobs:
           name: gradle-build-results
           path: build/reports/gradle-actions/build-results.json
           retention-days: 1
-      - name: Prepare artifact suffix
-        run: echo "ARTIFACT_SUFFIX=${GITHUB_REF_NAME//\//-}-latest-DEV" >> "$GITHUB_ENV"
+          if-no-files-found: error
+
+      - name: Prepare JAR files
+        id: jars
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          plugin_version=$(sed -n 's/^punisherxVersion=//p' gradle.properties | head -n 1)
+          bridge_version=$(sed -n 's/^bridgeVersion=//p' gradle.properties | head -n 1)
+          short_sha="${GITHUB_SHA::7}"
+
+          test -n "$plugin_version"
+          test -n "$bridge_version"
+
+          core_source="build/libs/PunisherX-${plugin_version}.jar"
+          bungee_source="bungee-bridge/build/libs/PunisherX-BungeeCord-Bridge-${bridge_version}.jar"
+          velocity_source="velocity-bridge/build/libs/PunisherX-Velocity-Bridge-${bridge_version}.jar"
+
+          test -f "$core_source"
+          test -f "$bungee_source"
+          test -f "$velocity_source"
+
+          mkdir -p build/ci-artifacts
+          core_name="PunisherX-Paper-${plugin_version}-${short_sha}.jar"
+          bungee_name="PunisherX-BungeeCord-Bridge-${bridge_version}.jar"
+          velocity_name="PunisherX-Velocity-Bridge-${bridge_version}.jar"
+
+          cp "$core_source" "build/ci-artifacts/$core_name"
+          cp "$bungee_source" "build/ci-artifacts/$bungee_name"
+          cp "$velocity_source" "build/ci-artifacts/$velocity_name"
+
+          {
+            echo "core_path=build/ci-artifacts/$core_name"
+            echo "core_name=$core_name"
+            echo "bungee_path=build/ci-artifacts/$bungee_name"
+            echo "bungee_name=$bungee_name"
+            echo "velocity_path=build/ci-artifacts/$velocity_name"
+            echo "velocity_name=$velocity_name"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Upload core JAR
-
+        id: core_artifact
         uses: actions/upload-artifact@v7
         with:
-          name: PunisherX-${{ env.ARTIFACT_SUFFIX }}.jar
-          path: build/libs/*.jar
+          name: ${{ steps.jars.outputs.core_name }}
+          path: ${{ steps.jars.outputs.core_path }}
+          archive: false
           retention-days: 7
+          if-no-files-found: error
+
       - name: Upload bungee-bridge JAR
         uses: actions/upload-artifact@v7
         with:
-          name: PunisherX-bungee-bridge-${{ env.ARTIFACT_SUFFIX }}.jar
-          path: bungee-bridge/build/libs/*.jar
+          name: ${{ steps.jars.outputs.bungee_name }}
+          path: ${{ steps.jars.outputs.bungee_path }}
+          archive: false
           retention-days: 7
+          if-no-files-found: error
 
       - name: Upload velocity-bridge JAR
         uses: actions/upload-artifact@v7
         with:
-          name: PunisherX-velocity-bridge-${{ env.ARTIFACT_SUFFIX }}.jar
-          path: velocity-bridge/build/libs/*.jar
+          name: ${{ steps.jars.outputs.velocity_name }}
+          path: ${{ steps.jars.outputs.velocity_path }}
+          archive: false
           retention-days: 7
-          
+          if-no-files-found: error
+
+      - name: Prepare Build Explorer payload
+        if: github.event_name == 'push'
+        shell: bash
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          CORE_ARTIFACT_URL: ${{ steps.core_artifact.outputs.artifact-url }}
+          CORE_PATH: ${{ steps.jars.outputs.core_path }}
+          CORE_NAME: ${{ steps.jars.outputs.core_name }}
+        run: |
+          set -euo pipefail
+
+          zero_sha="0000000000000000000000000000000000000000"
+          if [[ -n "$BEFORE_SHA" && "$BEFORE_SHA" != "$zero_sha" ]] && git cat-file -e "$BEFORE_SHA^{commit}" 2>/dev/null; then
+            commit_range="$BEFORE_SHA..$GITHUB_SHA"
+          elif git rev-parse "$GITHUB_SHA^" >/dev/null 2>&1; then
+            commit_range="$GITHUB_SHA^..$GITHUB_SHA"
+          else
+            commit_range="$GITHUB_SHA"
+          fi
+
+          : > build/ci-commits.ndjson
+          while IFS= read -r -d '' sha \
+            && IFS= read -r -d '' commit_time \
+            && IFS= read -r -d '' message; do
+            jq -cn \
+              --arg sha "$sha" \
+              --arg time "$commit_time" \
+              --arg message "$message" \
+              '{sha: $sha, time: $time, message: $message}' \
+              >> build/ci-commits.ndjson
+          done < <(git log --reverse --format='%H%x00%cI%x00%B%x00' "$commit_range")
+
+          jq -s '.' build/ci-commits.ndjson > build/ci-commits.json
+
+          core_sha256=$(sha256sum "$CORE_PATH" | cut -d ' ' -f 1)
+          core_size=$(stat -c '%s' "$CORE_PATH")
+          build_time=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+
+          jq -n \
+            --argjson id "$GITHUB_RUN_NUMBER" \
+            --arg time "$build_time" \
+            --arg channel "DEV" \
+            --slurpfile commits build/ci-commits.json \
+            --arg name "$CORE_NAME" \
+            --arg sha256 "$core_sha256" \
+            --argjson size "$core_size" \
+            --arg url "$CORE_ARTIFACT_URL" \
+            '{
+              id: $id,
+              time: $time,
+              channel: $channel,
+              commits: $commits[0],
+              downloads: {
+                "server:paper": {
+                  name: $name,
+                  checksums: {sha256: $sha256},
+                  size: $size,
+                  url: $url
+                }
+              }
+            }' > build/build-info.json
+
+      - name: Publish DEV build to Build Explorer
+        if: github.event_name == 'push'
+        shell: bash
+        env:
+          BUILD_CI_TOKEN: ${{ secrets.BUILD_CI_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$BUILD_CI_TOKEN"
+
+          curl --fail-with-body \
+            --retry 3 \
+            --retry-all-errors \
+            --connect-timeout 10 \
+            --max-time 60 \
+            -X POST \
+            -H 'Content-Type: application/json' \
+            -H "X-Build-Token: $BUILD_CI_TOKEN" \
+            --data-binary @build/build-info.json \
+            https://new.syntaxdevteam.pl/api/builds/ci/punisherx
 
   dependency-submission:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
