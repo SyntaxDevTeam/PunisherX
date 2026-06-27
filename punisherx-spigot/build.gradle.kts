@@ -32,7 +32,7 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:26.1.2-R0.1-SNAPSHOT")
     implementation("net.byteflux:libby-bukkit:1.3.1")
 
-    compileOnly("pl.syntaxdevteam:syntaxcore:1.3.0-R0.5-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:syntaxcore:1.4.0-R0.1-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:messageHandler-spigot:1.2.0-R0.3-SNAPSHOT")
 
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
@@ -41,11 +41,6 @@ dependencies {
     compileOnly("com.maxmind.geoip2:geoip2:5.1.0")
     compileOnly("org.apache.ant:ant:1.10.17")
 
-    compileOnly("com.zaxxer:HikariCP:7.0.2")
-    compileOnly("org.mariadb.jdbc:mariadb-java-client:3.5.5")
-    compileOnly("org.xerial:sqlite-jdbc:3.50.3.0")
-    compileOnly("org.postgresql:postgresql:42.7.11")
-    compileOnly("com.h2database:h2:2.3.232")
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.4")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
 

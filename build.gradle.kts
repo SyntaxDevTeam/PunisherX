@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") version "2.4.0" apply false
-    id("com.gradleup.shadow") version "9.4.2" apply false
+    id("com.gradleup.shadow") version "9.4.3" apply false
     id("org.jetbrains.dokka-javadoc") version "2.2.0" apply false
     id("io.papermc.hangar-publish-plugin") version "0.1.4" apply false
     id("xyz.jpenilla.run-paper") version "3.0.2" apply false
