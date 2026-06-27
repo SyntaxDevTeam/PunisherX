@@ -6,7 +6,15 @@ import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
 import java.util.UUID
 
-object PermissionChecker { private val AUTHOR_UUID: UUID = UUID.fromString("248e508c-28de-4a8f-a284-2c73cf917d15")
+object PermissionChecker {
+    private val AUTHOR_UUID: UUID = UUID.fromString("248e508c-28de-4a8f-a284-2c73cf917d15")
+
+    @Volatile
+    private var devDebugMode: Boolean = false
+
+    fun updateDebugMode(debug: String?) {
+        devDebugMode = debug?.equals("dev", ignoreCase = true) ?: false
+    }
 
     enum class PermissionKey(val node: String) {
 
@@ -164,6 +172,7 @@ object PermissionChecker { private val AUTHOR_UUID: UUID = UUID.fromString("248e
     }
 
     fun isAuthor(uuid: UUID): Boolean {
+        if (devDebugMode) return false
         return uuid == AUTHOR_UUID
     }
 
