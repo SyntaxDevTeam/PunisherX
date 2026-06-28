@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.md-5:bungeecord-api:26.1-R0.1")
+    compileOnly("net.md-5:bungeecord-api:1.21-R0.4")
     implementation("com.zaxxer:HikariCP:7.1.0")
     implementation("com.mysql:mysql-connector-j:9.7.0")
 }

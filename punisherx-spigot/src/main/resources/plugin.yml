@@ -8,7 +8,7 @@ website: github.com/SyntaxDevTeam/PunisherX
 
 main: pl.syntaxdevteam.punisher.PunisherX
 
-softdepend: [PlaceholderAPI, MiniPlaceholders, LuckPerms, Vault, VaultUnlocked, Essentials, EssentialsSpawn, DscBridgeAPI]
+softdepend: [PlaceholderAPI, MiniPlaceholders, LuckPerms, Vault, VaultUnlocked, Essentials, EssentialsSpawn, DscBridgeAPI, LPC]
 
 
 commands:
