@@ -26,5 +26,5 @@ libraries:
   # SyntaxDevTeam libraries
   - coordinate: pl.syntaxdevteam:syntaxcore:1.4.0-R0.1-SNAPSHOT
     repository: syntaxdevteam-snapshots
-  - coordinate: pl.syntaxdevteam:messageHandler-paper:1.2.0-R0.3-SNAPSHOT
+  - coordinate: pl.syntaxdevteam:messageHandler-paper:1.2.1-R0.1-SNAPSHOT
     repository: syntaxdevteam-snapshots
