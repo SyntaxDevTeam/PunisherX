@@ -192,7 +192,24 @@ jobs:
             exit 1
           fi
 
-          jar="$(find "${BUILD_JAR_DIR}" -type f -name '*.jar' ! -name '*-sources.jar' ! -name '*-javadoc.jar' | sort | tail -n 1)"
+          jar="$(python3 - <<'PY'
+          from pathlib import Path
+          import os
+          import sys
+
+          jar_dir = Path(os.environ["BUILD_JAR_DIR"])
+          excluded_suffixes = ("-sources.jar", "-javadoc.jar", "-plain.jar", "-original.jar")
+          candidates = [
+              path for path in jar_dir.glob("*.jar")
+              if not path.name.endswith(excluded_suffixes)
+          ]
+          preferred = [path for path in candidates if path.name.startswith("PunisherX-")]
+          pool = preferred or candidates
+          if not pool:
+              sys.exit(1)
+          print(max(pool, key=lambda path: path.stat().st_size))
+          PY
+          )"
           if [ -z "${jar}" ]; then
             echo "No JAR found for ${BUILD_SLUG} in ${BUILD_JAR_DIR}." >&2
             exit 1
@@ -202,7 +219,12 @@ jobs:
           if [ -z "${version}" ] || [ "${version}" = "unspecified" ]; then
             version="${GITHUB_SHA::12}"
           fi
-          filename="${BUILD_SLUG}-${BUILD_SERVER}-${version}-${BUILD_CHANNEL^^}-${GITHUB_RUN_NUMBER_VALUE}.jar"
+          artifact_base="$(basename "${jar}" .jar)"
+          if [ "${artifact_base%-${GITHUB_RUN_NUMBER_VALUE}}" != "${artifact_base}" ]; then
+            filename="${artifact_base}.jar"
+          else
+            filename="${artifact_base}-${GITHUB_RUN_NUMBER_VALUE}.jar"
+          fi
           sha256="$(sha256sum "${jar}" | awk '{print $1}')"
           size="$(stat -c%s "${jar}")"
 
