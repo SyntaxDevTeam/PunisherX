@@ -54,7 +54,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
     private fun processPlayerJoinLocation(
         player: org.bukkit.entity.Player,
         name: String,
-        uuid: java.util.UUID,
+        uuid: UUID,
         radius: Double,
         jailLoc: Location?,
         unjailLoc: Location?
