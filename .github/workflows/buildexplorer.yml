@@ -11,7 +11,7 @@ permissions:
 
 env:
   MINI_PORTAL_URL: https://new.syntaxdevteam.pl
-  BUILD_CHANNEL: wip
+  BUILD_CHANNEL: dev
 
 jobs:
   detect:
@@ -58,6 +58,7 @@ jobs:
               {
                   "slug": "punisherx-paper",
                   "server": "Paper",
+                  "gradle_project": ":punisherx-paper",
                   "gradle_task": ":punisherx-paper:build",
                   "jar_dir": "punisherx-paper/build/libs",
                   "paths": ["punisherx-paper/"],
@@ -65,6 +66,7 @@ jobs:
               {
                   "slug": "punisherx-spigot",
                   "server": "Spigot",
+                  "gradle_project": ":punisherx-spigot",
                   "gradle_task": ":punisherx-spigot:build",
                   "jar_dir": "punisherx-spigot/build/libs",
                   "paths": ["punisherx-spigot/"],
@@ -72,6 +74,7 @@ jobs:
               {
                   "slug": "punisherx-bungeecord-bridge",
                   "server": "BungeeCord",
+                  "gradle_project": ":PunisherX-BungeeCord-Bridge",
                   "gradle_task": ":PunisherX-BungeeCord-Bridge:build",
                   "jar_dir": "bungee-bridge/build/libs",
                   "paths": ["bungee-bridge/"],
@@ -79,6 +82,7 @@ jobs:
               {
                   "slug": "punisherx-velocity-bridge",
                   "server": "Velocity",
+                  "gradle_project": ":PunisherX-Velocity-Bridge",
                   "gradle_task": ":PunisherX-Velocity-Bridge:build",
                   "jar_dir": "velocity-bridge/build/libs",
                   "paths": ["velocity-bridge/"],
@@ -107,7 +111,7 @@ jobs:
           include = []
           for product in products:
               if include_all or touches(product["paths"]):
-                  include.append({key: product[key] for key in ("slug", "server", "gradle_task", "jar_dir")})
+                  include.append({key: product[key] for key in ("slug", "server", "gradle_project", "gradle_task", "jar_dir")})
 
           print("matrix=" + json.dumps({"include": include}, separators=(",", ":")))
           print("has_changes=" + ("true" if include else "false"))
@@ -173,6 +177,7 @@ jobs:
           GITHUB_RUN_NUMBER_VALUE: ${{ github.run_number }}
           BUILD_SLUG: ${{ matrix.slug }}
           BUILD_SERVER: ${{ matrix.server }}
+          BUILD_GRADLE_PROJECT: ${{ matrix.gradle_project }}
           BUILD_JAR_DIR: ${{ matrix.jar_dir }}
         run: |
           set -euo pipefail
@@ -193,7 +198,10 @@ jobs:
             exit 1
           fi
 
-          version="${GITHUB_SHA::12}"
+          version="$(./gradlew -q "${BUILD_GRADLE_PROJECT}:properties" --console=plain --no-daemon | awk -F': ' '$1 == "version" {print $2; exit}' | tr -d '\r')"
+          if [ -z "${version}" ] || [ "${version}" = "unspecified" ]; then
+            version="${GITHUB_SHA::12}"
+          fi
           filename="${BUILD_SLUG}-${BUILD_SERVER}-${version}-${BUILD_CHANNEL^^}-${GITHUB_RUN_NUMBER_VALUE}.jar"
           sha256="$(sha256sum "${jar}" | awk '{print $1}')"
           size="$(stat -c%s "${jar}")"
