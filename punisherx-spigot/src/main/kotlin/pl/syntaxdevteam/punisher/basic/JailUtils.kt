@@ -1,5 +1,4 @@
 package pl.syntaxdevteam.punisher.basic
-import pl.syntaxdevteam.punisher.compatibility.*
 
 import org.bukkit.Bukkit
 import org.bukkit.Location

@@ -1,5 +1,4 @@
 package pl.syntaxdevteam.punisher.basic
-import pl.syntaxdevteam.punisher.compatibility.*
 
 import pl.syntaxdevteam.punisher.PunisherX
 import java.time.LocalDateTime
