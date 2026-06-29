@@ -1,0 +1,247 @@
+name: Build and publish PunisherX
+
+on:
+  push:
+    branches: [main, experimental-spigot-version]
+  pull_request:
+    branches: [main, experimental-spigot-version]
+
+permissions:
+  contents: read
+
+env:
+  MINI_PORTAL_URL: https://new.syntaxdevteam.pl
+  BUILD_CHANNEL: wip
+
+jobs:
+  detect:
+    name: Detect changed products
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.products.outputs.matrix }}
+      has_changes: ${{ steps.products.outputs.has_changes }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build product matrix
+        id: products
+        env:
+          GITHUB_BEFORE: ${{ github.event.before }}
+          GITHUB_AFTER: ${{ github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          python3 - <<'PY' >> "${GITHUB_OUTPUT}"
+          import json
+          import os
+          import subprocess
+
+          after = os.environ["GITHUB_AFTER"]
+          before = os.environ.get("GITHUB_BEFORE", "")
+          if os.environ.get("EVENT_NAME") == "pull_request":
+              before = os.environ.get("PR_BASE_SHA", before)
+
+          all_zero = "0" * 40
+          if not before or before == all_zero:
+              changed = ["__all__"]
+          else:
+              raw = subprocess.check_output(
+                  ["git", "diff", "--name-only", f"{before}..{after}"],
+                  text=True,
+              )
+              changed = [line.strip() for line in raw.splitlines() if line.strip()]
+
+          products = [
+              {
+                  "slug": "punisherx-paper",
+                  "server": "Paper",
+                  "gradle_task": ":paper:build",
+                  "jar_dir": "paper/build/libs",
+                  "paths": ["paper/", "src/", "api/"],
+              },
+              {
+                  "slug": "punisherx-spigot",
+                  "server": "Spigot",
+                  "gradle_task": ":spigot:build",
+                  "jar_dir": "spigot/build/libs",
+                  "paths": ["spigot/"],
+              },
+              {
+                  "slug": "punisherx-bungeecord-bridge",
+                  "server": "BungeeCord",
+                  "gradle_task": ":bungeecord-bridge:build",
+                  "jar_dir": "bungeecord-bridge/build/libs",
+                  "paths": ["bungeecord-bridge/", "bungee-bridge/"],
+              },
+              {
+                  "slug": "punisherx-velocity-bridge",
+                  "server": "Velocity",
+                  "gradle_task": ":velocity-bridge:build",
+                  "jar_dir": "velocity-bridge/build/libs",
+                  "paths": ["velocity-bridge/"],
+              },
+          ]
+          shared = [
+              "common/",
+              "buildSrc/",
+              "gradle/",
+              "gradlew",
+              "gradlew.bat",
+              "settings.gradle",
+              "settings.gradle.kts",
+              "build.gradle",
+              "build.gradle.kts",
+              "gradle.properties",
+          ]
+
+          def touches(prefixes):
+              if "__all__" in changed:
+                  return True
+              return any(path == prefix or path.startswith(prefix) for path in changed for prefix in prefixes)
+
+          include_all = touches(shared)
+          include = []
+          for product in products:
+              if include_all or touches(product["paths"]):
+                  include.append({key: product[key] for key in ("slug", "server", "gradle_task", "jar_dir")})
+
+          print("matrix=" + json.dumps({"include": include}, separators=(",", ":")))
+          print("has_changes=" + ("true" if include else "false"))
+          PY
+
+  verify:
+    name: Verify repository
+    runs-on: ubuntu-latest
+    needs: detect
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Test all modules
+        run: |
+          chmod +x ./gradlew
+          ./gradlew test --console=plain --no-daemon
+
+  publish:
+    name: Publish ${{ matrix.slug }}
+    runs-on: ubuntu-latest
+    needs: [detect, verify]
+    if: github.event_name == 'push' && needs.detect.outputs.has_changes == 'true'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.detect.outputs.matrix) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build selected product
+        run: |
+          chmod +x ./gradlew
+          ./gradlew "${{ matrix.gradle_task }}" --console=plain --no-daemon
+
+      - name: Publish artifact to BuildExplorer
+        env:
+          BUILD_CI_TOKEN: ${{ secrets.BUILD_CI_TOKEN }}
+          GITHUB_BEFORE: ${{ github.event.before }}
+          GITHUB_AFTER: ${{ github.sha }}
+          GITHUB_RUN_ID_VALUE: ${{ github.run_id }}
+          GITHUB_RUN_NUMBER_VALUE: ${{ github.run_number }}
+          BUILD_SLUG: ${{ matrix.slug }}
+          BUILD_SERVER: ${{ matrix.server }}
+          BUILD_JAR_DIR: ${{ matrix.jar_dir }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${BUILD_CI_TOKEN}" ]; then
+            echo "Missing BUILD_CI_TOKEN repository secret." >&2
+            exit 1
+          fi
+
+          if [ ! -d "${BUILD_JAR_DIR}" ]; then
+            echo "Directory ${BUILD_JAR_DIR} does not exist for ${BUILD_SLUG}." >&2
+            exit 1
+          fi
+
+          jar="$(find "${BUILD_JAR_DIR}" -type f -name '*.jar' ! -name '*-sources.jar' ! -name '*-javadoc.jar' | sort | tail -n 1)"
+          if [ -z "${jar}" ]; then
+            echo "No JAR found for ${BUILD_SLUG} in ${BUILD_JAR_DIR}." >&2
+            exit 1
+          fi
+
+          version="${GITHUB_SHA::12}"
+          filename="${BUILD_SLUG}-${BUILD_SERVER}-${version}-${BUILD_CHANNEL^^}-${GITHUB_RUN_NUMBER_VALUE}.jar"
+          sha256="$(sha256sum "${jar}" | awk '{print $1}')"
+          size="$(stat -c%s "${jar}")"
+
+          export BUILD_VERSION="${version}"
+          export BUILD_FILENAME="${filename}"
+          export BUILD_SHA256="${sha256}"
+          export BUILD_SIZE="${size}"
+
+          python3 - <<'PY' > build-info.json
+          import json
+          import os
+          import subprocess
+          from datetime import datetime, timezone
+
+          before = os.environ.get("GITHUB_BEFORE", "")
+          after = os.environ["GITHUB_AFTER"]
+          rev_range = after
+          if before and before != "0000000000000000000000000000000000000000":
+              rev_range = f"{before}..{after}"
+
+          raw = subprocess.check_output(
+              ["git", "log", "--format=%H%x1f%cI%x1f%s", rev_range],
+              text=True,
+          ).strip()
+          commits = []
+          for line in raw.splitlines():
+              if not line:
+                  continue
+              sha, time, message = line.split("\x1f", 2)
+              commits.append({"sha": sha, "time": time, "message": message})
+
+          payload = {
+              "id": int(os.environ["GITHUB_RUN_ID_VALUE"]),
+              "time": datetime.now(timezone.utc).isoformat(),
+              "channel": os.environ["BUILD_CHANNEL"],
+              "server": os.environ["BUILD_SERVER"],
+              "version": os.environ["BUILD_VERSION"],
+              "build_number": os.environ["GITHUB_RUN_NUMBER_VALUE"],
+              "filename": os.environ["BUILD_FILENAME"],
+              "sha256": os.environ["BUILD_SHA256"],
+              "size": int(os.environ["BUILD_SIZE"]),
+              "commits": commits[:100],
+          }
+          print(json.dumps(payload, ensure_ascii=False))
+          PY
+
+          curl --fail-with-body \
+            -X POST "${MINI_PORTAL_URL}/api/builds/ci/${BUILD_SLUG}" \
+            -H "X-Build-Token: ${BUILD_CI_TOKEN}" \
+            -F "metadata=<build-info.json;type=application/json" \
+            -F "artifact=@${jar};filename=${filename};type=application/java-archive"

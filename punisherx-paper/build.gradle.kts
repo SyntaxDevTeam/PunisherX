@@ -1,3 +1,5 @@
+@file:Suppress("AvoidDuplicateDependencies")
+
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
