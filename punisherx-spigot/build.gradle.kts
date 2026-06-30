@@ -32,7 +32,7 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21.11-R0.1-SNAPSHOT")
     implementation("net.byteflux:libby-bukkit:1.3.1")
 
-    compileOnly("pl.syntaxdevteam:syntaxcore:1.4.0-R0.1-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:syntaxcore:1.4.1-R0.1-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:messageHandler-spigot:1.2.1-R0.1-SNAPSHOT")
 
     compileOnly("org.eclipse.aether:aether-api:1.1.0")

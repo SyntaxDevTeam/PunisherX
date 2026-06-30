@@ -11,6 +11,7 @@ import pl.syntaxdevteam.core.SyntaxCore
 import pl.syntaxdevteam.core.manager.PluginManagerX
 import pl.syntaxdevteam.core.logging.Logger
 import pl.syntaxdevteam.core.stats.StatsCollector
+import pl.syntaxdevteam.core.tools.UUIDManager
 import pl.syntaxdevteam.core.update.GitHubSource
 import pl.syntaxdevteam.core.update.ModrinthSource
 import pl.syntaxdevteam.message.MessageHandler
@@ -84,6 +85,7 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var onlinePunishmentWatcher: OnlinePunishmentWatcher
     lateinit var punishTemplateManager: PunishTemplateManager
     lateinit var discordBridge: DiscordBridge
+    lateinit var uuidManager: UUIDManager
 
     override fun onLoad() {
         libraryLoader = LibraryLoader(this)
@@ -133,7 +135,7 @@ class PunisherX : JavaPlugin(), Listener {
     fun resolvePlayerUuid(identifier: String): UUID {
         runCatching { UUID.fromString(identifier) }.getOrNull()?.let { return it }
         Bukkit.getPlayerExact(identifier)?.uniqueId?.let { return it }
-        return Bukkit.getOfflinePlayer(identifier).uniqueId
+        return uuidManager.getUUID(identifier)
     }
 
 

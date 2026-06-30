@@ -152,6 +152,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         } else {
             plugin.logger.debug("DscBridgeAPI unavailable, skipping DiscordBridge initialization.")
         }
+        plugin.uuidManager = SyntaxCore.uuidManager
     }
 
     /**

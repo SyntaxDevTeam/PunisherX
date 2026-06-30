@@ -60,7 +60,7 @@ class JailListGUI(plugin: PunisherX) : BaseGUI(plugin) {
     private fun createHead(punishment: PunishmentData): ItemStack {
         val head = ItemStack(Material.PLAYER_HEAD)
         val meta = head.itemMeta as SkullMeta
-        val offline = Bukkit.getOfflinePlayer(punishment.name)
+        val offline = Bukkit.getOfflinePlayer(plugin.uuidManager.getUUID(punishment.name))
         meta.owningPlayer = offline
         meta.displayName(mH.formatMixedTextToMiniMessage("<yellow>${punishment.name}</yellow>", TagResolver.empty()))
         val formattedDate = dateFormat.format(Date(punishment.start))
