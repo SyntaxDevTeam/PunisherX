@@ -1,31 +1,30 @@
 package pl.syntaxdevteam.punisher.compatibility
 
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer
 import net.md_5.bungee.api.ChatMessageType
-import net.md_5.bungee.api.chat.TextComponent
+import org.bukkit.Bukkit
+import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerLoginEvent
-import org.bukkit.Bukkit
-import org.bukkit.OfflinePlayer
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.meta.ItemMeta
+import pl.syntaxdevteam.message.SyntaxMessages
 
-private val legacySerializer = LegacyComponentSerializer.legacySection()
-
-fun Component.toSpigotString(): String = legacySerializer.serialize(this)
+/*
+ * Spigot API still expects legacy strings in places where Paper accepts Adventure
+ * components. Formatting/parsing belongs to messageHandler-spigot; this file only
+ * bridges already-built Components into Spigot calls.
+ */
+private fun Component.toSpigotString(): String =
+    SyntaxMessages.messages.legacyComponentSerializer(this)
 
 fun CommandSender.sendMessage(component: Component) {
     sendMessage(component.toSpigotString())
-}
-
-fun CommandSender.sendRichMessage(message: String) {
-    sendMessage(MiniMessage.miniMessage().deserialize(message))
 }
 
 fun Player.kick(component: Component) {
@@ -35,7 +34,7 @@ fun Player.kick(component: Component) {
 fun Player.sendActionBar(component: Component) {
     spigot().sendMessage(
         ChatMessageType.ACTION_BAR,
-        *TextComponent.fromLegacyText(component.toSpigotString())
+        *BungeeComponentSerializer.get().serialize(component)
     )
 }
 

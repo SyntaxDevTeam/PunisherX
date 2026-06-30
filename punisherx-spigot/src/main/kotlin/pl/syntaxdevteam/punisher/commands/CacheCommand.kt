@@ -1,5 +1,4 @@
 package pl.syntaxdevteam.punisher.commands
-import pl.syntaxdevteam.punisher.compatibility.*
 
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
@@ -10,7 +9,7 @@ class CacheCommand(private val plugin: PunisherX) : BasicCommand {
         val sender = stack.sender
 
         if (sender !is org.bukkit.command.ConsoleCommandSender) {
-            sender.sendRichMessage("Console only!")
+            sender.sendMessage("Console only!")
             return
         }
 
