@@ -19,6 +19,8 @@ class VersionCheckerSupportTest {
     fun `supports approved year-based versions`() {
         assertTrue(VersionChecker.isVersionSupported("26.1"))
         assertTrue(VersionChecker.isVersionSupported("26.1.0"))
+        assertTrue(VersionChecker.isVersionSupported("26.2"))
+        assertTrue(VersionChecker.isVersionSupported("26.2.0"))
     }
 
     @Test
@@ -26,7 +28,7 @@ class VersionCheckerSupportTest {
         assertFalse(VersionChecker.isVersionSupported("1.20.5"))
         assertFalse(VersionChecker.isVersionSupported("1.22"))
         assertFalse(VersionChecker.isVersionSupported("26.0"))
-        assertFalse(VersionChecker.isVersionSupported("26.2"))
+        assertFalse(VersionChecker.isVersionSupported("26.3"))
         assertFalse(VersionChecker.isVersionSupported("27.1"))
     }
 }
