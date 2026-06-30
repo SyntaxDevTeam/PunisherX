@@ -13,46 +13,57 @@ softdepend: [PlaceholderAPI, MiniPlaceholders, LuckPerms, Vault, VaultUnlocked, 
 
 commands:
   ban:
+    aliases: [bx]
     description: Bans a player for a specified time with a reason.
     usage: /ban <player> (time) <reason>
     permission: punisherx.cmd.ban
   banip:
+    aliases: [bip]
     description: Bans a player's IP for a specified time with a reason.
     usage: /banip <ip|player> (time) <reason>
     permission: punisherx.cmd.banip
   unban:
+    aliases: [ub]
     description: Unbans a player or IP.
     usage: /unban <ip|player>
     permission: punisherx.cmd.unban
   jail:
+    aliases: [j]
     description: Allows administrators to jail a player in a specified location in the config.yml for a set duration.
     usage: /jail <player> (time) <reason>
     permission: punisherx.cmd.jail
   unjail:
+    aliases: [uj]
     description: Counterpart to the jail command. Instantly releases a player from jail, teleporting them to "World Spawn".
     usage: /unjail <player>
     permission: punisherx.cmd.unjail
   setjail:
+    aliases: [sjail]
     description: Sets the jail area with a specified radius. Simply stand at the desired location and use the command to designate the jail area. This simplifies the process, avoiding tedious config settings.
     usage: /unban radius <radius>
     permission: punisherx.cmd.setjail
   setunjail:
+    aliases: [sunjail]
     description: Sets the respawn location after a jail sentence ends.
     usage: /setunjail
     permission: punisherx.manage.set_spawn
   mute:
+    aliases: [mx]
     description: Mutes a player for a specified time with a reason.
     usage: /mute <player> (time) <reason>
     permission: punisherx.cmd.mute
   unmute:
+    aliases: [um]
     description: Unmutes a player.
     usage: /unmute <player>
     permission: punisherx.cmd.unmute
   warn:
+    aliases: [wx]
     description: Issues a warning to a player with an optional duration and reason.
     usage: /warn <player> (time) <reason>
     permission: punisherx.cmd.warn
   unwarn:
+    aliases: [uw]
     description: Removes the last warning issued to a player.
     usage: /unwarn <player>
     permission: punisherx.cmd.unwarn
@@ -61,10 +72,12 @@ commands:
     usage: /punish <player> <template> (lvl)
     permission: punisherx.cmd.punish
   clearall:
+    aliases: [ca]
     description: Clears all active penalties for a player.
     usage: /clearall <player>
     permission: punisherx.cmd.clearall
   kick:
+    aliases: [kx]
     description: Kicks a player from the server with a reason.
     usage: /kick <player> <reason>
     permission: punisherx.cmd.kick
@@ -73,10 +86,12 @@ commands:
     usage: /change-reason <penalty_id> <new_reason>
     permission: punisherx.cmd.change_reason
   check:
+    aliases: [cx]
     description: Checks the active penalties for a player.
     usage: /check <player> <warn|mute|ban|all>
     permission: punisherx.check
   history:
+    aliases: [hx]
     description: Displays the full penalty history for a player.
     usage: /history <player> (page)
     permission: punisherx.cmd.history
@@ -85,6 +100,7 @@ commands:
     usage: /banlist (--h) (page)
     permission: punisherx.cmd.banlist
   panel:
+    aliases: [px]
     description: Opens the PunisherX GUI with useful information and shortcuts.
     usage: /panel
     permission: punisherx.cmd.panel
@@ -92,10 +108,17 @@ commands:
     description: Converts legacy translation placeholders from {} to <> in the active language file.
     usage: /langfix
     permission: punisherx.cmd.prx
+  cache:
+    description: Displays UUID/IP cache diagnostics in console.
+    usage: /cache
+    permission: punisherx.cmd.prx
   punisherx:
-    aliases: [prx]
     description: Base command for PunisherX with subcommands for help, version, reload, export, import, and migrate.
     usage: /punisherx <help|version|reload|export|import|migrate>
+    permission: punisherx.cmd.prx
+  prx:
+    description: Base command alias for PunisherX.
+    usage: /prx <help|version|reload|export|import|migrate>
     permission: punisherx.cmd.prx
 
 permissions:

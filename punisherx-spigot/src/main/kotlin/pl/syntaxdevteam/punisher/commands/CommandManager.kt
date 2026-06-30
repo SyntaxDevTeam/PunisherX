@@ -1,5 +1,4 @@
 package pl.syntaxdevteam.punisher.commands
-import pl.syntaxdevteam.punisher.compatibility.*
 
 import pl.syntaxdevteam.punisher.PunisherX
 
@@ -7,6 +6,8 @@ class CommandManager(private val plugin: PunisherX) {
 
     fun registerCommands() {
         register("punisherx", PunishesXCommands(plugin))
+        register("prx", PunishesXCommands(plugin))
+        register("cache", CacheCommand(plugin))
         register("check", CheckCommand(plugin, plugin.playerIPManager))
         register("history", HistoryCommand(plugin, plugin.playerIPManager))
         register("banlist", BanListCommand(plugin))
