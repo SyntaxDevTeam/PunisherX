@@ -4,9 +4,12 @@ import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventOwner
 import org.jetbrains.annotations.NotNull
+import org.yaml.snakeyaml.Yaml
 import java.lang.management.ManagementFactory
 import java.net.HttpURLConnection
 import java.net.URI
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.core.database.DatabaseType
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
@@ -15,6 +18,37 @@ private data class ConnectivityCheckResult(
     val ok: Boolean,
     val message: String,
     val durationMs: Long
+)
+
+private data class LibraryCoordinate(
+    val groupId: String,
+    val artifactId: String,
+    val version: String
+) {
+    val artifactKey: String = "$groupId:$artifactId"
+
+    companion object {
+        fun parse(coordinate: String): LibraryCoordinate? {
+            val parts = coordinate.split(":")
+            if (parts.size < 3) {
+                return null
+            }
+            return LibraryCoordinate(parts[0], parts[1], parts.subList(2, parts.size).joinToString(":"))
+        }
+    }
+}
+
+private data class LibraryProbe(
+    val artifactKey: String,
+    val className: String
+)
+
+private data class LibraryDiagnostic(
+    val artifactKey: String,
+    val declaredVersion: String?,
+    val runtimeVersion: String?,
+    val source: String?,
+    val error: String?
 )
 
 class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
@@ -170,6 +204,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             val uptime = ManagementFactory.getRuntimeMXBean().uptime
             val safeDatabaseMessage = databaseCheck.message.replace('<', '[').replace('>', ']')
             val safeNetworkMessage = externalConnectivity.message.replace('<', '[').replace('>', ']')
+            val libraryReport = formatLibraryDiagnostics(buildLibraryDiagnostics())
             val report = listOf(
                 " ",
                 "<gray>-+-----------------------------------------------",
@@ -190,6 +225,8 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
                         " <gray>${externalConnectivity.durationMs}ms</gray>",
                 " <gray>| <white>Network details: <gray>$safeNetworkMessage</gray>",
                 " <gray>| <white>Data folder: <gray>${plugin.dataFolder.absolutePath}</gray>",
+                " <gray>| <white>Libraries:",
+                libraryReport,
                 " <gray>| <white>Share this output with support if an issue occurs.",
                 "<gray>-+-----------------------------------------------",
                 " "
@@ -199,6 +236,95 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
                 sender.sendMessage(mH.miniMessageFormat(report))
             })
         })
+    }
+
+    private fun buildLibraryDiagnostics(): List<LibraryDiagnostic> {
+        val declaredLibraries = loadDeclaredLibraries()
+        val declaredByArtifact = declaredLibraries.associateBy { it.artifactKey }
+        val artifactKeys = (declaredByArtifact.keys + runtimeLibraryProbes.map { it.artifactKey }).sorted()
+
+        return artifactKeys.map { artifactKey ->
+            val coordinate = declaredByArtifact[artifactKey]
+            val probe = runtimeLibraryProbes.firstOrNull { it.artifactKey == artifactKey }
+            val runtime = probe?.let { detectRuntimeLibrary(it.className) }
+            LibraryDiagnostic(
+                artifactKey = artifactKey,
+                declaredVersion = coordinate?.version,
+                runtimeVersion = runtime?.version,
+                source = runtime?.source,
+                error = runtime?.error ?: if (probe == null) "no runtime probe" else null
+            )
+        }
+    }
+
+    private fun loadDeclaredLibraries(): List<LibraryCoordinate> {
+        return try {
+            val input = plugin.javaClass.classLoader.getResourceAsStream("paper-libraries.yml") ?: return emptyList()
+            input.use {
+                val data = Yaml().load<Map<String, Any>>(it) ?: return emptyList()
+                val libraries = data["libraries"] as? List<*> ?: return emptyList()
+                libraries.mapNotNull { entry ->
+                    when (entry) {
+                        is String -> LibraryCoordinate.parse(entry)
+                        is Map<*, *> -> (entry["coordinate"] as? String)?.let(LibraryCoordinate::parse)
+                        else -> null
+                    }
+                }
+            }
+        } catch (exception: Exception) {
+            listOf(LibraryCoordinate("diagnostics", "paper-libraries.yml", "error:${exception.message ?: exception.javaClass.simpleName}"))
+        }
+    }
+
+    private data class RuntimeLibraryResult(
+        val version: String?,
+        val source: String?,
+        val error: String?
+    )
+
+    private fun detectRuntimeLibrary(className: String): RuntimeLibraryResult {
+        return try {
+            val clazz = Class.forName(className, false, plugin.javaClass.classLoader)
+            val source = clazz.protectionDomain?.codeSource?.location?.toString()
+            val version = clazz.`package`?.implementationVersion ?: inferVersionFromSource(source)
+            RuntimeLibraryResult(version, source?.let(::shortenJarSource), null)
+        } catch (exception: Throwable) {
+            RuntimeLibraryResult(null, null, "not loaded: ${exception.javaClass.simpleName}")
+        }
+    }
+
+    private fun inferVersionFromSource(source: String?): String? {
+        if (source == null) {
+            return null
+        }
+        val fileName = source.substringAfterLast('/').removeSuffix(".jar")
+        val decoded = URLDecoder.decode(fileName, StandardCharsets.UTF_8)
+        val versionCandidate = decoded.substringAfterLast('-', missingDelimiterValue = "")
+        return versionCandidate.takeIf { it.any(Char::isDigit) }
+    }
+
+    private fun shortenJarSource(source: String): String {
+        val decoded = URLDecoder.decode(source, StandardCharsets.UTF_8)
+        return decoded.substringAfterLast('/').ifBlank { decoded }
+    }
+
+    private fun formatLibraryDiagnostics(diagnostics: List<LibraryDiagnostic>): String {
+        if (diagnostics.isEmpty()) {
+            return " <gray>|   <gray>No loader libraries declared.</gray>"
+        }
+
+        return diagnostics.joinToString("\n") { diagnostic ->
+            val declared = diagnostic.declaredVersion ?: "not declared"
+            val runtime = diagnostic.runtimeVersion ?: diagnostic.error ?: "unknown"
+            val status = when {
+                diagnostic.runtimeVersion == null -> "<yellow>?</yellow>"
+                diagnostic.declaredVersion == null -> "<yellow>runtime-only</yellow>"
+                diagnostic.declaredVersion == diagnostic.runtimeVersion -> "<green>OK</green>"
+                else -> "<red>MISMATCH</red>"
+            }
+            val source = diagnostic.source?.let { " <dark_gray>[$it]</dark_gray>" } ?: ""
+            " <gray>|   <white>${diagnostic.artifactKey}: <gold>declared $declared</gold>, <gray>runtime $runtime</gray> $status$source"
+        }
     }
 
     private fun checkExternalConnectivity(): ConnectivityCheckResult {
@@ -349,5 +475,28 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             }
         }
         return emptyList()
+    }
+
+    private companion object {
+        private val runtimeLibraryProbes = listOf(
+            LibraryProbe("org.jetbrains.kotlin:kotlin-stdlib", "kotlin.Unit"),
+            LibraryProbe("org.eclipse.aether:aether-api", "org.eclipse.aether.artifact.Artifact"),
+            LibraryProbe("org.yaml:snakeyaml", "org.yaml.snakeyaml.Yaml"),
+            LibraryProbe("com.google.code.gson:gson", "com.google.gson.Gson"),
+            LibraryProbe("com.maxmind.geoip2:geoip2", "com.maxmind.geoip2.DatabaseReader"),
+            LibraryProbe("org.apache.ant:ant", "org.apache.tools.ant.Project"),
+            LibraryProbe("com.github.ben-manes.caffeine:caffeine", "com.github.benmanes.caffeine.cache.Caffeine"),
+            LibraryProbe("dev.dejvokep:boosted-yaml", "dev.dejvokep.boostedyaml.YamlDocument"),
+            LibraryProbe("dev.faststats.metrics:bukkit", "dev.faststats.bukkit.BukkitMetrics"),
+            LibraryProbe("net.luckperms:api", "net.luckperms.api.LuckPerms"),
+            LibraryProbe("me.clip:placeholderapi", "me.clip.placeholderapi.PlaceholderAPI"),
+            LibraryProbe("io.github.miniplaceholders:miniplaceholders-kotlin-ext", "io.github.miniplaceholders.kotlin.ExpansionExtKt"),
+            LibraryProbe("com.github.milkbowl:VaultAPI", "net.milkbowl.vault.chat.Chat"),
+            LibraryProbe("net.milkbowl.vault:VaultUnlockedAPI", "net.milkbowl.vault2.chat.Chat"),
+            LibraryProbe("net.essentialsx:EssentialsXSpawn", "com.earth2me.essentials.spawn.IEssentialsSpawn"),
+            LibraryProbe("pl.syntaxdevteam:syntaxcore", "pl.syntaxdevteam.core.SyntaxCore"),
+            LibraryProbe("pl.syntaxdevteam:messageHandler-paper", "pl.syntaxdevteam.message.MessageHandler"),
+            LibraryProbe("pl.syntaxdevteam:DscBridgeAPI", "pl.syntaxdevteam.dscbridgeapi.external.model.BridgeSlashCommand")
+        )
     }
 }
