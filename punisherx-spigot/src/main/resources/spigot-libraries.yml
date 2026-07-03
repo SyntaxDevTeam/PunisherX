@@ -11,6 +11,23 @@ libraries:
   - org.eclipse.aether:aether-api:1.1.0
   - org.yaml:snakeyaml:2.6
   - com.google.code.gson:gson:2.14.0
+  # MessageHandler libraries
+  - com.github.ben-manes.caffeine:caffeine:3.2.4
+  - net.kyori:adventure-nbt:5.2.0
+  - net.kyori:adventure-api:5.2.0
+  - net.kyori:adventure-key:5.2.0
+  - net.kyori:adventure-platform-api:4.4.1
+  - net.kyori:adventure-platform-bukkit:4.4.1
+  - net.kyori:adventure-platform-facet:4.4.1
+  - net.kyori:adventure-text-minimessage:5.2.0
+  - net.kyori:adventure-text-serializer-json:5.2.0
+  - net.kyori:adventure-text-serializer-gson:5.2.0
+  - net.kyori:adventure-text-serializer-legacy:5.2.0
+  - net.kyori:adventure-text-serializer-plain:5.2.0
+  - net.kyori:adventure-text-serializer-ansi:5.2.0
+  - net.kyori:examination-api:1.3.0
+  - net.kyori:examination-string:1.3.0
+  - net.kyori:option:1.1.0
   # Additional libraries
   - com.maxmind.geoip2:geoip2:5.1.0
   - org.apache.ant:ant:1.10.17
@@ -27,5 +44,5 @@ libraries:
   # SyntaxDevTeam libraries
   - coordinate: pl.syntaxdevteam:syntaxcore:1.4.1-R0.1-SNAPSHOT
     repository: syntaxdevteam-snapshots
-  - coordinate: pl.syntaxdevteam:messageHandler-spigot:1.2.1-R0.1-SNAPSHOT
+  - coordinate: pl.syntaxdevteam:messageHandler-spigot:1.2.2-R0.4-SNAPSHOT
     repository: syntaxdevteam-snapshots

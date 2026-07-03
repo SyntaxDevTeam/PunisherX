@@ -51,18 +51,17 @@ dependencies {
     //compileOnly("dev.folia:folia-api:1.21.11-R0.1-SNAPSHOT")
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:syntaxcore:1.4.0-R0.1-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.2.1-R0.1-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.2.2-R0.4-SNAPSHOT")
 
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.6")
     compileOnly("com.google.code.gson:gson:2.14.0")
-
     compileOnly("com.maxmind.geoip2:geoip2:5.1.0")
     compileOnly("org.apache.ant:ant:1.10.17")
-
-
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.4")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
+
+    compileOnly("net.kyori:adventure-nbt:4.26.1")
 
     compileOnly("net.luckperms:api:5.5")
     compileOnly("me.clip:placeholderapi:2.12.2")

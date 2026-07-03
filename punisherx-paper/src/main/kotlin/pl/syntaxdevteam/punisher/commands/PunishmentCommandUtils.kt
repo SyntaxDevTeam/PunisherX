@@ -1,9 +1,9 @@
 package pl.syntaxdevteam.punisher.commands
 
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.compatibility.multilineComponent
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 internal object PunishmentCommandUtils {
@@ -74,11 +74,7 @@ internal object PunishmentCommandUtils {
     ) {
         if (targetPlayer == null) return
         val kickMessages = plugin.messageHandler.getSmartMessage(section, key, placeholders)
-        val kickMessageBuilder = Component.text()
-        kickMessages.forEach { line ->
-            kickMessageBuilder.append(line).append(Component.newline())
-        }
-        targetPlayer.kick(kickMessageBuilder.build())
+        targetPlayer.kick(multilineComponent(kickMessages))
     }
 
     fun sendBroadcast(

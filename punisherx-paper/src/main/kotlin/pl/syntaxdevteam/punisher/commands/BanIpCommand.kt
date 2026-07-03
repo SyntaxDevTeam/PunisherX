@@ -2,11 +2,11 @@ package pl.syntaxdevteam.punisher.commands
 
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.compatibility.multilineComponent
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.UUID
 
@@ -102,9 +102,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
                 "kick_message",
                 placeholders
             )
-            val builder = Component.text()
-            lines.forEach { builder.append(it).append(Component.newline()) }
-            targetPlayer.kick(builder.build())
+            targetPlayer.kick(multilineComponent(lines))
         }
 
         val msgLines = plugin.messageHandler.getSmartMessage(

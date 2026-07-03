@@ -1,11 +1,11 @@
 package pl.syntaxdevteam.punisher.bridge
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
-import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
 import pl.syntaxdevteam.core.platform.ServerEnvironment
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.compatibility.multilineComponent
 import pl.syntaxdevteam.punisher.databases.PunishmentData
 import java.util.concurrent.TimeUnit
 
@@ -82,15 +82,8 @@ class OnlinePunishmentWatcher(private val plugin: PunisherX) {
             )
         )
 
-        val kickMessage = Component.text()
-        kickMessages.forEachIndexed { index, component ->
-            kickMessage.append(component)
-            if (index != kickMessages.lastIndex) {
-                kickMessage.append(Component.newline())
-            }
-        }
-
-        plugin.schedulerAdapter.runSync { player.kick(kickMessage.build()) }
+        val kickMessage = multilineComponent(kickMessages)
+        plugin.schedulerAdapter.runSync { player.kick(kickMessage) }
     }
 
     companion object {

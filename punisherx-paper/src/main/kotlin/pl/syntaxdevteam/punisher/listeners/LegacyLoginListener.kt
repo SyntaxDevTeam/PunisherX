@@ -2,12 +2,12 @@
 
 package pl.syntaxdevteam.punisher.listeners
 
-import net.kyori.adventure.text.Component
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.compatibility.multilineComponent
 
 class LegacyLoginListener(private val plugin: PunisherX) : Listener {
 
@@ -53,12 +53,7 @@ class LegacyLoginListener(private val plugin: PunisherX) : Listener {
                             )
                             else -> emptyList()
                         }
-                        val kickMessage = Component.text()
-                        kickMessages.forEach { line ->
-                            kickMessage.append(line)
-                            kickMessage.append(Component.newline())
-                        }
-                        event.disallow(PlayerLoginEvent.Result.KICK_BANNED, kickMessage.build())
+                        event.disallow(PlayerLoginEvent.Result.KICK_BANNED, multilineComponent(kickMessages))
                         plugin.logger.debug("Player ${event.player.name} was kicked for: $reason")
                     }
                 } else {

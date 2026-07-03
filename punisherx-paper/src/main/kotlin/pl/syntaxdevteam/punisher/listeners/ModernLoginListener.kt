@@ -11,6 +11,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.compatibility.multilineComponent
 import java.time.Duration
 import java.util.Locale
 import java.util.UUID
@@ -137,11 +138,7 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
                         )
                         else -> emptyList()
                     }
-                    val kickMessage = Component.text().also { builder ->
-                        kickLines.forEach { line ->
-                            builder.append(line).append(Component.newline())
-                        }
-                    }.build()
+                    val kickMessage = multilineComponent(kickLines)
 
                     plugin.logger.debug("Player $playerName was kicked for: $reason")
 
