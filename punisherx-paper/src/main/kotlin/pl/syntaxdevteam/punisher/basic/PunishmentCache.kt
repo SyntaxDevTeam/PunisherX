@@ -218,7 +218,8 @@ class PunishmentCache(private val plugin: PunisherX) {
     data class CachedPunishment(val endTime: Long, val returnLocation: StoredLocation?)
 
     data class StoredLocation(
-        val world: String,
+        val world: String? = null,
+        val worldKey: String? = null,
         val x: Double,
         val y: Double,
         val z: Double,
@@ -226,19 +227,23 @@ class PunishmentCache(private val plugin: PunisherX) {
         val pitch: Float
     ) {
         fun toLocation(): Location? {
-            val bukkitWorld = Bukkit.getWorld(world) ?: return null
+            val bukkitWorld = JailUtils.resolveWorldCompat(worldKey, world) ?: return null
             return Location(bukkitWorld, x, y, z, yaw, pitch)
         }
 
         companion object {
-            fun fromLocation(location: Location): StoredLocation = StoredLocation(
-                world = location.world?.name ?: "",
-                x = location.x,
-                y = location.y,
-                z = location.z,
-                yaw = location.yaw,
-                pitch = location.pitch
-            )
+            fun fromLocation(location: Location): StoredLocation {
+                val world = location.world
+                return StoredLocation(
+                    world = world?.name,
+                    worldKey = world?.let { JailUtils.namespacedWorldKey(it) },
+                    x = location.x,
+                    y = location.y,
+                    z = location.z,
+                    yaw = location.yaw,
+                    pitch = location.pitch
+                )
+            }
         }
     }
 }

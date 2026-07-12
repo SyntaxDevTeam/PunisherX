@@ -18,6 +18,7 @@ import java.util.Locale
 import java.util.UUID
 
 class PunishCommand(private val plugin: PunisherX) : BasicCommand {
+    private data class TemplateTime(val seconds: Long?)
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.PUNISH)) {
@@ -115,6 +116,7 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
 
         when (type) {
             "BAN" -> applyBan(stack, targetName, uuid, template.reason, templateLevel)
+            "BANIP" -> applyBanIp(stack, targetName, uuid, template.reason, templateLevel)
             "MUTE" -> applyMute(stack, targetName, uuid, template.reason, templateLevel)
             "WARN" -> applyWarn(stack, targetName, uuid, template.reason, templateLevel)
             "KICK" -> applyKick(stack, targetName, uuid, template.reason, templateLevel)
@@ -132,6 +134,7 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
     private fun isBypassed(targetPlayer: org.bukkit.entity.Player, type: String): Boolean {
         return when (type) {
             "BAN" -> PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_BAN)
+            "BANIP" -> PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_BANIP)
             "MUTE" -> PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_MUTE)
             "WARN" -> PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_WARN)
             "KICK" -> PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_KICK)
@@ -140,10 +143,14 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         }
     }
 
-    private fun parseTemplateTime(stack: CommandSourceStack, time: String?): Long? {
-        val trimmed = time?.trim()?.takeIf { it.isNotEmpty() } ?: return null
+    private fun parseTemplateTime(stack: CommandSourceStack, time: String?): TemplateTime? {
+        val trimmed = time?.trim()?.takeIf { it.isNotEmpty() } ?: return TemplateTime(null)
+        if (trimmed.equals("permanent", ignoreCase = true)) {
+            return TemplateTime(null)
+        }
+
         return try {
-            plugin.timeHandler.parseTime(trimmed)
+            TemplateTime(plugin.timeHandler.parseTime(trimmed))
         } catch (_: NumberFormatException) {
             stack.sender.sendMessage(
                 plugin.messageHandler.stringMessageToComponent(
@@ -163,10 +170,8 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         reason: String,
         templateLevel: PunishTemplateLevel
     ) {
-        val parsedSeconds = parseTemplateTime(stack, templateLevel.time) ?: run {
-            if (!templateLevel.time.isNullOrBlank()) return
-            null
-        }
+        val parsedTemplateTime = parseTemplateTime(stack, templateLevel.time) ?: return
+        val parsedSeconds = parsedTemplateTime.seconds
         val start = System.currentTimeMillis()
         val end = parsedSeconds?.let { start + it * 1000 } ?: -1
         val punishmentType = "BAN"
@@ -201,6 +206,71 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_BAN, "ban", "broadcast", placeholders)
     }
 
+    private fun applyBanIp(
+        stack: CommandSourceStack,
+        targetName: String,
+        uuid: UUID,
+        reason: String,
+        templateLevel: PunishTemplateLevel
+    ) {
+        val parsedTemplateTime = parseTemplateTime(stack, templateLevel.time) ?: return
+        val parsedSeconds = parsedTemplateTime.seconds
+        val playerIps = (
+            plugin.playerIPManager.getPlayerIPsByUUID(uuid.toString()) +
+                plugin.playerIPManager.getPlayerIPsByName(targetName.lowercase())
+            ).distinct()
+
+        if (playerIps.isEmpty()) {
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("banip", "not_found"))
+            return
+        }
+
+        val start = System.currentTimeMillis()
+        val end = parsedSeconds?.let { start + it * 1000 } ?: -1
+        val punishmentType = "BANIP"
+        val punishmentIds = mutableListOf<Long>()
+        var dbError = false
+
+        playerIps.forEach { ip ->
+            val punishmentId = plugin.databaseHandler.addPunishment(targetName, ip, reason, stack.sender.name, punishmentType, start, end)
+            if (punishmentId == null) {
+                plugin.logger.err("Failed to add IP ban to database for $ip.")
+                dbError = true
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban-ip $ip")
+            } else {
+                punishmentIds.add(punishmentId)
+            }
+            plugin.databaseHandler.addPunishmentHistory(targetName, ip, reason, stack.sender.name, punishmentType, start, end)
+            plugin.proxyBridgeMessenger.notifyIpBan(ip, reason, end)
+        }
+
+        if (dbError) {
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
+        }
+
+        val formattedTime = plugin.timeHandler.formatTime(templateLevel.time)
+        val placeholders = PunishmentCommandUtils.buildPlaceholders(
+            player = targetName,
+            operator = stack.sender.name,
+            reason = reason,
+            time = formattedTime,
+            type = punishmentType,
+            extra = mapOf(
+                "id" to when {
+                    punishmentIds.isEmpty() -> "?"
+                    punishmentIds.size == 1 -> punishmentIds.first().toString()
+                    else -> punishmentIds.joinToString(",")
+                }
+            )
+        )
+
+        val targetPlayer = Bukkit.getPlayer(uuid)
+        PunishmentCommandUtils.sendKickMessage(plugin, targetPlayer, "banip", "kick_message", placeholders)
+        PunishmentCommandUtils.sendSenderMessages(plugin, stack, "banip", "ban", placeholders)
+        plugin.actionExecutor.executeAction("ip_banned", targetName, placeholders)
+        PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_BANIP, "banip", "ban", placeholders)
+    }
+
     private fun applyMute(
         stack: CommandSourceStack,
         targetName: String,
@@ -208,10 +278,8 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         reason: String,
         templateLevel: PunishTemplateLevel
     ) {
-        val parsedSeconds = parseTemplateTime(stack, templateLevel.time) ?: run {
-            if (!templateLevel.time.isNullOrBlank()) return
-            null
-        }
+        val parsedTemplateTime = parseTemplateTime(stack, templateLevel.time) ?: return
+        val parsedSeconds = parsedTemplateTime.seconds
         val start = System.currentTimeMillis()
         val end = parsedSeconds?.let { start + it * 1000 } ?: -1
         val punishmentType = "MUTE"
@@ -246,10 +314,8 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         reason: String,
         templateLevel: PunishTemplateLevel
     ) {
-        val parsedSeconds = parseTemplateTime(stack, templateLevel.time) ?: run {
-            if (!templateLevel.time.isNullOrBlank()) return
-            null
-        }
+        val parsedTemplateTime = parseTemplateTime(stack, templateLevel.time) ?: return
+        val parsedSeconds = parsedTemplateTime.seconds
         val start = System.currentTimeMillis()
         val end = parsedSeconds?.let { start + it * 1000 } ?: -1
         val punishmentType = "WARN"
@@ -325,10 +391,8 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         reason: String,
         templateLevel: PunishTemplateLevel
     ) {
-        val parsedSeconds = parseTemplateTime(stack, templateLevel.time) ?: run {
-            if (!templateLevel.time.isNullOrBlank()) return
-            null
-        }
+        val parsedTemplateTime = parseTemplateTime(stack, templateLevel.time) ?: return
+        val parsedSeconds = parsedTemplateTime.seconds
         val start = System.currentTimeMillis()
         val end = parsedSeconds?.let { start + it * 1000 } ?: -1
         val punishmentType = "JAIL"

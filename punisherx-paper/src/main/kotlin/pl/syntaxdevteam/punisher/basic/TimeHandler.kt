@@ -38,9 +38,12 @@ class TimeHandler internal constructor(
     fun formatTime(time: String?): String {
         if (time == null) return messageLookup("formatTime", "undefined")
 
-        val isNumeric = time.all { it.isDigit() }
+        val normalized = time.trim().lowercase()
+        if (normalized.isEmpty() || normalized == "permanent") return messageLookup("formatTime", "undefined")
+
+        val isNumeric = normalized.all { it.isDigit() }
         if (isNumeric) {
-            val totalSeconds = time.toLong()
+            val totalSeconds = normalized.toLong()
             val days = totalSeconds / (60 * 60 * 24)
             val hours = (totalSeconds % (60 * 60 * 24)) / (60 * 60)
             val minutes = (totalSeconds % (60 * 60)) / 60
@@ -60,8 +63,12 @@ class TimeHandler internal constructor(
             return timeComponents.joinToString(", ")
         }
 
-        val amount = time.dropLast(1).toLong()
-        val unit = time.last()
+        if (!normalized.matches(Regex("\\d+[smhd]"))) {
+            return messageLookup("formatTime", "undefined")
+        }
+
+        val amount = normalized.dropLast(1).toLong()
+        val unit = normalized.last()
 
         return when (unit) {
             's' -> "$amount ${getLocalizedMessage("second", amount)}"

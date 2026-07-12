@@ -99,6 +99,17 @@ templates:
     3:
       punish: ban
       time: "permanent"
+  AltAccountAbuse:
+    reason: "Alt account abuse"
+    1:
+      punish: banip
+      time: "7d"
+    2:
+      punish: banip
+      time: "30d"
+    3:
+      punish: banip
+      time: "90d"
   InappropriateSkin:
     reason: "Inappropriate name or skin"
     1:

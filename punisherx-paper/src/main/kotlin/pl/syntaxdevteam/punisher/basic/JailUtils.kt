@@ -2,7 +2,9 @@ package pl.syntaxdevteam.punisher.basic
 
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.NamespacedKey
 import org.bukkit.OfflinePlayer
+import org.bukkit.World
 import org.bukkit.configuration.file.FileConfiguration
 import pl.syntaxdevteam.punisher.hooks.HookHandler
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
@@ -10,6 +12,8 @@ import java.util.LinkedHashSet
 import java.util.Locale
 
 object JailUtils {
+    private const val WORLD_NAME_FIELD = "world"
+    private const val WORLD_KEY_FIELD = "world_key"
 
     enum class UnjailLocationSource {
         CONFIGURED,
@@ -20,8 +24,7 @@ object JailUtils {
     }
 
     fun getJailLocation(config: FileConfiguration): Location? {
-        val worldName = config.getString("jail.location.world") ?: return null
-        val world = Bukkit.getWorld(worldName) ?: return null
+        val world = getConfiguredWorld(config, "jail.location") ?: return null
         val x = config.getDouble("jail.location.x")
         val y = config.getDouble("jail.location.y")
         val z = config.getDouble("jail.location.z")
@@ -31,9 +34,9 @@ object JailUtils {
     }
 
     fun setJailLocation(config: FileConfiguration, location: Location, radius: Double): Boolean {
-        val world = location.world?.name ?: return false
+        val world = location.world ?: return false
 
-        config.set("jail.location.world", world)
+        setConfiguredWorld(config, "jail.location", world)
         config.set("jail.location.x", location.x)
         config.set("jail.location.y", location.y)
         config.set("jail.location.z", location.z)
@@ -45,9 +48,9 @@ object JailUtils {
     }
 
     fun setUnjailLocation(config: FileConfiguration, location: Location): Boolean {
-        val world = location.world?.name ?: return false
+        val world = location.world ?: return false
 
-        config.set("unjail.unjail_location.world", world)
+        setConfiguredWorld(config, "unjail.unjail_location", world)
         config.set("unjail.unjail_location.x", location.x)
         config.set("unjail.unjail_location.y", location.y)
         config.set("unjail.unjail_location.z", location.z)
@@ -55,7 +58,7 @@ object JailUtils {
         config.set("unjail.unjail_location.pitch", location.pitch.toDouble())
 
         // Maintain legacy keys for backwards compatibility with existing configs
-        config.set("spawn.location.world", world)
+        setConfiguredWorld(config, "spawn.location", world)
         config.set("spawn.location.x", location.x)
         config.set("spawn.location.y", location.y)
         config.set("spawn.location.z", location.z)
@@ -97,6 +100,21 @@ object JailUtils {
                 }
             }
         }
+
+        return null
+    }
+
+    fun namespacedWorldKey(world: World): String = world.key.toString()
+
+    fun resolveWorldCompat(worldKey: String?, legacyName: String?): World? {
+        normalizeIdentifier(worldKey)
+            ?.let { resolveWorldIdentifier(it, preferKey = true) }
+            ?.let { return it }
+
+        normalizeIdentifier(legacyName)
+            ?.takeUnless { it == normalizeIdentifier(worldKey) }
+            ?.let { resolveWorldIdentifier(it, preferKey = false) }
+            ?.let { return it }
 
         return null
     }
@@ -206,12 +224,12 @@ object JailUtils {
 
     private fun getConfiguredUnjailLocation(config: FileConfiguration): Location? {
         val basePath = when {
+            config.contains("unjail.unjail_location.$WORLD_KEY_FIELD") -> "unjail.unjail_location"
             config.contains("unjail.unjail_location.world") -> "unjail.unjail_location"
             else -> "spawn.location"
         }
 
-        val worldName = config.getString("$basePath.world") ?: return null
-        val world = Bukkit.getWorld(worldName) ?: return null
+        val world = getConfiguredWorld(config, basePath) ?: return null
         val x = config.getDouble("$basePath.x")
         val y = config.getDouble("$basePath.y")
         val z = config.getDouble("$basePath.z")
@@ -219,6 +237,40 @@ object JailUtils {
         val pitch = config.getDouble("$basePath.pitch", 0.0).toFloat()
         return Location(world, x, y, z, yaw, pitch)
     }
+
+    private fun getConfiguredWorld(config: FileConfiguration, basePath: String): World? =
+        resolveWorldCompat(
+            worldKey = config.getString("$basePath.$WORLD_KEY_FIELD"),
+            legacyName = config.getString("$basePath.$WORLD_NAME_FIELD")
+        )
+
+    private fun setConfiguredWorld(config: FileConfiguration, basePath: String, world: World) {
+        config.set("$basePath.$WORLD_NAME_FIELD", world.name)
+        config.set("$basePath.$WORLD_KEY_FIELD", namespacedWorldKey(world))
+    }
+
+    private fun resolveWorldIdentifier(identifier: String, preferKey: Boolean): World? {
+        if (preferKey) {
+            resolveWorldByKey(identifier)?.let { return it }
+            Bukkit.getWorld(identifier)?.let { return it }
+        } else {
+            Bukkit.getWorld(identifier)?.let { return it }
+            resolveWorldByKey(identifier)?.let { return it }
+        }
+
+        return Bukkit.getWorlds().firstOrNull { world ->
+            world.name.equals(identifier, ignoreCase = true) ||
+                namespacedWorldKey(world).equals(identifier, ignoreCase = true)
+        }
+    }
+
+    private fun resolveWorldByKey(identifier: String): World? {
+        val key = runCatching { NamespacedKey.fromString(identifier) }.getOrNull() ?: return null
+        return Bukkit.getWorld(key)
+    }
+
+    private fun normalizeIdentifier(identifier: String?): String? =
+        identifier?.trim()?.takeIf { it.isNotEmpty() }
 
     private fun cloneIfValid(location: Location?): Location? {
         return location?.takeIf { it.world != null }?.clone()

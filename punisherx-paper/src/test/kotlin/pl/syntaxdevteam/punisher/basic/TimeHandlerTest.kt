@@ -55,6 +55,9 @@ class TimeHandlerTest {
         assertEquals("1 hour_one, 1 minute_one, 1 second_one", handler.formatTime("3661"))
         assertEquals("3 day_few", handler.formatTime("3d"))
         assertEquals("10 minute_many", handler.formatTime("10m"))
+        assertEquals("5 minute_many", handler.formatTime("5M"))
+        assertEquals("undefined", handler.formatTime("permanent"))
+        assertEquals("undefined", handler.formatTime("   "))
         assertEquals("undefined", handler.formatTime("5x"))
     }
 
