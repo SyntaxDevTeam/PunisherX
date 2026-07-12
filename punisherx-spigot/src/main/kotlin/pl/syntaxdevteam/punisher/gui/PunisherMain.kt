@@ -1,11 +1,9 @@
 package pl.syntaxdevteam.punisher.gui
-import pl.syntaxdevteam.punisher.compatibility.*
 
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.InventoryClickEvent
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.gui.admin.AdminListGUI
 import pl.syntaxdevteam.punisher.gui.admin.ConfigGUI
@@ -57,8 +55,7 @@ class PunisherMain(plugin: PunisherX) : BaseGUI(plugin) {
     )
 
     override fun open(player: Player) {
-        val inventory = createSpigotInventory(null, 45, getTitle())
-        inventory.fillWithFiller()
+        val gui = createGui(5)
         val serverName = plugin.getServerName()
         val onlinePlayers = Bukkit.getOnlinePlayers().size.toString()
         val totalPlayers = plugin.playerIPManager.getAllDecryptedRecords().size.toString()
@@ -84,24 +81,15 @@ class PunisherMain(plugin: PunisherX) : BaseGUI(plugin) {
                 )
                 else -> emptyList()
             }
-            inventory.setItem(entry.slot, createItem(entry.material, entry.title, lore))
+            gui.setItem(
+                entry.slot,
+                createGuiItem(entry.material, entry.title, lore) { clicker ->
+                    entry.onClick(clicker)
+                }
+            )
         }
 
-        player.openInventory(inventory)
-    }
-
-    override fun handleClick(event: InventoryClickEvent) {
-        val view = event.view
-        val topSize = view.topInventory.size
-        val slot = event.rawSlot
-
-        if (slot !in 0 until topSize) return
-
-        event.isCancelled = true
-
-        val entry = menuEntries.firstOrNull { it.slot == slot } ?: return
-        val player = event.whoClicked as? Player ?: return
-        entry.onClick(player)
+        gui.open(player)
     }
 
     override fun getTitle(): Component {

@@ -6,9 +6,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import pl.syntaxdevteam.punisher.PunisherX
@@ -20,11 +17,6 @@ import java.util.Date
 class BanListGUI(plugin: PunisherX) : BaseGUI(plugin) {
     private val dateFormat = SimpleDateFormat("yy-MM-dd HH:mm:ss")
 
-    private class Holder(var page: Int) : InventoryHolder {
-        lateinit var inv: Inventory
-        override fun getInventory(): Inventory = inv
-    }
-
     override fun open(player: Player) {
         open(player, 0)
     }
@@ -35,25 +27,27 @@ class BanListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         val punishments = plugin.databaseHandler.getBannedPlayers(limit, offset)
         val hasNext = plugin.databaseHandler.getBannedPlayers(1, offset + limit).isNotEmpty()
 
-        val holder = Holder(page)
-        val inventory = createSpigotInventory(holder, 45, getTitle())
-        holder.inv = inventory
-
-        inventory.fillWithFiller()
+        val gui = createGui(5)
 
         punishments.forEachIndexed { index, punishment ->
-            inventory.setItem(index, createHead(punishment))
+            gui.setItem(index, createGuiItem(createHead(punishment)))
         }
 
         if (page > 0) {
-            inventory.setItem(36, createNavItem(Material.PAPER, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")))
+            gui.setItem(36, createNavGuiItem(Material.PAPER, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")) { clicker ->
+                open(clicker, page - 1)
+            })
         }
-        inventory.setItem(40, createNavItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")))
+        gui.setItem(40, createNavGuiItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")) { clicker ->
+            PunishedListGUI(plugin).open(clicker)
+        })
         if (hasNext) {
-            inventory.setItem(44, createNavItem(Material.BOOK, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")))
+            gui.setItem(44, createNavGuiItem(Material.BOOK, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")) { clicker ->
+                open(clicker, page + 1)
+            })
         }
 
-        player.openInventory(inventory)
+        gui.open(player)
     }
 
     private fun createHead(punishment: PunishmentData): ItemStack {
@@ -79,18 +73,6 @@ class BanListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         )
         head.itemMeta = meta
         return head
-    }
-
-    override fun handleClick(event: InventoryClickEvent) {
-        event.isCancelled = true
-        val holder = event.view.topInventory.holder as? Holder ?: return
-        val player = event.whoClicked as? Player ?: return
-        val limit = 27
-        when (event.rawSlot) {
-            36 -> if (holder.page > 0) open(player, holder.page - 1)
-            40 -> PunishedListGUI(plugin).open(player)
-            44 -> if (plugin.databaseHandler.getBannedPlayers(1, (holder.page + 1) * limit).isNotEmpty()) open(player, holder.page + 1)
-        }
     }
 
     override fun getTitle(): Component {

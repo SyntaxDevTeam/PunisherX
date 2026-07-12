@@ -1,12 +1,8 @@
 package pl.syntaxdevteam.punisher.gui.report
 
 import net.kyori.adventure.text.Component
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.InventoryHolder
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
 
@@ -15,43 +11,24 @@ import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
  */
 class ReportSelectorGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
-    private class Holder : InventoryHolder {
-        lateinit var inv: Inventory
-        override fun getInventory(): Inventory = inv
-    }
-
     override fun open(player: Player) {
-        val holder = Holder()
-        val inv = Bukkit.createInventory(holder, 45, getTitle())
-        holder.inv = inv
+        val gui = createGui(5)
 
-        inv.fillWithFiller()
-
-        inv.setItem(20, createItem(
+        gui.setItem(20, createGuiItem(
             Material.GREEN_DYE,
             mH.stringMessageToStringNoPrefix("GUI", "Report.menu.online")
-        ))
+        ) { clicker -> ReportPlayerGUI(plugin).open(clicker) })
 
-        inv.setItem(24, createItem(
+        gui.setItem(24, createGuiItem(
             Material.RED_DYE,
             mH.stringMessageToStringNoPrefix("GUI", "Report.menu.offline")
-        ))
+        ) { clicker -> ReportOfflineGUI(plugin).open(clicker) })
 
-        inv.setItem(40, createNavItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")))
+        gui.setItem(40, createNavGuiItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")) { clicker ->
+            clicker.closeInventory()
+        })
 
-        player.openInventory(inv)
-    }
-
-    override fun handleClick(event: InventoryClickEvent) {
-        event.isCancelled = true
-        val holder = event.view.topInventory.holder as? Holder ?: return
-        val player = event.whoClicked as? Player ?: return
-
-        when (event.rawSlot) {
-            20 -> ReportPlayerGUI(plugin).open(player)
-            24 -> ReportOfflineGUI(plugin).open(player)
-            40 -> player.closeInventory()
-        }
+        gui.open(player)
     }
 
     override fun getTitle(): Component {

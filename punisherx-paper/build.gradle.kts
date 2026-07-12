@@ -60,6 +60,7 @@ dependencies {
     compileOnly("org.apache.ant:ant:1.10.17")
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.4")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
+    compileOnly("dev.triumphteam:triumph-gui:3.1.13")
 
     compileOnly("net.kyori:adventure-nbt:4.26.1")
 

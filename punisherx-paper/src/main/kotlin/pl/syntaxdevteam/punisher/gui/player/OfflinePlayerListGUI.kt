@@ -6,9 +6,6 @@ import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import com.destroystokyo.paper.profile.PlayerProfile
@@ -28,11 +25,6 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             LAST_SEEN_DESC -> LAST_SEEN_ASC
             LAST_SEEN_ASC -> NAME_ASC
         }
-    }
-
-    private class Holder(var page: Int, var sort: SortMode) : InventoryHolder {
-        lateinit var inv: Inventory
-        override fun getInventory(): Inventory = inv
     }
 
     override fun open(player: Player) {
@@ -61,11 +53,7 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         val startIndex = currentPage * playersPerPage
         val pageList = sorted.drop(startIndex).take(playersPerPage)
 
-        val holder = Holder(currentPage, sort)
-        val inventory = Bukkit.createInventory(holder, 45, getTitle())
-        holder.inv = inventory
-
-        inventory.fillWithFiller()
+        val gui = createGui(5)
 
         pageList.forEachIndexed { index, info ->
             val uuid = UUID.fromString(info.playerUUID)
@@ -87,7 +75,10 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 )
             )
             head.itemMeta = meta
-            inventory.setItem(index, head)
+            gui.setItem(index, createGuiItem(head) { clicker ->
+                val off = Bukkit.getOfflinePlayer(UUID.fromString(info.playerUUID))
+                PlayerActionGUI(plugin).open(clicker, off)
+            })
 
             Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
                 val offlineTime = plugin.timeHandler.getOfflineDuration(info.lastUpdated)
@@ -106,8 +97,8 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                     .getPunishmentHistory(info.playerUUID, limit = 3, offset = 0)
                 val punishmentLines = punishments.map { "${it.type}: ${it.reason}" }
                 Bukkit.getScheduler().runTask(plugin, Runnable {
-                    if (!holder.inv.viewers.contains(player)) return@Runnable
-                    val item = inventory.getItem(index) ?: return@Runnable
+                    if (!gui.inventory.viewers.contains(player)) return@Runnable
+                    val item = gui.inventory.getItem(index) ?: return@Runnable
                     val im = item.itemMeta as SkullMeta
                     val loreLines = mutableListOf(
                         mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.uuid", mapOf("uuid" to info.playerUUID)),
@@ -133,18 +124,24 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                     }
                     im.lore(loreLines)
                     item.itemMeta = im
-                    inventory.setItem(index, item)
+                    gui.updateItem(index, item)
                 })
             })
         }
 
         if (currentPage > 0)
-            inventory.setItem(36, createNavItem(Material.PAPER, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")))
+            gui.setItem(36, createNavGuiItem(Material.PAPER, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")) { clicker ->
+                open(clicker, currentPage - 1, sort)
+            })
 
-        inventory.setItem(40, createNavItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")))
+        gui.setItem(40, createNavGuiItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")) { clicker ->
+            PunisherMain(plugin).open(clicker)
+        })
 
         if (currentPage < totalPages - 1)
-            inventory.setItem(44, createNavItem(Material.BOOK, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")))
+            gui.setItem(44, createNavGuiItem(Material.BOOK, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")) { clicker ->
+                open(clicker, currentPage + 1, sort)
+            })
 
         val sortNameKey = when (sort) {
             SortMode.NAME_ASC -> "nameAsc"
@@ -152,50 +149,11 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             SortMode.LAST_SEEN_DESC -> "lastSeenDesc"
             SortMode.LAST_SEEN_ASC -> "lastSeenAsc"
         }
-        inventory.setItem(38, createNavItem(Material.COMPASS, mH.stringMessageToStringNoPrefix("GUI", "OfflineList.sort.$sortNameKey")))
+        gui.setItem(38, createNavGuiItem(Material.COMPASS, mH.stringMessageToStringNoPrefix("GUI", "OfflineList.sort.$sortNameKey")) { clicker ->
+            open(clicker, 0, sort.next())
+        })
 
-        player.openInventory(inventory)
-    }
-
-    override fun handleClick(event: InventoryClickEvent) {
-        event.isCancelled = true
-        val holder = event.view.topInventory.holder as? Holder ?: return
-        val player = event.whoClicked as? Player ?: return
-
-        val records = plugin.playerIPManager.getAllDecryptedRecords()
-        val players = records
-            .mapNotNull { info ->
-                val uuid = UUID.fromString(info.playerUUID)
-                if (Bukkit.getPlayer(uuid) != null) null else info
-            }
-            .distinctBy { it.playerUUID }
-            .let { list ->
-                when (holder.sort) {
-                    SortMode.NAME_ASC -> list.sortedBy { it.playerName.lowercase() }
-                    SortMode.NAME_DESC -> list.sortedByDescending { it.playerName.lowercase() }
-                    SortMode.LAST_SEEN_DESC -> list.sortedByDescending { plugin.timeHandler.parseDate(it.lastUpdated) ?: 0L }
-                    SortMode.LAST_SEEN_ASC -> list.sortedBy { plugin.timeHandler.parseDate(it.lastUpdated) ?: Long.MAX_VALUE }
-                }
-            }
-
-        val playersPerPage = 27
-        val slot = event.rawSlot
-        if (slot in 0 until playersPerPage) {
-            val index = holder.page * playersPerPage + slot
-            if (index < players.size) {
-                val info = players[index]
-                val off = Bukkit.getOfflinePlayer(UUID.fromString(info.playerUUID))
-                PlayerActionGUI(plugin).open(player, off)
-            }
-            return
-        }
-
-        when (slot) {
-            36 -> if (holder.page > 0) open(player, holder.page - 1, holder.sort)
-            38 -> open(player, 0, holder.sort.next())
-            40 -> PunisherMain(plugin).open(player)
-            44 -> if (holder.page < (players.size - 1) / playersPerPage) open(player, holder.page + 1, holder.sort)
-        }
+        gui.open(player)
     }
 
     override fun getTitle(): Component {

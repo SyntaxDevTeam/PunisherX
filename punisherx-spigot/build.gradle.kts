@@ -41,6 +41,7 @@ dependencies {
     compileOnly("com.maxmind.geoip2:geoip2:5.1.0")
     compileOnly("org.apache.ant:ant:1.10.17")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
+    compileOnly("dev.triumphteam:triumph-gui:3.1.13")
 
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.4")
     compileOnly("net.kyori:adventure-nbt:5.2.0")

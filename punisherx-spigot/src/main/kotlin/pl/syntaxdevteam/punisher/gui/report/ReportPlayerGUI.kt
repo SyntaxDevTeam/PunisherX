@@ -3,13 +3,9 @@ import pl.syntaxdevteam.punisher.compatibility.*
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
@@ -27,11 +23,6 @@ class ReportPlayerGUI(plugin: PunisherX) : BaseGUI(plugin) {
         28,29,30,31,32,33,34
     )
 
-    private class Holder(val players: List<Player>, var page: Int) : InventoryHolder {
-        lateinit var inv: Inventory
-        override fun getInventory(): Inventory = inv
-    }
-
     override fun open(player: Player) {
         val online = ArrayList(plugin.server.onlinePlayers)
         // Do not include the player themselves in the list
@@ -48,11 +39,7 @@ class ReportPlayerGUI(plugin: PunisherX) : BaseGUI(plugin) {
         val startIndex = currentPage * playersPerPage
         val playersPage = list.drop(startIndex).take(playersPerPage)
 
-        val holder = Holder(list, currentPage)
-        val inv = createSpigotInventory(holder, 45, getTitle())
-        holder.inv = inv
-
-        inv.fillWithFiller()
+        val gui = createGui(5)
 
         playersPage.forEachIndexed { index, target ->
             val slot = if (index < centerSlots.size) centerSlots[index] else index
@@ -65,51 +52,30 @@ class ReportPlayerGUI(plugin: PunisherX) : BaseGUI(plugin) {
             meta.addEnchant(Enchantment.UNBREAKING, 1, true)
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES)
             head.itemMeta = meta
-            inv.setItem(slot, head)
+            gui.setItem(slot, createGuiItem(head) { clicker ->
+                if (target.uniqueId == clicker.uniqueId) {
+                    clicker.sendMessage(mH.stringMessageToComponent("error", "cannot-report-self"))
+                    return@createGuiItem
+                }
+                ReportReasonGUI(plugin).open(clicker, target)
+            })
         }
 
         if (currentPage > 0)
-            inv.setItem(36, createNavItem(Material.PAPER, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")))
+            gui.setItem(36, createNavGuiItem(Material.PAPER, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")) { clicker ->
+                open(clicker, currentPage - 1, list)
+            })
 
-        inv.setItem(40, createNavItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")))
+        gui.setItem(40, createNavGuiItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")) { clicker ->
+            ReportSelectorGUI(plugin).open(clicker)
+        })
 
         if (currentPage < totalPages - 1)
-            inv.setItem(44, createNavItem(Material.BOOK, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")))
+            gui.setItem(44, createNavGuiItem(Material.BOOK, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")) { clicker ->
+                open(clicker, currentPage + 1, list)
+            })
 
-        player.openInventory(inv)
-    }
-
-    override fun handleClick(event: InventoryClickEvent) {
-        event.isCancelled = true
-        val holder = event.view.topInventory.holder as? Holder ?: return
-        val clicker = event.whoClicked as? Player ?: return
-
-        val slot = event.rawSlot
-        val playersPerPage = 27
-
-        // Map centered slots back to index
-        val localIndex = centerSlots.indexOf(slot)
-        if (localIndex >= 0) {
-            val index = holder.page * playersPerPage + localIndex
-            if (index < holder.players.size) {
-                val target = holder.players[index]
-                if (target.uniqueId == clicker.uniqueId) {
-                    clicker.sendMessage(mH.stringMessageToComponent("error", "cannot-report-self"))
-                    return
-                }
-                ReportReasonGUI(plugin).open(clicker, target)
-            }
-            return
-        }
-
-        when (slot) {
-            36 -> if (holder.page > 0) open(clicker, holder.page - 1, holder.players)
-            40 -> ReportSelectorGUI(plugin).open(clicker)
-            44 -> {
-                val totalPages = if (holder.players.isEmpty()) 1 else (holder.players.size - 1) / playersPerPage + 1
-                if (holder.page < totalPages - 1) open(clicker, holder.page + 1, holder.players)
-            }
-        }
+        gui.open(player)
     }
 
     override fun getTitle(): Component {

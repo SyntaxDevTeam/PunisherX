@@ -17,6 +17,8 @@ libraries:
   # MessageHandler libraries
   - com.github.ben-manes.caffeine:caffeine:3.2.4
   - net.kyori:adventure-nbt:4.26.1
+  # GUI libraries
+  - dev.triumphteam:triumph-gui:3.1.13
   # Additional libraries
   - com.maxmind.geoip2:geoip2:5.1.0
   - org.apache.ant:ant:1.10.17

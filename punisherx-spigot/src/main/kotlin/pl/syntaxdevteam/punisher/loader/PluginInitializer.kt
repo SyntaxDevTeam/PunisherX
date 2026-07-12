@@ -1,6 +1,6 @@
 package pl.syntaxdevteam.punisher.loader
-import pl.syntaxdevteam.punisher.compatibility.*
 
+import dev.triumphteam.gui.TriumphGui
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.scheduler.BukkitRunnable
 import pl.syntaxdevteam.core.SyntaxCore
@@ -116,6 +116,7 @@ class PluginInitializer(private val plugin: PunisherX) {
     }
 
     private fun setupHandlers() {
+        TriumphGui.init(plugin)
         t("before SyntaxMessages.initialize")
         SyntaxMessages.initialize(plugin)
         t("after SyntaxMessages.initialize")
@@ -181,7 +182,6 @@ class PluginInitializer(private val plugin: PunisherX) {
         if (plugin.hookHandler.checkPlaceholderAPI()) {
             PlaceholderHandler(plugin).register()
         }
-        //plugin.server.pluginManager.registerEvents(GUIHandler(plugin), plugin)
     }
 
     /**

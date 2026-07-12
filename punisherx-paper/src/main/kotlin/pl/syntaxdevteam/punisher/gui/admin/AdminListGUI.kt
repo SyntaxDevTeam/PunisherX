@@ -5,9 +5,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import pl.syntaxdevteam.punisher.PunisherX
@@ -20,14 +17,6 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
  * GUI displaying currently online administrators.
  */
 class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
-
-    /**
-     * Inventory holder used to store the current page of the GUI.
-     */
-    private class Holder(var page: Int) : InventoryHolder {
-        lateinit var inv: Inventory
-        override fun getInventory(): Inventory = inv
-    }
 
     override fun open(player: Player) {
         open(player, 0)
@@ -47,11 +36,7 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         val startIndex = currentPage * playersPerPage
         val playersPage = online.drop(startIndex).take(playersPerPage)
 
-        val holder = Holder(currentPage)
-        val inventory = Bukkit.createInventory(holder, 45, getTitle())
-        holder.inv = inventory
-
-        inventory.fillWithFiller()
+        val gui = createGui(5)
 
         playersPage.forEachIndexed { index, target ->
             val head = ItemStack(Material.PLAYER_HEAD)
@@ -73,7 +58,7 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 )
             )
             head.itemMeta = meta
-            inventory.setItem(index, head)
+            gui.setItem(index, createGuiItem(head))
 
             Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
                 val uuid = target.uniqueId
@@ -85,8 +70,8 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 val lastActive = PlayerStatsService.getLastActiveString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
 
                 Bukkit.getScheduler().runTask(plugin, Runnable {
-                    if (!holder.inv.viewers.contains(player)) return@Runnable
-                    val item = inventory.getItem(index) ?: return@Runnable
+                    if (!gui.inventory.viewers.contains(player)) return@Runnable
+                    val item = gui.inventory.getItem(index) ?: return@Runnable
                     val im = item.itemMeta as SkullMeta
                     im.lore(
                         listOf(
@@ -100,41 +85,28 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                         )
                     )
                     item.itemMeta = im
-                    inventory.setItem(index, item)
+                    gui.updateItem(index, item)
                 })
             })
         }
 
         if (currentPage > 0) {
-            inventory.setItem(36, createNavItem(Material.PAPER, "<yellow>Poprzednia strona</yellow>"))
+            gui.setItem(36, createNavGuiItem(Material.PAPER, "<yellow>Poprzednia strona</yellow>") { clicker ->
+                open(clicker, currentPage - 1)
+            })
         }
 
-        inventory.setItem(40, createNavItem(Material.BARRIER, "<yellow>Powrót</yellow>"))
+        gui.setItem(40, createNavGuiItem(Material.BARRIER, "<yellow>Powrót</yellow>") { clicker ->
+            PunisherMain(plugin).open(clicker)
+        })
 
         if (currentPage < totalPages - 1) {
-            inventory.setItem(44, createNavItem(Material.BOOK, "<yellow>Następna strona</yellow>"))
+            gui.setItem(44, createNavGuiItem(Material.BOOK, "<yellow>Następna strona</yellow>") { clicker ->
+                open(clicker, currentPage + 1)
+            })
         }
 
-        player.openInventory(inventory)
-    }
-
-    override fun handleClick(event: InventoryClickEvent) {
-        event.isCancelled = true
-        val holder = event.view.topInventory.holder as? Holder ?: return
-        val player = event.whoClicked as? Player ?: return
-
-        val online = plugin.server.onlinePlayers.filter {
-            PermissionChecker.hasPermissionStartingWith(it, "punisherx")
-        }
-        val playersPerPage = 27
-        val totalPages = if (online.isEmpty()) 1 else (online.size - 1) / playersPerPage + 1
-        val slot = event.rawSlot
-
-        when (slot) {
-            36 -> if (holder.page > 0) open(player, holder.page - 1)
-            40 -> PunisherMain(plugin).open(player)
-            44 -> if (holder.page < totalPages - 1) open(player, holder.page + 1)
-        }
+        gui.open(player)
     }
 
     override fun getTitle(): Component {

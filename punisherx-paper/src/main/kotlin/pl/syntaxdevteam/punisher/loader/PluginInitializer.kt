@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.loader
 
+import dev.triumphteam.gui.TriumphGui
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.scheduler.BukkitRunnable
 import pl.syntaxdevteam.core.SyntaxCore
@@ -95,8 +96,6 @@ class PluginInitializer(private val plugin: PunisherX) {
             plugin.databaseHandler.createTables()
         }
         plugin.logger.debug("Detected server: ${ServerEnvironment.platformName}")
-        // SQLite and H2 are local file-based — no network I/O, safe to run synchronously.
-        // Running them async caused a race: players could connect before ready=true was set.
         val dbTypeName = plugin.databaseHandler.databaseType().name
         val isLocalDb = dbTypeName == "SQLITE" || dbTypeName == "H2"
         plugin.logger.diag("[TIMING] dbTypeName=$dbTypeName isLocalDb=$isLocalDb")
@@ -123,6 +122,7 @@ class PluginInitializer(private val plugin: PunisherX) {
     }
 
     private fun setupHandlers() {
+        TriumphGui.init(plugin)
         t("before SyntaxMessages.initialize")
         SyntaxMessages.initialize(plugin)
         t("after SyntaxMessages.initialize")
@@ -196,7 +196,6 @@ class PluginInitializer(private val plugin: PunisherX) {
         if (plugin.hookHandler.checkPlaceholderAPI()) {
             PlaceholderHandler(plugin).register()
         }
-        //plugin.server.pluginManager.registerEvents(GUIHandler(plugin), plugin)
     }
 
     /**
