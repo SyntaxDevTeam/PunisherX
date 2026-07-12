@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 env:
-  MINI_PORTAL_URL: https://new.syntaxdevteam.pl
+  MINI_PORTAL_URL: https://syntaxdevteam.pl
   BUILD_CHANNEL: dev
 
 jobs:
