@@ -1,5 +1,5 @@
 Plugin oferuje rozbudowany zestaw permisji do zarządzania dostępem do różnych funkcji. Poniżej znajdziesz pogrupowaną listę dostępnych permisji wraz z opisami.
-
+Rekomendowany plugin do uprawnień: [LuckPerms](https://luckperms.net/)
 
 ### Permisje komend
 

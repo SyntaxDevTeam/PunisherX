@@ -49,6 +49,9 @@ dependencies:
     DscBridgeAPI:
       load: BEFORE
       required: false
+    LPC:
+      load: BEFORE
+      required: false
 
 
 commands:
