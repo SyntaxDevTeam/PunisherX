@@ -130,7 +130,7 @@ jobs:
           test -n "$plugin_version"
           test -n "$bridge_version"
 
-          core_source=$(printf 'build/libs/PunisherX-%s.jar' "$plugin_version")
+          core_source=$(printf 'punisherx-paper/build/libs/PunisherX-Paper-%s.jar' "$plugin_version")
           bungee_source=$(printf 'bungee-bridge/build/libs/PunisherX-BungeeCord-Bridge-%s.jar' "$bridge_version")
           velocity_source=$(printf 'velocity-bridge/build/libs/PunisherX-Velocity-Bridge-%s.jar' "$bridge_version")
 
