@@ -33,7 +33,7 @@ The Paper implementation uses Paper-only APIs and is therefore not copied into t
 * [x] One-command full punishment clearance for any player.
 * [x] Full jail support via command or configuration.
 * [x] Sync-Bridge modules for BungeeCord and Velocity.
-* [x] Requires Java 21 or higher.
+* [x] Requires Java 21 or higher; the Velocity 4 bridge requires Java 25 or higher.
 
 If you have questions or need help, feel free to join our [Discord](https://discord.gg/Zk6mxv7eMh)
 

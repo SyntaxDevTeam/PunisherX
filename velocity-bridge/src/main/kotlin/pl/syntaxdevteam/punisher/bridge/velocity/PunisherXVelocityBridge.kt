@@ -10,6 +10,7 @@ import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
+import com.velocitypowered.api.proxy.ServerConnection
 import com.velocitypowered.api.proxy.messages.ChannelIdentifier
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier
 import com.velocitypowered.api.scheduler.ScheduledTask
@@ -63,9 +64,12 @@ class PunisherXVelocityBridge @Inject constructor(
         }
 
         event.result = PluginMessageEvent.ForwardResult.handled()
+        if (event.source !is ServerConnection) {
+            return
+        }
 
         val dataInput = DataInputStream(ByteArrayInputStream(event.data))
-        val action = runCatching { dataInput.readUTF() }.getOrNull()?.uppercase(Locale.getDefault()) ?: return
+        val action = runCatching { dataInput.readUTF() }.getOrNull()?.uppercase(Locale.ROOT) ?: return
         val target = runCatching { dataInput.readUTF() }.getOrNull() ?: return
         val reason = runCatching { dataInput.readUTF() }.getOrNull() ?: ""
         val end = runCatching { dataInput.readLong() }.getOrNull() ?: -1L
@@ -90,7 +94,9 @@ class PunisherXVelocityBridge @Inject constructor(
     @Subscribe
     fun onShutdown(event: ProxyShutdownEvent) {
         pollTask?.cancel()
-        bridgeDatabase.close()
+        if (::bridgeDatabase.isInitialized) {
+            bridgeDatabase.close()
+        }
     }
 
     private fun schedulePolling() {
@@ -106,7 +112,7 @@ class PunisherXVelocityBridge @Inject constructor(
         if (events.isEmpty()) return
 
         events.forEach { event ->
-            when (event.action.uppercase(Locale.getDefault())) {
+            when (event.action.uppercase(Locale.ROOT)) {
                 "BAN" -> handleBan(event.target, event.reason, event.end)
                 "BANIP" -> handleBanIp(event.target, event.reason, event.end)
                 else -> logger.warn("Unknown bridge action ${event.action} for event ${event.id}")

@@ -1,10 +1,15 @@
 # PunisherX Velocity Bridge
 
-PunisherX Velocity Bridge is the missing link between PunisherX for Paper and your Velocity 3.4 network. Connected to the same database where BAN/BANIP events are stored, it automatically listens for new entries in the `bridge_events` table and instantly disconnects matching players from the proxy — even if the ban was issued on an empty server or directly from the console.
+PunisherX Velocity Bridge is the missing link between PunisherX for Paper and your Velocity 4.0.0-SNAPSHOT network. Connected to the same database where BAN/BANIP events are stored, it automatically listens for new entries in the `bridge_events` table and instantly disconnects matching players from the proxy — even if the ban was issued on an empty server or directly from the console.
 
 In practice, this means you are no longer limited by the requirement that the banned player must be on the same server where the punishment is executed.
 
 Configuration is limited to setting up the MySQL connection (host, port, database, username, password) and the polling interval.
+
+## Requirements
+
+* Velocity `4.0.0-SNAPSHOT`
+* Java 25 or newer
 
 ## Configuration
 

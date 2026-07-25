@@ -9,14 +9,16 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
-    annotationProcessor("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
-    implementation("com.zaxxer:HikariCP:7.1.0")
+    compileOnly("com.velocitypowered:velocity-api:4.0.0-SNAPSHOT")
+    annotationProcessor("com.velocitypowered:velocity-api:4.0.0-SNAPSHOT")
+    implementation("com.zaxxer:HikariCP:7.1.0") {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
     implementation("com.mysql:mysql-connector-j:9.7.0")
 }
 
 extensions.configure<KotlinJvmProjectExtension> {
-    jvmToolchain(21)
+    jvmToolchain(25)
 }
 
 tasks.processResources {
