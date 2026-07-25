@@ -63,7 +63,7 @@ dependencies {
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
     compileOnly("dev.triumphteam:triumph-gui:3.1.13")
 
-    compileOnly("net.kyori:adventure-nbt:4.26.1")
+    compileOnly("net.kyori:adventure-nbt:5.2.0")
 
     compileOnly("net.luckperms:api:5.5")
     compileOnly("me.clip:placeholderapi:2.12.3")
