@@ -69,7 +69,7 @@ dependencies {
         isTransitive = false
     }
     compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
-    compileOnly("dev.faststats.metrics:bukkit:0.26.1")
+    compileOnly("dev.faststats.metrics:bukkit:0.28.0")
 
     testImplementation(kotlin("test"))
 }
