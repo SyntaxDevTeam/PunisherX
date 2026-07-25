@@ -31,17 +31,17 @@ libraries:
   # GUI libraries
   - dev.triumphteam:triumph-gui:3.1.13
   # Additional libraries
-  - com.maxmind.geoip2:geoip2:5.1.0
+  - com.maxmind.geoip2:geoip2:5.2.0
   - org.apache.ant:ant:1.10.17
   # Database libraries
   # All databases libraries is implemented in SyntaxCore
 
   # FastStats dependencies
-  - coordinate: dev.faststats.metrics:core:0.27.1
+  - coordinate: dev.faststats.metrics:core:0.28.0
     repository: faststatsReleases
-  - coordinate: dev.faststats.metrics:config:0.27.1
+  - coordinate: dev.faststats.metrics:config:0.28.0
     repository: faststatsReleases
-  - coordinate: dev.faststats.metrics:bukkit:0.27.1
+  - coordinate: dev.faststats.metrics:bukkit:0.28.0
     repository: faststatsReleases
   # SyntaxDevTeam libraries
   - coordinate: pl.syntaxdevteam:syntaxcore:1.4.1-R0.1-SNAPSHOT

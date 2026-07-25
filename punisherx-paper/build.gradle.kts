@@ -47,6 +47,7 @@ val mockitoAgent = configurations.create("mockitoAgent")
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    //compileOnly("io.papermc.paper:paper-api:26.2.build.+")
     //compileOnly("org.leavesmc.leaves:leaves-api:1.21.10-R0.1-SNAPSHOT")
     //compileOnly("dev.folia:folia-api:1.21.11-R0.1-SNAPSHOT")
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
@@ -56,7 +57,7 @@ dependencies {
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.6")
     compileOnly("com.google.code.gson:gson:2.14.0")
-    compileOnly("com.maxmind.geoip2:geoip2:5.1.0")
+    compileOnly("com.maxmind.geoip2:geoip2:5.2.0")
     compileOnly("org.apache.ant:ant:1.10.17")
     compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.4")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
@@ -65,7 +66,7 @@ dependencies {
     compileOnly("net.kyori:adventure-nbt:4.26.1")
 
     compileOnly("net.luckperms:api:5.5")
-    compileOnly("me.clip:placeholderapi:2.12.2")
+    compileOnly("me.clip:placeholderapi:2.12.3")
     compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.1.0")
     compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
     compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.15")
@@ -74,14 +75,14 @@ dependencies {
     }
     compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
 
-    compileOnly("dev.faststats.metrics:bukkit:0.27.1")
+    compileOnly("dev.faststats.metrics:bukkit:0.28.0")
 
     testImplementation(kotlin("test"))
     testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:6.3.0")
-    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.10") {
+    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.11") {
         isTransitive = false
     }
 }
