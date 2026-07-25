@@ -323,7 +323,7 @@ jobs:
               -H 'Content-Type: application/json' \
               -H "X-Build-Token: $BUILD_CI_TOKEN" \
               --data-binary "@$payload" \
-              "https://new.syntaxdevteam.pl/api/builds/ci/$slug"
+              "https://syntaxdevteam.pl/api/builds/ci/$slug"
           }
 
           if [[ "$CORE_CHANGED" == true ]]; then
