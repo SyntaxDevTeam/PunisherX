@@ -157,6 +157,20 @@ notifications:
 
 
 # /********************************************/
+#    Report settings
+# /********************************************/
+
+reports:
+  # The Spigot module uses the inventory GUI. This option is shared with the
+  # Paper configuration where native Dialog forms are available on 1.21.6+.
+  use-dialogs: true
+  reasons:
+    - "Cheating"
+    - "Griefing"
+    - "Spamming"
+    - "Offensive language"
+
+# /********************************************/
 #    GUI settings
 # /********************************************/
 

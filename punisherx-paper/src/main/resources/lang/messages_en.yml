@@ -23,10 +23,21 @@ error:
 
 # /report <player> command messages
 reports:
-  usage: "Correct usage: <gold>/report <player>"
-  cannot-report-self: "<red>You cannot report your self!"
-  report-sent: "<green>Your report against <gold><target></gold> for <gray><reason></gray> has been submitted!</green>"
-  admin-notify: "<red>[Report]</red> <gold><reporter></gold> reported <yellow><target></yellow> for <gray><reason></gray>"
+  usage: "Correct usage: <gold>/report [player]"
+  cannot-report-self: "<red>You cannot report yourself!</red>"
+  already-submitted: "<red>You already have an open report. Staff must close it before you can submit another one.</red>"
+  invalid-reason: "<red>The report reason must contain between 3 and 255 characters.</red>"
+  no-targets: "<yellow>There are no online or recently disconnected players to report.</yellow>"
+  invalid-form: "<red>The report form contained invalid data. Please open it again.</red>"
+  report-sent: "<green>Your report against <gold><target></gold> for <gray><reason></gray> has been submitted. This player now has <gold><count></gold> report(s).</green>"
+  admin-notify: "<red>[Report]</red> <gold><reporter></gold> reported <yellow><target></yellow> for <gray><reason></gray> <dark_gray>(reports: <count>)</dark_gray>"
+  dialog-title: "<red>Report a player</red>"
+  dialog-body: "<gray>Select a player and the reason for the report.</gray>"
+  dialog-body-target: "<gray>Choose the reason for reporting <gold><target></gold>.</gray>"
+  dialog-target-label: "<yellow>Player</yellow>"
+  dialog-reason-label: "<yellow>Reason</yellow>"
+  dialog-submit: "<green>Submit report</green>"
+  dialog-cancel: "<red>Cancel</red>"
 
 # /setjail command messages
 setjail:
@@ -268,8 +279,15 @@ banlist:
 change-reason:
   usage: "Correct usage: <gold>/change-reason <punishment_ID> <new_reason>"
   invalid_id: "<red>Invalid punishment ID</red>"
+  invalid_reason: "<red>The new reason must contain between 3 and 255 characters.</red>"
   success: "<green>The reason for punishment ID <gold><id></gold> was changed to \"<gold><reason></gold>\".</green>"
   failure: "<red>Failed to update the reason for punishment ID <gold><id></gold>.</red>"
+  dialog_title: "<gold>Change punishment reason</gold>"
+  dialog_body: "<gray>Enter the punishment history ID and its new reason.</gray>"
+  dialog_id_label: "<yellow>Punishment ID</yellow>"
+  dialog_reason_label: "<yellow>New reason</yellow>"
+  dialog_submit: "<green>Save</green>"
+  dialog_cancel: "<red>Cancel</red>"
 
 # /clearall command messages
 clear:

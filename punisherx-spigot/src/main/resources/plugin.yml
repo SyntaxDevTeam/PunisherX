@@ -85,6 +85,9 @@ commands:
     description: Updates the reason for a specific penalty by ID.
     usage: /change-reason <penalty_id> <new_reason>
     permission: punisherx.cmd.change_reason
+  report:
+    description: Reports a player for breaking server rules.
+    usage: /report [player]
   check:
     aliases: [cx]
     description: Checks the active penalties for a player.
@@ -183,6 +186,9 @@ permissions:
     default: op
   punisherx.see:
     description: Allows viewing all punishments.
+    default: op
+  punisherx.see.reports:
+    description: Allows receiving new player report notifications.
     default: op
   punisherx.see.ban:
     description: Allows viewing ban notifications.

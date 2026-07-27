@@ -19,6 +19,24 @@ error:
   reload: "<red>Wystąpił błąd podczas przeładowania konfiguracji:</red>"
   bypass: "<red><b>UWAGA!</b> Gracz <gold><player></gold> nie może otrzymać kary ze względu na swoje uprawnienia (OP lub bypass).</red><newline><dark_gray>Może dałoby się to obejść...</dark_gray>"
 
+# Wiadomości komendy /report
+reports:
+  usage: "Poprawne użycie: <gold>/report [gracz]"
+  cannot-report-self: "<red>Nie możesz zgłosić samego siebie!</red>"
+  already-submitted: "<red>Masz już otwarte zgłoszenie. Obsługa musi je zamknąć, zanim wyślesz kolejne.</red>"
+  invalid-reason: "<red>Powód zgłoszenia musi mieć od 3 do 255 znaków.</red>"
+  no-targets: "<yellow>Nie ma graczy online ani niedawno rozłączonych, których można zgłosić.</yellow>"
+  invalid-form: "<red>Formularz zawierał nieprawidłowe dane. Otwórz go ponownie.</red>"
+  report-sent: "<green>Zgłoszenie gracza <gold><target></gold> za <gray><reason></gray> zostało wysłane. Ten gracz ma teraz <gold><count></gold> zgłoszeń.</green>"
+  admin-notify: "<red>[Zgłoszenie]</red> <gold><reporter></gold> zgłosił(a) <yellow><target></yellow> za <gray><reason></gray> <dark_gray>(zgłoszenia: <count>)</dark_gray>"
+  dialog-title: "<red>Zgłoś gracza</red>"
+  dialog-body: "<gray>Wybierz gracza oraz powód zgłoszenia.</gray>"
+  dialog-body-target: "<gray>Wybierz powód zgłoszenia gracza <gold><target></gold>.</gray>"
+  dialog-target-label: "<yellow>Gracz</yellow>"
+  dialog-reason-label: "<yellow>Powód</yellow>"
+  dialog-submit: "<green>Wyślij zgłoszenie</green>"
+  dialog-cancel: "<red>Anuluj</red>"
+
 # Wiadomości komendy /setjail
 setjail:
   usage: "Poprawne użycie to: <gold>/setjail <promień>"
@@ -257,6 +275,7 @@ banlist:
 change-reason:
   usage: "Poprawne użycie to: <gold>/change-reason <ID_kary> <nowy_powód>"
   invalid_id: "<red>Nieprawidłowy identyfikator kary</red>"
+  invalid_reason: "<red>Nowy powód musi mieć od 3 do 255 znaków.</red>"
   success: "<green>Zmieniono dotychczasowy powód kary o ID <gold><id></gold> na \"<gold><reason></gold>\".</green>"
   failure: "<red>Nie udało się zaktualizować powodu kary o ID <gold><id></gold>.</red>"
 

@@ -26,7 +26,7 @@ class ReportPlayerGUI(plugin: PunisherX) : BaseGUI(plugin) {
     override fun open(player: Player) {
         val online = ArrayList(plugin.server.onlinePlayers)
         // Do not include the player themselves in the list
-        online.removeIf { it.uniqueId == player.uniqueId }
+        online.removeIf { it.uniqueId == player.uniqueId || !player.canSee(it) }
         online.sortBy { it.name.lowercase() }
         open(player, 0, online)
     }
@@ -54,7 +54,7 @@ class ReportPlayerGUI(plugin: PunisherX) : BaseGUI(plugin) {
             head.itemMeta = meta
             gui.setItem(slot, createGuiItem(head) { clicker ->
                 if (target.uniqueId == clicker.uniqueId) {
-                    clicker.sendMessage(mH.stringMessageToComponent("error", "cannot-report-self"))
+                    clicker.sendMessage(mH.stringMessageToComponent("reports", "cannot-report-self"))
                     return@createGuiItem
                 }
                 ReportReasonGUI(plugin).open(clicker, target)

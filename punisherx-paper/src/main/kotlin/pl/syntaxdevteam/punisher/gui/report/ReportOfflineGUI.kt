@@ -71,7 +71,7 @@ class ReportOfflineGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 head.itemMeta = meta
                 gui.setItem(slot, createGuiItem(head) { clicker ->
                     if (target.uniqueId == clicker.uniqueId) {
-                        clicker.sendMessage(mH.stringMessageToComponent("error", "cannot-report-self"))
+                        clicker.sendMessage(mH.stringMessageToComponent("reports", "cannot-report-self"))
                         return@createGuiItem
                     }
                     ReportReasonGUI(plugin).open(clicker, target)

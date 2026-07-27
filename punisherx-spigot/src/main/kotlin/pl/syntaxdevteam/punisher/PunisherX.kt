@@ -38,6 +38,7 @@ import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import pl.syntaxdevteam.punisher.hooks.DiscordBridge
 import pl.syntaxdevteam.punisher.stats.FastStatsBridge
 import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
+import pl.syntaxdevteam.punisher.reports.ReportService
 import java.io.File
 import java.util.logging.Level
 import java.util.*
@@ -85,6 +86,7 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var onlinePunishmentWatcher: OnlinePunishmentWatcher
     lateinit var punishTemplateManager: PunishTemplateManager
     lateinit var discordBridge: DiscordBridge
+    val reportService: ReportService by lazy(LazyThreadSafetyMode.NONE) { ReportService(this) }
     lateinit var uuidManager: UUIDManager
 
     override fun onLoad() {

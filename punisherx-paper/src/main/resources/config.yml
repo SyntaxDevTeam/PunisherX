@@ -157,6 +157,24 @@ notifications:
 
 
 # /********************************************/
+#    Report settings
+# /********************************************/
+
+reports:
+  # Paper 1.21.6+ uses the native Dialog form. Older Paper versions and
+  # Spigot automatically use the inventory GUI.
+  use-dialogs: true
+  reasons:
+    - "Cheating"
+    - "Griefing"
+    - "Spamming"
+    - "Offensive language"
+
+dialogs:
+  # Opens /change-reason [id] as a native form on Paper 1.21.6+.
+  use-change-reason: true
+
+# /********************************************/
 #    GUI settings
 # /********************************************/
 

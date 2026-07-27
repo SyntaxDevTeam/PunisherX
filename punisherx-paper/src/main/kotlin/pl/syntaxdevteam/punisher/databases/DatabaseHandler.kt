@@ -474,6 +474,35 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
+    fun hasReportByReporter(player: UUID): Boolean {
+        return try {
+            query(
+                "SELECT COUNT(*) AS reportCount FROM reports WHERE player = ?",
+                player.toString()
+            ) { rs -> rs.getInt("reportCount") }
+                .firstOrNull()
+                ?.let { it > 0 }
+                ?: false
+        } catch (e: Exception) {
+            logger.err("Failed to check reports submitted by $player. ${e.message}")
+            false
+        }
+    }
+
+    fun countReportsAgainst(suspect: UUID): Int {
+        return try {
+            query(
+                "SELECT COUNT(*) AS reportCount FROM reports WHERE suspect = ?",
+                suspect.toString()
+            ) { rs -> rs.getInt("reportCount") }
+                .firstOrNull()
+                ?: 0
+        } catch (e: Exception) {
+            logger.err("Failed to count reports against $suspect. ${e.message}")
+            0
+        }
+    }
+
     fun deleteReport(id: Int): Boolean {
         return try {
             execute("DELETE FROM reports WHERE id = ?", id)
@@ -536,6 +565,14 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun updatePunishmentReason(id: Int, newReason: String): Boolean {
         return try {
+            val exists = query(
+                "SELECT COUNT(*) AS punishmentCount FROM punishmenthistory WHERE id = ?",
+                id
+            ) { rs -> rs.getInt("punishmentCount") }
+                .firstOrNull()
+                ?.let { it > 0 }
+                ?: false
+            if (!exists) return false
             execute("UPDATE punishmentHistory SET reason = ? WHERE id = ?", newReason, id)
             true
         } catch (e: Exception) {

@@ -15,11 +15,13 @@ class VersionCompatibility(
     private val currentVersion: SemanticVersion = versionChecker.getSemanticVersion()
 
     enum class CompatibilityFlag {
-        MODERN_LOGIN_EVENTS
+        MODERN_LOGIN_EVENTS,
+        DIALOGS
     }
 
     private val featureIntroductions: Map<CompatibilityFlag, SemanticVersion> = mapOf(
-        CompatibilityFlag.MODERN_LOGIN_EVENTS to parseVersion("1.21.7")
+        CompatibilityFlag.MODERN_LOGIN_EVENTS to parseVersion("1.21.7"),
+        CompatibilityFlag.DIALOGS to parseVersion("1.21.6")
     )
 
     fun supports(flag: CompatibilityFlag): Boolean {

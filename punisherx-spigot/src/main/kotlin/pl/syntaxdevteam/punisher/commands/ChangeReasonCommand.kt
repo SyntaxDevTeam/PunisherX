@@ -20,6 +20,10 @@ class ChangeReasonCommand(private val plugin: PunisherX) : BasicCommand {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("change-reason", "invalid_id"))
                     return
                 }
+                if (newReason.length !in 3..255) {
+                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("change-reason", "invalid_reason"))
+                    return
+                }
                 val success = plugin.databaseHandler.updatePunishmentReason(id, newReason)
                 if (success) {
                     stack.sender.sendMessage(
@@ -39,7 +43,7 @@ class ChangeReasonCommand(private val plugin: PunisherX) : BasicCommand {
                     )
                 }
             } else {
-                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("ban", "usage"))
+                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("change-reason", "usage"))
             }
         } else {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))

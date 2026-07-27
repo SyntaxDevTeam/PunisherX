@@ -12,7 +12,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
-import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 /**
  * GUI to pick a reason for a report.
@@ -26,7 +25,9 @@ class ReportReasonGUI(plugin: PunisherX) : BaseGUI(plugin) {
     )
 
     fun open(player: Player, target: OfflinePlayer) {
-        val reasons = plugin.config.getStringList("gui.punish.reasons").ifEmpty { listOf("Cheating", "Griefing", "Spamming") }
+        val reasons = plugin.config.getStringList("reports.reasons")
+            .ifEmpty { plugin.config.getStringList("gui.punish.reasons") }
+            .ifEmpty { listOf("Cheating", "Griefing", "Spamming") }
         openPaged(player, target, 0, reasons)
     }
 
@@ -82,35 +83,7 @@ class ReportReasonGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
     private fun submitReport(reporter: Player, target: OfflinePlayer, reason: String) {
         reporter.closeInventory()
-
-        val success = plugin.databaseHandler.addReport(reporter.uniqueId, target.uniqueId, reason)
-        if (success) {
-            reporter.sendMessage(
-                mH.stringMessageToComponent(
-                    "reports",
-                    "report-sent",
-                    mapOf("target" to (target.name ?: target.uniqueId.toString()), "reason" to reason)
-                )
-            )
-
-            plugin.server.onlinePlayers
-                .filter { PermissionChecker.hasWithSee(it, PermissionChecker.PermissionKey.SEE_REPORTS) }
-                .forEach { staff ->
-                    staff.sendMessage(
-                        mH.stringMessageToComponentNoPrefix(
-                            "reports",
-                            "admin-notify",
-                            mapOf(
-                                "reporter" to reporter.name,
-                                "target" to (target.name ?: target.uniqueId.toString()),
-                                "reason" to reason
-                            )
-                        )
-                    )
-                }
-        } else {
-            reporter.sendMessage(mH.stringMessageToComponentNoPrefix("error", "db_error"))
-        }
+        plugin.reportService.submitAndNotify(reporter, target, reason)
     }
 
     override fun getTitle(): Component {
