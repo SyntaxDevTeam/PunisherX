@@ -1,5 +1,4 @@
 package pl.syntaxdevteam.punisher.databases
-import pl.syntaxdevteam.punisher.compatibility.*
 
 import java.time.Instant
 import java.time.ZoneId
@@ -34,3 +33,8 @@ data class ReportData(
     }
 }
 
+sealed interface ReportSubmissionResult {
+    data class Accepted(val suspectReportCount: Int) : ReportSubmissionResult
+    data object ReporterAlreadyHasOpenReport : ReportSubmissionResult
+    data object DatabaseError : ReportSubmissionResult
+}

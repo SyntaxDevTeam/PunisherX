@@ -479,7 +479,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
             query(
                 "SELECT COUNT(*) AS reportCount FROM reports WHERE player = ?",
                 player.toString()
-            ) { rs -> rs.getInt("reportCount") }
+            ) { it.getInt("reportCount") }
                 .firstOrNull()
                 ?.let { it > 0 }
                 ?: false
@@ -489,17 +489,29 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    fun countReportsAgainst(suspect: UUID): Int {
+    @Synchronized
+    fun submitReport(player: UUID, suspect: UUID, reason: String): ReportSubmissionResult {
         return try {
-            query(
+            val openReports = query(
+                "SELECT COUNT(*) AS reportCount FROM reports WHERE player = ?",
+                player.toString()
+            ) { it.getInt("reportCount") }.firstOrNull() ?: 0
+            if (openReports > 0) {
+                return ReportSubmissionResult.ReporterAlreadyHasOpenReport
+            }
+
+            if (!addReport(player, suspect, reason)) {
+                return ReportSubmissionResult.DatabaseError
+            }
+
+            val suspectReportCount = query(
                 "SELECT COUNT(*) AS reportCount FROM reports WHERE suspect = ?",
                 suspect.toString()
-            ) { rs -> rs.getInt("reportCount") }
-                .firstOrNull()
-                ?: 0
+            ) { it.getInt("reportCount") }.firstOrNull() ?: 1
+            ReportSubmissionResult.Accepted(suspectReportCount)
         } catch (e: Exception) {
-            logger.err("Failed to count reports against $suspect. ${e.message}")
-            0
+            logger.err("Failed to submit report from $player against $suspect. ${e.message}")
+            ReportSubmissionResult.DatabaseError
         }
     }
 
@@ -565,14 +577,6 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun updatePunishmentReason(id: Int, newReason: String): Boolean {
         return try {
-            val exists = query(
-                "SELECT COUNT(*) AS punishmentCount FROM punishmenthistory WHERE id = ?",
-                id
-            ) { rs -> rs.getInt("punishmentCount") }
-                .firstOrNull()
-                ?.let { it > 0 }
-                ?: false
-            if (!exists) return false
             execute("UPDATE punishmentHistory SET reason = ? WHERE id = ?", newReason, id)
             true
         } catch (e: Exception) {
