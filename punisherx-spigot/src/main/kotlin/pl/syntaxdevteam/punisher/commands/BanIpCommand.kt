@@ -115,7 +115,9 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
 
         plugin.actionExecutor.executeAction("ip_banned", rawTarget, placeholders)
 
-        plugin.server.onlinePlayers.filter { PermissionChecker.hasWithSee(it, PermissionChecker.PermissionKey.SEE_BANIP) }
+        plugin.server.onlinePlayers
+            .filterNot { it.name == stack.sender.name }
+            .filter { PermissionChecker.hasWithSee(it, PermissionChecker.PermissionKey.SEE_BANIP) }
             .forEach { player -> msgLines.forEach { player.sendMessage(it) } }
 
         if (isForce) plugin.logger.warning("Force by ${stack.sender.name} on $rawTarget")

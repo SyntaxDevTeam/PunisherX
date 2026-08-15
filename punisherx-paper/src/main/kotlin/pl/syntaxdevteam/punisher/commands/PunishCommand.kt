@@ -3,7 +3,6 @@ package pl.syntaxdevteam.punisher.commands
 import io.papermc.paper.ban.BanListType
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.ban.ProfileBanList
@@ -103,17 +102,6 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
             )
             return
         }
-        if (PermissionChecker.isAuthor(uuid)) {
-            val prefix = plugin.messageHandler.getPrefix()
-            stack.sender.sendMessage(
-                plugin.messageHandler.formatMixedTextToMiniMessage(
-                    "$prefix <red>You can't punish the plugin author</red>",
-                    TagResolver.empty()
-                )
-            )
-            return
-        }
-
         when (type) {
             "BAN" -> applyBan(stack, targetName, uuid, template.reason, templateLevel)
             "BANIP" -> applyBanIp(stack, targetName, uuid, template.reason, templateLevel)

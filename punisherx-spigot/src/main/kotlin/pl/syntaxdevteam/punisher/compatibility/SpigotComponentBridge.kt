@@ -24,7 +24,7 @@ private fun Component.toSpigotString(): String =
     SyntaxMessages.messages.legacyComponentSerializer(this)
 
 fun CommandSender.sendMessage(component: Component) {
-    sendMessage(component.toSpigotString())
+    spigot().sendMessage(*BungeeComponentSerializer.get().serialize(component))
 }
 
 fun Player.kick(component: Component) {

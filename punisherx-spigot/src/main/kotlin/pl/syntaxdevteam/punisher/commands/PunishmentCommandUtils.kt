@@ -89,7 +89,8 @@ internal object PunishmentCommandUtils {
         placeholders: Map<String, String>
     ) {
         val broadcastMessages = plugin.messageHandler.getSmartMessage(section, key, placeholders)
-        plugin.server.onlinePlayers.forEach { onlinePlayer ->
+        val operator = placeholders["operator"]
+        plugin.server.onlinePlayers.filterNot { it.name == operator }.forEach { onlinePlayer ->
             if (PermissionChecker.hasWithSee(onlinePlayer, permissionKey)) {
                 broadcastMessages.forEach { onlinePlayer.sendMessage(it) }
             }

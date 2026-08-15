@@ -2,7 +2,6 @@ package pl.syntaxdevteam.punisher.commands
 
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
@@ -42,13 +41,6 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                     )
                     return@forEach
                 }
-                val prefix = plugin.messageHandler.getPrefix()
-                if (PermissionChecker.isAuthor(uuid)) {
-                    stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("$prefix <red>You can't punish the plugin author</red>",
-                        TagResolver.empty()))
-                    return@forEach
-                }
-
                 if(history) {
                     plugin.databaseHandler.addPunishmentHistory(
                         target.name,
@@ -97,15 +89,6 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                 return
             }
         }
-      val prefix = plugin.messageHandler.getPrefix()
-        if (PermissionChecker.isAuthor(uuid)) {
-            stack.sender.sendMessage(
-                plugin.messageHandler.formatMixedTextToMiniMessage("$prefix <red>You can't punish the plugin author</red>",
-                    TagResolver.empty())
-            )
-            return
-        }
-
         if(history) {
             plugin.databaseHandler.addPunishmentHistory(
                 targetArg,

@@ -22,7 +22,9 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
         val playerOrIpOrUUID = args[0]
 
         if (playerOrIpOrUUID.matches(Regex("\\d+\\.\\d+\\.\\d+\\.\\d+"))) {
-            unbanIP(stack, playerOrIpOrUUID)
+            if (!unbanIP(stack, playerOrIpOrUUID)) {
+                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "ip_not_found", mapOf("ip" to playerOrIpOrUUID)))
+            }
             return
         }
 
@@ -35,19 +37,11 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         val ips = plugin.playerIPManager.getPlayerIPsByName(playerOrIpOrUUID)
-        if (ips.isEmpty()) {
-            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
-            return
-        }
-
         plugin.logger.debug("Assigned IPs for player $playerOrIpOrUUID: $ips")
 
-        var anyUnbanned = false
-        ips.forEach { ip ->
-            if (unbanIP(stack, ip)) anyUnbanned = true
-        }
+        val anyUnbanned = ips.map { ip -> unbanIP(stack, ip) }.any { it }
         if (!anyUnbanned) {
-            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_found", mapOf("player" to playerOrIpOrUUID)))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_punished", mapOf("player" to playerOrIpOrUUID)))
         }
     }
 
@@ -56,7 +50,6 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
 
         if (punishments.isEmpty()) {
             plugin.logger.debug("Player $playerName ($uuid) has no ban")
-            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_punished", mapOf("player" to playerName)))
             return false
         }
 
@@ -87,7 +80,6 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
 
         if (punishments.isEmpty()) {
             plugin.logger.debug("No punishments found for IP $ip")
-            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "ip_not_found", mapOf("ip" to ip)))
             return false
         }
 

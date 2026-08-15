@@ -1,7 +1,6 @@
 package pl.syntaxdevteam.punisher.basic
 import pl.syntaxdevteam.punisher.compatibility.*
 
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
@@ -19,6 +18,7 @@ import java.util.*
 class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
     private val updateChecker = SyntaxCore.updateChecker
+    private val authorUseNotifier = AuthorUseNotifier(plugin)
 
     fun handlePlayerJoin(event: PlayerJoinEvent) {
         val player    = event.player
@@ -27,13 +27,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         val radius    = plugin.config.getDouble("jail.radius", 10.0)
         val jailLoc   = JailUtils.getJailLocation(plugin.config)
         
-        if (PermissionChecker.isAuthor(uuid)) {
-            player.sendMessage(
-                plugin.messageHandler
-                .formatMixedTextToMiniMessage(plugin.messageHandler.getPrefix() + " <green>Witaj, <b>$name</b><newline>    Ten serwer używa ${plugin.description.name} ${plugin.description.version} ❤",
-                        TagResolver.empty())
-            )
-        }
+        authorUseNotifier.notifyIfAuthor(player)
 
         val unjailLoc = JailUtils.getUnjailLocation(
             plugin.config,

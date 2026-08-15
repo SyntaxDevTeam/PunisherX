@@ -3,7 +3,6 @@ import pl.syntaxdevteam.punisher.compatibility.*
 
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.GameMode
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.basic.JailUtils
@@ -33,14 +32,6 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             )
             return
         }
-        val prefix = plugin.messageHandler.getPrefix()
-
-        if(PermissionChecker.isAuthor(uuid)){
-            stack.sender.sendMessage(plugin.messageHandler.formatMixedTextToMiniMessage("$prefix <red>You can't punish the plugin author</red>",
-                TagResolver.empty()))
-            return
-        }
-
         var gtime: String?
         var reason: String
         try {

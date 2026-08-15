@@ -81,7 +81,6 @@ class PluginInitializer(private val plugin: PunisherX) {
         //        plugin.cfg = ConfigManager(plugin, plugin.logger, confFile.toString(), version.toString(), 141, 150, true)
         plugin.cfg = ConfigManager(plugin)
         plugin.cfg.load()
-        PermissionChecker.updateDebugMode(plugin.config.getString("debug"))
         plugin.punishTemplateManager = PunishTemplateManager(plugin)
         plugin.punishTemplateManager.load()
     }

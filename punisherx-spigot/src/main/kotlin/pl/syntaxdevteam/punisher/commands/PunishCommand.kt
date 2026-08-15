@@ -1,7 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 import pl.syntaxdevteam.punisher.compatibility.*
 
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Bukkit
 import org.bukkit.BanList
 import org.bukkit.GameMode
@@ -102,17 +101,6 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
             )
             return
         }
-        if (PermissionChecker.isAuthor(uuid)) {
-            val prefix = plugin.messageHandler.getPrefix()
-            stack.sender.sendMessage(
-                plugin.messageHandler.formatMixedTextToMiniMessage(
-                    "$prefix <red>You can't punish the plugin author</red>",
-                    TagResolver.empty()
-                )
-            )
-            return
-        }
-
         when (type) {
             "BAN" -> applyBan(stack, targetName, uuid, template.reason, templateLevel)
             "BANIP" -> applyBanIp(stack, targetName, uuid, template.reason, templateLevel)
