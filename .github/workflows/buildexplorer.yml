@@ -2,28 +2,16 @@ name: Build and publish PunisherX
 
 on:
   push:
-    branches: [main, experimental-spigot-version]
+    branches: [main, experimental-spigot-version, "experimental/**"]
   pull_request:
-    branches: [main, experimental-spigot-version]
+    branches: [main, experimental-spigot-version, "experimental/**"]
   workflow_dispatch:
-    inputs:
-      channel:
-        description: Build Explorer release channel
-        required: true
-        default: dev
-        type: choice
-        options:
-          - release
-          - snapshot
-          - dev
-          - wip
 
 permissions:
   contents: read
 
 env:
   MINI_PORTAL_URL: https://syntaxdevteam.pl
-  BUILD_CHANNEL: ${{ inputs.channel || 'dev' }}
 
 jobs:
   detect:
@@ -66,32 +54,12 @@ jobs:
               )
               changed = [line.strip() for line in raw.splitlines() if line.strip()]
 
-          minecraft_versions = [
-              "1.20.6",
-              "1.21.0",
-              "1.21.1",
-              "1.21.2",
-              "1.21.3",
-              "1.21.4",
-              "1.21.5",
-              "1.21.6",
-              "1.21.7",
-              "1.21.8",
-              "1.21.9",
-              "1.21.10",
-              "1.21.11",
-              "26.1.0",
-              "26.1.1",
-              "26.1.2",
-              "26.2.0",
-          ]
-
           products = [
               {
                   "project": "punisherx",
                   "platform": "paper",
                   "platform_family": "server",
-                  "game_versions": minecraft_versions,
+                  "version_source": "punisherx-paper/src/main/kotlin/pl/syntaxdevteam/punisher/compatibility/VersionChecker.kt",
                   "gradle_project": ":punisherx-paper",
                   "gradle_task": ":punisherx-paper:build",
                   "jar_dir": "punisherx-paper/build/libs",
@@ -101,7 +69,7 @@ jobs:
                   "project": "punisherx",
                   "platform": "spigot",
                   "platform_family": "server",
-                  "game_versions": minecraft_versions,
+                  "version_source": "punisherx-spigot/src/main/kotlin/pl/syntaxdevteam/punisher/compatibility/VersionChecker.kt",
                   "gradle_project": ":punisherx-spigot",
                   "gradle_task": ":punisherx-spigot:build",
                   "jar_dir": "punisherx-spigot/build/libs",
@@ -111,7 +79,7 @@ jobs:
                   "project": "punisherx-proxy-bridge",
                   "platform": "bungeecord",
                   "platform_family": "proxy",
-                  "game_versions": [],
+                  "version_source": "",
                   "gradle_project": ":PunisherX-BungeeCord-Bridge",
                   "gradle_task": ":PunisherX-BungeeCord-Bridge:build",
                   "jar_dir": "bungee-bridge/build/libs",
@@ -121,7 +89,7 @@ jobs:
                   "project": "punisherx-proxy-bridge",
                   "platform": "velocity",
                   "platform_family": "proxy",
-                  "game_versions": [],
+                  "version_source": "",
                   "gradle_project": ":PunisherX-Velocity-Bridge",
                   "gradle_task": ":PunisherX-Velocity-Bridge:build",
                   "jar_dir": "velocity-bridge/build/libs",
@@ -157,7 +125,7 @@ jobs:
                           "project",
                           "platform",
                           "platform_family",
-                          "game_versions",
+                          "version_source",
                           "gradle_project",
                           "gradle_task",
                           "jar_dir",
@@ -230,7 +198,7 @@ jobs:
           BUILD_PROJECT: ${{ matrix.project }}
           BUILD_PLATFORM: ${{ matrix.platform }}
           BUILD_PLATFORM_FAMILY: ${{ matrix.platform_family }}
-          BUILD_GAME_VERSIONS: ${{ toJSON(matrix.game_versions) }}
+          BUILD_VERSION_SOURCE: ${{ matrix.version_source }}
           BUILD_GRADLE_PROJECT: ${{ matrix.gradle_project }}
           BUILD_JAR_DIR: ${{ matrix.jar_dir }}
         run: |
@@ -269,10 +237,62 @@ jobs:
             exit 1
           fi
 
+          artifact_name="$(basename "${jar}")"
+          artifact_name_upper="${artifact_name^^}"
+
+          if [[ "${GITHUB_REF_NAME_VALUE}" == experimental/* || "${GITHUB_REF_NAME_VALUE}" == experimental-* ]]; then
+            channel="wip"
+          elif [[ "${artifact_name_upper}" == *"-DEV"* ]]; then
+            channel="dev"
+          elif [[ "${artifact_name_upper}" == *"-SNAPSHOT"* ]]; then
+            channel="snapshot"
+          else
+            channel="release"
+          fi
+
+          echo "Build Explorer channel: ${channel} (${artifact_name}, branch ${GITHUB_REF_NAME_VALUE})"
+
+          game_versions="$(python3 - <<'PY'
+          import json
+          import os
+          import re
+          import sys
+          from pathlib import Path
+
+          source = os.environ.get("BUILD_VERSION_SOURCE", "").strip()
+          if not source:
+              print("[]")
+              raise SystemExit(0)
+
+          path = Path(source)
+          if not path.is_file():
+              print(f"Minecraft version source not found: {source}", file=sys.stderr)
+              raise SystemExit(1)
+
+          text = path.read_text(encoding="utf-8")
+          matches = re.findall(
+              r"SemanticVersion\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)",
+              text,
+          )
+          if not matches:
+              print(f"No supported Minecraft versions found in {source}", file=sys.stderr)
+              raise SystemExit(1)
+
+          versions = []
+          for major, minor, patch in matches:
+              normalized = f"{major}.{minor}" if int(patch) == 0 else f"{major}.{minor}.{patch}"
+              if normalized not in versions:
+                  versions.append(normalized)
+
+          print(json.dumps(versions, separators=(",", ":")))
+          PY
+          )"
+
           version="$(./gradlew -q "${BUILD_GRADLE_PROJECT}:properties" --console=plain --no-daemon | awk -F': ' '$1 == "version" {print $2; exit}' | tr -d '\r')"
           if [ -z "${version}" ] || [ "${version}" = "unspecified" ]; then
             version="${GITHUB_SHA::12}"
           fi
+
           artifact_base="$(basename "${jar}" .jar)"
           if [ "${artifact_base%-${GITHUB_RUN_NUMBER_VALUE}}" != "${artifact_base}" ]; then
             filename="${artifact_base}.jar"
@@ -282,6 +302,8 @@ jobs:
           sha256="$(sha256sum "${jar}" | awk '{print $1}')"
           size="$(stat -c%s "${jar}")"
 
+          export BUILD_CHANNEL="${channel}"
+          export BUILD_GAME_VERSIONS="${game_versions}"
           export BUILD_VERSION="${version}"
           export BUILD_FILENAME="${filename}"
           export BUILD_SHA256="${sha256}"
