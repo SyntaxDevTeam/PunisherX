@@ -221,10 +221,7 @@ jobs:
 
           jar_dir = Path(os.environ["BUILD_JAR_DIR"])
           excluded_suffixes = ("-sources.jar", "-javadoc.jar", "-plain.jar", "-original.jar")
-          candidates = [
-              path for path in jar_dir.glob("*.jar")
-              if not path.name.endswith(excluded_suffixes)
-          ]
+          candidates = [path for path in jar_dir.glob("*.jar") if not path.name.endswith(excluded_suffixes)]
           preferred = [path for path in candidates if path.name.startswith("PunisherX-")]
           pool = preferred or candidates
           if not pool:
@@ -242,9 +239,11 @@ jobs:
 
           if [[ "${GITHUB_REF_NAME_VALUE}" == experimental/* || "${GITHUB_REF_NAME_VALUE}" == experimental-* ]]; then
             channel="wip"
+          elif [[ "${artifact_name_upper}" == *"-WIP"* || "${artifact_name_upper}" == *"-PREALPHA"* || "${artifact_name_upper}" == *"-ALPHA"* ]]; then
+            channel="wip"
           elif [[ "${artifact_name_upper}" == *"-DEV"* ]]; then
             channel="dev"
-          elif [[ "${artifact_name_upper}" == *"-SNAPSHOT"* ]]; then
+          elif [[ "${artifact_name_upper}" == *"-SNAPSHOT"* || "${artifact_name_upper}" == *"-BETA"* || "${artifact_name_upper}" == *"-RC"* ]]; then
             channel="snapshot"
           else
             channel="release"
@@ -270,10 +269,7 @@ jobs:
               raise SystemExit(1)
 
           text = path.read_text(encoding="utf-8")
-          matches = re.findall(
-              r"SemanticVersion\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)",
-              text,
-          )
+          matches = re.findall(r"SemanticVersion\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)", text)
           if not matches:
               print(f"No supported Minecraft versions found in {source}", file=sys.stderr)
               raise SystemExit(1)
@@ -321,10 +317,7 @@ jobs:
           if before and before != "0000000000000000000000000000000000000000":
               rev_range = f"{before}..{after}"
 
-          raw = subprocess.check_output(
-              ["git", "log", "--format=%H%x1f%cI%x1f%s", rev_range],
-              text=True,
-          ).strip()
+          raw = subprocess.check_output(["git", "log", "--format=%H%x1f%cI%x1f%s", rev_range], text=True).strip()
           commits = []
           for line in raw.splitlines():
               if not line:
@@ -337,6 +330,7 @@ jobs:
               "time": datetime.now(timezone.utc).isoformat(),
               "channel": os.environ["BUILD_CHANNEL"],
               "platform": os.environ["BUILD_PLATFORM"],
+              "compatible_platforms": [os.environ["BUILD_PLATFORM"]],
               "platform_family": os.environ["BUILD_PLATFORM_FAMILY"],
               "game_versions": json.loads(os.environ["BUILD_GAME_VERSIONS"]),
               "java_version": 21,
