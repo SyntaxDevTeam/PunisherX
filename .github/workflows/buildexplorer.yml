@@ -2,16 +2,16 @@ name: Build and publish PunisherX
 
 on:
   push:
-    branches: [main, experimental-spigot-version]
+    branches: [main, experimental-spigot-version, "experimental/**"]
   pull_request:
-    branches: [main, experimental-spigot-version]
+    branches: [main, experimental-spigot-version, "experimental/**"]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 env:
   MINI_PORTAL_URL: https://syntaxdevteam.pl
-  BUILD_CHANNEL: dev
 
 jobs:
   detect:
@@ -45,7 +45,7 @@ jobs:
               before = os.environ.get("PR_BASE_SHA", before)
 
           all_zero = "0" * 40
-          if not before or before == all_zero:
+          if os.environ.get("EVENT_NAME") == "workflow_dispatch" or not before or before == all_zero:
               changed = ["__all__"]
           else:
               raw = subprocess.check_output(
@@ -56,32 +56,40 @@ jobs:
 
           products = [
               {
-                  "slug": "punisherx-paper",
-                  "server": "Paper",
+                  "project": "punisherx",
+                  "platform": "paper",
+                  "platform_family": "server",
+                  "version_source": "punisherx-paper/src/main/kotlin/pl/syntaxdevteam/punisher/compatibility/VersionChecker.kt",
                   "gradle_project": ":punisherx-paper",
                   "gradle_task": ":punisherx-paper:build",
                   "jar_dir": "punisherx-paper/build/libs",
                   "paths": ["punisherx-paper/"],
               },
               {
-                  "slug": "punisherx-spigot",
-                  "server": "Spigot",
+                  "project": "punisherx",
+                  "platform": "spigot",
+                  "platform_family": "server",
+                  "version_source": "punisherx-spigot/src/main/kotlin/pl/syntaxdevteam/punisher/compatibility/VersionChecker.kt",
                   "gradle_project": ":punisherx-spigot",
                   "gradle_task": ":punisherx-spigot:build",
                   "jar_dir": "punisherx-spigot/build/libs",
                   "paths": ["punisherx-spigot/"],
               },
               {
-                  "slug": "punisherx-bungeecord-bridge",
-                  "server": "BungeeCord",
+                  "project": "punisherx-proxy-bridge",
+                  "platform": "bungeecord",
+                  "platform_family": "proxy",
+                  "version_source": "",
                   "gradle_project": ":PunisherX-BungeeCord-Bridge",
                   "gradle_task": ":PunisherX-BungeeCord-Bridge:build",
                   "jar_dir": "bungee-bridge/build/libs",
                   "paths": ["bungee-bridge/"],
               },
               {
-                  "slug": "punisherx-velocity-bridge",
-                  "server": "Velocity",
+                  "project": "punisherx-proxy-bridge",
+                  "platform": "velocity",
+                  "platform_family": "proxy",
+                  "version_source": "",
                   "gradle_project": ":PunisherX-Velocity-Bridge",
                   "gradle_task": ":PunisherX-Velocity-Bridge:build",
                   "jar_dir": "velocity-bridge/build/libs",
@@ -111,7 +119,18 @@ jobs:
           include = []
           for product in products:
               if include_all or touches(product["paths"]):
-                  include.append({key: product[key] for key in ("slug", "server", "gradle_project", "gradle_task", "jar_dir")})
+                  include.append({
+                      key: product[key]
+                      for key in (
+                          "project",
+                          "platform",
+                          "platform_family",
+                          "version_source",
+                          "gradle_project",
+                          "gradle_task",
+                          "jar_dir",
+                      )
+                  })
 
           print("matrix=" + json.dumps({"include": include}, separators=(",", ":")))
           print("has_changes=" + ("true" if include else "false"))
@@ -140,10 +159,10 @@ jobs:
           ./gradlew test --console=plain --no-daemon
 
   publish:
-    name: Publish ${{ matrix.slug }}
+    name: Publish ${{ matrix.project }} / ${{ matrix.platform }}
     runs-on: ubuntu-latest
     needs: [detect, verify]
-    if: github.event_name == 'push' && needs.detect.outputs.has_changes == 'true'
+    if: github.event_name != 'pull_request' && needs.detect.outputs.has_changes == 'true'
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.detect.outputs.matrix) }}
@@ -168,15 +187,18 @@ jobs:
           chmod +x ./gradlew
           ./gradlew "${{ matrix.gradle_task }}" --console=plain --no-daemon
 
-      - name: Publish artifact to BuildExplorer
+      - name: Publish artifact to Build Explorer v2
         env:
           BUILD_CI_TOKEN: ${{ secrets.BUILD_CI_TOKEN }}
           GITHUB_BEFORE: ${{ github.event.before }}
           GITHUB_AFTER: ${{ github.sha }}
           GITHUB_RUN_ID_VALUE: ${{ github.run_id }}
           GITHUB_RUN_NUMBER_VALUE: ${{ github.run_number }}
-          BUILD_SLUG: ${{ matrix.slug }}
-          BUILD_SERVER: ${{ matrix.server }}
+          GITHUB_REF_NAME_VALUE: ${{ github.ref_name }}
+          BUILD_PROJECT: ${{ matrix.project }}
+          BUILD_PLATFORM: ${{ matrix.platform }}
+          BUILD_PLATFORM_FAMILY: ${{ matrix.platform_family }}
+          BUILD_VERSION_SOURCE: ${{ matrix.version_source }}
           BUILD_GRADLE_PROJECT: ${{ matrix.gradle_project }}
           BUILD_JAR_DIR: ${{ matrix.jar_dir }}
         run: |
@@ -188,7 +210,7 @@ jobs:
           fi
 
           if [ ! -d "${BUILD_JAR_DIR}" ]; then
-            echo "Directory ${BUILD_JAR_DIR} does not exist for ${BUILD_SLUG}." >&2
+            echo "Directory ${BUILD_JAR_DIR} does not exist for ${BUILD_PROJECT}/${BUILD_PLATFORM}." >&2
             exit 1
           fi
 
@@ -199,10 +221,7 @@ jobs:
 
           jar_dir = Path(os.environ["BUILD_JAR_DIR"])
           excluded_suffixes = ("-sources.jar", "-javadoc.jar", "-plain.jar", "-original.jar")
-          candidates = [
-              path for path in jar_dir.glob("*.jar")
-              if not path.name.endswith(excluded_suffixes)
-          ]
+          candidates = [path for path in jar_dir.glob("*.jar") if not path.name.endswith(excluded_suffixes)]
           preferred = [path for path in candidates if path.name.startswith("PunisherX-")]
           pool = preferred or candidates
           if not pool:
@@ -211,14 +230,65 @@ jobs:
           PY
           )"
           if [ -z "${jar}" ]; then
-            echo "No JAR found for ${BUILD_SLUG} in ${BUILD_JAR_DIR}." >&2
+            echo "No JAR found for ${BUILD_PROJECT}/${BUILD_PLATFORM} in ${BUILD_JAR_DIR}." >&2
             exit 1
           fi
+
+          artifact_name="$(basename "${jar}")"
+          artifact_name_upper="${artifact_name^^}"
+
+          if [[ "${GITHUB_REF_NAME_VALUE}" == experimental/* || "${GITHUB_REF_NAME_VALUE}" == experimental-* ]]; then
+            channel="wip"
+          elif [[ "${artifact_name_upper}" == *"-WIP"* || "${artifact_name_upper}" == *"-PREALPHA"* || "${artifact_name_upper}" == *"-ALPHA"* ]]; then
+            channel="wip"
+          elif [[ "${artifact_name_upper}" == *"-DEV"* ]]; then
+            channel="dev"
+          elif [[ "${artifact_name_upper}" == *"-SNAPSHOT"* || "${artifact_name_upper}" == *"-BETA"* || "${artifact_name_upper}" == *"-RC"* ]]; then
+            channel="snapshot"
+          else
+            channel="release"
+          fi
+
+          echo "Build Explorer channel: ${channel} (${artifact_name}, branch ${GITHUB_REF_NAME_VALUE})"
+
+          game_versions="$(python3 - <<'PY'
+          import json
+          import os
+          import re
+          import sys
+          from pathlib import Path
+
+          source = os.environ.get("BUILD_VERSION_SOURCE", "").strip()
+          if not source:
+              print("[]")
+              raise SystemExit(0)
+
+          path = Path(source)
+          if not path.is_file():
+              print(f"Minecraft version source not found: {source}", file=sys.stderr)
+              raise SystemExit(1)
+
+          text = path.read_text(encoding="utf-8")
+          matches = re.findall(r"SemanticVersion\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)", text)
+          if not matches:
+              print(f"No supported Minecraft versions found in {source}", file=sys.stderr)
+              raise SystemExit(1)
+
+          versions = []
+          for major, minor, patch in matches:
+              normalized = f"{major}.{minor}" if int(patch) == 0 else f"{major}.{minor}.{patch}"
+              if normalized not in versions:
+                  versions.append(normalized)
+
+          print(json.dumps(versions, separators=(",", ":")))
+          PY
+          )"
 
           version="$(./gradlew -q "${BUILD_GRADLE_PROJECT}:properties" --console=plain --no-daemon | awk -F': ' '$1 == "version" {print $2; exit}' | tr -d '\r')"
           if [ -z "${version}" ] || [ "${version}" = "unspecified" ]; then
             version="${GITHUB_SHA::12}"
           fi
+
           artifact_base="$(basename "${jar}" .jar)"
           if [ "${artifact_base%-${GITHUB_RUN_NUMBER_VALUE}}" != "${artifact_base}" ]; then
             filename="${artifact_base}.jar"
@@ -228,6 +298,8 @@ jobs:
           sha256="$(sha256sum "${jar}" | awk '{print $1}')"
           size="$(stat -c%s "${jar}")"
 
+          export BUILD_CHANNEL="${channel}"
+          export BUILD_GAME_VERSIONS="${game_versions}"
           export BUILD_VERSION="${version}"
           export BUILD_FILENAME="${filename}"
           export BUILD_SHA256="${sha256}"
@@ -245,10 +317,7 @@ jobs:
           if before and before != "0000000000000000000000000000000000000000":
               rev_range = f"{before}..{after}"
 
-          raw = subprocess.check_output(
-              ["git", "log", "--format=%H%x1f%cI%x1f%s", rev_range],
-              text=True,
-          ).strip()
+          raw = subprocess.check_output(["git", "log", "--format=%H%x1f%cI%x1f%s", rev_range], text=True).strip()
           commits = []
           for line in raw.splitlines():
               if not line:
@@ -260,9 +329,15 @@ jobs:
               "id": int(os.environ["GITHUB_RUN_ID_VALUE"]),
               "time": datetime.now(timezone.utc).isoformat(),
               "channel": os.environ["BUILD_CHANNEL"],
-              "server": os.environ["BUILD_SERVER"],
+              "platform": os.environ["BUILD_PLATFORM"],
+              "compatible_platforms": [os.environ["BUILD_PLATFORM"]],
+              "platform_family": os.environ["BUILD_PLATFORM_FAMILY"],
+              "game_versions": json.loads(os.environ["BUILD_GAME_VERSIONS"]),
+              "java_version": 21,
               "version": os.environ["BUILD_VERSION"],
               "build_number": os.environ["GITHUB_RUN_NUMBER_VALUE"],
+              "branch": os.environ["GITHUB_REF_NAME_VALUE"],
+              "commit_sha": after,
               "filename": os.environ["BUILD_FILENAME"],
               "sha256": os.environ["BUILD_SHA256"],
               "size": int(os.environ["BUILD_SIZE"]),
@@ -272,7 +347,7 @@ jobs:
           PY
 
           curl --fail-with-body \
-            -X POST "${MINI_PORTAL_URL}/api/builds/ci/${BUILD_SLUG}" \
+            -X POST "${MINI_PORTAL_URL}/api/v2/builds/ci/${BUILD_PROJECT}" \
             -H "X-Build-Token: ${BUILD_CI_TOKEN}" \
             -F "metadata=<build-info.json;type=application/json" \
             -F "artifact=@${jar};filename=${filename};type=application/java-archive"
