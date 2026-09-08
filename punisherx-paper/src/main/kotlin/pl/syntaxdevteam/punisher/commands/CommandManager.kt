@@ -161,12 +161,12 @@ class CommandManager(private val plugin: PunisherX) {
                 "clearall",
                 plugin.messageHandler.stringMessageToString("clear", "usage"),
                 ClearAllCommand(plugin)
-            )/*
+            )
             commands.register(
                 "panel",
                 "Opens the PunisherX GUI with lots of useful information and commands.",
                 PanelCommand(plugin)
-            )*/
+            )
             commands.register(
                 "langfix",
                 "Converts legacy translation placeholders from {} to <>",
@@ -281,11 +281,11 @@ class CommandManager(private val plugin: PunisherX) {
                         plugin.messageHandler.stringMessageToString("clear", "usage"),
                         ClearAllCommand(plugin)
                     )
-                    /*"panel" -> commands.register(
+                    "panel" -> commands.register(
                         commandName,
                         "Opens the PunisherX GUI with lots of useful information and commands.",
                         PanelCommand(plugin)
-                    )*/
+                    )
                 }
             }
         }

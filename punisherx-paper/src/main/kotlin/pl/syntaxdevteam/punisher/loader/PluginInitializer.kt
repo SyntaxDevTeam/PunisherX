@@ -35,7 +35,6 @@ import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
 import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
 import pl.syntaxdevteam.punisher.compatibility.VersionChecker
 import pl.syntaxdevteam.punisher.hooks.DiscordBridge
-import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
 import java.io.File
 import java.util.Locale
