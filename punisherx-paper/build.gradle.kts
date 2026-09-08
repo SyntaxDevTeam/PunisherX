@@ -3,6 +3,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.papermc.hangarpublishplugin.model.Platforms
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.file.DuplicatesStrategy
 
 plugins {
     id("io.papermc.hangar-publish-plugin")
@@ -20,8 +21,9 @@ kotlin {
 }
 
 repositories {
-    maven("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/") //SyntaxDevTeam
-    maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/") //SyntaxDevTeam
+    maven("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/")
+    maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
+
     gradlePluginPortal()
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/") {
@@ -30,16 +32,44 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/") {
         name = "sonatype"
     }
-    maven("https://repo.menthamc.org/repository/maven-public/")
-    maven("https://repo.extendedclip.com/releases/") // PlaceholderAPI
-    maven("https://repo.codemc.org/repository/maven-public/") // VaultUnlockedAPI
-    maven("https://jitpack.io") // VaultAPI
-    maven("https://repo.essentialsx.net/releases/") // EssentialsX
+    maven("https://repo.extendedclip.com/releases/") {
+        content {
+            includeGroup("me.clip")
+        }
+    }
+    maven("https://repo.codemc.org/repository/maven-public/") {
+        content {
+            includeGroup("net.milkbowl.vault")
+        }
+    }
+    maven("https://jitpack.io") {
+        content {
+            includeGroup("com.github.milkbowl")
+        }
+    }
+    maven("https://repo.essentialsx.net/releases/") {
+        content {
+            includeGroup("net.essentialsx")
+        }
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "faststatsReleases"
+                url = uri("https://repo.faststats.dev/releases")
+            }
+        }
+
+        filter {
+            includeGroup("dev.faststats.metrics")
+        }
+    }
     maven("https://repo.leavesmc.org/snapshots/") {
         name = "leavesmc-repo"
-    }
-    maven("https://repo.faststats.dev/releases") {
-        name = "faststatsReleases"
+
+        content {
+            includeGroup("org.leavesmc.leaves")
+        }
     }
 }
 
@@ -75,7 +105,7 @@ dependencies {
     }
     compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
 
-    compileOnly("dev.faststats.metrics:bukkit:0.28.0")
+    compileOnly("dev.faststats.metrics:bukkit:0.30.0")
 
     testImplementation(kotlin("test"))
     testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
@@ -118,7 +148,19 @@ tasks.named<ShadowJar>("shadowJar") {
     archiveBaseName.set("PunisherX-Paper")
     archiveClassifier.set("")
     archiveVersion.set(project.version.toString())
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     mergeServiceFiles()
+
+    filesMatching("META-INF/services/**") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+
+    filesMatching("META-INF/*.kotlin_module") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+
     dependencies {
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7"))

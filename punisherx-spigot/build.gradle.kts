@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import org.gradle.api.file.DuplicatesStrategy
 
 plugins {
     id("io.papermc.hangar-publish-plugin")
@@ -10,22 +11,88 @@ plugins {
 description = "Advanced punishment system for Spigot servers with commands like warn, mute, jail, ban, kick and more."
 
 repositories {
-    maven("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/")
-    maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
+    // SyntaxDevTeam
+    maven("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/") {
+        content {
+            includeGroup("pl.syntaxdevteam")
+        }
+    }
+
+    maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/") {
+        content {
+            includeGroup("pl.syntaxdevteam")
+        }
+    }
+    // Standard dependencies
     mavenCentral()
+    // AlessioDP
     maven("https://repo.alessiodp.com/releases/") {
         name = "alessioReleases"
     }
+
+    // Spigot API
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") {
         name = "spigotSnapshots"
+
+        content {
+            includeGroup("org.spigotmc")
+        }
     }
-    maven("https://oss.sonatype.org/content/groups/public/")
-    maven("https://repo.menthamc.org/repository/maven-public/")
-    maven("https://repo.extendedclip.com/releases/")
-    maven("https://repo.codemc.org/repository/maven-public/")
-    maven("https://jitpack.io")
-    maven("https://repo.essentialsx.net/releases/")
-    maven("https://repo.faststats.dev/releases")
+
+    // Sonatype
+    maven("https://oss.sonatype.org/content/groups/public/") {
+        name = "sonatype"
+    }
+
+    // PlaceholderAPI
+    maven("https://repo.extendedclip.com/releases/") {
+        name = "placeholderApi"
+
+        content {
+            includeGroup("me.clip")
+        }
+    }
+
+    // VaultUnlocked
+    maven("https://repo.codemc.org/repository/maven-public/") {
+        name = "codeMc"
+
+        content {
+            includeGroup("net.milkbowl.vault")
+        }
+    }
+
+    // Legacy VaultAPI
+    maven("https://jitpack.io") {
+        name = "jitpack"
+
+        content {
+            includeGroup("com.github.milkbowl")
+        }
+    }
+
+    // EssentialsX
+    maven("https://repo.essentialsx.net/releases/") {
+        name = "essentialsX"
+
+        content {
+            includeGroup("net.essentialsx")
+        }
+    }
+
+    // FastStats — tylko to repo może obsługiwać FastStats
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "faststatsReleases"
+                url = uri("https://repo.faststats.dev/releases")
+            }
+        }
+
+        filter {
+            includeGroup("dev.faststats.metrics")
+        }
+    }
 }
 
 dependencies {
@@ -69,7 +136,7 @@ dependencies {
         isTransitive = false
     }
     compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
-    compileOnly("dev.faststats.metrics:bukkit:0.28.0")
+    compileOnly("dev.faststats.metrics:bukkit:0.30.0")
 
     testImplementation(kotlin("test"))
 }
@@ -102,7 +169,24 @@ tasks.named<ShadowJar>("shadowJar") {
     archiveBaseName.set("PunisherX-Spigot")
     archiveClassifier.set("")
     archiveVersion.set(project.version.toString())
-    relocate("net.byteflux.libby", "pl.syntaxdevteam.punisher.libs.libby")
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    mergeServiceFiles()
+
+    filesMatching("META-INF/services/**") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+
+    filesMatching("META-INF/*.kotlin_module") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+
+    relocate(
+        "net.byteflux.libby",
+        "pl.syntaxdevteam.punisher.libs.libby"
+    )
+
     dependencies {
         include(dependency("net.byteflux:libby-bukkit"))
         include(dependency("net.byteflux:libby-core"))
@@ -111,8 +195,9 @@ tasks.named<ShadowJar>("shadowJar") {
         include(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8"))
     }
 }
+
 plugindeployer {
     paper { dir = "/home/debian/server/Paper/26.2/plugins" } //ostatnia wersja dla Paper
-    folia { dir = "/home/debian/server/Folia/26.1.2/plugins" } //ostatnia wersja dla Folia
+    folia { dir = "/home/debian/server/Folia/26.2/plugins" } //ostatnia wersja dla Folia
     spigot { dir = "/home/debian/server/Spigot/26.2/plugins" } //ostatnia wersja dla Spigot
 }

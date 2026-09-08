@@ -37,11 +37,11 @@ libraries:
   # All databases libraries is implemented in SyntaxCore
 
   # FastStats dependencies
-  - coordinate: dev.faststats.metrics:core:0.28.0
+  - coordinate: dev.faststats.metrics:core:0.30.0
     repository: faststatsReleases
-  - coordinate: dev.faststats.metrics:config:0.28.0
+  - coordinate: dev.faststats.metrics:config:0.30.0
     repository: faststatsReleases
-  - coordinate: dev.faststats.metrics:bukkit:0.28.0
+  - coordinate: dev.faststats.metrics:bukkit:0.30.0
     repository: faststatsReleases
   # SyntaxDevTeam libraries
   - coordinate: pl.syntaxdevteam:syntaxcore:1.4.1-R0.1-SNAPSHOT
