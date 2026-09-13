@@ -103,10 +103,10 @@ dependencies {
     compileOnly("pl.syntaxdevteam:messageHandler-spigot:1.2.2-R0.4-SNAPSHOT")
 
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
-    compileOnly("org.yaml:snakeyaml:2.6")
+    compileOnly("org.yaml:snakeyaml:2.7")
     compileOnly("com.google.code.gson:gson:2.14.0")
     compileOnly("com.maxmind.geoip2:geoip2:5.2.0")
-    compileOnly("org.apache.ant:ant:1.10.17")
+    compileOnly("org.apache.ant:ant:1.10.18")
     compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
     compileOnly("dev.triumphteam:triumph-gui:3.1.13")
 
@@ -136,7 +136,7 @@ dependencies {
         isTransitive = false
     }
     compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
-    compileOnly("dev.faststats.metrics:bukkit:0.30.0")
+    compileOnly("dev.faststats.metrics:bukkit:0.30.1")
 
     testImplementation(kotlin("test"))
 }

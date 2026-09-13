@@ -10,8 +10,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.velocitypowered:velocity-api:4.0.0-SNAPSHOT")
-    annotationProcessor("com.velocitypowered:velocity-api:4.0.0-SNAPSHOT")
+    compileOnly("com.velocitypowered:velocity-api:4.1.2-SNAPSHOT")
+    annotationProcessor("com.velocitypowered:velocity-api:4.1.2-SNAPSHOT")
     implementation("com.zaxxer:HikariCP:7.1.0") {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
