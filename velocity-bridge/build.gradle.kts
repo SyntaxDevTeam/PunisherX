@@ -15,7 +15,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:7.1.0") {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-    implementation("com.mysql:mysql-connector-j:9.7.0")
+    implementation("com.mysql:mysql-connector-j:26.7.0")
 }
 
 extensions.configure<KotlinJvmProjectExtension> {
