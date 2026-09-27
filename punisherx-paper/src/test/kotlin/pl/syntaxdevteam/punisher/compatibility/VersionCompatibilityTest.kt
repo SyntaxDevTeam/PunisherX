@@ -9,9 +9,9 @@ import kotlin.test.assertTrue
 class VersionCompatibilityTest {
 
     @Test
-    fun `dialogs start at Minecraft 1_21_6`() {
-        assertFalse(compatibilityFor("1.21.5").supports(VersionCompatibility.CompatibilityFlag.DIALOGS))
-        assertTrue(compatibilityFor("1.21.6").supports(VersionCompatibility.CompatibilityFlag.DIALOGS))
+    fun `Paper dialog API starts at Minecraft 1_21_7`() {
+        assertFalse(compatibilityFor("1.21.6").supports(VersionCompatibility.CompatibilityFlag.DIALOGS))
+        assertTrue(compatibilityFor("1.21.7").supports(VersionCompatibility.CompatibilityFlag.DIALOGS))
         assertTrue(compatibilityFor("1.21.11").supports(VersionCompatibility.CompatibilityFlag.DIALOGS))
     }
 

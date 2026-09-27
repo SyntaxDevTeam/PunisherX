@@ -21,7 +21,7 @@ class VersionCompatibility(
 
     private val featureIntroductions: Map<CompatibilityFlag, SemanticVersion> = mapOf(
         CompatibilityFlag.MODERN_LOGIN_EVENTS to parseVersion("1.21.7"),
-        CompatibilityFlag.DIALOGS to parseVersion("1.21.6")
+        CompatibilityFlag.DIALOGS to parseVersion("1.21.7")
     )
 
     fun supports(flag: CompatibilityFlag): Boolean {

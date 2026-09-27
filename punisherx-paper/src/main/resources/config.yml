@@ -1,4 +1,4 @@
-config-version: 163
+config-version: 164
 
 # /********************************************/
 #    Global settings
@@ -164,10 +164,10 @@ reports:
   # /reports lists open reports; /reports history lists resolved/rejected reports.
   # Closing a report allows its author to submit another one.
   page-size: 10
-  # Paper 1.21.6+ uses native dialogs for the staff report inbox.
+  # Paper 1.21.7+ uses native dialogs for the staff report inbox.
   # Older Paper versions and Spigot keep the inventory/chat interface.
   admin-use-dialogs: true
-  # Paper 1.21.6+ uses the native Dialog form. Older Paper versions and
+  # Paper 1.21.7+ uses the native Dialog form. Older Paper versions and
   # Spigot automatically use the inventory GUI.
   use-dialogs: true
   reasons:
@@ -177,8 +177,13 @@ reports:
     - "Offensive language"
 
 dialogs:
-  # Opens /change-reason [id] as a native form on Paper 1.21.6+.
+  # Opens /change-reason [id] as a native form on Paper 1.21.7+.
   use-change-reason: true
+  # Show punishment lists from /banlist, /history and /check as native dialogs.
+  # Consoles and Paper versions older than 1.21.7 keep the chat representation.
+  use-list-views: true
+  # Number of punishment entries displayed on one dialog page (1-20).
+  list-page-size: 10
 
 # /********************************************/
 #    GUI settings

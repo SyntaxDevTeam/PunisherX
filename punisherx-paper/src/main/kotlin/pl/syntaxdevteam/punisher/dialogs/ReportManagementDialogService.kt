@@ -21,7 +21,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-/** Native staff report browser available on Paper 1.21.6+. */
+/** Native staff report browser available through the Paper API on 1.21.7+. */
 @Suppress("UnstableApiUsage")
 class ReportManagementDialogService(private val plugin: PunisherX) {
     private companion object {

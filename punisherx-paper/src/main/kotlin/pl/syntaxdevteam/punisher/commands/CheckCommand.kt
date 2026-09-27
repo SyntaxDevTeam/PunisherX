@@ -2,9 +2,14 @@ package pl.syntaxdevteam.punisher.commands
 
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
+import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.compatibility.DialogSupport
+import pl.syntaxdevteam.punisher.databases.PunishmentData
+import pl.syntaxdevteam.punisher.dialogs.PunishmentListDialogService
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.players.PlayerIPManager
 
@@ -39,6 +44,18 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
                         stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("check", "invalid_type"))
                         return
                     }
+                }
+
+                if (DialogSupport.canUseListDialogs(plugin, stack.sender)) {
+                    openDialog(
+                        stack.sender as Player,
+                        targetPlayer ?: player,
+                        uuid.toString(),
+                        type,
+                        filteredPunishments,
+                        1
+                    )
+                    return
                 }
 
                 if (filteredPunishments.isEmpty()) {
@@ -93,6 +110,29 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
         } else {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
         }
+    }
+
+    private fun openDialog(
+        viewer: Player,
+        targetName: String,
+        uuid: String,
+        type: String,
+        punishments: List<PunishmentData>,
+        page: Int
+    ) {
+        val pageSize = plugin.config.getInt("dialogs.list-page-size", 10).coerceIn(1, 20)
+        val offset = (page - 1) * pageSize
+        PunishmentListDialogService(plugin).open(
+            player = viewer,
+            title = plugin.messageHandler.stringMessageToComponentNoPrefix("check", "title"),
+            subtitle = Component.text("$targetName • $uuid • ${type.uppercase()} • #$page"),
+            entries = punishments.drop(offset).take(pageSize),
+            page = page,
+            hasNext = punishments.size > offset + pageSize,
+            loadPage = { requestedPage ->
+                openDialog(viewer, targetName, uuid, type, punishments, requestedPage)
+            }
+        )
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {

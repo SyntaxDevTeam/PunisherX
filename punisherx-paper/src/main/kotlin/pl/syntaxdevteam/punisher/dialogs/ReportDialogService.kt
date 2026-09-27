@@ -17,7 +17,7 @@ import pl.syntaxdevteam.punisher.PunisherX
 import java.time.Duration
 
 /**
- * Native report form available on Paper 1.21.6 and newer.
+ * Native report form available through the Paper API on 1.21.7 and newer.
  */
 @Suppress("UnstableApiUsage")
 class ReportDialogService(private val plugin: PunisherX) {

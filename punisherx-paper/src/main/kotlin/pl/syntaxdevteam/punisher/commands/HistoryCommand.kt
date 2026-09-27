@@ -2,9 +2,13 @@ package pl.syntaxdevteam.punisher.commands
 
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
+import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.compatibility.DialogSupport
+import pl.syntaxdevteam.punisher.dialogs.PunishmentListDialogService
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.players.PlayerIPManager
 import java.text.SimpleDateFormat
@@ -24,7 +28,7 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
         val player = args[0]
         if (player.equals(stack.sender.name, ignoreCase = true) || PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.HISTORY)) {
 
-            val page = if (args.size > 1) args[1].toIntOrNull() ?: 1 else 1
+            val page = (if (args.size > 1) args[1].toIntOrNull() ?: 1 else 1).coerceAtLeast(1)
             val limit = 10
             val offset = (page - 1) * limit
 
@@ -33,6 +37,12 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
                 null -> Bukkit.getOfflinePlayer(uuid).name
                 else -> Bukkit.getPlayer(player)?.name
             }
+
+            if (DialogSupport.canUseListDialogs(plugin, stack.sender)) {
+                openDialog(stack.sender as Player, targetPlayer ?: player, uuid.toString(), page)
+                return
+            }
+
             val punishments = plugin.databaseHandler.getPunishmentHistory(uuid.toString(), limit, offset)
 
             if (punishments.isEmpty()) {
@@ -93,6 +103,21 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
         } else {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("history", "no_permission"))
         }
+    }
+
+    private fun openDialog(viewer: Player, targetName: String, uuid: String, page: Int) {
+        val pageSize = plugin.config.getInt("dialogs.list-page-size", 10).coerceIn(1, 20)
+        val offset = (page - 1) * pageSize
+        val punishments = plugin.databaseHandler.getPunishmentHistory(uuid, pageSize + 1, offset)
+        PunishmentListDialogService(plugin).open(
+            player = viewer,
+            title = plugin.messageHandler.stringMessageToComponentNoPrefix("history", "title"),
+            subtitle = Component.text("$targetName • $uuid • #$page"),
+            entries = punishments.take(pageSize),
+            page = page,
+            hasNext = punishments.size > pageSize,
+            loadPage = { requestedPage -> openDialog(viewer, targetName, uuid, requestedPage) }
+        )
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {

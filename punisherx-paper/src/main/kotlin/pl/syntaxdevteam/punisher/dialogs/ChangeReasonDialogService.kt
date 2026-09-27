@@ -15,7 +15,7 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.time.Duration
 
 /**
- * Native Paper form for editing punishment reasons on 1.21.6+.
+ * Native Paper form for editing punishment reasons on 1.21.7+.
  */
 @Suppress("UnstableApiUsage")
 class ChangeReasonDialogService(private val plugin: PunisherX) {

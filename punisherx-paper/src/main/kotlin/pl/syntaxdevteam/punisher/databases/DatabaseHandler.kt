@@ -725,7 +725,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
             DatabaseType.MYSQL,
             DatabaseType.MARIADB,
             DatabaseType.POSTGRESQL,
-            DatabaseType.SQLITE
+            DatabaseType.SQLITE,
+            DatabaseType.H2
         )
 
         val params = mutableListOf<Any>(uuid)
@@ -761,7 +762,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
             DatabaseType.MYSQL,
             DatabaseType.MARIADB,
             DatabaseType.POSTGRESQL,
-            DatabaseType.SQLITE
+            DatabaseType.SQLITE,
+            DatabaseType.H2
         )
 
         val params = mutableListOf<Any>()
@@ -801,7 +803,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
             DatabaseType.MYSQL,
             DatabaseType.MARIADB,
             DatabaseType.POSTGRESQL,
-            DatabaseType.SQLITE
+            DatabaseType.SQLITE,
+            DatabaseType.H2
         )
 
         val params = mutableListOf<Any>()

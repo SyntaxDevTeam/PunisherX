@@ -3,7 +3,7 @@
 - `/report` — wybór gracza i powodu w formularzu Paper lub GUI.
 - `/report gracz` — wybór powodu dla wskazanego gracza.
 - `/report gracz powód` — wysłanie własnego powodu (3–255 znaków).
-- `/reports` — natywny dialog na Paper 1.21.6+; panel ekwipunku na starszym Paper i Spigot; lista tekstowa w konsoli.
+- `/reports` — natywny dialog na Paper 1.21.7+; panel ekwipunku na starszym Paper i Spigot; lista tekstowa w konsoli.
 - `/reports gui [strona]` — panel, 45 zgłoszeń na stronę.
 - `/reports list [strona]` — lista tekstowa; wielkość strony ustawia `reports.page-size` (1–50).
 - `/reports view id` — autor, zgłoszony gracz, powód, data i decyzja. W otwartym zgłoszeniu kliknięcie komendy wstawia ją do czatu; należy dopisać uzasadnienie i wysłać.

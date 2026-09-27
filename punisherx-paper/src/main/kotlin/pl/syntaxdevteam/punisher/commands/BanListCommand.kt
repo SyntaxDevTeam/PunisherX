@@ -2,8 +2,12 @@ package pl.syntaxdevteam.punisher.commands
 
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
+import net.kyori.adventure.text.Component
+import org.bukkit.entity.Player
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.compatibility.DialogSupport
+import pl.syntaxdevteam.punisher.dialogs.PunishmentListDialogService
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.text.SimpleDateFormat
 import java.util.*
@@ -27,6 +31,12 @@ class BanListCommand(private val plugin: PunisherX) : BasicCommand {
                 arg.equals("--h", ignoreCase = true) -> historyMode = true
                 arg.toIntOrNull() != null -> page = arg.toInt()
             }
+        }
+        page = page.coerceAtLeast(1)
+
+        if (DialogSupport.canUseListDialogs(plugin, stack.sender)) {
+            openDialog(stack.sender as Player, page, historyMode)
+            return
         }
 
         val limit = 10
@@ -80,6 +90,25 @@ class BanListCommand(private val plugin: PunisherX) : BasicCommand {
                     "<click:run_command:'/banlist $nextPage'>[Next]</click> </blue>"
         )
         stack.sender.sendMessage(navigation)
+    }
+
+    private fun openDialog(player: Player, page: Int, historyMode: Boolean) {
+        val pageSize = plugin.config.getInt("dialogs.list-page-size", 10).coerceIn(1, 20)
+        val offset = (page - 1) * pageSize
+        val punishments = if (historyMode) {
+            plugin.databaseHandler.getHistoryBannedPlayers(pageSize + 1, offset)
+        } else {
+            plugin.databaseHandler.getBannedPlayers(pageSize + 1, offset)
+        }
+        PunishmentListDialogService(plugin).open(
+            player = player,
+            title = mh.stringMessageToComponentNoPrefix("banlist", "title"),
+            subtitle = Component.text("${if (historyMode) "--h • " else ""}#$page"),
+            entries = punishments.take(pageSize),
+            page = page,
+            hasNext = punishments.size > pageSize,
+            loadPage = { requestedPage -> openDialog(player, requestedPage, historyMode) }
+        )
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
