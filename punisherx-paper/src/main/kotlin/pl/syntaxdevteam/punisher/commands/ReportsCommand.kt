@@ -9,6 +9,8 @@ import pl.syntaxdevteam.punisher.gui.report.ReportInboxGUI
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
+import pl.syntaxdevteam.punisher.dialogs.ReportManagementDialogService
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.UUID
 
@@ -42,7 +44,7 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
                         message(sender, "admin-usage")
                         return
                     }
-                    ReportInboxGUI(plugin).open(sender, page)
+                    if (!openDialogInbox(sender, page, false)) ReportInboxGUI(plugin).open(sender, page)
                 }
                 "list", "history" -> {
                     val page = if (args.size < 2) 1 else args[1].toIntOrNull()
@@ -52,6 +54,9 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
                         return
                     }
                     val closed = args.firstOrNull()?.equals("history", true) == true
+                    if (sender is Player && openDialogInbox(sender, page, closed)) {
+                        return
+                    }
                     val reports = plugin.databaseHandler.getReports(pageSize + 1, (page - 1) * pageSize, closed)
                     message(sender, if (closed) "history-title" else "inbox-title", mapOf("page" to "$page"))
                     if (reports.isEmpty()) message(sender, "empty")
@@ -86,6 +91,9 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
                         return
                     }
                     if (action == "view") {
+                        if (sender is Player && openDialogDetails(sender, id)) {
+                            return
+                        }
                         message(sender, "details-title", mapOf("id" to "$id"))
                         sender.sendMessage(Component.text("${name(report.player)} (${report.player}) → ${name(report.suspect)} (${report.suspect})\n${report.filedAt}\n${report.reason}"))
                         message(sender, "status-${report.status.lowercase()}")
@@ -122,4 +130,17 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     private fun name(uuid: UUID): String = Bukkit.getOfflinePlayer(uuid).name ?: uuid.toString()
+
+    private fun openDialogInbox(player: Player, page: Int, closed: Boolean): Boolean =
+        useDialogs() && runCatching { ReportManagementDialogService(plugin).openInbox(player, page, closed) }
+            .onFailure { plugin.logger.warning("Could not open report management dialog, using inventory GUI: ${it.message}") }
+            .getOrDefault(false)
+
+    private fun openDialogDetails(player: Player, id: Int): Boolean =
+        useDialogs() && runCatching { ReportManagementDialogService(plugin).openDetails(player, id) }
+            .onFailure { plugin.logger.warning("Could not open report details dialog, using chat output: ${it.message}") }
+            .getOrDefault(false)
+
+    private fun useDialogs(): Boolean = plugin.config.getBoolean("reports.admin-use-dialogs", true) &&
+        plugin.versionCompatibility.supports(VersionCompatibility.CompatibilityFlag.DIALOGS)
 }

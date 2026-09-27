@@ -1,4 +1,4 @@
-config-version: 162
+config-version: 163
 
 # /********************************************/
 #    Global settings
@@ -164,6 +164,9 @@ reports:
   # /reports lists open reports; /reports history lists resolved/rejected reports.
   # Closing a report allows its author to submit another one.
   page-size: 10
+  # Paper 1.21.6+ uses native dialogs for the staff report inbox.
+  # Older Paper versions and Spigot keep the inventory/chat interface.
+  admin-use-dialogs: true
   # Paper 1.21.6+ uses the native Dialog form. Older Paper versions and
   # Spigot automatically use the inventory GUI.
   use-dialogs: true
