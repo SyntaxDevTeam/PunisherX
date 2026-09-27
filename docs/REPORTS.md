@@ -19,7 +19,7 @@ Po zainstalowaniu nowego JAR uruchom ponownie serwer. Sprawdź, czy używane tł
 
 ## Weryfikacja
 
-Automatycznie: `./gradlew :punisherx-paper:test :punisherx-spigot:compileKotlin` oraz `python3 -m unittest discover -s scripts/tests -v`. Testy SQLite wykonują SQL odczytany z kodu Kotlin; nie zastępują testów całego pluginu na serwerze ani testów innych silników baz.
+Automatycznie: `./gradlew :punisherx-paper:test :punisherx-spigot:test :punisherx-paper:shadowJar :punisherx-spigot:shadowJar`. Testy automatyczne nie zastępują sprawdzenia całego przepływu na uruchomionym serwerze ani testów wszystkich obsługiwanych silników baz danych.
 
 Test na serwerze z kontem gracza i administratora:
 

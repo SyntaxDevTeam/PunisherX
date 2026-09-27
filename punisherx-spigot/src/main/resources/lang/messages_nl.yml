@@ -219,6 +219,37 @@ clear:
   clear_message: "<green>Alle actieve straffen zijn geannuleerd! </green><dark_gray>Pssst! Heb je misschien wat connecties met de beheerders of zo?</dark_gray>"
 
 # GUI-berichten
+reports:
+  gui-title: "Spelersmeldingen"
+  gui-details: "Klik om details en acties te bekijken."
+  gui-history: "Meldingsgeschiedenis"
+  admin-usage: "<gold>/reports list [page] | history [page] | view <id> | resolve <id> <note> | reject <id> <note></gold><newline><gray>The note must contain between 3 and 255 characters. Click a report to view details.</gray>"
+  inbox-title: "<gold>Open reports — page <page></gold>"
+  history-title: "<gold>Report history — page <page></gold>"
+  empty: "<gray>No reports on this page.</gray>"
+  details-title: "<gold>Report #<id></gold>"
+  not-found: "<red>Report not found.</red>"
+  already-closed: "<yellow>This report is already closed.</yellow>"
+  handled: "<green>Report #<id> closed. The decision and note were saved.</green>"
+  status-open: "<yellow>Status: open</yellow>"
+  status-resolved: "<green>Status: resolved</green>"
+  status-rejected: "<red>Status: rejected</red>"
+  usage: "Correct usage: <gold>/report [player] [reason]"
+  cannot-report-self: "<red>You cannot report yourself!</red>"
+  already-submitted: "<red>You already have an open report. Staff must close it before you submit another one.</red>"
+  invalid-reason: "<red>The report reason must contain between 3 and 255 characters.</red>"
+  no-targets: "<yellow>There are no players available to report.</yellow>"
+  invalid-form: "<red>The form contains invalid data. Open it again.</red>"
+  report-sent: "<green>Your report against <gold><target></gold> for <gray><reason></gray> was submitted. This player now has <gold><count></gold> reports.</green>"
+  admin-notify: "<red>[Report]</red> <gold><reporter></gold> reported <yellow><target></yellow> for <gray><reason></gray> <dark_gray>(reports: <count>)</dark_gray> <click:run_command:/reports><yellow>[Open reports]</yellow></click>"
+  dialog-title: "<red>Report a player</red>"
+  dialog-body: "<gray>Select the player and report reason.</gray>"
+  dialog-body-target: "<gray>Select the reason for reporting <gold><target></gold>.</gray>"
+  dialog-target-label: "<yellow>Player</yellow>"
+  dialog-reason-label: "<yellow>Reason</yellow>"
+  dialog-submit: "<green>Submit report</green>"
+  dialog-cancel: "<red>Cancel</red>"
+
 GUI:
   PunisherMain:
     title:         "<dark_gray>Hoofdmenu PunisherX</dark_gray>"
@@ -288,6 +319,20 @@ GUI:
     title: "<yellow>Kies duur</yellow>"
   PunishReason:
     title: "<yellow>Kies reden</yellow>"
+  Report:
+    menu:
+      title: "<yellow>Kies een speler om te rapporteren</yellow>"
+      online: "<green>Online spelers</green>"
+      offline: "<red>Offline spelers (afgelopen uur)</red>"
+    player:
+      title: "<yellow>Kies een speler om te rapporteren</yellow>"
+    offline:
+      title: "<yellow>Offline spelers (afgelopen uur)</yellow>"
+    reason:
+      title: "<yellow>Kies de reden van de melding</yellow>"
+    lore:
+      clickToReport: "<gray>Klik om te rapporteren</gray>"
+      clickToChoose: "<gray>Klik om te kiezen</gray>"
   Nav:
     next: "<gray>Volgende pagina</gray>"
     previous: "<gray>Vorige pagina</gray>"

@@ -402,6 +402,20 @@ GUI:
     title: "<yellow>Konfiguracja</yellow>"
     setunjail: "<yellow>Ustaw punkt powrotu</yellow>"
     setjail: "<yellow>Ustaw więzienie</yellow>"
+  Report:
+    menu:
+      title: "<yellow>Wybierz gracza do zgłoszenia</yellow>"
+      online: "<green>Gracze online</green>"
+      offline: "<red>Gracze offline (ostatnia godzina)</red>"
+    player:
+      title: "<yellow>Wybierz gracza do zgłoszenia</yellow>"
+    offline:
+      title: "<yellow>Gracze offline (ostatnia godzina)</yellow>"
+    reason:
+      title: "<yellow>Wybierz powód zgłoszenia</yellow>"
+    lore:
+      clickToReport: "<gray>Kliknij, aby zgłosić</gray>"
+      clickToChoose: "<gray>Kliknij, aby wybrać</gray>"
   Nav:
     next: "<gray>Następna strona</gray>"
     previous: "<gray>Poprzednia strona</gray>"

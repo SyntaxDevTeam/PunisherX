@@ -117,7 +117,10 @@ commands:
     permission: punisherx.cmd.change_reason
   report:
     description: Reports a player for breaking server rules.
-    usage: /report [player]
+    usage: /report [player] [reason]
+  reports:
+    description: Reviews and manages player reports.
+    usage: /reports [gui|list|history|view|resolve|reject]
   check:
     description: Checks the active penalties for a player.
     usage: /check <player> <warn|mute|ban|all>
