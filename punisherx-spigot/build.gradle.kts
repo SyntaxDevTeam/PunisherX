@@ -100,7 +100,7 @@ dependencies {
     implementation("net.byteflux:libby-bukkit:1.3.2")
 
     compileOnly("pl.syntaxdevteam:syntaxcore:1.4.1-R0.1-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:messageHandler-spigot:1.2.2-R0.4-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:messageHandler-spigot:1.3.0-R0.1-SNAPSHOT")
 
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.7")

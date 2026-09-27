@@ -82,7 +82,7 @@ dependencies {
     //compileOnly("dev.folia:folia-api:1.21.11-R0.1-SNAPSHOT")
     //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("pl.syntaxdevteam:syntaxcore:1.4.0-R0.1-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.2.2-R0.4-SNAPSHOT")
+    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.3.0-R0.1-SNAPSHOT")
 
     compileOnly("org.eclipse.aether:aether-api:1.1.0")
     compileOnly("org.yaml:snakeyaml:2.7")
