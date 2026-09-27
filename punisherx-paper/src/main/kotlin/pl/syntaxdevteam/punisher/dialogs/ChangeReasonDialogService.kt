@@ -76,7 +76,7 @@ class ChangeReasonDialogService(private val plugin: PunisherX) {
             ),
             null,
             150,
-            null
+            closeAction()
         )
         val inputs = listOf(
             DialogInput.text(
@@ -141,4 +141,9 @@ class ChangeReasonDialogService(private val plugin: PunisherX) {
             plugin.messageHandler.stringMessageToComponent("change-reason", key, placeholders)
         )
     }
+
+    private fun closeAction() = DialogAction.customClick(
+        { _, audience -> audience.closeDialog() },
+        ClickCallback.Options.builder().uses(1).lifetime(Duration.ofMinutes(5)).build()
+    )
 }

@@ -268,7 +268,16 @@ clear:
   clear_message: "<green>Alle deine aktiven Strafen wurden aufgehoben!</green> <gray>Pssst! Hast du vielleicht Absprachen mit der Administration?</gray>"
 
 # Nachrichten für das GUI
+punishment-dialog:
+  close: "<red>Schließen</red>"
+  entry: "<gold>#<id></gold> <dark_gray>•</dark_gray> <yellow><player></yellow> <dark_gray>•</dark_gray> <aqua><type></aqua>"
+  tooltip: "<gray><reason></gray>"
+  details: "<gold><player></gold> <dark_gray>(<uuid>)</dark_gray><newline><yellow>#<id></yellow> <dark_gray>•</dark_gray> <aqua><type></aqua><newline><newline><white><reason></white><newline><newline><gray><start></gray> <dark_gray>→</dark_gray> <gray><end></gray><newline><gold><operator></gold> <dark_gray>•</dark_gray> <gray><server></gray>"
+
 reports:
+  dialog-list-entry: "<gold>#<id></gold> <dark_gray>•</dark_gray> <yellow><target></yellow> <dark_gray>•</dark_gray> <white><reason></white>"
+  dialog-details-body: "<gold><reporter></gold> <dark_gray>(<reporter_uuid>)</dark_gray> <gray>→</gray> <yellow><target></yellow> <dark_gray>(<target_uuid>)</dark_gray><newline><gray><filed_at></gray><newline><newline><white><reason></white>"
+  dialog-resolution-body: "<gold><handled_by></gold> <dark_gray>•</dark_gray> <gray><handled_at></gray><newline><white><note></white>"
   gui-title: "Spielermeldungen"
   gui-details: "Klicken, um Details und Aktionen anzuzeigen."
   gui-history: "Meldungsverlauf"

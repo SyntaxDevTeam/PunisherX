@@ -8,7 +8,7 @@ import kotlin.test.assertNotNull
 
 class ReportMessagesTest {
 
-    private val bundledLanguages = listOf("ar", "de", "en", "es", "fr", "it", "nl", "pl", "pt", "ru", "ua")
+    private val bundledLanguages = listOf("ar", "de", "en", "es", "fr", "it", "ko", "nl", "pl", "pt", "ru", "ua")
 
     private val requiredGuiKeys = listOf(
         "GUI.Report.menu.title",
@@ -31,7 +31,9 @@ class ReportMessagesTest {
         "reports.no-targets", "reports.invalid-form", "reports.report-sent", "reports.admin-notify",
         "reports.dialog-title", "reports.dialog-body", "reports.dialog-body-target",
         "reports.dialog-target-label", "reports.dialog-reason-label", "reports.dialog-submit",
-        "reports.dialog-cancel"
+        "reports.dialog-cancel", "reports.dialog-list-entry", "reports.dialog-details-body",
+        "reports.dialog-resolution-body", "punishment-dialog.close", "punishment-dialog.entry",
+        "punishment-dialog.tooltip", "punishment-dialog.details"
     )
 
     @Test

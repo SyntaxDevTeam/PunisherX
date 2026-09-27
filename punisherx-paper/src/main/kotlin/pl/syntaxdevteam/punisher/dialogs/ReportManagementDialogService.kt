@@ -52,7 +52,11 @@ class ReportManagementDialogService(private val plugin: PunisherX) {
                 visible.mapIndexed { index, report ->
                     SingleOptionDialogInput.OptionEntry.create(
                         report.id.toString(),
-                        Component.text("#${report.id} • ${name(report.suspect)} • ${report.reason.take(80)}"),
+                        message("dialog-list-entry", mapOf(
+                            "id" to report.id.toString(),
+                            "target" to name(report.suspect),
+                            "reason" to report.reason.take(80)
+                        )),
                         index == 0
                     )
                 }
@@ -71,7 +75,7 @@ class ReportManagementDialogService(private val plugin: PunisherX) {
             openInbox(player, 1, !closed)
         }
 
-        val close = ActionButton.create(message("dialog-cancel"), null, 120, null)
+        val close = closeButton()
         val dialog = Dialog.create { builder ->
             builder.empty().base(baseBuilder.build()).type(DialogType.multiAction(actions, close, 2))
         }
@@ -82,10 +86,14 @@ class ReportManagementDialogService(private val plugin: PunisherX) {
     fun openDetails(player: Player, id: Int, returnPage: Int = 1, closedList: Boolean = false): Boolean {
         if (!canRead(player) || !plugin.databaseHandler.isReady()) return false
         val report = plugin.databaseHandler.getReports(reportId = id).firstOrNull() ?: return false
-        val body = Component.text(
-            "${name(report.player)} (${report.player}) → ${name(report.suspect)} (${report.suspect})\n" +
-                "${TIME_FORMAT.format(report.filedAt.atZone(ZoneId.systemDefault()))}\n\n${report.reason}"
-        ).append(Component.newline()).append(message("status-${report.status.lowercase()}"))
+        val body = message("dialog-details-body", mapOf(
+            "reporter" to name(report.player),
+            "reporter_uuid" to report.player.toString(),
+            "target" to name(report.suspect),
+            "target_uuid" to report.suspect.toString(),
+            "filed_at" to TIME_FORMAT.format(report.filedAt.atZone(ZoneId.systemDefault())),
+            "reason" to report.reason
+        )).append(Component.newline()).append(message("status-${report.status.lowercase()}"))
         val base = DialogBase.builder(message("details-title", mapOf("id" to id.toString())))
             .canCloseWithEscape(true)
             .pause(false)
@@ -100,11 +108,17 @@ class ReportManagementDialogService(private val plugin: PunisherX) {
             actions += decisionButton(player, report, "RESOLVED", "status-resolved")
             actions += decisionButton(player, report, "REJECTED", "status-rejected")
         } else if (report.status != "OPEN") {
-            val resolution = Component.text("${report.handledBy} • ${report.handledAt}\n${report.note.orEmpty()}")
+            val resolution = message("dialog-resolution-body", mapOf(
+                "handled_by" to report.handledBy.orEmpty(),
+                "handled_at" to report.handledAt
+                    ?.let { TIME_FORMAT.format(it.atZone(ZoneId.systemDefault())) }
+                    .orEmpty(),
+                "note" to report.note.orEmpty()
+            ))
             base.body(listOf(DialogBody.plainMessage(body, 440), DialogBody.plainMessage(resolution, 440)))
         }
         actions += button(guiMessage("Nav.back")) { openInbox(player, returnPage, closedList) }
-        val close = ActionButton.create(message("dialog-cancel"), null, 120, null)
+        val close = closeButton()
         val dialog = Dialog.create { builder ->
             builder.empty().base(base.build()).type(DialogType.multiAction(actions, close, 2))
         }
@@ -135,6 +149,16 @@ class ReportManagementDialogService(private val plugin: PunisherX) {
             { response, _ -> callback(response) },
             ClickCallback.Options.builder().uses(1).lifetime(Duration.ofMinutes(10)).build()
         ))
+
+    private fun closeButton(): ActionButton = ActionButton.create(
+        message("dialog-cancel"),
+        null,
+        120,
+        DialogAction.customClick(
+            { _, audience -> audience.closeDialog() },
+            ClickCallback.Options.builder().uses(1).lifetime(Duration.ofMinutes(10)).build()
+        )
+    )
 
     private fun canRead(player: Player) = PermissionChecker.hasWithSee(player, PermissionChecker.PermissionKey.SEE_REPORTS) || canManage(player)
     private fun canManage(player: Player) = PermissionChecker.hasWithManage(player, PermissionChecker.PermissionKey.MANAGE_REPORTS)

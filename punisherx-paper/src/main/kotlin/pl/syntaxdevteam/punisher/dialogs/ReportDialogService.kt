@@ -111,7 +111,7 @@ class ReportDialogService(private val plugin: PunisherX) {
             plugin.messageHandler.stringMessageToComponentNoPrefix("reports", "dialog-cancel"),
             null,
             150,
-            null
+            closeAction()
         )
         val targetName = preselectedTarget?.name ?: preselectedTarget?.uniqueId?.toString()
         val bodyText = if (targetName == null) {
@@ -139,6 +139,11 @@ class ReportDialogService(private val plugin: PunisherX) {
         player.showDialog(dialog)
         return true
     }
+
+    private fun closeAction() = DialogAction.customClick(
+        { _, audience -> audience.closeDialog() },
+        ClickCallback.Options.builder().uses(1).lifetime(Duration.ofMinutes(5)).build()
+    )
 
     private fun reportablePlayers(reporter: Player): List<OfflinePlayer> {
         val now = System.currentTimeMillis()

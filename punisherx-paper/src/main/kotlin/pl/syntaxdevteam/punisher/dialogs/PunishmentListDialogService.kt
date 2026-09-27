@@ -32,8 +32,12 @@ class PunishmentListDialogService(private val plugin: PunisherX) {
         val safePage = page.coerceAtLeast(1)
         val actions = entries.map { punishment ->
             button(
-                Component.text("#${punishment.id} • ${punishment.name} • ${punishment.type}"),
-                Component.text(punishment.reason.take(120))
+                message("entry", mapOf(
+                    "id" to punishment.id.toString(),
+                    "player" to punishment.name,
+                    "type" to punishment.type
+                )),
+                message("tooltip", mapOf("reason" to punishment.reason.take(120)))
             ) { openDetails(player, title, punishment) { loadPage(safePage) } }
         }.toMutableList()
 
@@ -47,17 +51,24 @@ class PunishmentListDialogService(private val plugin: PunisherX) {
             .canCloseWithEscape(true).pause(false)
             .afterAction(DialogBase.DialogAfterAction.NONE)
             .body(listOf(DialogBody.plainMessage(body, 440))).build()
-        val close = ActionButton.create(gui("Nav.back"), null, 140, null)
+        val close = closeButton()
         val type = if (actions.isEmpty()) DialogType.notice(close) else DialogType.multiAction(actions, close, 2)
         player.showDialog(Dialog.create { it.empty().base(base).type(type) })
     }
 
     private fun openDetails(player: Player, title: Component, data: PunishmentData, back: () -> Unit) {
         val end = if (data.end == -1L) "∞" else dateFormat.format(Date(data.end))
-        val details = Component.text(
-            "${data.name} (${data.uuid})\n#${data.id} • ${data.type}\n\n${data.reason}\n\n" +
-                "${dateFormat.format(Date(data.start))} → $end\n${data.operator} • ${data.server}"
-        )
+        val details = message("details", mapOf(
+            "player" to data.name,
+            "uuid" to data.uuid,
+            "id" to data.id.toString(),
+            "type" to data.type,
+            "reason" to data.reason,
+            "start" to dateFormat.format(Date(data.start)),
+            "end" to end,
+            "operator" to data.operator,
+            "server" to data.server
+        ))
         val base = DialogBase.builder(title).canCloseWithEscape(true).pause(false)
             .afterAction(DialogBase.DialogAfterAction.NONE)
             .body(listOf(DialogBody.plainMessage(details, 440))).build()
@@ -71,5 +82,17 @@ class PunishmentListDialogService(private val plugin: PunisherX) {
             ClickCallback.Options.builder().uses(1).lifetime(Duration.ofMinutes(10)).build()
         ))
 
+    private fun closeButton(): ActionButton = ActionButton.create(
+        message("close"),
+        null,
+        140,
+        DialogAction.customClick(
+            { _, audience -> audience.closeDialog() },
+            ClickCallback.Options.builder().uses(1).lifetime(Duration.ofMinutes(10)).build()
+        )
+    )
+
     private fun gui(key: String) = plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", key)
+    private fun message(key: String, values: Map<String, String> = emptyMap()) =
+        plugin.messageHandler.stringMessageToComponentNoPrefix("punishment-dialog", key, values)
 }
