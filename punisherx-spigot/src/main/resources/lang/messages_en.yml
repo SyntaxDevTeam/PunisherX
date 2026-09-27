@@ -40,6 +40,8 @@ reports:
   usage: "Correct usage: <gold>/report [player] [reason]"
   cannot-report-self: "<red>You cannot report yourself!</red>"
   already-submitted: "<red>You already have an open report. Staff must close it before you can submit another one.</red>"
+  already-reported-target: "<red>You already have an open report against this player. Wait until staff closes it.</red>"
+  report-limit-reached: "<red>You have reached the limit of <limit> open reports. Wait until staff closes one of them.</red>"
   invalid-reason: "<red>The report reason must contain between 3 and 255 characters.</red>"
   no-targets: "<yellow>There are no online or recently disconnected players to report.</yellow>"
   invalid-form: "<red>The report form contained invalid data. Please open it again.</red>"

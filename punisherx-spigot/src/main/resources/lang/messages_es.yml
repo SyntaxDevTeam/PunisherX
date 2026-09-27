@@ -287,6 +287,8 @@ reports:
   usage: "Correct usage: <gold>/report [player] [reason]"
   cannot-report-self: "<red>You cannot report yourself!</red>"
   already-submitted: "<red>You already have an open report. Staff must close it before you submit another one.</red>"
+  already-reported-target: "<red>Ya tienes un reporte abierto contra este jugador. Espera a que el equipo lo cierre.</red>"
+  report-limit-reached: "<red>Has alcanzado el límite de <limit> reportes abiertos. Espera a que el equipo cierre uno.</red>"
   invalid-reason: "<red>The report reason must contain between 3 and 255 characters.</red>"
   no-targets: "<yellow>There are no players available to report.</yellow>"
   invalid-form: "<red>The form contains invalid data. Open it again.</red>"

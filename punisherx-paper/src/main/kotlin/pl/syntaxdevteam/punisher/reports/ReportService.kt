@@ -8,7 +8,8 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 enum class ReportSubmissionStatus {
     SUCCESS,
-    ALREADY_SUBMITTED,
+    ALREADY_REPORTED_TARGET,
+    OPEN_REPORT_LIMIT_REACHED,
     SELF_REPORT,
     INVALID_REASON,
     DATABASE_ERROR
@@ -24,8 +25,11 @@ data class ReportSubmissionResult(
  * dialogs cannot apply different submission rules.
  */
 class ReportService(private val plugin: PunisherX) {
-    fun hasOpenReport(reporter: Player): Boolean =
-        plugin.databaseHandler.hasReportByReporter(reporter.uniqueId)
+    private val maxOpenReports: Int
+        get() = plugin.config.getInt("reports.max-open-per-reporter", 3).coerceAtLeast(1)
+
+    fun hasReachedOpenReportLimit(reporter: Player): Boolean =
+        plugin.databaseHandler.countOpenReportsByReporter(reporter.uniqueId) >= maxOpenReports
 
     fun submit(reporter: Player, target: OfflinePlayer, rawReason: String): ReportSubmissionResult {
         val reason = rawReason.trim()
@@ -40,13 +44,16 @@ class ReportService(private val plugin: PunisherX) {
             val result = plugin.databaseHandler.submitReport(
                 reporter.uniqueId,
                 target.uniqueId,
-                reason
+                reason,
+                maxOpenReports
             )
         ) {
             is DatabaseReportSubmissionResult.Accepted ->
                 ReportSubmissionResult(ReportSubmissionStatus.SUCCESS, result.suspectReportCount)
-            DatabaseReportSubmissionResult.ReporterAlreadyHasOpenReport ->
-                ReportSubmissionResult(ReportSubmissionStatus.ALREADY_SUBMITTED)
+            DatabaseReportSubmissionResult.ReporterAlreadyReportedSuspect ->
+                ReportSubmissionResult(ReportSubmissionStatus.ALREADY_REPORTED_TARGET)
+            DatabaseReportSubmissionResult.ReporterReachedOpenReportLimit ->
+                ReportSubmissionResult(ReportSubmissionStatus.OPEN_REPORT_LIMIT_REACHED)
             DatabaseReportSubmissionResult.DatabaseError ->
                 ReportSubmissionResult(ReportSubmissionStatus.DATABASE_ERROR)
         }
@@ -82,9 +89,18 @@ class ReportService(private val plugin: PunisherX) {
                     }
             }
 
-            ReportSubmissionStatus.ALREADY_SUBMITTED ->
+            ReportSubmissionStatus.ALREADY_REPORTED_TARGET ->
                 reporter.sendMessage(
-                    plugin.messageHandler.stringMessageToComponent("reports", "already-submitted")
+                    plugin.messageHandler.stringMessageToComponent("reports", "already-reported-target")
+                )
+
+            ReportSubmissionStatus.OPEN_REPORT_LIMIT_REACHED ->
+                reporter.sendMessage(
+                    plugin.messageHandler.stringMessageToComponent(
+                        "reports",
+                        "report-limit-reached",
+                        mapOf("limit" to maxOpenReports.toString())
+                    )
                 )
 
             ReportSubmissionStatus.SELF_REPORT ->

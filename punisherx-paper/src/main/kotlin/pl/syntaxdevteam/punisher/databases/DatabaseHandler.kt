@@ -482,30 +482,38 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
-    fun hasReportByReporter(player: UUID): Boolean {
+    fun countOpenReportsByReporter(player: UUID): Int {
         return try {
             query(
                 "SELECT COUNT(*) AS reportCount FROM reports WHERE player = ? AND NOT EXISTS (SELECT 1 FROM report_resolutions rr WHERE rr.reportId = reports.id)",
                 player.toString()
             ) { it.getInt("reportCount") }
                 .firstOrNull()
-                ?.let { it > 0 }
-                ?: false
+                ?: 0
         } catch (e: Exception) {
             logger.err("Failed to check reports submitted by $player. ${e.message}")
-            false
+            0
         }
     }
 
     @Synchronized
-    fun submitReport(player: UUID, suspect: UUID, reason: String): ReportSubmissionResult {
+    fun submitReport(player: UUID, suspect: UUID, reason: String, maxOpenReports: Int): ReportSubmissionResult {
         return try {
+            val duplicateReports = query(
+                "SELECT COUNT(*) AS reportCount FROM reports WHERE player = ? AND suspect = ? AND NOT EXISTS (SELECT 1 FROM report_resolutions rr WHERE rr.reportId = reports.id)",
+                player.toString(),
+                suspect.toString()
+            ) { it.getInt("reportCount") }.firstOrNull() ?: 0
+            if (duplicateReports > 0) {
+                return ReportSubmissionResult.ReporterAlreadyReportedSuspect
+            }
+
             val openReports = query(
                 "SELECT COUNT(*) AS reportCount FROM reports WHERE player = ? AND NOT EXISTS (SELECT 1 FROM report_resolutions rr WHERE rr.reportId = reports.id)",
                 player.toString()
             ) { it.getInt("reportCount") }.firstOrNull() ?: 0
-            if (openReports > 0) {
-                return ReportSubmissionResult.ReporterAlreadyHasOpenReport
+            if (openReports >= maxOpenReports.coerceAtLeast(1)) {
+                return ReportSubmissionResult.ReporterReachedOpenReportLimit
             }
 
             if (!addReport(player, suspect, reason)) {

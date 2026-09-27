@@ -24,8 +24,9 @@ class ReportCommand(private val plugin: PunisherX) : BasicCommand {
             sender.sendMessage(mH.stringMessageToComponent("error", "db_not_ready"))
             return
         }
-        if (plugin.reportService.hasOpenReport(sender)) {
-            sender.sendMessage(mH.stringMessageToComponent("reports", "already-submitted"))
+        if (plugin.reportService.hasReachedOpenReportLimit(sender)) {
+            val limit = plugin.config.getInt("reports.max-open-per-reporter", 3).coerceAtLeast(1)
+            sender.sendMessage(mH.stringMessageToComponent("reports", "report-limit-reached", mapOf("limit" to limit.toString())))
             return
         }
 

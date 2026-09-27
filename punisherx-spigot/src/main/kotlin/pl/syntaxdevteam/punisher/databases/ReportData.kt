@@ -39,6 +39,7 @@ data class ReportData(
 
 sealed interface ReportSubmissionResult {
     data class Accepted(val suspectReportCount: Int) : ReportSubmissionResult
-    data object ReporterAlreadyHasOpenReport : ReportSubmissionResult
+    data object ReporterAlreadyReportedSuspect : ReportSubmissionResult
+    data object ReporterReachedOpenReportLimit : ReportSubmissionResult
     data object DatabaseError : ReportSubmissionResult
 }

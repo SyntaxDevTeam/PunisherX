@@ -38,6 +38,8 @@ reports:
   usage: "Poprawne użycie: <gold>/report [gracz] [powód]"
   cannot-report-self: "<red>Nie możesz zgłosić samego siebie!</red>"
   already-submitted: "<red>Masz już otwarte zgłoszenie. Obsługa musi je zamknąć, zanim wyślesz kolejne.</red>"
+  already-reported-target: "<red>Masz już otwarte zgłoszenie na tego gracza. Poczekaj, aż obsługa je zamknie.</red>"
+  report-limit-reached: "<red>Osiągnięto limit <limit> otwartych zgłoszeń. Poczekaj, aż obsługa zamknie jedno z nich.</red>"
   invalid-reason: "<red>Powód zgłoszenia musi mieć od 3 do 255 znaków.</red>"
   no-targets: "<yellow>Nie ma graczy online ani niedawno rozłączonych, których można zgłosić.</yellow>"
   invalid-form: "<red>Formularz zawierał nieprawidłowe dane. Otwórz go ponownie.</red>"

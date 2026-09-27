@@ -1,4 +1,4 @@
-config-version: 164
+config-version: 165
 
 # /********************************************/
 #    Global settings
@@ -164,6 +164,9 @@ reports:
   # /reports lists open reports; /reports history lists resolved/rejected reports.
   # Closing a report allows its author to submit another one.
   page-size: 10
+  # Maximum number of open reports one player may have submitted at once.
+  # Only one open report from the same reporter against the same player is allowed.
+  max-open-per-reporter: 3
   # Paper 1.21.7+ uses native dialogs for the staff report inbox.
   # Older Paper versions and Spigot keep the inventory/chat interface.
   admin-use-dialogs: true
