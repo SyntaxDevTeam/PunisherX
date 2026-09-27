@@ -5,6 +5,7 @@ import java.io.InputStreamReader
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class ReportMessagesTest {
 
@@ -49,5 +50,51 @@ class ReportMessagesTest {
                 assertFalse(value.isBlank(), "Empty $key in $resource")
             }
         }
+    }
+
+    @Test
+    fun `bundled languages preserve Polish runtime placeholders`() {
+        val polish = loadLanguage("pl")
+        val mismatches = mutableListOf<String>()
+        val runtimePlaceholders = setOf(
+            "player", "ip", "world", "locationx", "locationy", "locationz", "radius",
+            "reason", "time", "id", "message", "warn_no", "template", "level", "type",
+            "uuid", "operator", "server", "reporter", "target", "count", "limit", "page",
+            "reporter_uuid", "target_uuid", "filed_at", "handled_by", "handled_at", "note",
+            "servername", "daily", "tps", "onlineplayers", "totalplayers", "onlinestr",
+            "totalstr", "lastactive", "playerip", "punishments", "punishstr", "geo",
+            "lastseen", "lastlocation", "logout", "offlinetime", "punishment", "date",
+            "start", "end", "list"
+        )
+        bundledLanguages.filterNot { it == "pl" }.forEach { language ->
+            val translation = loadLanguage(language)
+            (requiredGuiKeys + requiredReportKeys)
+                .filterNot { it.endsWith("usage") }
+                .forEach { key ->
+                    val expected = placeholders(polish.get(key), runtimePlaceholders)
+                    val actual = placeholders(translation.get(key), runtimePlaceholders)
+                    if (expected != actual) {
+                        mismatches += "messages_$language.yml: $key expected=$expected actual=$actual"
+                    }
+                }
+        }
+        assertTrue(mismatches.isEmpty(), mismatches.joinToString("\n"))
+    }
+
+    private fun loadLanguage(language: String): YamlConfiguration {
+        val resource = "/lang/messages_${language}.yml"
+        val stream = assertNotNull(javaClass.getResourceAsStream(resource), "Missing $resource")
+        return stream.use { YamlConfiguration.loadConfiguration(InputStreamReader(it, Charsets.UTF_8)) }
+    }
+
+    private fun placeholders(value: Any?, allowed: Set<String>): Set<String> {
+        val strings = when (value) {
+            is String -> listOf(value)
+            is List<*> -> value.filterIsInstance<String>()
+            else -> emptyList()
+        }
+        return strings.flatMap { text ->
+            Regex("<([A-Za-z_][A-Za-z0-9_-]*)>").findAll(text).map { it.groupValues[1] }.toList()
+        }.filterTo(mutableSetOf()) { it in allowed }
     }
 }
