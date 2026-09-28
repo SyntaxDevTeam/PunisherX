@@ -108,6 +108,7 @@ dependencies {
     compileOnly("dev.faststats.metrics:bukkit:0.30.1")
 
     testImplementation(kotlin("test"))
+    testImplementation("org.xerial:sqlite-jdbc:3.53.2.1")
     testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     testImplementation("org.mockito:mockito-core:5.23.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
