@@ -122,6 +122,46 @@ class PunishmentCache(private val plugin: PunisherX) {
             .filterValues { it.endTime > System.currentTimeMillis() || it.endTime == -1L }
             .mapValues { it.value.endTime }
 
+    internal fun identityMigrationEvidence(sourceUuid: UUID): Boolean =
+        cache.getIfPresent(sourceUuid) != null || readCacheEntries().containsKey(sourceUuid.toString())
+
+    internal fun identityMigrationTargetExists(targetUuid: UUID): Boolean =
+        cache.getIfPresent(targetUuid) != null || readCacheEntries().containsKey(targetUuid.toString())
+
+    internal fun migrateIdentityCache(migrationId: UUID, sourceUuid: UUID, targetUuid: UUID): Boolean {
+        require(sourceUuid != targetUuid)
+        val entries = readCacheEntries()
+        val source = entries[sourceUuid.toString()] ?: return false
+        check(!entries.containsKey(targetUuid.toString())) {
+            "PunisherX jail cache already contains target UUID"
+        }
+        val backup = identityMigrationBackup(migrationId)
+        if (!backup.exists()) {
+            backup.parentFile.mkdirs()
+            backup.writeText(if (cacheFile.exists()) cacheFile.readText() else "{}")
+        }
+        entries.remove(sourceUuid.toString())
+        entries[targetUuid.toString()] = source
+        cacheFile.writeText(gson.toJson(entries))
+        cache.invalidate(sourceUuid)
+        cache.put(targetUuid, source)
+        return true
+    }
+
+    internal fun rollbackIdentityCache(migrationId: UUID): Boolean {
+        val backup = identityMigrationBackup(migrationId)
+        if (!backup.exists()) return false
+        cacheFile.writeText(backup.readText())
+        cache.invalidateAll()
+        readCacheEntries().forEach { (key, value) ->
+            runCatching { UUID.fromString(key) }.getOrNull()?.let { cache.put(it, value) }
+        }
+        return true
+    }
+
+    private fun identityMigrationBackup(migrationId: UUID): File =
+        File(plugin.dataFolder, "identity-migration-backups/$migrationId/jail-cache.json")
+
     fun getReleaseLocation(uuid: UUID): Location? {
         val cached = cache.getIfPresent(uuid)
         val storedLocation = cached?.returnLocation?.toLocation()

@@ -647,10 +647,32 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun overwritePlayerCache(lines: List<String>) {
         try {
-            execute("DELETE FROM playercache")
-            lines.forEach { execute("INSERT INTO playercache (data) VALUES (?)", it) }
+            replacePlayerCacheLinesTransactional(lines)
         } catch (e: Exception) {
             logger.err("Failed to overwrite player cache. ${e.message}")
+        }
+    }
+
+    internal fun replacePlayerCacheLinesTransactional(lines: List<String>) {
+        db.getConnection().use { connection ->
+            val autoCommit = connection.autoCommit
+            try {
+                connection.autoCommit = false
+                connection.createStatement().use { it.executeUpdate("DELETE FROM playercache") }
+                connection.prepareStatement("INSERT INTO playercache (data) VALUES (?)").use { statement ->
+                    lines.forEach { line ->
+                        statement.setString(1, line)
+                        statement.addBatch()
+                    }
+                    if (lines.isNotEmpty()) statement.executeBatch()
+                }
+                connection.commit()
+            } catch (failure: Throwable) {
+                runCatching { connection.rollback() }
+                throw failure
+            } finally {
+                connection.autoCommit = autoCommit
+            }
         }
     }
 
