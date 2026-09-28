@@ -4,6 +4,8 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.mariadb.jdbc.DatabaseMetaData
 import pl.syntaxdevteam.core.database.*
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.identity.PunisherIdentityMigrationBridgeResult
+import pl.syntaxdevteam.punisher.identity.PunisherIdentityMigrationStore
 import java.io.File
 import java.io.IOException
 import java.sql.Statement
@@ -207,6 +209,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
             )
         )
         db.createTable(bridgeQueueSchema)
+        db.getConnection().use(PunisherIdentityMigrationStore::migrateSchema)
         ready.set(true)
     }
 
@@ -675,6 +678,33 @@ class DatabaseHandler(private val plugin: PunisherX) {
             }
         }
     }
+
+    internal fun inspectIdentityMigration(
+        migrationId: UUID,
+        sourceUuid: UUID,
+        targetUuid: UUID,
+    ): PunisherIdentityMigrationBridgeResult =
+        db.getConnection().use { connection ->
+            PunisherIdentityMigrationStore.inspect(connection, migrationId, sourceUuid, targetUuid)
+        }
+
+    internal fun migrateIdentity(
+        migrationId: UUID,
+        sourceUuid: UUID,
+        targetUuid: UUID,
+    ): PunisherIdentityMigrationBridgeResult =
+        db.getConnection().use { connection ->
+            PunisherIdentityMigrationStore.migrate(connection, migrationId, sourceUuid, targetUuid)
+        }
+
+    internal fun rollbackIdentityMigration(
+        migrationId: UUID,
+        sourceUuid: UUID,
+        targetUuid: UUID,
+    ): PunisherIdentityMigrationBridgeResult =
+        db.getConnection().use { connection ->
+            PunisherIdentityMigrationStore.rollback(connection, migrationId, sourceUuid, targetUuid)
+        }
 
     // ---------------------------------------------------------------------
     // Query helpers
