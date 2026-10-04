@@ -1,4 +1,4 @@
-config-version: 165
+config-version: 166
 
 # /********************************************/
 #    Global settings
@@ -238,7 +238,7 @@ webhook:
       default: 8421504
     embed:
       title: "Event Title"
-      description: "Administrator {operator} {type} {player} for {reason} for {time}"
+      description: "Administrator {operator} {type} {player} for {reason}. Issued: {t_start}, ends: {t_end}, remaining: {time}"
       url: "https://example.com"
       timestamp: "" # ISO-8601 or "now" for current time
       thumbnail-url: "" # URL, Minecraft nick/UUID, or base64 PNG data
@@ -264,6 +264,12 @@ webhook:
           inline: false
         - name: "Time"
           value: "{time}"
+          inline: true
+        - name: "Issued at"
+          value: "{t_start}"
+          inline: true
+        - name: "Ends at"
+          value: "{t_end}"
           inline: true
         - name: "ID"
           value: "{id}"

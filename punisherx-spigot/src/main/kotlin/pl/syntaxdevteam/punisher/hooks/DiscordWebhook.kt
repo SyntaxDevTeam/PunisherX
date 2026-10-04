@@ -25,6 +25,7 @@ class DiscordWebhook(plugin: PunisherX) {
     private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
     private val log = plugin.logger
     private val mh = plugin.messageHandler
+    private val timeHandler = plugin.timeHandler
     private val synchronousDelivery = plugin.config.getString("debug", "off").equals("diag", ignoreCase = true)
     private val namedColors = mapOf(
         "black" to 0x000000,
@@ -62,7 +63,8 @@ class DiscordWebhook(plugin: PunisherX) {
      * @param adminName Administrator's name
      * @param reason Reason for the punishment
      * @param type Type of punishment (ban, mute, kick)
-     * @param duration Duration of the punishment (in milliseconds)
+     * @param start Punishment creation time (epoch milliseconds)
+     * @param end Punishment expiration time (epoch milliseconds), or -1 for permanent
      */
     fun sendPunishmentWebhook(
         playerId: String,
@@ -70,7 +72,8 @@ class DiscordWebhook(plugin: PunisherX) {
         adminName: String,
         reason: String,
         type: String,
-        duration: Long
+        start: Long,
+        end: Long
     ) {
         log.debug("[DiscordWebhook] Received a webhook delivery request.")
         log.debug("[DiscordWebhook] Validating webhook configuration (enabled=$enabled, URL configured=${webhookUrl.isNotBlank()}).")
@@ -88,7 +91,7 @@ class DiscordWebhook(plugin: PunisherX) {
             log.debug("[DiscordWebhook] Starting $deliveryMode webhook processing.")
             try {
                 log.debug("[DiscordWebhook] Building webhook placeholders.")
-                val placeholders = buildPlaceholders(playerId, playerName, adminName, reason, type, duration)
+                val placeholders = buildPlaceholders(playerId, playerName, adminName, reason, type, start, end)
                 log.debug("[DiscordWebhook] Resolving webhook embed fields.")
                 val fields = resolveFields(placeholders)
 
@@ -178,16 +181,22 @@ class DiscordWebhook(plugin: PunisherX) {
         return color ?: defaultColors.getValue("default")
     }
 
-    private fun formatDuration(duration: Long): String {
-        return if (duration == -1L) {
+    private fun formatDate(timestamp: Long): String {
+        return if (timestamp == -1L) {
             mh.stringMessageToStringNoPrefix("formatTime", "undefined")
         } else {
             val dateTime = LocalDateTime.ofInstant(
-                Instant.ofEpochMilli(duration),
+                Instant.ofEpochMilli(timestamp),
                 ZoneId.systemDefault()
             )
             dateTime.format(formatter)
         }
+    }
+
+    private fun formatRemainingTime(end: Long): String {
+        if (end == -1L) return mh.stringMessageToStringNoPrefix("formatTime", "undefined")
+        val remainingSeconds = ((end - System.currentTimeMillis()) / 1000).coerceAtLeast(0)
+        return timeHandler.formatTime(remainingSeconds.toString())
     }
 
     private fun buildPlaceholders(
@@ -196,7 +205,8 @@ class DiscordWebhook(plugin: PunisherX) {
         adminName: String,
         reason: String,
         type: String,
-        duration: Long
+        start: Long,
+        end: Long
     ): Map<String, String> {
         return mapOf(
             "id"    to playerId,
@@ -204,7 +214,9 @@ class DiscordWebhook(plugin: PunisherX) {
             "operator" to adminName,
             "reason" to reason,
             "type" to type.uppercase(),
-            "time" to formatDuration(duration),
+            "t_start" to formatDate(start),
+            "t_end" to formatDate(end),
+            "time" to formatRemainingTime(end),
         )
     }
 

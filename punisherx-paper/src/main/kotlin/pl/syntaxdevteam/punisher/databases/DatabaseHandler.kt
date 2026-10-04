@@ -373,7 +373,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     adminName = operator,
                     reason = reason,
                     type = punishmentType,
-                    duration = end
+                    start = start,
+                    end = end
                 )
             }
             punishmentId
