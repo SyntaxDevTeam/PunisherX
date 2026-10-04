@@ -36,6 +36,7 @@ import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import pl.syntaxdevteam.core.platform.ServerEnvironment
 import pl.syntaxdevteam.punisher.hooks.DiscordBridge
 import pl.syntaxdevteam.punisher.stats.FastStatsBridge
+import pl.syntaxdevteam.punisher.identity.PunisherXIdentityMigrationService
 import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
 import pl.syntaxdevteam.punisher.reports.ReportService
 import java.io.File
@@ -98,6 +99,12 @@ class PunisherX : JavaPlugin(), Listener {
         SyntaxCore.init(this, versionType = "paper")
         pluginInitializer = PluginInitializer(this)
         pluginInitializer.onEnable()
+        server.servicesManager.register(
+            PunisherXIdentityMigrationService::class.java,
+            PunisherXIdentityMigrationService(this),
+            this,
+            org.bukkit.plugin.ServicePriority.Normal,
+        )
         versionChecker.checkAndLog()
         fastStatsBridge.ready()
     }
@@ -115,6 +122,7 @@ class PunisherX : JavaPlugin(), Listener {
      * Closes the database connection and unregisters events.
      */
     override fun onDisable() {
+        server.servicesManager.unregisterAll(this)
         fastStatsBridge.shutdown()
         databaseHandler.closeConnection()
         AsyncChatEvent.getHandlerList().unregister(this as Plugin)

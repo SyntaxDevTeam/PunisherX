@@ -235,11 +235,79 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         else cacheFile.appendText("$encryptedData\n")
     }
 
+    internal fun identityMigrationEvidence(sourceUuid: UUID): Int =
+        readLines().count { line ->
+            parsePlayerInfo(decrypt(line))?.playerUUID.equals(sourceUuid.toString(), ignoreCase = true)
+        }
+
+    internal fun migrateIdentityCache(migrationId: UUID, sourceUuid: UUID, targetUuid: UUID): Int {
+        require(sourceUuid != targetUuid)
+        val original = readLines()
+        val backup = identityMigrationBackup(migrationId)
+        if (!backup.exists()) {
+            backup.parentFile.mkdirs()
+            backup.writeText(original.joinToString(separator = "\n", postfix = if (original.isEmpty()) "" else "\n"))
+        }
+        var changed = 0
+        val migrated = original.map { encrypted ->
+            val info = parsePlayerInfo(decrypt(encrypted))
+            if (info == null || !info.playerUUID.equals(sourceUuid.toString(), ignoreCase = true)) {
+                encrypted
+            } else {
+                changed++
+                encrypt(
+                    listOf(
+                        info.playerName,
+                        targetUuid.toString(),
+                        info.playerIP,
+                        info.geoLocation,
+                        info.lastUpdated,
+                    ).joinToString(separator),
+                )
+            }
+        }
+        if (changed > 0) overwriteLinesStrict(migrated)
+        return changed
+    }
+
+    internal fun rollbackIdentityCache(migrationId: UUID): Boolean {
+        val backup = identityMigrationBackup(migrationId)
+        if (!backup.exists()) return false
+        val lines = backup.readLines()
+        overwriteLinesStrict(lines)
+        return true
+    }
+
+    private fun identityMigrationBackup(migrationId: UUID): File =
+        File(plugin.dataFolder, "identity-migration-backups/$migrationId/player-cache.txt")
+
     private fun overwriteLines(lines: List<String>) {
-        if (useDatabase) plugin.databaseHandler.overwritePlayerCache(lines)
-        else {
-            cacheFile.writeText("")
-            lines.forEach { cacheFile.appendText("$it\n") }
+        runCatching { overwriteLinesStrict(lines) }
+            .onFailure { plugin.logger.err("Failed to overwrite player cache: ${it.message}") }
+    }
+
+    private fun overwriteLinesStrict(lines: List<String>) {
+        if (useDatabase) {
+            plugin.databaseHandler.replacePlayerCacheLinesTransactional(lines)
+        } else {
+            val temp = File(cacheFile.parentFile, ".${cacheFile.name}.identity-migration.tmp")
+            temp.writeText(lines.joinToString(separator = "\n", postfix = if (lines.isEmpty()) "" else "\n"))
+            try {
+                java.nio.file.Files.move(
+                    temp.toPath(),
+                    cacheFile.toPath(),
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE,
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                )
+            } catch (_: java.nio.file.AtomicMoveNotSupportedException) {
+                java.nio.file.Files.move(
+                    temp.toPath(),
+                    cacheFile.toPath(),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                )
+            } finally {
+                temp.delete()
+            }
         }
     }
 }

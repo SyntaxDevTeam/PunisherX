@@ -4,6 +4,8 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.mariadb.jdbc.DatabaseMetaData
 import pl.syntaxdevteam.core.database.*
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.identity.PunisherIdentityMigrationBridgeResult
+import pl.syntaxdevteam.punisher.identity.PunisherIdentityMigrationStore
 import java.io.File
 import java.io.IOException
 import java.sql.Statement
@@ -207,6 +209,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
             )
         )
         db.createTable(bridgeQueueSchema)
+        db.getConnection().use(PunisherIdentityMigrationStore::migrateSchema)
         ready.set(true)
     }
 
@@ -648,12 +651,61 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun overwritePlayerCache(lines: List<String>) {
         try {
-            execute("DELETE FROM playercache")
-            lines.forEach { execute("INSERT INTO playercache (data) VALUES (?)", it) }
+            replacePlayerCacheLinesTransactional(lines)
         } catch (e: Exception) {
             logger.err("Failed to overwrite player cache. ${e.message}")
         }
     }
+
+    internal fun replacePlayerCacheLinesTransactional(lines: List<String>) {
+        db.getConnection().use { connection ->
+            val autoCommit = connection.autoCommit
+            try {
+                connection.autoCommit = false
+                connection.createStatement().use { it.executeUpdate("DELETE FROM playercache") }
+                connection.prepareStatement("INSERT INTO playercache (data) VALUES (?)").use { statement ->
+                    lines.forEach { line ->
+                        statement.setString(1, line)
+                        statement.addBatch()
+                    }
+                    if (lines.isNotEmpty()) statement.executeBatch()
+                }
+                connection.commit()
+            } catch (failure: Throwable) {
+                runCatching { connection.rollback() }
+                throw failure
+            } finally {
+                connection.autoCommit = autoCommit
+            }
+        }
+    }
+
+    internal fun inspectIdentityMigration(
+        migrationId: UUID,
+        sourceUuid: UUID,
+        targetUuid: UUID,
+    ): PunisherIdentityMigrationBridgeResult =
+        db.getConnection().use { connection ->
+            PunisherIdentityMigrationStore.inspect(connection, migrationId, sourceUuid, targetUuid)
+        }
+
+    internal fun migrateIdentity(
+        migrationId: UUID,
+        sourceUuid: UUID,
+        targetUuid: UUID,
+    ): PunisherIdentityMigrationBridgeResult =
+        db.getConnection().use { connection ->
+            PunisherIdentityMigrationStore.migrate(connection, migrationId, sourceUuid, targetUuid)
+        }
+
+    internal fun rollbackIdentityMigration(
+        migrationId: UUID,
+        sourceUuid: UUID,
+        targetUuid: UUID,
+    ): PunisherIdentityMigrationBridgeResult =
+        db.getConnection().use { connection ->
+            PunisherIdentityMigrationStore.rollback(connection, migrationId, sourceUuid, targetUuid)
+        }
 
     // ---------------------------------------------------------------------
     // Query helpers
