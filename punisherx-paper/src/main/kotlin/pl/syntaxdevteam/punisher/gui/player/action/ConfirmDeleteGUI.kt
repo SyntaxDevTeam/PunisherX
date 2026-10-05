@@ -15,8 +15,10 @@ class ConfirmDeleteGUI(plugin: PunisherX) : BaseGUI(plugin) {
         gui.setItem(11, createGuiItem(Material.GREEN_WOOL, mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.confirmDelete.confirm")) { clicker ->
             clicker.closeInventory()
             target.player?.kick(mH.stringMessageToComponentNoPrefix("GUI", "PlayerAction.deleteMessage"))
-            plugin.databaseHandler.deletePlayerData(target.uniqueId.toString())
-            plugin.playerIPManager.deletePlayerInfo(target.uniqueId)
+            plugin.schedulerAdapter.runAsync(Runnable {
+                plugin.databaseHandler.deletePlayerData(target.uniqueId.toString())
+                plugin.playerIPManager.deletePlayerInfo(target.uniqueId)
+            })
         })
         gui.setItem(15, createGuiItem(Material.RED_WOOL, mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.confirmDelete.cancel")) { clicker ->
             clicker.closeInventory()

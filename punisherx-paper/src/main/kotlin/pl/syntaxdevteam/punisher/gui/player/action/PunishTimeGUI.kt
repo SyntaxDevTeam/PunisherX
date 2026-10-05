@@ -10,13 +10,30 @@ import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
 class PunishTimeGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
     fun open(player: Player, target: OfflinePlayer, type: String) {
-        val gui = createGui(3)
         val times = plugin.config.getStringList("gui.punish.times")
-        times.forEachIndexed { index, time ->
-            gui.setItem(10 + index, createGuiItem(Material.PAPER, "<yellow>$time</yellow>") { clicker ->
+        openPage(player, target, type, times, 0)
+    }
+
+    private fun openPage(player: Player, target: OfflinePlayer, type: String, times: List<String>, page: Int) {
+        val gui = createGui(5)
+        val slots = (10..16) + (19..25) + (28..34)
+        val perPage = slots.size
+        val totalPages = maxOf(1, (times.size + perPage - 1) / perPage)
+        val currentPage = page.coerceIn(0, totalPages - 1)
+        times.drop(currentPage * perPage).take(perPage).forEachIndexed { index, time ->
+            gui.setItem(slots[index], createGuiItem(Material.PAPER, "<yellow>$time</yellow>") { clicker ->
                 PunishReasonGUI(plugin).open(clicker, target, type, time)
             })
         }
+        if (currentPage > 0) gui.setItem(36, createNavGuiItem(Material.ARROW, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")) { clicker ->
+            openPage(clicker, target, type, times, currentPage - 1)
+        })
+        gui.setItem(40, createNavGuiItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")) { clicker ->
+            PunishTypeGUI(plugin).open(clicker, target)
+        })
+        if (currentPage < totalPages - 1) gui.setItem(44, createNavGuiItem(Material.ARROW, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")) { clicker ->
+            openPage(clicker, target, type, times, currentPage + 1)
+        })
         gui.open(player)
     }
 

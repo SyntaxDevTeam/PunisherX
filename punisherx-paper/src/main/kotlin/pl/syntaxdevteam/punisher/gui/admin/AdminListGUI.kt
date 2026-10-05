@@ -49,7 +49,8 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             meta.lore(
                 listOf(
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to loadMsg)),
-                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loadMsg)),
+                    if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.VIEW_IP))
+                        mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loadMsg)) else Component.empty(),
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to loadMsg)),
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to loadMsg)),
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to loadMsg)),
@@ -60,7 +61,7 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             head.itemMeta = meta
             gui.setItem(index, createGuiItem(head))
 
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
+            plugin.schedulerAdapter.runAsync(Runnable {
                 val uuid = target.uniqueId
                 val onlineStr  = PlayerStatsService.getCurrentOnlineString(uuid) ?: "Brak danych"
                 val totalStr   = PlayerStatsService.getTotalPlaytimeString(uuid) ?: "Brak danych"
@@ -69,14 +70,15 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 val punishments = plugin.databaseHandler.getActivePunishmentsString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
                 val lastActive = PlayerStatsService.getLastActiveString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
 
-                Bukkit.getScheduler().runTask(plugin, Runnable {
+                plugin.schedulerAdapter.runRegionally(player.location, Runnable {
                     if (!gui.inventory.viewers.contains(player)) return@Runnable
                     val item = gui.inventory.getItem(index) ?: return@Runnable
                     val im = item.itemMeta as SkullMeta
                     im.lore(
                         listOf(
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to target.uniqueId.toString())),
-                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to playerIP)),
+                            if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.VIEW_IP))
+                                mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to playerIP)) else Component.empty(),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to onlineStr)),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to totalStr)),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to lastActive)),

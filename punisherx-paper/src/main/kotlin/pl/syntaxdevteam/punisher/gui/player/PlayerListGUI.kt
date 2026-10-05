@@ -12,6 +12,7 @@ import pl.syntaxdevteam.punisher.gui.PunisherMain
 import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
 import pl.syntaxdevteam.punisher.gui.player.action.PlayerActionGUI
 import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 /**
  * GUI displaying currently online players.
@@ -20,19 +21,20 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
     override fun open(player: Player) {
         val online = ArrayList(plugin.server.onlinePlayers)
         online.sortBy { it.name.lowercase() }
-        open(player, 0, online)
+        open(player, 0, online, "")
     }
 
     /**
      * Opens the player list GUI for the given page.
      */
-    private fun open(player: Player, page: Int, online: List<Player>) {
+    private fun open(player: Player, page: Int, online: List<Player>, query: String) {
+        val filtered = online.filter { it.name.contains(query, ignoreCase = true) }
         val playersPerPage = 27
-        val totalPages = if (online.isEmpty()) 1 else (online.size - 1) / playersPerPage + 1
+        val totalPages = if (filtered.isEmpty()) 1 else (filtered.size - 1) / playersPerPage + 1
         val currentPage = page.coerceIn(0, totalPages - 1)
 
         val startIndex = currentPage * playersPerPage
-        val playersPage = online.drop(startIndex).take(playersPerPage)
+        val playersPage = filtered.drop(startIndex).take(playersPerPage)
 
         val gui = createGui(5)
 
@@ -45,7 +47,8 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             meta.lore(
                 listOf(
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to loading)),
-                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loading)),
+                    if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.VIEW_IP))
+                        mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loading)) else Component.empty(),
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to loading)),
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to loading)),
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to loading)),
@@ -58,7 +61,7 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 PlayerActionGUI(plugin).open(clicker, target)
             })
 
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
+            plugin.schedulerAdapter.runAsync(Runnable {
                 val uuid = target.uniqueId
                 val onlineStr = PlayerStatsService.getCurrentOnlineString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
                 val totalStr = PlayerStatsService.getTotalPlaytimeString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
@@ -67,14 +70,15 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 val punishments = plugin.databaseHandler.getActivePunishmentsString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
                 val lastActive = PlayerStatsService.getLastActiveString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
 
-                Bukkit.getScheduler().runTask(plugin, Runnable {
+                plugin.schedulerAdapter.runRegionally(player.location, Runnable {
                     if (!gui.inventory.viewers.contains(player)) return@Runnable
                     val item = gui.inventory.getItem(index) ?: return@Runnable
                     val im = item.itemMeta as SkullMeta
                     im.lore(
                         listOf(
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to target.uniqueId.toString())),
-                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to playerIP)),
+                            if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.VIEW_IP))
+                                mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to playerIP)) else Component.empty(),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to onlineStr)),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to totalStr)),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to lastActive)),
@@ -90,16 +94,21 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
         if (currentPage > 0)
             gui.setItem(36, createNavGuiItem(Material.PAPER, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")) { clicker ->
-                open(clicker, currentPage - 1, online)
+                open(clicker, currentPage - 1, online, query)
             })
 
         gui.setItem(40, createNavGuiItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")) { clicker ->
             PunisherMain(plugin).open(clicker)
         })
+        gui.setItem(39, createNavGuiItem(Material.NAME_TAG, "<yellow>Search players</yellow>") { clicker ->
+            plugin.guiSearchService.request(clicker, "<yellow>Enter player name in chat, or 'cancel'.</yellow>") { searcher, text ->
+                open(searcher, 0, online, text)
+            }
+        })
 
         if (currentPage < totalPages - 1)
             gui.setItem(44, createNavGuiItem(Material.BOOK, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")) { clicker ->
-                open(clicker, currentPage + 1, online)
+                open(clicker, currentPage + 1, online, query)
             })
 
         gui.open(player)

@@ -455,6 +455,18 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
+    fun removePunishmentById(id: Int): Boolean {
+        return try {
+            val params = mutableListOf<Any>(id)
+            val sql = appendServerFilter("DELETE FROM punishments WHERE id = ?", params, true)
+            execute(sql, *params.toTypedArray())
+            true
+        } catch (e: Exception) {
+            logger.err("Failed to remove punishment id $id. ${e.message}")
+            false
+        }
+    }
+
     fun deletePlayerData(uuid: String) {
         try {
             val punishmentsParams = mutableListOf<Any>(uuid)
@@ -856,6 +868,43 @@ class DatabaseHandler(private val plugin: PunisherX) {
         } catch (e: Exception) {
             logger.err("Failed to get banned players: ${e.message}")
             mutableListOf()
+        }
+    }
+
+    fun getActivePunishmentsFiltered(
+        types: Set<String>,
+        nameQuery: String,
+        limit: Int,
+        offset: Int
+    ): List<PunishmentData> {
+        val normalizedTypes = types.map { it.uppercase() }.filter { it in setOf("BAN", "BANIP", "JAIL", "MUTE", "WARN") }
+        val params = mutableListOf<Any>()
+        val conditions = mutableListOf<String>()
+        if (normalizedTypes.isNotEmpty()) {
+            conditions += "punishmentType IN (${normalizedTypes.joinToString(",") { "?" }})"
+            params.addAll(normalizedTypes)
+        }
+        if (nameQuery.isNotBlank()) {
+            conditions += "LOWER(name) LIKE ?"
+            params += "%${nameQuery.lowercase()}%"
+        }
+        var sql = "SELECT * FROM punishments"
+        if (conditions.isNotEmpty()) sql += " WHERE " + conditions.joinToString(" AND ")
+        sql = appendServerFilter(sql, params, conditions.isNotEmpty())
+        sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
+        params += limit
+        params += offset
+        return try {
+            query(sql, *params.toTypedArray()) { rs ->
+                PunishmentData(
+                    rs.getInt("id"), rs.getString("uuid"), rs.getString("punishmentType"),
+                    rs.getString("reason"), rs.getLong("start"), rs.getLong("endTime"),
+                    rs.getString("name"), rs.getString("operator"), rs.getString("server")
+                )
+            }.filter { plugin.punishmentManager.isPunishmentActive(it) }
+        } catch (e: Exception) {
+            logger.err("Failed to filter active punishments: ${e.message}")
+            emptyList()
         }
     }
 
