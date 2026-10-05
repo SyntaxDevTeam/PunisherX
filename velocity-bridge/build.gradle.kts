@@ -10,12 +10,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.velocitypowered:velocity-api:4.1.2-SNAPSHOT")
-    annotationProcessor("com.velocitypowered:velocity-api:4.1.2-SNAPSHOT")
-    implementation("com.zaxxer:HikariCP:7.1.0") {
+    compileOnly(libs.velocity.api)
+    annotationProcessor(libs.velocity.api)
+    implementation(libs.hikari) {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-    implementation("com.mysql:mysql-connector-j:26.7.0")
+    implementation(libs.mysql.connector)
 }
 
 extensions.configure<KotlinJvmProjectExtension> {

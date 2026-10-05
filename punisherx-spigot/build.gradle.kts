@@ -96,64 +96,84 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.21.11-R0.2-SNAPSHOT")
-    implementation("net.byteflux:libby-bukkit:1.3.2")
+    compileOnly(libs.spigot.api)
+    implementation(libs.libby.bukkit)
 
-    compileOnly("pl.syntaxdevteam:syntaxcore:1.4.1-R0.1-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:messageHandler-spigot:1.3.0-R0.1-SNAPSHOT")
+    compileOnly(libs.syntaxcore)
+    compileOnly(libs.messagehandler.spigot)
 
-    compileOnly("org.eclipse.aether:aether-api:1.1.0")
-    compileOnly("org.yaml:snakeyaml:2.7")
-    compileOnly("com.google.code.gson:gson:2.14.0")
-    compileOnly("com.maxmind.geoip2:geoip2:5.2.0")
-    compileOnly("org.apache.ant:ant:1.10.18")
-    compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
-    compileOnly("dev.triumphteam:triumph-gui:3.1.13")
+    compileOnly(libs.aether.api)
+    compileOnly(libs.snakeyaml)
+    compileOnly(libs.gson)
+    compileOnly(libs.geoip)
+    compileOnly(libs.ant)
+    compileOnly(libs.boosted.yaml)
+    compileOnly(libs.triumph.gui)
 
-    compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.4")
-    compileOnly("net.kyori:adventure-nbt:5.2.0")
-    compileOnly("net.kyori:adventure-api:5.2.0")
-    compileOnly("net.kyori:adventure-key:5.2.0")
-    compileOnly("net.kyori:adventure-platform-api:4.4.1")
-    compileOnly("net.kyori:adventure-platform-bukkit:4.4.1")
-    compileOnly("net.kyori:adventure-platform-facet:4.4.1")
-    compileOnly("net.kyori:adventure-text-minimessage:5.2.0")
-    compileOnly("net.kyori:adventure-text-serializer-json:5.2.0")
-    compileOnly("net.kyori:adventure-text-serializer-gson:5.2.0")
-    compileOnly("net.kyori:adventure-text-serializer-legacy:5.2.0")
-    compileOnly("net.kyori:adventure-text-serializer-plain:5.2.0")
-    compileOnly("net.kyori:adventure-text-serializer-ansi:5.2.0")
-    compileOnly("net.kyori:examination-api:1.3.0")
-    compileOnly("net.kyori:examination-string:1.3.0")
-    compileOnly("net.kyori:option:1.1.0")
+    compileOnly(libs.caffeine)
+    compileOnly(libs.adventure.nbt)
+    compileOnly(libs.adventure.api)
+    compileOnly(libs.adventure.key)
+    compileOnly(libs.adventure.platform.api)
+    compileOnly(libs.adventure.platform.bukkit)
+    compileOnly(libs.adventure.platform.facet)
+    compileOnly(libs.adventure.minimessage)
+    compileOnly(libs.adventure.json)
+    compileOnly(libs.adventure.gson)
+    compileOnly(libs.adventure.legacy)
+    compileOnly(libs.adventure.plain)
+    compileOnly(libs.adventure.ansi)
+    compileOnly(libs.examination.api)
+    compileOnly(libs.examination.string)
+    compileOnly(libs.kyori.option)
 
-    compileOnly("net.luckperms:api:5.5")
-    compileOnly("me.clip:placeholderapi:2.12.3")
-    compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.1.0")
-    compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
-    compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.15")
-    compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2") {
+    compileOnly(libs.luckperms.api)
+    compileOnly(libs.placeholderapi)
+    compileOnly(libs.miniplaceholders.kotlin)
+    compileOnly(libs.vault.api)
+    compileOnly(libs.vault.unlocked.api)
+    compileOnly(libs.essentialsx.spawn) {
         isTransitive = false
     }
-    compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
-    compileOnly("dev.faststats.metrics:bukkit:0.30.1")
+    compileOnly(libs.dscbridge.api)
+    compileOnly(libs.faststats.bukkit)
 
-    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlin.test)
 }
 
 extensions.configure<KotlinJvmProjectExtension> {
     jvmToolchain(21)
 }
 
+val runtimeLibraryVersions = mapOf(
+    "aetherVersion" to libs.versions.aether.get(),
+    "snakeyamlVersion" to libs.versions.snakeyaml.get(),
+    "gsonVersion" to libs.versions.gson.get(),
+    "caffeineVersion" to libs.versions.caffeine.get(),
+    "adventureVersion" to libs.versions.adventure.core.get(),
+    "adventurePlatformVersion" to libs.versions.adventure.platform.get(),
+    "examinationVersion" to libs.versions.examination.get(),
+    "optionVersion" to libs.versions.kyori.option.get(),
+    "triumphGuiVersion" to libs.versions.triumph.gui.get(),
+    "geoipVersion" to libs.versions.geoip.get(),
+    "antVersion" to libs.versions.ant.get(),
+    "faststatsVersion" to libs.versions.faststats.get(),
+    "syntaxcoreVersion" to libs.versions.syntaxcore.get(),
+    "messagehandlerVersion" to libs.versions.messagehandler.get(),
+)
+
 tasks.processResources {
     val props = mapOf(
         "version" to version,
         "description" to project.description
     )
-    inputs.properties(props)
+    inputs.properties(props + runtimeLibraryVersions)
     filteringCharset = "UTF-8"
     filesMatching(listOf("plugin.yml")) {
         expand(props)
+    }
+    filesMatching("spigot-libraries.yml") {
+        expand(runtimeLibraryVersions)
     }
 }
 

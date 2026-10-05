@@ -1,17 +1,17 @@
 plugins {
-    kotlin("jvm") version "2.4.20" apply false
-    id("com.gradleup.shadow") version "9.6.1" apply false
-    id("org.jetbrains.dokka-javadoc") version "2.2.0" apply false
-    id("io.papermc.hangar-publish-plugin") version "0.1.4" apply false
-    id("xyz.jpenilla.run-paper") version "3.1.0" apply false
-    id("pl.syntaxdevteam.plugindeployer") version "1.0.6-R0.2-SNAPSHOT" apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.shadow) apply false
+    alias(libs.plugins.dokka.javadoc) apply false
+    alias(libs.plugins.hangar) apply false
+    alias(libs.plugins.run.paper) apply false
+    alias(libs.plugins.plugindeployer) apply false
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = property("punisherxVersion") as String
+version = "1.7.8-DEV"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
-val bridgeVersion = property("bridgeVersion") as String
+val bridgeVersion = "1.1.1-R0.1-SNAPSHOT"
 
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
@@ -25,8 +25,15 @@ subprojects {
 
 tasks.register("buildAll") {
     group = "build"
-    description = "Builds both Paper and Spigot versions of the plugin"
-    dependsOn(":punisherx-paper:build", ":punisherx-spigot:build")
+    description = "Builds all enabled PunisherX server and proxy modules"
+    val enabledBuilds = listOf(
+        ":punisherx-paper",
+        ":punisherx-spigot",
+        ":PunisherX-Velocity-Bridge",
+        ":PunisherX-BungeeCord-Bridge",
+    ).filter { findProject(it) != null }
+        .map { "$it:build" }
+    dependsOn(enabledBuilds)
 }
 
 tasks.register("deploySpigotOnly") {

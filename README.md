@@ -17,6 +17,16 @@ PunisherX supports message customization with MiniMessage/Legacy/plain formats, 
 
 The Paper implementation uses Paper-only APIs and is therefore not copied into the Spigot module. Shared logic must be extracted behind platform adapters before native Spigot support can be completed.
 
+## 🛠️ Building
+
+Build every enabled server and proxy module with:
+
+```bash
+./gradlew clean buildAll
+```
+
+The PunisherX and bridge release versions are declared in the root `build.gradle.kts`. Versions of Gradle plugins, platform APIs, runtime libraries, integrations, and test dependencies have one source of truth in `gradle/libs.versions.toml`. The Paper and Spigot runtime manifests are expanded from the same catalog during `processResources`.
+
 ## ✅ Key Features
 * [x] Built for Paper 1.20.6, 1.21 - 1.21.11, 26.1-26.1.2 and compatible forks, including improved Folia support.
 * [x] Actively maintained with up-to-date APIs and backward compatibility.

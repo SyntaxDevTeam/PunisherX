@@ -11,14 +11,16 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.md-5:bungeecord-api:1.21-R0.4")
-    implementation("com.zaxxer:HikariCP:7.1.0")
-    implementation("com.mysql:mysql-connector-j:26.7.0")
+    compileOnly(libs.bungeecord.api)
+    implementation(libs.hikari)
+    implementation(libs.mysql.connector)
 }
+
+val brigadierCoordinates = libs.brigadier.get().toString()
 
 configurations.configureEach {
     resolutionStrategy.dependencySubstitution {
-        substitute(module("net.md-5:brigadier")).using(module("com.mojang:brigadier:1.0.500"))
+        substitute(module("net.md-5:brigadier")).using(module(brigadierCoordinates))
     }
 }
 

@@ -1,0 +1,116 @@
+[versions]
+kotlin = "2.4.20"
+shadow = "9.6.1"
+dokka = "2.2.0"
+hangar = "0.1.4"
+run-paper-plugin = "3.1.0"
+plugindeployer = "1.0.6-R0.2-SNAPSHOT"
+
+paper-api = "1.21.11-R0.1-SNAPSHOT"
+spigot-api = "1.21.11-R0.2-SNAPSHOT"
+velocity-api = "4.1.2-SNAPSHOT"
+bungeecord-api = "1.21-R0.4"
+brigadier = "1.0.500"
+
+syntaxcore = "1.4.1-R0.1-SNAPSHOT"
+messagehandler = "1.3.0-R0.1-SNAPSHOT"
+libby = "1.3.2"
+aether = "1.1.0"
+snakeyaml = "2.7"
+gson = "2.14.0"
+geoip = "5.2.0"
+ant = "1.10.18"
+caffeine = "3.2.4"
+boosted-yaml = "1.3.7"
+triumph-gui = "3.1.13"
+adventure-core = "5.2.0"
+adventure-platform = "4.4.1"
+examination = "1.3.0"
+kyori-option = "1.1.0"
+
+luckperms = "5.5"
+placeholderapi = "2.12.3"
+miniplaceholders = "3.1.0"
+vault = "1.7.1"
+vault-unlocked = "2.15"
+essentialsx = "2.21.2"
+dscbridge = "1.0.0-R0.7-SNAPSHOT"
+faststats = "0.30.1"
+
+sqlite = "3.53.2.1"
+mockito = "5.23.0"
+mockito-inline = "5.2.0"
+mockito-kotlin = "6.3.0"
+byte-buddy-agent = "1.18.13-jdk5"
+
+hikari = "7.1.0"
+mysql = "26.7.0"
+paper-run = "26.3"
+folia-run = "26.2"
+
+[libraries]
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+
+paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper-api" }
+spigot-api = { module = "org.spigotmc:spigot-api", version.ref = "spigot-api" }
+velocity-api = { module = "com.velocitypowered:velocity-api", version.ref = "velocity-api" }
+bungeecord-api = { module = "net.md-5:bungeecord-api", version.ref = "bungeecord-api" }
+brigadier = { module = "com.mojang:brigadier", version.ref = "brigadier" }
+
+syntaxcore = { module = "pl.syntaxdevteam:syntaxcore", version.ref = "syntaxcore" }
+messagehandler-paper = { module = "pl.syntaxdevteam:messageHandler-paper", version.ref = "messagehandler" }
+messagehandler-spigot = { module = "pl.syntaxdevteam:messageHandler-spigot", version.ref = "messagehandler" }
+libby-bukkit = { module = "net.byteflux:libby-bukkit", version.ref = "libby" }
+aether-api = { module = "org.eclipse.aether:aether-api", version.ref = "aether" }
+snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+geoip = { module = "com.maxmind.geoip2:geoip2", version.ref = "geoip" }
+ant = { module = "org.apache.ant:ant", version.ref = "ant" }
+caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
+boosted-yaml = { module = "dev.dejvokep:boosted-yaml", version.ref = "boosted-yaml" }
+triumph-gui = { module = "dev.triumphteam:triumph-gui", version.ref = "triumph-gui" }
+
+adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure-core" }
+adventure-key = { module = "net.kyori:adventure-key", version.ref = "adventure-core" }
+adventure-nbt = { module = "net.kyori:adventure-nbt", version.ref = "adventure-core" }
+adventure-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure-core" }
+adventure-json = { module = "net.kyori:adventure-text-serializer-json", version.ref = "adventure-core" }
+adventure-gson = { module = "net.kyori:adventure-text-serializer-gson", version.ref = "adventure-core" }
+adventure-legacy = { module = "net.kyori:adventure-text-serializer-legacy", version.ref = "adventure-core" }
+adventure-plain = { module = "net.kyori:adventure-text-serializer-plain", version.ref = "adventure-core" }
+adventure-ansi = { module = "net.kyori:adventure-text-serializer-ansi", version.ref = "adventure-core" }
+adventure-platform-api = { module = "net.kyori:adventure-platform-api", version.ref = "adventure-platform" }
+adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform" }
+adventure-platform-facet = { module = "net.kyori:adventure-platform-facet", version.ref = "adventure-platform" }
+examination-api = { module = "net.kyori:examination-api", version.ref = "examination" }
+examination-string = { module = "net.kyori:examination-string", version.ref = "examination" }
+kyori-option = { module = "net.kyori:option", version.ref = "kyori-option" }
+
+luckperms-api = { module = "net.luckperms:api", version.ref = "luckperms" }
+placeholderapi = { module = "me.clip:placeholderapi", version.ref = "placeholderapi" }
+miniplaceholders-kotlin = { module = "io.github.miniplaceholders:miniplaceholders-kotlin-ext", version.ref = "miniplaceholders" }
+vault-api = { module = "com.github.milkbowl:VaultAPI", version.ref = "vault" }
+vault-unlocked-api = { module = "net.milkbowl.vault:VaultUnlockedAPI", version.ref = "vault-unlocked" }
+essentialsx-spawn = { module = "net.essentialsx:EssentialsXSpawn", version.ref = "essentialsx" }
+dscbridge-api = { module = "pl.syntaxdevteam:DscBridgeAPI", version.ref = "dscbridge" }
+faststats-core = { module = "dev.faststats.metrics:core", version.ref = "faststats" }
+faststats-config = { module = "dev.faststats.metrics:config", version.ref = "faststats" }
+faststats-bukkit = { module = "dev.faststats.metrics:bukkit", version.ref = "faststats" }
+
+sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito-inline" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
+byte-buddy-agent = { module = "net.bytebuddy:byte-buddy-agent", version.ref = "byte-buddy-agent" }
+
+hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+mysql-connector = { module = "com.mysql:mysql-connector-j", version.ref = "mysql" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+dokka-javadoc = { id = "org.jetbrains.dokka-javadoc", version.ref = "dokka" }
+hangar = { id = "io.papermc.hangar-publish-plugin", version.ref = "hangar" }
+run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper-plugin" }
+plugindeployer = { id = "pl.syntaxdevteam.plugindeployer", version.ref = "plugindeployer" }

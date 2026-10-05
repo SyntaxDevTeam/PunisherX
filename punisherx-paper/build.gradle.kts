@@ -13,7 +13,6 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = property("punisherxVersion") as String
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val targetJavaVersion = 21
@@ -81,44 +80,40 @@ repositories {
 val mockitoAgent = configurations.create("mockitoAgent")
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    //compileOnly("io.papermc.paper:paper-api:26.2.build.+")
-    //compileOnly("org.leavesmc.leaves:leaves-api:1.21.10-R0.1-SNAPSHOT")
-    //compileOnly("dev.folia:folia-api:1.21.11-R0.1-SNAPSHOT")
-    //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:syntaxcore:1.4.0-R0.1-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.3.0-R0.1-SNAPSHOT")
+    compileOnly(libs.paper.api)
+    compileOnly(libs.syntaxcore)
+    compileOnly(libs.messagehandler.paper)
 
-    compileOnly("org.eclipse.aether:aether-api:1.1.0")
-    compileOnly("org.yaml:snakeyaml:2.7")
-    compileOnly("com.google.code.gson:gson:2.14.0")
-    compileOnly("com.maxmind.geoip2:geoip2:5.2.0")
-    compileOnly("org.apache.ant:ant:1.10.18")
-    compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.4")
-    compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
-    compileOnly("dev.triumphteam:triumph-gui:3.1.13")
+    compileOnly(libs.aether.api)
+    compileOnly(libs.snakeyaml)
+    compileOnly(libs.gson)
+    compileOnly(libs.geoip)
+    compileOnly(libs.ant)
+    compileOnly(libs.caffeine)
+    compileOnly(libs.boosted.yaml)
+    compileOnly(libs.triumph.gui)
 
-    compileOnly("net.kyori:adventure-nbt:5.2.0")
+    compileOnly(libs.adventure.nbt)
 
-    compileOnly("net.luckperms:api:5.5")
-    compileOnly("me.clip:placeholderapi:2.12.3")
-    compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.1.0")
-    compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
-    compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.15")
-    compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2"){
+    compileOnly(libs.luckperms.api)
+    compileOnly(libs.placeholderapi)
+    compileOnly(libs.miniplaceholders.kotlin)
+    compileOnly(libs.vault.api)
+    compileOnly(libs.vault.unlocked.api)
+    compileOnly(libs.essentialsx.spawn) {
         isTransitive = false
     }
-    compileOnly("pl.syntaxdevteam:DscBridgeAPI:1.0.0-R0.7-SNAPSHOT")
+    compileOnly(libs.dscbridge.api)
 
-    compileOnly("dev.faststats.metrics:bukkit:0.30.1")
+    compileOnly(libs.faststats.bukkit)
 
-    testImplementation(kotlin("test"))
-    testImplementation("org.xerial:sqlite-jdbc:3.53.2.1")
-    testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    testImplementation("org.mockito:mockito-core:5.23.0")
-    testImplementation("org.mockito:mockito-inline:5.2.0")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:6.3.0")
-    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.13-jdk5") {
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.sqlite.jdbc)
+    testImplementation(libs.paper.api)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.mockito.kotlin)
+    mockitoAgent(libs.byte.buddy.agent) {
         isTransitive = false
     }
 }
@@ -133,25 +128,43 @@ tasks {
     }
     runServer {
         javaLauncher.set(serverJavaLauncher)
-        minecraftVersion("26.3")
+        minecraftVersion(libs.versions.paper.run.get())
         runDirectory(rootProject.file("run/paper"))
     }
     runPaper.folia.registerTask {
         javaLauncher.set(serverJavaLauncher)
-        minecraftVersion("26.2")
+        minecraftVersion(libs.versions.folia.run.get())
         runDirectory(rootProject.file("run/folia"))
     }
 }
+
+val runtimeLibraryVersions = mapOf(
+    "kotlinVersion" to libs.versions.kotlin.get(),
+    "aetherVersion" to libs.versions.aether.get(),
+    "snakeyamlVersion" to libs.versions.snakeyaml.get(),
+    "gsonVersion" to libs.versions.gson.get(),
+    "caffeineVersion" to libs.versions.caffeine.get(),
+    "adventureVersion" to libs.versions.adventure.core.get(),
+    "triumphGuiVersion" to libs.versions.triumph.gui.get(),
+    "geoipVersion" to libs.versions.geoip.get(),
+    "antVersion" to libs.versions.ant.get(),
+    "faststatsVersion" to libs.versions.faststats.get(),
+    "syntaxcoreVersion" to libs.versions.syntaxcore.get(),
+    "messagehandlerVersion" to libs.versions.messagehandler.get(),
+)
 
 tasks.processResources {
     val props = mapOf(
         "version" to version,
         "description" to description
     )
-    inputs.properties(props)
+    inputs.properties(props + runtimeLibraryVersions)
     filteringCharset = "UTF-8"
     filesMatching(listOf("paper-plugin.yml")) {
         expand(props)
+    }
+    filesMatching("paper-libraries.yml") {
+        expand(runtimeLibraryVersions)
     }
 }
 
