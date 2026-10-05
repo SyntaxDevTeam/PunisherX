@@ -3,7 +3,9 @@ package pl.syntaxdevteam.punisher.platform
 import io.papermc.paper.threadedregions.scheduler.AsyncScheduler
 import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler
 import io.papermc.paper.threadedregions.scheduler.RegionScheduler
+import io.papermc.paper.threadedregions.scheduler.EntityScheduler
 import org.bukkit.Server
+import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitScheduler
 import org.mockito.kotlin.any
@@ -90,5 +92,19 @@ class SchedulerAdapterTest {
         adapter.runRegionally(location, task)
 
         verify(regionScheduler).execute(eq(plugin), eq(location), any())
+    }
+
+    @Test
+    fun `runForPlayer uses entity scheduler on folia`() {
+        val plugin = mock<Plugin>()
+        val player = mock<Player>()
+        val entityScheduler = mock<EntityScheduler>()
+        val task = mock<Runnable>()
+        whenever(player.scheduler).thenReturn(entityScheduler)
+
+        val adapter = BukkitSchedulerAdapter(plugin, foliaBasedOverride = true)
+        adapter.runForPlayer(player, task)
+
+        verify(entityScheduler).execute(eq(plugin), eq(task), eq(null), eq(1L))
     }
 }

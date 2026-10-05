@@ -64,7 +64,7 @@ class PunisherMain(plugin: PunisherX) : BaseGUI(plugin) {
         plugin.schedulerAdapter.runAsync(Runnable {
             val totalPlayers = plugin.playerIPManager.getAllDecryptedRecords().size.toString()
             val daily = plugin.databaseHandler.countTodayPunishments().toString()
-            plugin.schedulerAdapter.runRegionally(player.location, Runnable {
+            plugin.schedulerAdapter.runForPlayer(player, Runnable {
                 if (player.isOnline) show(player, serverName, onlinePlayers, totalPlayers, daily, time, tps)
             })
         })

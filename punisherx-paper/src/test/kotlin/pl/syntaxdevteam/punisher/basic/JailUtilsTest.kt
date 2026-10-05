@@ -4,6 +4,7 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.configuration.file.YamlConfiguration
+import org.bukkit.entity.Player
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import pl.syntaxdevteam.punisher.compatibility.platform.SchedulerAdapter
@@ -19,6 +20,7 @@ class JailUtilsTest {
         override fun runSync(task: Runnable) = task.run()
         override fun runSyncLater(delayTicks: Long, task: Runnable) = task.run()
         override fun runRegionally(location: Location, task: Runnable) = task.run()
+        override fun runForPlayer(player: Player, task: Runnable) = task.run()
         override fun isFoliaBased(): Boolean = true
     }
 

@@ -1,12 +1,12 @@
 package pl.syntaxdevteam.punisher.gui
 
-import io.papermc.paper.event.player.AsyncChatEvent
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.compatibility.*
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
@@ -20,13 +20,12 @@ class GuiSearchService(private val plugin: PunisherX) : Listener {
     }
 
     @EventHandler
-    fun onChat(event: AsyncChatEvent) {
+    fun onChat(event: AsyncPlayerChatEvent) {
         val callback = pending.remove(event.player.uniqueId) ?: return
         event.isCancelled = true
-        val query = PlainTextComponentSerializer.plainText().serialize(event.originalMessage()).trim()
+        val query = event.message.trim()
         plugin.schedulerAdapter.runForPlayer(event.player, Runnable {
-            if (query.equals("cancel", true) || query.equals("anuluj", true)) return@Runnable
-            callback(event.player, query)
+            if (!query.equals("cancel", true) && !query.equals("anuluj", true)) callback(event.player, query)
         })
     }
 

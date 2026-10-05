@@ -20,6 +20,8 @@ import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
+import pl.syntaxdevteam.punisher.gui.GuiPunishmentService
+import pl.syntaxdevteam.punisher.gui.GuiSearchService
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
 import pl.syntaxdevteam.punisher.listeners.ReloadListener
@@ -142,6 +144,8 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.versionChecker = VersionChecker(plugin)
         plugin.versionCompatibility = VersionCompatibility(plugin.versionChecker)
         plugin.guiMaterialResolver = GuiMaterialResolver(plugin.versionChecker.getSemanticVersion())
+        plugin.guiPunishmentService = GuiPunishmentService(plugin)
+        plugin.guiSearchService = GuiSearchService(plugin)
         plugin.actionExecutor = PunishmentActionExecutor(plugin)
         plugin.proxyBridgeMessenger = ProxyBridgeMessenger(plugin).also { it.registerChannel() }
         plugin.onlinePunishmentWatcher = OnlinePunishmentWatcher(plugin).also { it.start() }
@@ -177,6 +181,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.server.pluginManager.registerEvents(ModernLoginListener(plugin), plugin)
         plugin.logger.debug("Registered Spigot AsyncPlayerPreLoginEvent listener")
         plugin.server.pluginManager.registerEvents(ReloadListener(plugin), plugin)
+        plugin.server.pluginManager.registerEvents(plugin.guiSearchService, plugin)
         plugin.server.servicesManager.register(PunisherXApi::class.java, plugin.punisherXApi, plugin, ServicePriority.Normal)
         if (plugin.hookHandler.checkPlaceholderAPI()) {
             PlaceholderHandler(plugin).register()

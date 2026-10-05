@@ -6,6 +6,8 @@ import org.bukkit.entity.Player
 import org.bukkit.OfflinePlayer
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+import pl.syntaxdevteam.punisher.compatibility.*
 
 class PunishTypeGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
@@ -18,29 +20,20 @@ class PunishTypeGUI(plugin: PunisherX) : BaseGUI(plugin) {
         gui.setItem(11, createGuiItem(Material.REDSTONE_BLOCK, mH.stringMessageToStringNoPrefix("GUI", "PunishType.banip")) { clicker ->
             clicker.closeInventory()
             val reasonBan = mH.stringMessageToString("banip", "no_reasons")
-            val force = plugin.config.getBoolean("gui.punish.use_force", false)
-            val command = buildString {
-                append("banip ")
-                append(target.name)
-                append(' ')
-                append(reasonBan)
-                if (force) append(" --force")
-            }
-            clicker.performCommand(command)
+            plugin.guiPunishmentService.banIp(clicker, target, reasonBan)
         })
         gui.setItem(12, createGuiItem(Material.BLAZE_ROD, mH.stringMessageToStringNoPrefix("GUI", "PunishType.kick")) { clicker ->
             val online = target.player ?: return@createGuiItem
             clicker.closeInventory()
-            val reasonKick = mH.stringMessageToString("kick", "no_reasons")
-            val force = plugin.config.getBoolean("gui.punish.use_force", false)
-            val command = buildString {
-                append("kick ")
-                append(online.name)
-                append(' ')
-                append(reasonKick)
-                if (force) append(" --force")
+            if (!PermissionChecker.hasWithLegacy(clicker, PermissionChecker.PermissionKey.KICK)) {
+                clicker.sendMessage(mH.stringMessageToComponent("error", "no_permission")); return@createGuiItem
             }
-            clicker.performCommand(command)
+            if (!plugin.config.getBoolean("gui.punish.use_force", false) && PermissionChecker.hasWithLegacy(online, PermissionChecker.PermissionKey.BYPASS_KICK)) {
+                clicker.sendMessage(mH.stringMessageToComponent("error", "bypass", mapOf("player" to online.name))); return@createGuiItem
+            }
+            val reasonKick = mH.stringMessageToString("kick", "no_reasons")
+            online.kick(mH.stringMessageToComponent("kick", "kick_message", mapOf("player" to online.name, "operator" to clicker.name, "reason" to reasonKick)))
+            clicker.sendMessage(mH.stringMessageToComponent("kick", "kick", mapOf("player" to online.name, "reason" to reasonKick)))
         })
         gui.setItem(
             14,

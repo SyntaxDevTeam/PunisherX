@@ -2,6 +2,7 @@
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.papermc.hangarpublishplugin.model.Platforms
+import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.file.DuplicatesStrategy
 
@@ -18,6 +19,10 @@ description = "Advanced punishment system for Minecraft servers with commands li
 val targetJavaVersion = 21
 kotlin {
     jvmToolchain(targetJavaVersion)
+}
+
+val serverJavaLauncher = javaToolchains.launcherFor {
+    languageVersion.set(JavaLanguageVersion.of(25))
 }
 
 repositories {
@@ -127,10 +132,15 @@ tasks {
         jvmArgs("-javaagent:${mockitoAgent.singleFile}")
     }
     runServer {
-        minecraftVersion("26.1.1")
+        javaLauncher.set(serverJavaLauncher)
+        minecraftVersion("26.3")
         runDirectory(rootProject.file("run/paper"))
     }
-    runPaper.folia.registerTask()
+    runPaper.folia.registerTask {
+        javaLauncher.set(serverJavaLauncher)
+        minecraftVersion("26.2")
+        runDirectory(rootProject.file("run/folia"))
+    }
 }
 
 tasks.processResources {

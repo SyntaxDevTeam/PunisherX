@@ -2,6 +2,7 @@ package pl.syntaxdevteam.punisher.teleport
 
 import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import org.mockito.kotlin.mock
 import pl.syntaxdevteam.punisher.compatibility.platform.SchedulerAdapter
@@ -16,6 +17,7 @@ class SafeTeleportServiceTest {
         override fun runSync(task: Runnable) = task.run()
         override fun runSyncLater(delayTicks: Long, task: Runnable) = task.run()
         override fun runRegionally(location: Location, task: Runnable) = task.run()
+        override fun runForPlayer(player: Player, task: Runnable) = task.run()
         override fun isFoliaBased(): Boolean = false
     }
 

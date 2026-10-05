@@ -70,7 +70,7 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 val punishments = plugin.databaseHandler.getActivePunishmentsString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
                 val lastActive = PlayerStatsService.getLastActiveString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
 
-                plugin.schedulerAdapter.runRegionally(player.location, Runnable {
+                plugin.schedulerAdapter.runForPlayer(player, Runnable {
                     if (!gui.inventory.viewers.contains(player)) return@Runnable
                     val item = gui.inventory.getItem(index) ?: return@Runnable
                     val im = item.itemMeta as SkullMeta

@@ -24,7 +24,7 @@ class PlayerActionGUI(plugin: PunisherX) : BaseGUI(plugin) {
             clicker.closeInventory()
             plugin.schedulerAdapter.runAsync(Runnable {
                 val punishments = plugin.databaseHandler.getPunishments(target.uniqueId.toString())
-                plugin.schedulerAdapter.runRegionally(clicker.location, Runnable {
+                plugin.schedulerAdapter.runForPlayer(clicker, Runnable {
                     if (punishments.isEmpty()) clicker.sendMessage(mH.stringMessageToComponent("error", "no_data"))
                     else punishments.forEach { plugin.guiPunishmentService.revoke(clicker, it) }
                 })

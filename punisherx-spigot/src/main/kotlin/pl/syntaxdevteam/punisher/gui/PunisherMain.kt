@@ -1,4 +1,5 @@
 package pl.syntaxdevteam.punisher.gui
+import pl.syntaxdevteam.punisher.compatibility.*
 
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -55,14 +56,23 @@ class PunisherMain(plugin: PunisherX) : BaseGUI(plugin) {
     )
 
     override fun open(player: Player) {
-        val gui = createGui(5)
         val serverName = plugin.getServerName()
         val onlinePlayers = Bukkit.getOnlinePlayers().size.toString()
-        val totalPlayers = plugin.playerIPManager.getAllDecryptedRecords().size.toString()
-        val daily = plugin.databaseHandler.countTodayPunishments().toString()
         val uptimeSeconds = ManagementFactory.getRuntimeMXBean().uptime / 1000
         val time = plugin.timeHandler.formatTime(uptimeSeconds.toString())
         val tps = getServerTPS()
+        player.sendActionBar(mH.miniMessageFormat("<gray>Loading panel...</gray>"))
+        plugin.schedulerAdapter.runAsync(Runnable {
+            val totalPlayers = plugin.playerIPManager.getAllDecryptedRecords().size.toString()
+            val daily = plugin.databaseHandler.countTodayPunishments().toString()
+            plugin.schedulerAdapter.runForPlayer(player, Runnable {
+                if (player.isOnline) show(player, serverName, onlinePlayers, totalPlayers, daily, time, tps)
+            })
+        })
+    }
+
+    private fun show(player: Player, serverName: String, onlinePlayers: String, totalPlayers: String, daily: String, time: String, tps: String) {
+        val gui = createGui(5)
 
         menuEntries.forEach { entry ->
             val lore = when (entry.slot) {

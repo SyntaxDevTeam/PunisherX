@@ -1,6 +1,7 @@
 package pl.syntaxdevteam.punisher.compatibility.platform
 
 import org.bukkit.Location
+import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import pl.syntaxdevteam.core.platform.ServerEnvironment
 
@@ -9,6 +10,7 @@ interface SchedulerAdapter {
     fun runSync(task: Runnable)
     fun runSyncLater(delayTicks: Long, task: Runnable)
     fun runRegionally(location: Location, task: Runnable)
+    fun runForPlayer(player: Player, task: Runnable)
     fun isFoliaBased(): Boolean
 }
 
@@ -46,6 +48,14 @@ class BukkitSchedulerAdapter(
     override fun runRegionally(location: Location, task: Runnable) {
         if (foliaBased) {
             plugin.server.regionScheduler.execute(plugin, location, task)
+        } else {
+            runSync(task)
+        }
+    }
+
+    override fun runForPlayer(player: Player, task: Runnable) {
+        if (foliaBased) {
+            player.scheduler.execute(plugin, task, null, 1L)
         } else {
             runSync(task)
         }

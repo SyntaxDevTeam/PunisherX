@@ -36,7 +36,7 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         player.sendActionBar(mH.miniMessageFormat("<gray>Loading offline players...</gray>"))
         plugin.schedulerAdapter.runAsync(Runnable {
             val records = plugin.playerIPManager.getAllDecryptedRecords()
-            plugin.schedulerAdapter.runRegionally(player.location, Runnable {
+            plugin.schedulerAdapter.runForPlayer(player, Runnable {
                 if (player.isOnline) show(player, page, sort, query, records)
             })
         })
@@ -109,7 +109,7 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 val punishments = plugin.databaseHandler
                     .getPunishmentHistory(info.playerUUID, limit = 3, offset = 0)
                 val punishmentLines = punishments.map { "${it.type}: ${it.reason}" }
-                plugin.schedulerAdapter.runRegionally(player.location, Runnable {
+                plugin.schedulerAdapter.runForPlayer(player, Runnable {
                     if (!gui.inventory.viewers.contains(player)) return@Runnable
                     val item = gui.inventory.getItem(index) ?: return@Runnable
                     val im = item.itemMeta as SkullMeta

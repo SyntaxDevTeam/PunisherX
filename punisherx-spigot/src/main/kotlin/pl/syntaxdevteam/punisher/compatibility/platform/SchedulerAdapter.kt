@@ -1,6 +1,7 @@
 package pl.syntaxdevteam.punisher.compatibility.platform
 
 import org.bukkit.Location
+import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 
 interface SchedulerAdapter {
@@ -8,6 +9,7 @@ interface SchedulerAdapter {
     fun runSync(task: Runnable)
     fun runSyncLater(delayTicks: Long, task: Runnable)
     fun runRegionally(location: Location, task: Runnable)
+    fun runForPlayer(player: Player, task: Runnable)
 }
 
 class BukkitSchedulerAdapter(
@@ -27,6 +29,10 @@ class BukkitSchedulerAdapter(
     }
 
     override fun runRegionally(location: Location, task: Runnable) {
+        runSync(task)
+    }
+
+    override fun runForPlayer(player: Player, task: Runnable) {
         runSync(task)
     }
 }
