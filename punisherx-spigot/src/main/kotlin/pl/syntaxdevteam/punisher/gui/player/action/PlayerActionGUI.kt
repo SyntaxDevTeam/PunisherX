@@ -20,6 +20,19 @@ class PlayerActionGUI(plugin: PunisherX) : BaseGUI(plugin) {
         gui.setItem(11, createGuiItem(Material.MACE, mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.punish")) { clicker ->
             PunishTypeGUI(plugin).open(clicker, target)
         })
+        gui.setItem(
+            12,
+            createGuiItem(
+                Material.LIGHTNING_ROD,
+                "<gold>⚡</gold> ${mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.punish")} <dark_gray>/punish</dark_gray>"
+            ) { clicker ->
+                if (!PermissionChecker.hasWithLegacy(clicker, PermissionChecker.PermissionKey.PUNISH)) {
+                    clicker.sendMessage(mH.stringMessageToComponent("error", "no_permission"))
+                    return@createGuiItem
+                }
+                QuickPunishGUI(plugin).open(clicker, target)
+            }
+        )
 
         gui.setItem(13, createGuiItem(Material.TOTEM_OF_UNDYING, mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.undo")) { clicker ->
             clicker.closeInventory()
