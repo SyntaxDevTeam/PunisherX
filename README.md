@@ -13,7 +13,7 @@ PunisherX supports message customization with MiniMessage/Legacy/plain formats, 
 
 * `punisherx-paper` – the production Paper/Folia plugin implementation.
 * `punisherx-spigot` – the Spigot platform module prepared for a native implementation.
-* `bungee-bridge` and `velocity-bridge` – proxy synchronization bridges.
+* `punisherx-bungee-bridge` and `punisherx-velocity-bridge` – proxy synchronization bridges.
 
 The Paper implementation uses Paper-only APIs and is therefore not copied into the Spigot module. Shared logic must be extracted behind platform adapters before native Spigot support can be completed.
 

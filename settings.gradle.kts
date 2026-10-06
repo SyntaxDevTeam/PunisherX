@@ -14,16 +14,11 @@ plugins {
 
 rootProject.name = "PunisherX"
 
-private data class ModuleDefinition(
-    val projectName: String,
-    val directory: String? = null,
-)
-
 private val availableModules = linkedMapOf(
-    "paper" to ModuleDefinition("punisherx-paper"),
-    "spigot" to ModuleDefinition("punisherx-spigot"),
-    "velocity-bridge" to ModuleDefinition("PunisherX-Velocity-Bridge", "velocity-bridge"),
-    "bungee-bridge" to ModuleDefinition("PunisherX-BungeeCord-Bridge", "bungee-bridge"),
+    "paper" to "punisherx-paper",
+    "spigot" to "punisherx-spigot",
+    "velocity-bridge" to "punisherx-velocity-bridge",
+    "bungee-bridge" to "punisherx-bungee-bridge",
 )
 
 private fun normalizeModuleAlias(raw: String): String? {
@@ -31,7 +26,8 @@ private fun normalizeModuleAlias(raw: String): String? {
         "paper", "punisherx-paper" -> "paper"
         "spigot", "punisherx-spigot" -> "spigot"
         "velocity-bridge", "velocity", "punisherx-velocity-bridge" -> "velocity-bridge"
-        "bungee-bridge", "bungee", "bungeecord-bridge", "punisherx-bungeecord-bridge" -> "bungee-bridge"
+        "bungee-bridge", "bungee", "bungeecord-bridge", "punisherx-bungee-bridge",
+        "punisherx-bungeecord-bridge" -> "bungee-bridge"
         else -> null
     }
 }
@@ -76,9 +72,5 @@ val enabledModules = resolveEnabledModules()
 logger.lifecycle("PunisherX enabled build modules: ${enabledModules.joinToString(", ")}")
 
 enabledModules.forEach { module ->
-    val definition = availableModules.getValue(module)
-    include(definition.projectName)
-    definition.directory?.let { directory ->
-        project(":${definition.projectName}").projectDir = file(directory)
-    }
+    include(availableModules.getValue(module))
 }

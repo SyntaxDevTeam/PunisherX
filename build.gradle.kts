@@ -20,7 +20,7 @@ subprojects {
     apply(plugin = "org.jetbrains.dokka-javadoc")
 
     group = rootProject.group
-    version = if (name.endsWith("Bridge")) bridgeVersion else rootProject.version
+    version = if (name.endsWith("-bridge")) bridgeVersion else rootProject.version
 }
 
 tasks.register("buildAll") {
@@ -29,8 +29,8 @@ tasks.register("buildAll") {
     val enabledBuilds = listOf(
         ":punisherx-paper",
         ":punisherx-spigot",
-        ":PunisherX-Velocity-Bridge",
-        ":PunisherX-BungeeCord-Bridge",
+        ":punisherx-velocity-bridge",
+        ":punisherx-bungee-bridge",
     ).filter { findProject(it) != null }
         .map { "$it:build" }
     dependsOn(enabledBuilds)
