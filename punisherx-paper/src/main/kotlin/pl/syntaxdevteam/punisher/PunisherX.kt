@@ -148,11 +148,17 @@ class PunisherX : JavaPlugin(), Listener {
 
     override fun onDisable() {
         server.servicesManager.unregisterAll(this)
-        fastStatsBridge.shutdown()
-        databaseHandler.closeConnection()
+        runCatching { fastStatsBridge.shutdown() }
+        if (this::databaseHandler.isInitialized) {
+            databaseHandler.closeConnection()
+        }
         AsyncChatEvent.getHandlerList().unregister(this as Plugin)
-        pluginInitializer.onDisable()
-        runCatching { proxyBridgeMessenger.unregisterChannel() }
+        if (::pluginInitializer.isInitialized) {
+            pluginInitializer.onDisable()
+        }
+        if (this::proxyBridgeMessenger.isInitialized) {
+            runCatching { proxyBridgeMessenger.unregisterChannel() }
+        }
     }
 
     fun resolvePlayerUuid(identifier: String): UUID {
