@@ -100,7 +100,9 @@ class PunisherX : JavaPlugin(), Listener {
         )
         SyntaxCore.init(this, versionType = "paper")
 
-        val startupValidation = validateConfiguration()
+        // Language YAML is deliberately excluded here: MessageHandler must be able to
+        // preserve a broken translation and start on its bundled in-memory fallback.
+        val startupValidation = validateConfiguration(includeLanguageFiles = false)
         if (!startupValidation.valid) {
             startupValidation.issues.forEach { issue ->
                 super.getLogger().severe(
@@ -125,9 +127,10 @@ class PunisherX : JavaPlugin(), Listener {
     }
 
     /**
-     * Validates all runtime YAML files without modifying them.
+     * Validates runtime YAML files without modifying them.
      */
-    fun validateConfiguration(): ConfigurationValidationReport = ConfigurationPreflight(this).validate()
+    fun validateConfiguration(includeLanguageFiles: Boolean = true): ConfigurationValidationReport =
+        ConfigurationPreflight(this).validate(includeLanguageFiles)
 
     /**
      * Reloads PunisherX only after a successful read-only YAML preflight.
