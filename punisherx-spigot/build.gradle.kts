@@ -203,76 +203,22 @@ tasks.named<ShadowJar>("shadowJar") {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
 
+    relocate(
+        "net.byteflux.libby",
+        "pl.syntaxdevteam.punisher.libs.libby"
+    )
+
     dependencies {
-        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
-        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7"))
-        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8"))
-        exclude(dependency("org.jetbrains.kotlin:kotlin-reflect"))
-        exclude(dependency("org.jetbrains.kotlinx:kotlinx-coroutines-core"))
-        exclude(dependency("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8"))
-    }
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("PunisherXSpigot") {
-            artifact(tasks.named("shadowJar").get()) {
-                classifier = null
-            }
-            pom {
-                name.set("PunisherX-Spigot")
-                description.set(project.description)
-                url.set("https://github.com/SyntaxDevTeam/PunisherX")
-                licenses {
-                    license {
-                        name.set("MIT License")
-                        url.set("https://opensource.org/licenses/MIT")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("WieszczY85")
-                        name.set("WieszczY")
-                    }
-                }
-            }
-        }
-    }
-    repositories {
-        maven {
-            name = "Nexus"
-            url = uri("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
-            credentials {
-                username = findProperty("nexusUser")?.toString()
-                    ?: throw GradleException("Właściwość 'nexusUser' nie jest ustawiona w gradle.properties")
-                password = findProperty("nexusPassword")?.toString()
-                    ?: throw GradleException("Właściwość 'nexusPassword' nie jest ustawiona w gradle.properties")
-            }
-        }
-    }
-}
-
-hangarPublish {
-    publications.register("plugin") {
-        version.set(project.version as String)
-        channel.set("Release")
-        id.set("PunisherX")
-        apiKey.set(System.getenv("HANGAR_API_TOKEN"))
-
-        platforms {
-            register(Platforms.PAPER) {
-                jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-
-                val versions: List<String> = (property("spigotVersion") as String)
-                    .split(",")
-                    .map { it.trim() }
-                platformVersions.set(versions)
-            }
-        }
-        changelog.set(rootProject.file("CHANGELOG.md").readText())
+        include(dependency("net.byteflux:libby-bukkit"))
+        include(dependency("net.byteflux:libby-core"))
+        include(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
+        include(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7"))
+        include(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8"))
     }
 }
 
 plugindeployer {
-    spigot { dir = "/home/debian/server/Spigot/1.21.11/plugins" }
+    paper { dir = "/home/debian/server/Paper/26.2/plugins" } //ostatnia wersja dla Paper
+    folia { dir = "/home/debian/server/Folia/26.2/plugins" } //ostatnia wersja dla Folia
+    spigot { dir = "/home/debian/server/Spigot/26.2/plugins" } //ostatnia wersja dla Spigot
 }
