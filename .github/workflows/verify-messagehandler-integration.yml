@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - .github/workflows/verify-messagehandler-integration.yml
+      - punisherx-paper/src/**
+      - punisherx-spigot/src/**
+      - gradle/libs.versions.toml
   workflow_dispatch:
 
 permissions:
