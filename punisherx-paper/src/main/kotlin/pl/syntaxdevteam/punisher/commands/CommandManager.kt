@@ -17,12 +17,12 @@ class CommandManager(private val plugin: PunisherX) {
             commands.register(
                 "punisherx",
                 "PunisherX plugin command. Type /punisherx help to check available commands",
-                PunishesXCommands(plugin)
+                PunisherRootCommand(plugin)
             )
             commands.register(
                 "prx",
                 "PunisherX plugin command. Type /prx help to check available commands",
-                PunishesXCommands(plugin)
+                PunisherRootCommand(plugin)
             )
             commands.register(
                 "check",
