@@ -1,0 +1,49 @@
+name: Publish required MessageHandler snapshot
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/bootstrap-messagehandler.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      NEXUS_USER: ${{ secrets.NEXUS_USER }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+    steps:
+      - name: Checkout MessageHandler
+        uses: actions/checkout@v7
+        with:
+          repository: SyntaxDevTeam/MessageHandler
+          ref: main
+          path: MessageHandler
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Verify and publish snapshot
+        working-directory: MessageHandler
+        run: |
+          set -euo pipefail
+          if [ -z "${NEXUS_USER}" ] || [ -z "${NEXUS_PASSWORD}" ]; then
+            echo "Missing NEXUS_USER or NEXUS_PASSWORD secret." >&2
+            exit 1
+          fi
+          chmod +x ./gradlew
+          ./gradlew test build --console=plain --no-daemon
+          ./gradlew publish \
+            -PnexusUser="${NEXUS_USER}" \
+            -PnexusPassword="${NEXUS_PASSWORD}" \
+            --console=plain --no-daemon
