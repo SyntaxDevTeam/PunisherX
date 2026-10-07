@@ -1,5 +1,4 @@
 package pl.syntaxdevteam.punisher
-import pl.syntaxdevteam.punisher.compatibility.*
 
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
@@ -8,8 +7,8 @@ import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import pl.syntaxdevteam.core.SyntaxCore
-import pl.syntaxdevteam.core.manager.PluginManagerX
 import pl.syntaxdevteam.core.logging.Logger
+import pl.syntaxdevteam.core.manager.PluginManagerX
 import pl.syntaxdevteam.core.stats.StatsCollector
 import pl.syntaxdevteam.core.tools.UUIDManager
 import pl.syntaxdevteam.core.update.GitHubSource
@@ -17,33 +16,37 @@ import pl.syntaxdevteam.core.update.ModrinthSource
 import pl.syntaxdevteam.message.MessageHandler
 import pl.syntaxdevteam.punisher.api.PunisherXApi
 import pl.syntaxdevteam.punisher.basic.*
-import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
+import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
+import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
 import pl.syntaxdevteam.punisher.commands.CommandManager
 import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
 import pl.syntaxdevteam.punisher.common.ConfigManager
+import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
+import pl.syntaxdevteam.punisher.compatibility.VersionChecker
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
+import pl.syntaxdevteam.punisher.compatibility.platform.SchedulerAdapter
+import pl.syntaxdevteam.punisher.config.ConfigurationPreflight
+import pl.syntaxdevteam.punisher.config.ConfigurationValidationReport
 import pl.syntaxdevteam.punisher.databases.*
-import pl.syntaxdevteam.punisher.players.*
-import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
-import pl.syntaxdevteam.punisher.hooks.HookHandler
-import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
 import pl.syntaxdevteam.punisher.gui.GuiPunishmentService
 import pl.syntaxdevteam.punisher.gui.GuiSearchService
-import pl.syntaxdevteam.punisher.loader.PluginInitializer
-import pl.syntaxdevteam.punisher.inits.loader.LibraryLoader
-import pl.syntaxdevteam.punisher.compatibility.VersionChecker
-import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
-import pl.syntaxdevteam.punisher.compatibility.platform.SchedulerAdapter
-import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
-import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
-import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
+import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
 import pl.syntaxdevteam.punisher.hooks.DiscordBridge
-import pl.syntaxdevteam.punisher.stats.FastStatsBridge
-import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
+import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
+import pl.syntaxdevteam.punisher.hooks.HookHandler
+import pl.syntaxdevteam.punisher.inits.loader.LibraryLoader
+import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
+import pl.syntaxdevteam.punisher.loader.PluginInitializer
+import pl.syntaxdevteam.punisher.players.*
 import pl.syntaxdevteam.punisher.reports.ReportService
+import pl.syntaxdevteam.punisher.stats.FastStatsBridge
+import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
+import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
 import java.io.File
+import java.util.Properties
+import java.util.UUID
 import java.util.logging.Level
-import java.util.*
+
 class PunisherX : JavaPlugin(), Listener {
     private lateinit var libraryLoader: LibraryLoader
 
@@ -103,39 +106,61 @@ class PunisherX : JavaPlugin(), Listener {
         }
     }
 
-    /**
-     * Called when the plugin is enabled.
-     * Initializes the configuration, database, handlers, events, and commands.
-     */
     override fun onEnable() {
         SyntaxCore.registerUpdateSources(
             GitHubSource("SyntaxDevTeam/PunisherX"),
             ModrinthSource("VCNRcwC2")
         )
         SyntaxCore.init(this, versionType = "spigot")
+
+        val startupValidation = validateConfiguration()
+        if (!startupValidation.valid) {
+            startupValidation.issues.forEach { issue ->
+                super.getLogger().severe(
+                    "[Config validation] ${startupValidation.relativePath(issue.file)}: ${issue.error}"
+                )
+            }
+            throw IllegalStateException(
+                "PunisherX startup aborted because YAML validation failed: ${startupValidation.compactMessage()}"
+            )
+        }
+
         pluginInitializer = PluginInitializer(this)
         pluginInitializer.onEnable()
         versionChecker.checkAndLog()
         fastStatsBridge.ready()
     }
 
+    fun validateConfiguration(): ConfigurationValidationReport = ConfigurationPreflight(this).validate()
+
     /**
-     * Called when the plugin is reloaded.
-     * Reloads the configuration and reinitializes the database connection.
+     * Reloads PunisherX only after a successful read-only YAML preflight.
+     * If validation fails, the currently running plugin instance remains untouched.
      */
     fun onReload() {
+        val validation = validateConfiguration()
+        if (!validation.valid) {
+            validation.issues.forEach { issue ->
+                logger.err("[Config validation] ${validation.relativePath(issue.file)}: ${issue.error}")
+            }
+            throw IllegalStateException(
+                "Reload aborted because YAML validation failed: ${validation.compactMessage()}"
+            )
+        }
         reloadMyConfig()
     }
 
-    /**
-     * Called when the plugin is disabled.
-     * Closes the database connection and unregisters events.
-     */
     override fun onDisable() {
-        fastStatsBridge.shutdown()
-        databaseHandler.closeConnection()
-        pluginInitializer.onDisable()
-        runCatching { proxyBridgeMessenger.unregisterChannel() }
+        runCatching { fastStatsBridge.shutdown() }
+        if (this::databaseHandler.isInitialized) {
+            databaseHandler.closeConnection()
+        }
+        if (::pluginInitializer.isInitialized) {
+            pluginInitializer.onDisable()
+        }
+        if (this::proxyBridgeMessenger.isInitialized) {
+            runCatching { proxyBridgeMessenger.unregisterChannel() }
+        }
     }
 
     fun resolvePlayerUuid(identifier: String): UUID {
@@ -144,10 +169,6 @@ class PunisherX : JavaPlugin(), Listener {
         return uuidManager.getUUID(identifier)
     }
 
-
-    /**
-     * Reloads the plugin configuration and reinitializes the database connection.
-     */
     private fun reloadMyConfig() {
         pluginInitializer.onDisable()
         cancelPluginTasks()
@@ -162,11 +183,6 @@ class PunisherX : JavaPlugin(), Listener {
         server.scheduler.cancelTasks(this)
     }
 
-    /**
-     * Retrieves the server name from the server.properties file.
-     *
-     * @return The server name, or "Unknown Server" if not found.
-     */
     fun getServerName(): String {
         val properties = Properties()
         val file = File("server.properties")
