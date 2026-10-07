@@ -1,6 +1,7 @@
 package pl.syntaxdevteam.punisher.commands
 
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.compatibility.sendMessage
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 /**
