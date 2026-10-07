@@ -35,11 +35,11 @@ data class ConfigurationValidationReport(
 }
 
 /**
- * Performs a read-only validation pass over PunisherX YAML files before a reload.
+ * Performs a read-only validation pass over PunisherX YAML files.
  * No file is created, rewritten, renamed or deleted by this service.
  */
 class ConfigurationPreflight(private val plugin: PunisherX) {
-    fun validate(): ConfigurationValidationReport {
+    fun validate(includeLanguageFiles: Boolean = true): ConfigurationValidationReport {
         val issues = mutableListOf<ConfigurationValidationIssue>()
         val configFile = File(plugin.dataFolder, "config.yml")
         val config = validateYaml(configFile, issues)
@@ -47,7 +47,7 @@ class ConfigurationPreflight(private val plugin: PunisherX) {
         validateYaml(File(plugin.dataFolder, "punish-templates.yml"), issues)
         validateYaml(File(plugin.dataFolder, "DBAPI_config.yml"), issues)
 
-        if (config != null) {
+        if (includeLanguageFiles && config != null) {
             validateLanguageFiles(config, issues)
         }
 
