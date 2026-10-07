@@ -1,0 +1,65 @@
+name: Verify MessageHandler integration
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/verify-messagehandler-integration.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PunisherX
+        uses: actions/checkout@v7
+        with:
+          path: PunisherX
+
+      - name: Checkout MessageHandler
+        uses: actions/checkout@v7
+        with:
+          repository: SyntaxDevTeam/MessageHandler
+          ref: main
+          path: MessageHandler
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Publish required MessageHandler modules to runner Maven local
+        working-directory: MessageHandler
+        run: |
+          chmod +x ./gradlew
+          ./gradlew \
+            :MessageHandler-Paper:publishToMavenLocal \
+            :MessageHandler-Spigot:publishToMavenLocal \
+            --console=plain --no-daemon
+
+      - name: Prefer runner Maven local for this verification only
+        working-directory: PunisherX
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for name in ("punisherx-paper/build.gradle.kts", "punisherx-spigot/build.gradle.kts"):
+              path = Path(name)
+              text = path.read_text()
+              marker = "repositories {\n"
+              if marker not in text:
+                  raise SystemExit(f"repositories block not found in {name}")
+              path.write_text(text.replace(marker, marker + "    mavenLocal()\n", 1))
+          PY
+
+      - name: Test and build PunisherX against MessageHandler R0.2
+        working-directory: PunisherX
+        run: |
+          chmod +x ./gradlew
+          ./gradlew test build --console=plain --no-daemon
