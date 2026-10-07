@@ -7,6 +7,8 @@ on:
       - .github/workflows/verify-messagehandler-integration.yml
       - punisherx-paper/src/**
       - punisherx-spigot/src/**
+      - punisherx-paper/build.gradle.kts
+      - punisherx-spigot/build.gradle.kts
       - gradle/libs.versions.toml
   workflow_dispatch:
 
