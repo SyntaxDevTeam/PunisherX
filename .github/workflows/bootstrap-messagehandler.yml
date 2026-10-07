@@ -33,7 +33,14 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Verify and publish snapshot
+      - name: Verify MessageHandler
+        working-directory: MessageHandler
+        run: |
+          set -euo pipefail
+          chmod +x ./gradlew
+          ./gradlew test build --console=plain --no-daemon
+
+      - name: Publish Paper and Spigot snapshots
         working-directory: MessageHandler
         run: |
           set -euo pipefail
@@ -41,9 +48,28 @@ jobs:
             echo "Missing NEXUS_USER or NEXUS_PASSWORD secret." >&2
             exit 1
           fi
-          chmod +x ./gradlew
-          ./gradlew test build --console=plain --no-daemon
-          ./gradlew publish \
-            -PnexusUser="${NEXUS_USER}" \
-            -PnexusPassword="${NEXUS_PASSWORD}" \
-            --console=plain --no-daemon
+
+          publish_required() {
+            local attempt=1
+            local max_attempts=3
+            while true; do
+              if ./gradlew \
+                :MessageHandler-Paper:publishMessageHandlerPublicationToNexusRepository \
+                :MessageHandler-Spigot:publishMessageHandlerPublicationToNexusRepository \
+                -PnexusUser="${NEXUS_USER}" \
+                -PnexusPassword="${NEXUS_PASSWORD}" \
+                --console=plain --no-daemon; then
+                return 0
+              fi
+
+              if [ "$attempt" -ge "$max_attempts" ]; then
+                echo "Nexus publication failed after ${max_attempts} attempts." >&2
+                return 1
+              fi
+
+              attempt=$((attempt + 1))
+              sleep 5
+            done
+          }
+
+          publish_required
