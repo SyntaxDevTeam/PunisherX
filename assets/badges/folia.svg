@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="158" height="56" viewBox="0 0 158 56" fill="none">
+  <title>Supports Folia</title>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="158" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#299D65"/>
+      <stop offset="1" stop-color="#187346"/>
+    </linearGradient>
+  </defs>
+  <rect width="158" height="56" rx="8" fill="url(#background)"/>
+  <path d="M44 11C25 11 14 19 14 31c0 8 6 13 13 13 13 0 18-15 17-33Z" fill="white"/>
+  <path d="m18 43 19-23M25 34l-1-8m7 2 7-1" stroke="#187346" stroke-width="2.5" stroke-linecap="round"/>
+  <g fill="white" font-family="Arial, Helvetica, sans-serif">
+    <text x="60" y="24" font-size="14">Supports</text>
+    <text x="60" y="44" font-size="20" font-weight="700">Folia</text>
+  </g>
+</svg>

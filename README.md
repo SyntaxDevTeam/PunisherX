@@ -2,7 +2,13 @@
   <img src="assets/PunisherX_tiny.png" alt="PunisherX — Minecraft moderation" width="240">
   <h1>PunisherX</h1>
   <p><strong>From player reports to the right punishment — keep moderation in one place.</strong></p>
-  <p>Paper · Folia · Spigot · Velocity · BungeeCord</p>
+  <p>
+    <a href="#-download"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3.2.0/assets/cozy/supported/paper_vector.svg" alt="Supports Paper" height="56"></a>
+    <a href="#-download"><img src="assets/badges/folia.svg" alt="Supports Folia" height="56"></a>
+    <a href="#-download"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3.2.0/assets/cozy/supported/velocity_vector.svg" alt="Supports Velocity" height="56"></a>
+    <a href="#-download"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3.2.0/assets/cozy/supported/spigot_vector.svg" alt="Supports Spigot" height="56"></a>
+    <a href="#-download"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3.2.0/assets/cozy/supported/bungeecord_vector.svg" alt="Supports BungeeCord" height="56"></a>
+  </p>
 
 [![Build](https://github.com/SyntaxDevTeam/PunisherX/actions/workflows/buildexplorer.yml/badge.svg?branch=main)](https://github.com/SyntaxDevTeam/PunisherX/actions/workflows/buildexplorer.yml)
 [![Hangar Downloads](https://img.shields.io/hangar/dt/PunisherX?style=flat)](https://hangar.papermc.io/SyntaxDevTeam/PunisherX)
