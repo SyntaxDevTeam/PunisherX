@@ -1,5 +1,71 @@
 # Changelog
 
+## [1.8.0-SNAPSHOT] - Unreleased
+
+PunisherX takes a major step forward in everyday moderation: a native Spigot edition, a complete report workflow, faster access to punishment templates, and safer configuration handling. This update brings together the changes on `main` since 1.7.2.
+
+### Functional changes:
+
+* **Added a native Spigot edition.** PunisherX now has a dedicated Spigot implementation with its own command registration, scheduler and library loader, alongside the Paper/Folia edition.
+* **Expanded player reports into a complete moderation workflow.** Players can submit reports through `/report`, a GUI, or a native Paper form. Staff can browse open reports, inspect details, resolve or reject them with a reason, and review previous decisions through `/reports`.
+* Added persistent report decisions, including the handling administrator, explanation and time. Servers sharing the same database can access the same reports and their history.
+* Added protection against reporting yourself, invalid reasons and duplicate open reports against the same player. The number of open reports per reporter is configurable through `reports.max-open-per-reporter` (default: `3`).
+* Added separate permissions for reading reports and handling decisions: `punisherx.see.reports` and `punisherx.manage.reports`.
+* **Added native dialogs on Paper 1.21.7+.** Report submission and management, punishment lists in `/banlist`, `/history` and `/check`, and reason editing through `/change-reason` can use the native interface. Older Paper versions and Spigot retain inventory or chat interfaces; dialogs can be disabled in the configuration.
+* **Expanded the `/panel` moderation interface.** Added player search, more detailed punishment browsing and permission checks for player actions.
+* Added quick punishments from `punish-templates.yml` directly in the player GUI, including a preview of the next escalation level based on punishment history.
+* Added a live GUI editor for punishment duration and reason presets. Administrators can add, edit and remove presets without manually editing `config.yml`; changes are saved for future use.
+* Improved the offline player list: players known to the server are included even without an IP cache entry, the newest records are selected, and recently active players appear first by default.
+* Added logout location tracking. The panel can display the position captured when a player disconnects, with saved locations retained across server restarts.
+* Added configurable command aliases and improved command suggestions to match the entered text and relevant player lists.
+* Added Korean language resources for punishment and report messages.
+* Extended the recognized Minecraft versions to include **26.2**.
+
+### Configuration and language safety:
+
+* **Added `/prx validate` and `/punisherx validate`.** Administrators can check configuration and language YAML files without changing them.
+* Added validation before startup and `/prx reload`. If a checked YAML file is invalid, reload stops before dismantling the working plugin instance, and the invalid files are reported.
+* Missing language keys now use bundled defaults in memory instead of rewriting the administrator's language file.
+* Invalid language YAML at startup can fall back to the bundled translation. The original file is preserved, with a timestamped safety copy under `lang/backups/`.
+* Disabled the old language version migration mechanism to avoid automatic rewriting of custom translations.
+
+### Technical changes:
+
+* Reorganized the project into separate Paper, Spigot, Velocity and BungeeCord modules with selectable builds.
+* Replaced the previous inventory GUI implementation with **Triumph GUI** in both server editions.
+* Added player-aware scheduling for GUI updates and interactions, improving compatibility with Folia's region threading model.
+* Expanded the Velocity bridge with active network ban checks at login, in addition to queued punishment events. A player with an active network-wide ban can be refused at the proxy even after the original event has been processed.
+* Updated the Velocity bridge for Velocity 4. **The server plugin targets Java 21; the Velocity 4 bridge requires Java 25 or newer.**
+* Added a controlled `OFFLINE UUID -> PREMIUM UUID` migration service on Paper for integration with AuthGatewayX. It covers punishments, punishment history, reports, bridge targets, IP cache and jail cache, with migration journals, backups and rollback support.
+* Added namespaced world keys to jail and unjail locations while retaining compatibility with existing world names and older jail cache entries.
+* Improved database schema checks, including SQLite column detection and PostgreSQL handling for server-scoped punishments.
+* Added library diagnostics and runtime dependency checks, and improved runtime library loading.
+* Updated FastStats integration and added migration of its configuration.
+* Centralized dependency versions in a Gradle version catalog and updated Kotlin, Gradle, platform APIs and runtime libraries.
+* Expanded automated coverage for bundled translations, world compatibility, scheduling, UUID migration and logout location persistence, with CI checks for MessageHandler integration.
+* Added English and Polish administrator guides, plus documentation for reports, UUID migration and language safety.
+
+### Bug fixes:
+
+* **Fixed stale player cache data after repeated logins.** Existing UUID/IP entries now refresh instead of retaining the original visit date.
+* Fixed `/cache` selecting older player entries instead of the latest available records.
+* Fixed missing offline players and unavailable last logout locations in the moderation panel.
+* Fixed unsafe reload behavior when configuration files contain invalid YAML, and made Paper shutdown safe after startup validation fails.
+* Fixed language fallback initialization on Paper and Spigot, and Spigot component conversion in validation messages.
+* Corrected UUID handling in ban and jail list interfaces.
+* Improved multiline kick messages and resolved an Adventure library version conflict.
+* Adjusted chat listener priority and cancellation handling for better interaction with other chat plugins.
+* Improved GeoIP license-key validation and database preparation error handling, with contributions from **@d0ddn**.
+* Improved SQLite schema queries based on work by **@d0ddn**.
+* Fixed shaded MySQL JDBC driver discovery in the Velocity bridge.
+* Improved Discord webhook delivery diagnostics and added punishment start and end times to embed fields.
+
+## [1.7.2] - 2026-04-11
+## Changelog
+### Functional changes:
+* Added support for Minecraft 26.1.2
+* A new revolutionary statistics system, FastStats, has been added
+
 ## [1.7.1] - 2026-04-10
 * Added backward compatibility with Java and Minecraft
 
