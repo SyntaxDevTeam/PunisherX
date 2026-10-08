@@ -175,7 +175,8 @@ class PluginInitializer(private val plugin: PunisherX) {
      * Registers the plugin events.
      */
     private fun registerEvents() {
-        plugin.playerJoinListener = PlayerJoinListener(plugin.playerIPManager, plugin.punishmentChecker)
+        pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService.initialize(plugin.dataFolder)
+        plugin.playerJoinListener = PlayerJoinListener(plugin.playerIPManager, plugin.punishmentChecker, plugin)
         plugin.server.pluginManager.registerEvents(plugin.playerJoinListener, plugin)
         plugin.server.pluginManager.registerEvents(plugin.punishmentChecker, plugin)
         plugin.server.pluginManager.registerEvents(ModernLoginListener(plugin), plugin)

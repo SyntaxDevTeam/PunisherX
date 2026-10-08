@@ -31,7 +31,7 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
     }
 
     override fun open(player: Player) {
-        open(player, 0, SortMode.NAME_ASC, "")
+        open(player, 0, SortMode.LAST_SEEN_DESC, "")
     }
 
     private fun open(player: Player, page: Int, sort: SortMode, query: String) {
@@ -45,9 +45,21 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
     }
 
     private fun show(player: Player, page: Int, sort: SortMode, query: String, records: List<PlayerIPManager.PlayerInfo>) {
-        val players = records
+        val noData = mH.stringMessageToStringNoPrefix("error", "no_data")
+        val latestRecords = records.sortedByDescending { plugin.timeHandler.parseDate(it.lastUpdated) ?: 0L }
+            .distinctBy { it.playerUUID }
+        val knownPlayers = Bukkit.getOfflinePlayers().filter { !it.isOnline && it.name != null }
+            .map { off ->
+                val cached = latestRecords.firstOrNull { it.playerUUID == off.uniqueId.toString() }
+                pl.syntaxdevteam.punisher.players.PlayerIPManager.PlayerInfo(
+                    off.name!!, off.uniqueId.toString(), cached?.playerIP ?: noData,
+                    cached?.geoLocation ?: noData,
+                    PlayerStatsService.getLastSeenDate(off.uniqueId) ?: cached?.lastUpdated ?: noData
+                )
+            }
+        val players = (knownPlayers + latestRecords)
             .mapNotNull { info ->
-                val uuid = UUID.fromString(info.playerUUID)
+                val uuid = runCatching { UUID.fromString(info.playerUUID) }.getOrNull() ?: return@mapNotNull null
                 if (Bukkit.getPlayer(uuid) != null) null else info
             }
             .distinctBy { it.playerUUID }
@@ -102,7 +114,7 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                     .map { it.playerIP }
                     .distinct()
                     .take(3)
-                val ipLine = ipHistory.joinToString(", ")
+                val ipLine = ipHistory.joinToString(", ").ifEmpty { noData }
                 val geo = info.geoLocation
                 val lastLocation = PlayerStatsService.getLastLocationString(uuid)
                     ?: mH.stringMessageToStringNoPrefix("error", "no_data")

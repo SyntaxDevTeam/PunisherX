@@ -54,12 +54,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
             val geoLocation = "$city, $country"
             val lastUpdated = dateFormatter.format(Instant.now())
 
-            if (getPlayerInfo(playerName, playerUUID, playerIP) == null) {
-                savePlayerInfo(playerName, playerUUID, playerIP, geoLocation, lastUpdated)
-                plugin.logger.debug("Saved player info -> playerName: $playerName, playerUUID: $playerUUID, playerIP: $playerIP, geoLocation: $geoLocation, lastUpdated: $lastUpdated")
-            } else {
-                plugin.logger.debug("Player info already exists -> playerName: $playerName, playerUUID: $playerUUID, playerIP: $playerIP, geoLocation: $geoLocation, lastUpdated: $lastUpdated")
-            }
+            savePlayerInfo(playerName, playerUUID, playerIP, geoLocation, lastUpdated)
         })
     }
 
@@ -67,11 +62,17 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         return searchCache(playerName, playerUUID, playerIP)
     }
 
+    @Synchronized
     private fun savePlayerInfo(playerName: String, playerUUID: String, playerIP: String, geoLocation: String, lastUpdated: String) {
         val dataLine = "$playerName$separator$playerUUID$separator$playerIP$separator$geoLocation$separator$lastUpdated"
         val encryptedData = encrypt(dataLine)
-        appendLine(encryptedData)
-        plugin.logger.debug("Encrypted data saved -> $dataLine")
+        val lines = readLines()
+        val retained = lines.filter { line ->
+            val info = parsePlayerInfo(decrypt(line))
+            info == null || !info.playerUUID.equals(playerUUID, ignoreCase = true) || info.playerIP != playerIP
+        }
+        if (retained.size == lines.size) appendLine(encryptedData)
+        else overwriteLines(retained + encryptedData)
     }
 
     private fun generateKey(): Key {

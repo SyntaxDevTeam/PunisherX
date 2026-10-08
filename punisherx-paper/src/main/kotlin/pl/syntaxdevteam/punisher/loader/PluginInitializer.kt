@@ -183,7 +183,8 @@ class PluginInitializer(private val plugin: PunisherX) {
             .getOrElse {
                 VersionChecker(plugin).also { plugin.versionChecker = it }
             }
-        plugin.playerJoinListener = PlayerJoinListener(plugin.playerIPManager, plugin.punishmentChecker)
+        pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService.initialize(plugin.dataFolder)
+        plugin.playerJoinListener = PlayerJoinListener(plugin.playerIPManager, plugin.punishmentChecker, plugin)
         plugin.server.pluginManager.registerEvents(plugin.playerJoinListener, plugin)
         plugin.server.pluginManager.registerEvents(plugin.punishmentChecker, plugin)
         if (versionChecker.isAtLeast("1.21.7")) {

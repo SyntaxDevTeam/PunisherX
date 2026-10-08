@@ -21,7 +21,51 @@ import org.bukkit.Location
  */
 object PlayerStatsService {
     private val gson = Gson()
-    private val cache = mutableMapOf<UUID, Cached>()
+    private val cache = java.util.concurrent.ConcurrentHashMap<UUID, Cached>()
+    private val logoutLocations = java.util.concurrent.ConcurrentHashMap<UUID, LogoutLocation>()
+    private var locationFolder: File? = null
+
+    private data class LogoutLocation(val world: String, val x: Double, val y: Double, val z: Double)
+
+    fun initialize(dataFolder: File) {
+        locationFolder = File(dataFolder, "logout-locations")
+        logoutLocations.clear()
+    }
+
+    /** Capture on the player's thread, then persist the immutable snapshot asynchronously. */
+    fun captureLogoutLocation(uuid: UUID, location: Location): Runnable {
+        val snapshot = LogoutLocation(location.world!!.name, location.x, location.y, location.z)
+        logoutLocations[uuid] = snapshot
+        val folder = locationFolder
+        return Runnable {
+            if (folder != null) {
+                try {
+                    folder.mkdirs()
+                    synchronized(logoutLocations) {
+                        if (logoutLocations[uuid] === snapshot) {
+                            val destination = File(folder, "$uuid.json")
+                            val temporary = File(folder, "$uuid.json.tmp")
+                            temporary.writeText(gson.toJson(snapshot))
+                            java.nio.file.Files.move(
+                                temporary.toPath(), destination.toPath(),
+                                java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                            )
+                        }
+                    }
+                } catch (ex: Exception) {
+                    Bukkit.getLogger().warning("Failed to save logout location for $uuid: $ex")
+                }
+            }
+        }
+    }
+
+    private fun loadLogoutLocation(uuid: UUID): LogoutLocation? {
+        logoutLocations[uuid]?.let { return it }
+        val folder = locationFolder ?: return null
+        val file = File(folder, "$uuid.json")
+        if (!file.exists()) return null
+        return runCatching { gson.fromJson(file.readText(), LogoutLocation::class.java) }.getOrNull()
+    }
 
     private data class Cached(
         val json: JsonObject,
@@ -101,6 +145,9 @@ object PlayerStatsService {
     //TODO: Zredukować kod dla getLastLocation i getLastLocationString do jednej metody a następnie poprawić logikę w GUI w miejscu użycia tych metod.
     @Suppress("UnstableApiUsage")
     fun getLastLocationString(uuid: UUID): String? {
+        loadLogoutLocation(uuid)?.let { snapshot ->
+            return "${snapshot.world}: ${kotlin.math.floor(snapshot.x).toInt()}, ${kotlin.math.floor(snapshot.y).toInt()}, ${kotlin.math.floor(snapshot.z).toInt()}"
+        }
         return try {
             val worldFolder = Bukkit.getWorlds().firstOrNull()?.worldFolder ?: return null
             val dataFile = File(worldFolder, "playerdata/$uuid.dat")
@@ -125,6 +172,10 @@ object PlayerStatsService {
     }
 
     fun getLastLocation(uuid: UUID): Location? {
+        loadLogoutLocation(uuid)?.let { snapshot ->
+            val world = Bukkit.getWorld(snapshot.world) ?: return null
+            return Location(world, snapshot.x, snapshot.y, snapshot.z)
+        }
         return try {
             val worldFolder = Bukkit.getWorlds().firstOrNull()?.worldFolder ?: return null
             val dataFile = File(worldFolder, "playerdata/$uuid.dat")
