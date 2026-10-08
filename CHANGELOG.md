@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.8.0-SNAPSHOT] - Unreleased
+## [1.8.0-SNAPSHOT] - 2026-10-08
 
 PunisherX takes a major step forward in everyday moderation: a native Spigot edition, a complete report workflow, faster access to punishment templates, and safer configuration handling. This update brings together the changes on `main` since 1.7.2.
 
