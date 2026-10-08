@@ -19,7 +19,7 @@ PunisherX takes a major step forward in everyday moderation: a native Spigot edi
 * Added logout location tracking. The panel can display the position captured when a player disconnects, with saved locations retained across server restarts.
 * Added configurable command aliases and improved command suggestions to match the entered text and relevant player lists.
 * Added Korean language resources for punishment and report messages.
-* Extended the recognized Minecraft versions to include **26.2**.
+* Extended the recognized Minecraft versions to include **26.2** and **26.3**.
 
 ### Configuration and language safety:
 

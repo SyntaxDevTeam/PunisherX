@@ -24,7 +24,8 @@ class VersionChecker(private val plugin: PunisherX) {
             SemanticVersion(26, 1, 0),
             SemanticVersion(26, 1, 1),
             SemanticVersion(26, 1, 2),
-            SemanticVersion(26,2,0)
+            SemanticVersion(26,2,0),
+            SemanticVersion(26,3,0)
         )
 
         fun isVersionSupported(version: String): Boolean =
