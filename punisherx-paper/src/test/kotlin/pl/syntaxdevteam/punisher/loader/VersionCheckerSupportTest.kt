@@ -21,6 +21,8 @@ class VersionCheckerSupportTest {
         assertTrue(VersionChecker.isVersionSupported("26.1.0"))
         assertTrue(VersionChecker.isVersionSupported("26.2"))
         assertTrue(VersionChecker.isVersionSupported("26.2.0"))
+        assertTrue(VersionChecker.isVersionSupported("26.3"))
+        assertTrue(VersionChecker.isVersionSupported("26.3.0"))
     }
 
     @Test
@@ -28,7 +30,8 @@ class VersionCheckerSupportTest {
         assertFalse(VersionChecker.isVersionSupported("1.20.5"))
         assertFalse(VersionChecker.isVersionSupported("1.22"))
         assertFalse(VersionChecker.isVersionSupported("26.0"))
-        assertFalse(VersionChecker.isVersionSupported("26.3"))
+        assertFalse(VersionChecker.isVersionSupported("26.3.1"))
+        assertFalse(VersionChecker.isVersionSupported("26.4"))
         assertFalse(VersionChecker.isVersionSupported("27.1"))
     }
 }
