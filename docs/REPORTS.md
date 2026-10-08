@@ -1,4 +1,4 @@
-# Zgłoszenia graczy (Paper i Spigot)
+# [PL] Zgłoszenia graczy (Paper i Spigot)
 
 - `/report` — wybór gracza i powodu w formularzu Paper lub GUI.
 - `/report gracz` — wybór powodu dla wskazanego gracza.
