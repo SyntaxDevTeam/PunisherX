@@ -139,6 +139,7 @@ dependencies {
     compileOnly(libs.faststats.bukkit)
 
     testImplementation(libs.kotlin.test)
+    testImplementation(libs.spigot.api)
 }
 
 extensions.configure<KotlinJvmProjectExtension> {
