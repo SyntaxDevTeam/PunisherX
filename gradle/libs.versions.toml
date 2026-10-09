@@ -13,7 +13,7 @@ bungeecord-api = "1.21-R0.4"
 brigadier = "1.0.500"
 
 syntaxcore = "1.4.1-R0.1-SNAPSHOT"
-messagehandler = "1.3.0-R0.2-SNAPSHOT"
+messagehandler = "1.3.0-R0.3-SNAPSHOT"
 libby = "1.3.2"
 aether = "1.1.0"
 snakeyaml = "2.7"

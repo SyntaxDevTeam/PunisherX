@@ -11,6 +11,15 @@ plugins {
 description = "Advanced punishment system for Spigot servers with commands like warn, mute, jail, ban, kick and more."
 
 repositories {
+    // Opt-in for testing a locally published MessageHandler before uploading its snapshot.
+    if (providers.gradleProperty("punisherx.messagehandler.local").orNull == "true") {
+        mavenLocal {
+            content {
+                includeModule("pl.syntaxdevteam", "messageHandler-paper")
+                includeModule("pl.syntaxdevteam", "messageHandler-spigot")
+            }
+        }
+    }
     // SyntaxDevTeam
     maven("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/") {
         content {

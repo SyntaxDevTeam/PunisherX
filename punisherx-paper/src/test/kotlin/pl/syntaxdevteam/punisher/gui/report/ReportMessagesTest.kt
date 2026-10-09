@@ -34,7 +34,13 @@ class ReportMessagesTest {
         "reports.dialog-target-label", "reports.dialog-reason-label", "reports.dialog-submit",
         "reports.dialog-cancel", "reports.dialog-list-entry", "reports.dialog-details-body",
         "reports.dialog-resolution-body", "punishment-dialog.close", "punishment-dialog.entry",
-        "punishment-dialog.tooltip", "punishment-dialog.details"
+        "punishment-dialog.tooltip", "punishment-dialog.details",
+        "report-book.title", "report-book.author", "report-book.players-heading", "report-book.player-entry",
+        "report-book.reasons-heading", "report-book.reason-entry", "report-book.confirmation", "report-book.confirm-heading",
+        "report-book.submit", "report-book.previous", "report-book.next", "report-book.back", "report-book.empty",
+        "report-book.inbox-heading", "report-book.history-heading", "report-book.report-entry", "report-book.inbox", "report-book.history",
+        "report-book.details", "report-book.reason-page", "report-book.resolution", "report-book.note-page",
+        "report-book.actions-heading", "report-book.resolve", "report-book.reject", "report-book.decision-prompt", "report-book.filed-at"
     )
 
     @Test

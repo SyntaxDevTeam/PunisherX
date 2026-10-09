@@ -20,13 +20,13 @@ class UnMuteCommand(private val plugin: PunisherX) : BasicCommand {
                             plugin.databaseHandler.removePunishment(uuid, punishment.type)
                         }
                     }
-                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unmute", "unmute", mapOf("player" to player)))
+                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unmute", "unmute", mapOf("player" to player, "operator" to stack.sender.name)))
                     val targetPlayer = Bukkit.getPlayer(player)
-                    val muteMessage = plugin.messageHandler.stringMessageToComponent("unmute", "unmute_message")
+                    val muteMessage = plugin.messageHandler.stringMessageToComponent("unmute", "unmute_message", mapOf("player" to player, "operator" to stack.sender.name))
                     targetPlayer?.sendMessage(muteMessage)
                     plugin.logger.info("Player $player ($uuid) has been unmuted")
                 } else {
-                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_found", mapOf("player" to player)))
+                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_found", mapOf("player" to player, "operator" to stack.sender.name)))
                 }
             } else {
                 stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unmute", "usage"))

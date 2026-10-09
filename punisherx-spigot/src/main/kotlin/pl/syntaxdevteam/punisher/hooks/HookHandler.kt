@@ -39,7 +39,7 @@ class HookHandler(private val plugin: PunisherX) {
      * If the services are not found, warning messages are logged.
      */
     init {
-        //checkLuckPerms()
+        checkLuckPerms()
         //checkVault()
         /*
         if (chat == null || permission == null) {
@@ -237,6 +237,15 @@ class HookHandler(private val plugin: PunisherX) {
      * @param player The player whose prefix is being retrieved.
      * @return The prefix of the player as a [String].
      */
+    fun nameMetadata(name: String, colorKey: String): pl.syntaxdevteam.punisher.messages.NameMetadata? {
+        // Never perform a database lookup or wait for an offline user on the server thread.
+        val user = luckPerms?.userManager?.loadedUsers?.firstOrNull {
+            it.username?.equals(name, ignoreCase = true) == true
+        } ?: return null
+        val meta = user.cachedData.metaData
+        return pl.syntaxdevteam.punisher.messages.NameMetadata(meta.prefix.orEmpty(), meta.suffix.orEmpty(), meta.getMetaValue(colorKey).orEmpty())
+    }
+
     fun getPlayerPrefix(player: Player): String {
         return luckPerms?.getPlayerAdapter(Player::class.java)?.getMetaData(player)?.prefix
             ?: chat?.getPlayerPrefix(player)

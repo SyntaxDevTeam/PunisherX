@@ -40,7 +40,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
 
         val anyUnbanned = ips.map { ip -> unbanIP(stack, ip) }.any { it }
         if (!anyUnbanned) {
-            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_punished", mapOf("player" to playerOrIpOrUUID)))
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_punished", mapOf("player" to playerOrIpOrUUID, "operator" to stack.sender.name)))
         }
     }
 
@@ -66,7 +66,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.messageHandler.getSmartMessage(
                 "unban",
                 "unban",
-                mapOf("player" to playerName)
+                mapOf("player" to playerName, "operator" to stack.sender.name)
             ).forEach { stack.sender.sendMessage(it) }
             broadcastUnban(playerName, stack.sender.name)
         }
@@ -96,7 +96,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.messageHandler.getSmartMessage(
                 "unban",
                 "unban",
-                mapOf("player" to ip)
+                mapOf("player" to ip, "operator" to stack.sender.name)
             ).forEach { stack.sender.sendMessage(it) }
             broadcastUnban(ip, stack.sender.name)
         }
@@ -105,7 +105,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     private fun broadcastUnban(playerOrIp: String, commandSenderName: String) {
-        val messages = plugin.messageHandler.getSmartMessage("unban", "unban", mapOf("player" to playerOrIp))
+        val messages = plugin.messageHandler.getSmartMessage("unban", "unban", mapOf("player" to playerOrIp, "operator" to commandSenderName))
 
         plugin.server.onlinePlayers
             .filterNot { it.name == commandSenderName }

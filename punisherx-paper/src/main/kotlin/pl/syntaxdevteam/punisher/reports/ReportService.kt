@@ -22,7 +22,7 @@ data class ReportSubmissionResult(
 
 /**
  * Owns report validation and notifications so inventory GUIs and modern
- * dialogs cannot apply different submission rules.
+ * dialogs and books cannot apply different submission rules.
  */
 class ReportService(private val plugin: PunisherX) {
     private val maxOpenReports: Int

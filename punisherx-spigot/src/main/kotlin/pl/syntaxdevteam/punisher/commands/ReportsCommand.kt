@@ -35,13 +35,15 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
         }
         try {
             when (args.firstOrNull()?.lowercase() ?: if (sender is Player) "gui" else "list") {
-                "gui" -> {
+                "gui", "book" -> {
                     val page = if (args.size < 2) 1 else args[1].toIntOrNull()
                     if (sender !is Player || args.size > 2 || page == null || page < 1 || page > Int.MAX_VALUE / 45) {
                         message(sender, "admin-usage")
                         return
                     }
-                    ReportInboxGUI(plugin).open(sender, page)
+                    if (args.firstOrNull().equals("book", true) || useBooks()) {
+                        pl.syntaxdevteam.punisher.books.ReportBookService(plugin).openInbox(sender, page)
+                    } else ReportInboxGUI(plugin).open(sender, page)
                 }
                 "list", "history" -> {
                     val page = if (args.size < 2) 1 else args[1].toIntOrNull()
@@ -51,6 +53,10 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
                         return
                     }
                     val closed = args.firstOrNull()?.equals("history", true) == true
+                    if (sender is Player && useBooks()) {
+                        pl.syntaxdevteam.punisher.books.ReportBookService(plugin).openInbox(sender, page, closed)
+                        return
+                    }
                     val reports = plugin.databaseHandler.getReports(pageSize + 1, (page - 1) * pageSize, closed)
                     message(sender, if (closed) "history-title" else "inbox-title", mapOf("page" to "$page"))
                     if (reports.isEmpty()) message(sender, "empty")
@@ -85,6 +91,10 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
                         return
                     }
                     if (action == "view") {
+                        if (sender is Player && useBooks()) {
+                            pl.syntaxdevteam.punisher.books.ReportBookService(plugin).openDetails(sender, id)
+                            return
+                        }
                         message(sender, "details-title", mapOf("id" to "$id"))
                         sender.sendMessage(Component.text("${name(report.player)} (${report.player}) → ${name(report.suspect)} (${report.suspect})\n${report.filedAt}\n${report.reason}"))
                         message(sender, "status-${report.status.lowercase()}")
@@ -115,10 +125,12 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun suggest(stack: CommandSourceStack, args: Array<String>): List<String> {
         if (!canRead(stack.sender) || args.size > 1) return emptyList()
-        val actions = mutableListOf("gui", "list", "view", "history")
+        val actions = mutableListOf("gui", "book", "list", "view", "history")
         if (canManage(stack.sender)) actions.addAll(listOf("resolve", "reject"))
         return actions.filter { it.startsWith(args.firstOrNull().orEmpty(), true) }
     }
+
+    private fun useBooks() = plugin.config.getString("reports.admin-interface", "AUTO").equals("BOOK", true)
 
     private fun name(uuid: UUID): String = Bukkit.getOfflinePlayer(uuid).name ?: uuid.toString()
 }

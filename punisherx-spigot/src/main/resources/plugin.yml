@@ -14,7 +14,7 @@ softdepend: [PlaceholderAPI, MiniPlaceholders, LuckPerms, Vault, VaultUnlocked, 
 commands:
   reports:
     description: Review and manage player reports.
-    usage: /reports [gui|list|history|view|resolve|reject]
+    usage: /reports [gui|book|list|history|view|resolve|reject]
   ban:
     aliases: [bx]
     description: Bans a player for a specified time with a reason.

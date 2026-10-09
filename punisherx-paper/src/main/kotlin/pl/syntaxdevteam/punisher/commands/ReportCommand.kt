@@ -54,7 +54,13 @@ class ReportCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        val useDialogs = plugin.config.getBoolean("reports.use-dialogs", true) &&
+        if (plugin.config.getString("reports.player-interface", "AUTO").equals("BOOK", true)) {
+            pl.syntaxdevteam.punisher.books.ReportBookService(plugin).openReport(sender, target)
+            return
+        }
+
+        val mode = plugin.config.getString("reports.player-interface", "AUTO")
+        val useDialogs = !mode.equals("GUI", true) && (mode.equals("DIALOG", true) || plugin.config.getBoolean("reports.use-dialogs", true)) &&
             plugin.versionCompatibility.supports(VersionCompatibility.CompatibilityFlag.DIALOGS)
         if (useDialogs) {
             val opened = runCatching { ReportDialogService(plugin).open(sender, target) }

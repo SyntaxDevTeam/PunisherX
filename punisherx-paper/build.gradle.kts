@@ -25,6 +25,15 @@ val serverJavaLauncher = javaToolchains.launcherFor {
 }
 
 repositories {
+    // Opt-in for testing a locally published MessageHandler before uploading its snapshot.
+    if (providers.gradleProperty("punisherx.messagehandler.local").orNull == "true") {
+        mavenLocal {
+            content {
+                includeModule("pl.syntaxdevteam", "messageHandler-paper")
+                includeModule("pl.syntaxdevteam", "messageHandler-spigot")
+            }
+        }
+    }
     maven("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/")
     maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
 
@@ -110,6 +119,8 @@ dependencies {
     testImplementation(libs.kotlin.test)
     testImplementation(libs.sqlite.jdbc)
     testImplementation(libs.paper.api)
+    testImplementation(libs.messagehandler.paper)
+    testImplementation(libs.caffeine)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.kotlin)

@@ -1,4 +1,4 @@
-config-version: 166
+config-version: 168
 
 # /********************************************/
 #    Global settings
@@ -161,6 +161,10 @@ notifications:
 # /********************************************/
 
 reports:
+  # AUTO preserves use-dialogs/admin-use-dialogs. GUI, DIALOG or BOOK select a presentation.
+  # Spigot uses GUI when DIALOG is selected.
+  player-interface: AUTO
+  admin-interface: AUTO
   # /reports lists open reports; /reports history lists resolved/rejected reports.
   # Closing a report allows its author to submit another one.
   page-size: 10
@@ -301,3 +305,17 @@ debug: off
 # Should StatsCollector be enabled? Recommended: true.
 stats:
   enabled: true
+
+# Optional LuckPerms display placeholders in messages:
+# <operator_display>, <player_display>, <operator_prefix>, <player_prefix>,
+# <operator_suffix>, <player_suffix>. Original <operator>/<player> remain plain names.
+# Prefix/suffix accept legacy (&/section sign/hex) and MiniMessage formatting.
+# Set this LP meta key to a color such as &c, #ff5555 or <red>.
+# Offline users whose metadata is not cached, console and missing LP use plain names.
+name-formatting:
+  name-color-meta: name-color
+  # Layout tokens: $prefix, $name, $suffix. $player/$operator are aliases for $name.
+  # Spacing is literal. Defaults preserve the spacing stored in LP prefix/suffix.
+  # Example: "$suffix <gray>|</gray> $name $prefix". Use $$ for a literal dollar sign.
+  operator-display: "$prefix$name$suffix"
+  player-display: "$prefix$name$suffix"

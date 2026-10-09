@@ -49,22 +49,8 @@ jobs:
             :MessageHandler-Spigot:publishToMavenLocal \
             --console=plain --no-daemon
 
-      - name: Prefer runner Maven local for this verification only
-        working-directory: PunisherX
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          for name in ("punisherx-paper/build.gradle.kts", "punisherx-spigot/build.gradle.kts"):
-              path = Path(name)
-              text = path.read_text()
-              marker = "repositories {\n"
-              if marker not in text:
-                  raise SystemExit(f"repositories block not found in {name}")
-              path.write_text(text.replace(marker, marker + "    mavenLocal()\n", 1))
-          PY
-
-      - name: Test and build PunisherX against MessageHandler R0.2
+      - name: Test and build PunisherX against MessageHandler R0.3
         working-directory: PunisherX
         run: |
           chmod +x ./gradlew
-          ./gradlew test build --console=plain --no-daemon
+          ./gradlew test build -Ppunisherx.messagehandler.local=true --console=plain --no-daemon

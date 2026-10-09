@@ -38,13 +38,15 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
         }
         try {
             when (args.firstOrNull()?.lowercase() ?: if (sender is Player) "gui" else "list") {
-                "gui" -> {
+                "gui", "book" -> {
                     val page = if (args.size < 2) 1 else args[1].toIntOrNull()
                     if (sender !is Player || args.size > 2 || page == null || page < 1 || page > Int.MAX_VALUE / 45) {
                         message(sender, "admin-usage")
                         return
                     }
-                    if (!openDialogInbox(sender, page, false)) ReportInboxGUI(plugin).open(sender, page)
+                    if (args.firstOrNull().equals("book", true) || useBooks()) {
+                        pl.syntaxdevteam.punisher.books.ReportBookService(plugin).openInbox(sender, page)
+                    } else if (!openDialogInbox(sender, page, false)) ReportInboxGUI(plugin).open(sender, page)
                 }
                 "list", "history" -> {
                     val page = if (args.size < 2) 1 else args[1].toIntOrNull()
@@ -54,6 +56,10 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
                         return
                     }
                     val closed = args.firstOrNull()?.equals("history", true) == true
+                    if (sender is Player && useBooks()) {
+                        pl.syntaxdevteam.punisher.books.ReportBookService(plugin).openInbox(sender, page, closed)
+                        return
+                    }
                     if (sender is Player && openDialogInbox(sender, page, closed)) {
                         return
                     }
@@ -91,6 +97,10 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
                         return
                     }
                     if (action == "view") {
+                        if (sender is Player && useBooks()) {
+                            pl.syntaxdevteam.punisher.books.ReportBookService(plugin).openDetails(sender, id)
+                            return
+                        }
                         if (sender is Player && openDialogDetails(sender, id)) {
                             return
                         }
@@ -124,10 +134,12 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun suggest(stack: CommandSourceStack, args: Array<String>): List<String> {
         if (!canRead(stack.sender) || args.size > 1) return emptyList()
-        val actions = mutableListOf("gui", "list", "view", "history")
+        val actions = mutableListOf("gui", "book", "list", "view", "history")
         if (canManage(stack.sender)) actions.addAll(listOf("resolve", "reject"))
         return actions.filter { it.startsWith(args.firstOrNull().orEmpty(), true) }
     }
+
+    private fun useBooks() = plugin.config.getString("reports.admin-interface", "AUTO").equals("BOOK", true)
 
     private fun name(uuid: UUID): String = Bukkit.getOfflinePlayer(uuid).name ?: uuid.toString()
 
@@ -141,6 +153,7 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
             .onFailure { plugin.logger.warning("Could not open report details dialog, using chat output: ${it.message}") }
             .getOrDefault(false)
 
-    private fun useDialogs(): Boolean = plugin.config.getBoolean("reports.admin-use-dialogs", true) &&
+    private fun useDialogs(): Boolean = !plugin.config.getString("reports.admin-interface", "AUTO").equals("GUI", true) &&
+        (plugin.config.getString("reports.admin-interface", "AUTO").equals("DIALOG", true) || plugin.config.getBoolean("reports.admin-use-dialogs", true)) &&
         plugin.versionCompatibility.supports(VersionCompatibility.CompatibilityFlag.DIALOGS)
 }

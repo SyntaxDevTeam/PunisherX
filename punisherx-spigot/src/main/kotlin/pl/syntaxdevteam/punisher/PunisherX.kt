@@ -13,7 +13,6 @@ import pl.syntaxdevteam.core.stats.StatsCollector
 import pl.syntaxdevteam.core.tools.UUIDManager
 import pl.syntaxdevteam.core.update.GitHubSource
 import pl.syntaxdevteam.core.update.ModrinthSource
-import pl.syntaxdevteam.message.MessageHandler
 import pl.syntaxdevteam.punisher.api.PunisherXApi
 import pl.syntaxdevteam.punisher.basic.*
 import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
@@ -59,7 +58,11 @@ class PunisherX : JavaPlugin(), Listener {
     private lateinit var pluginInitializer: PluginInitializer
 
     lateinit var logger: Logger
-    lateinit var messageHandler: MessageHandler
+    val bookManager = pl.syntaxdevteam.punisher.books.BookManager(plainText = { messageHandler.getPlainText(it) })
+
+    fun nameMetadata(name: String, colorKey: String) = if (::hookHandler.isInitialized) hookHandler.nameMetadata(name, colorKey) else null
+
+    lateinit var messageHandler: pl.syntaxdevteam.punisher.messages.PunisherMessages
     lateinit var pluginsManager: PluginManagerX
 
     lateinit var pluginConfig: FileConfiguration

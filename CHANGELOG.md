@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+* Routed name parsing, component serialization and literal book placeholders through MessageHandler R0.3; removed the separate formatting pipeline from PunisherX.
+
+* Added optional LuckPerms display, prefix and suffix placeholders for player and operator names on Paper and Spigot, including configurable nickname color metadata and independent display name layouts.
+* Added configurable book interfaces for submitting and managing reports, with paginated menus, confirmation, history and existing decision commands.
+* Added a reusable BookManager with player-bound, single-use, expiring menu actions; existing GUI/dialog choices remain available.
+* Added configuration migration 168, Polish/English book messages and automated coverage for formatting and book action sessions.
+
 ## [1.8.0-SNAPSHOT] - 2026-10-08
 
 PunisherX takes a major step forward in everyday moderation: a native Spigot edition, a complete report workflow, faster access to punishment templates, and safer configuration handling. This update brings together the changes on `main` since 1.7.2.

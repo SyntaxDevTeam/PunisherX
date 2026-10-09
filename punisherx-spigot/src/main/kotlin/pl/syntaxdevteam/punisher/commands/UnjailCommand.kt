@@ -28,7 +28,7 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
                 plugin.messageHandler.stringMessageToComponent(
                     "error",
                     "player_not_punished",
-                    mapOf("player" to playerName)
+                    mapOf("player" to playerName, "operator" to stack.sender.name)
                 )
             )
             return
@@ -46,7 +46,7 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.cache.removePunishment(uuid, teleportPlayer = false, notify = false)
 
             val broadcastMessages =
-                plugin.messageHandler.getSmartMessage("unjail", "broadcast", mapOf("player" to playerName))
+                plugin.messageHandler.getSmartMessage("unjail", "broadcast", mapOf("player" to playerName, "operator" to stack.sender.name))
 
             plugin.server.onlinePlayers.forEach { onlinePlayer ->
                 if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_UNJAIL)) {
@@ -57,7 +57,7 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.messageHandler.getSmartMessage(
                 "unjail",
                 "success",
-                mapOf("player" to playerName)
+                mapOf("player" to playerName, "operator" to stack.sender.name)
             ).forEach { stack.sender.sendMessage(it) }
         }
 
@@ -67,7 +67,8 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
                     player.gameMode = GameMode.SURVIVAL
                     plugin.messageHandler.getSmartMessage(
                         "unjail",
-                        "unjail_message"
+                        "unjail_message",
+                        mapOf("player" to playerName, "operator" to stack.sender.name)
                     ).forEach { msg -> player.sendMessage(msg) }
                     plugin.logger.debug("<green>Player $playerName successfully unjailed.</green>")
                     completeUnjail()
@@ -75,7 +76,7 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
                     val failureMessage = plugin.messageHandler.stringMessageToComponent(
                         "unjail",
                         "teleport_failed",
-                        mapOf("player" to playerName)
+                        mapOf("player" to playerName, "operator" to stack.sender.name)
                     )
                     stack.sender.sendMessage(failureMessage)
                     player.sendMessage(failureMessage)

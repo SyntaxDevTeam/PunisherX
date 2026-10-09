@@ -101,7 +101,7 @@ For exact syntax, all permission nodes, parent permissions and Spigot dispatch d
 | Placeholders | [Placeholder reference](docs/WIKI/EN/PLACEHOLDERS.md) | [Placeholdery](docs/WIKI/PL/PLACEHOLDERS.md) |
 | API | [API reference](docs/WIKI/EN/API.md) | [API](docs/WIKI/PL/API.md) |
 
-Additional references: [language safety](docs/LANGUAGE-SAFETY.md), [report workflow](docs/REPORTS.md), [Paper UUID migration integration](docs/IDENTITY_MIGRATION.md), and the [GitHub Wiki](https://github.com/SyntaxDevTeam/PunisherX/wiki).
+Additional references: [LuckPerms display names](docs/LUCKPERMS-NAMES.md), [language safety](docs/LANGUAGE-SAFETY.md), [report workflow](docs/REPORTS.md), [Paper UUID migration integration](docs/IDENTITY_MIGRATION.md), and the [GitHub Wiki](https://github.com/SyntaxDevTeam/PunisherX/wiki).
 
 ## 🛠️ Build from source
 

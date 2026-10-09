@@ -126,7 +126,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         t("before SyntaxMessages.initialize")
         SyntaxMessages.initialize(plugin)
         t("after SyntaxMessages.initialize")
-        plugin.messageHandler = SyntaxMessages.messages
+        plugin.messageHandler = pl.syntaxdevteam.punisher.messages.PunisherMessages(plugin, SyntaxMessages.messages)
         t("after SyntaxMessages.messages")
         plugin.pluginsManager = SyntaxCore.pluginManagerx
         t("after pluginsManager")
@@ -187,6 +187,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.playerJoinListener = PlayerJoinListener(plugin.playerIPManager, plugin.punishmentChecker, plugin)
         plugin.server.pluginManager.registerEvents(plugin.playerJoinListener, plugin)
         plugin.server.pluginManager.registerEvents(plugin.punishmentChecker, plugin)
+        plugin.server.pluginManager.registerEvents(plugin.bookManager, plugin)
         if (versionChecker.isAtLeast("1.21.7")) {
             plugin.server.pluginManager.registerEvents(ModernLoginListener(plugin), plugin)
             plugin.logger.debug("Registered ModernLoginListener for 1.21.7+")

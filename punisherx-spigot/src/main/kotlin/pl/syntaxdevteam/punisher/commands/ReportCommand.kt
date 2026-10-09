@@ -51,6 +51,11 @@ class ReportCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
+        if (plugin.config.getString("reports.player-interface", "AUTO").equals("BOOK", true)) {
+            pl.syntaxdevteam.punisher.books.ReportBookService(plugin).openReport(sender, target)
+            return
+        }
+
         if (target == null) {
             ReportSelectorGUI(plugin).open(sender)
         } else {
