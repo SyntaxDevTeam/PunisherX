@@ -40,6 +40,22 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
+      - name: Check required MessageHandler version
+        working-directory: PunisherX
+        run: |
+          python3 - <<'PYCODE'
+          import re
+          import tomllib
+          from pathlib import Path
+          required = tomllib.loads(Path("gradle/libs.versions.toml").read_text())["versions"]["messagehandler"]
+          source = Path("../MessageHandler/build.gradle.kts").read_text()
+          match = re.search(r'^version\s*=\s*"([^"]+)"', source, re.MULTILINE)
+          actual = match.group(1) if match else "unknown"
+          if actual != required:
+              raise SystemExit(f"MessageHandler checkout has version {actual}, but PunisherX requires {required}. Push the matching MessageHandler API/version changes before building PunisherX.")
+          print(f"MessageHandler source version matches: {actual}")
+          PYCODE
+
       - name: Publish required MessageHandler modules to runner Maven local
         working-directory: MessageHandler
         run: |
