@@ -41,6 +41,7 @@ import java.io.File
 import java.util.Locale
 
 class PluginInitializer(private val plugin: PunisherX) {
+    private var databaseHandler: DatabaseHandler? = null
 
     fun onEnable() {
         val t0 = System.currentTimeMillis()
@@ -64,7 +65,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         runCatching { plugin.onlinePunishmentWatcher.stop() }
         runCatching { plugin.punishmentActionBarNotifier.stop() }
         runCatching { plugin.server.servicesManager.unregister(PunisherXApi::class.java, plugin.punisherXApi) }
-        plugin.databaseHandler.closeConnection()
+        databaseHandler?.closeConnection()
         plugin.logger.err("${plugin.description.name} ${plugin.description.version} has been disabled")
     }
 
@@ -90,24 +91,19 @@ class PluginInitializer(private val plugin: PunisherX) {
      * Sets up the database connection and creates necessary tables.
      */
     private fun setupDatabase() {
-        val databaseHandler = DatabaseHandler(plugin)
-        plugin.databaseHandler = databaseHandler
-        val databaseSetupTask = Runnable {
-            databaseHandler.openConnection()
-            databaseHandler.createTables()
-        }
-        plugin.logger.debug("Detected server: ${plugin.server.name} ${plugin.server.version}")
-        // SQLite and H2 are local file-based — no network I/O, safe to run synchronously.
-        // Running them async caused a race: players could connect before ready=true was set.
-        val dbTypeName = plugin.databaseHandler.databaseType().name
-        val isLocalDb = dbTypeName == "SQLITE" || dbTypeName == "H2"
-        plugin.logger.diag("[TIMING] dbTypeName=$dbTypeName isLocalDb=$isLocalDb")
-        if (isLocalDb) {
-            plugin.logger.debug("Local database ($dbTypeName) — running setup synchronously.")
-            databaseSetupTask.run()
-        } else {
-            plugin.logger.debug("Remote database detected, using Bukkit async scheduler.")
-            plugin.server.scheduler.runTaskAsynchronously(plugin, databaseSetupTask)
+        val database = DatabaseHandler(plugin)
+        databaseHandler = database
+        plugin.databaseHandler = database
+        // Every handler, listener and command installed below can access the database.
+        // Finish pool and schema initialization before publishing those consumers,
+        // including when PlugMan enables us while players are already online.
+        plugin.logger.debug("Initializing ${database.databaseType()} database before enabling handlers.")
+        try {
+            database.openConnection()
+            database.createTables()
+        } catch (error: Exception) {
+            runCatching { database.closeConnection() }.onFailure { error.addSuppressed(it) }
+            throw IllegalStateException("Database initialization failed: ${error.message}", error)
         }
     }
 

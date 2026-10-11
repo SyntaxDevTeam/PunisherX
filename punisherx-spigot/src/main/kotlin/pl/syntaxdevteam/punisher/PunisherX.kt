@@ -131,8 +131,7 @@ class PunisherX : JavaPlugin(), Listener {
             )
         }
 
-        pluginInitializer = PluginInitializer(this)
-        pluginInitializer.onEnable()
+        initializePlugin()
         versionChecker.checkAndLog()
         fastStatsBridge.ready()
     }
@@ -179,8 +178,18 @@ class PunisherX : JavaPlugin(), Listener {
         runCatching { proxyBridgeMessenger.unregisterChannel() }
         HandlerList.unregisterAll(this as Plugin)
         reloadConfig()
+        initializePlugin()
+    }
+
+    private fun initializePlugin() {
         pluginInitializer = PluginInitializer(this)
-        pluginInitializer.onEnable()
+        try {
+            pluginInitializer.onEnable()
+        } catch (error: Exception) {
+            // A plugin with no database must not keep accepting punishment commands.
+            server.pluginManager.disablePlugin(this)
+            throw error
+        }
     }
 
     private fun cancelPluginTasks() {

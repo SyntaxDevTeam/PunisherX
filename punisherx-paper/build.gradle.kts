@@ -117,7 +117,7 @@ dependencies {
     compileOnly(libs.faststats.bukkit)
 
     testImplementation(libs.kotlin.test)
-    testRuntimeOnly(libs.syntaxcore) {
+    testImplementation(libs.syntaxcore) {
         isTransitive = false
     }
     testImplementation(libs.sqlite.jdbc)
@@ -277,4 +277,11 @@ plugindeployer {
     paper { dir = "/home/debian/server/Paper/26.2/plugins" } //ostatnia wersja dla Paper
     folia { dir = "/home/debian/server/Folia/26.1.2/plugins" } //ostatnia wersja dla Folia
     spigot { dir = "/home/debian/server/Spigot/26.2/plugins" } //ostatnia wersja dla Spigot
+}
+
+// Keep shared Paper classes ahead of SyntaxCore's bundled classes when compiling tests.
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileTestKotlin") {
+    val testLibraries = libraries.files
+    val syntaxCoreJars = testLibraries.filter { it.name.startsWith("syntaxcore-") }
+    libraries.setFrom(testLibraries - syntaxCoreJars.toSet(), syntaxCoreJars)
 }

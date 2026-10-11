@@ -42,6 +42,7 @@ import java.io.File
 import java.util.Locale
 
 class PluginInitializer(private val plugin: PunisherX) {
+    private var databaseHandler: DatabaseHandler? = null
 
     fun onEnable() {
         val t0 = System.currentTimeMillis()
@@ -65,7 +66,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         runCatching { plugin.onlinePunishmentWatcher.stop() }
         runCatching { plugin.punishmentActionBarNotifier.stop() }
         runCatching { plugin.server.servicesManager.unregister(PunisherXApi::class.java, plugin.punisherXApi) }
-        plugin.databaseHandler.closeConnection()
+        databaseHandler?.closeConnection()
         plugin.logger.err(plugin.pluginMeta.name + " " + plugin.pluginMeta.version + " has been disabled ☹️")
     }
 
@@ -91,28 +92,19 @@ class PluginInitializer(private val plugin: PunisherX) {
      * Sets up the database connection and creates necessary tables.
      */
     private fun setupDatabase() {
-        val databaseHandler = DatabaseHandler(plugin)
-        plugin.databaseHandler = databaseHandler
-        val databaseSetupTask = Runnable {
-            databaseHandler.openConnection()
-            databaseHandler.createTables()
-        }
-        plugin.logger.debug("Detected server: ${ServerEnvironment.platformName}")
-        val dbTypeName = plugin.databaseHandler.databaseType().name
-        val isLocalDb = dbTypeName == "SQLITE" || dbTypeName == "H2"
-        plugin.logger.diag("[TIMING] dbTypeName=$dbTypeName isLocalDb=$isLocalDb")
-        if (isLocalDb) {
-            plugin.logger.debug("Local database ($dbTypeName) — running setup synchronously.")
-            databaseSetupTask.run()
-        } else if (ServerEnvironment.isFoliaBased()) {
-            plugin.logger.debug("Detected Folia server, using async database connection handling.")
-            plugin.server.globalRegionScheduler.execute(plugin, databaseSetupTask)
-        } else if (ServerEnvironment.isPaperBased()) {
-            plugin.logger.debug("Detected Paper server, using async database connection handling.")
-            plugin.server.scheduler.runTaskAsynchronously(plugin, databaseSetupTask)
-        } else {
-            plugin.logger.debug("Running sync database setup for non-Paper server.")
-            databaseSetupTask.run()
+        val database = DatabaseHandler(plugin)
+        databaseHandler = database
+        plugin.databaseHandler = database
+        // Every handler, listener and command installed below can access the database.
+        // Finish pool and schema initialization before publishing those consumers,
+        // including when PlugMan enables us while players are already online.
+        plugin.logger.debug("Initializing ${database.databaseType()} database before enabling handlers.")
+        try {
+            database.openConnection()
+            database.createTables()
+        } catch (error: Exception) {
+            runCatching { database.closeConnection() }.onFailure { error.addSuppressed(it) }
+            throw IllegalStateException("Database initialization failed: ${error.message}", error)
         }
     }
 
