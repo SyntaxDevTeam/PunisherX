@@ -21,6 +21,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
     private val authorUseNotifier = AuthorUseNotifier(plugin)
 
     fun handlePlayerJoin(event: PlayerJoinEvent) {
+        if (!plugin.isEnabled || plugin.punishmentChecker !== this) return
         val player    = event.player
         val name      = player.name
         val uuid      = player.uniqueId
@@ -108,6 +109,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerChat(event: AsyncChatEvent) {
+        if (!plugin.isEnabled || plugin.punishmentChecker !== this) return
         val player = event.player
         val playerName = player.name
         try {
@@ -160,6 +162,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerCommand(event: PlayerCommandPreprocessEvent) {
+        if (!plugin.isEnabled || plugin.punishmentChecker !== this) return
         try {
             val player = event.player
             val uuid = player.uniqueId.toString()
@@ -242,6 +245,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerMove(event: PlayerMoveEvent) {
+        if (!plugin.isEnabled || plugin.punishmentChecker !== this) return
         val player = event.player
         val uuid = player.uniqueId
         val jailLocation = JailUtils.getJailLocation(plugin.config) ?: return

@@ -40,6 +40,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
     }
 
     private val ready = AtomicBoolean(false)
+    private val lifecycleErrorReported = AtomicBoolean(false)
     private val dbType: DatabaseType = plugin.config
         .getString("database.type")
         ?.uppercase()
@@ -90,6 +91,25 @@ class DatabaseHandler(private val plugin: PunisherX) {
     fun closeConnection() {
         ready.set(false)
         db.close()
+    }
+
+    private fun reportDatabaseFailure(operation: String, error: Exception) {
+        logger.err("$operation. ${error.message}")
+        if (error.message?.contains("DataSource not initialized") == true &&
+            lifecycleErrorReported.compareAndSet(false, true)
+        ) {
+            // Keep the caller stack: hot reload can leave several plugin instances
+            // sharing the same log prefix, so a message alone cannot identify the owner.
+            plugin.server.logger.log(
+                java.util.logging.Level.SEVERE,
+                "[PunisherX] Database lifecycle failure: operation=$operation, " +
+                    "enabled=${plugin.isEnabled}, ready=${ready.get()}, " +
+                    "pluginInstance=${System.identityHashCode(plugin)}, " +
+                    "databaseInstance=${System.identityHashCode(this)}, " +
+                    "classLoader=${javaClass.classLoader}",
+                error
+            )
+        }
     }
 
     /** Utility for executing update/insert/delete statements. */
@@ -648,7 +668,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         try {
             execute("INSERT INTO playercache (data) VALUES (?)", data)
         } catch (e: Exception) {
-            logger.err("Failed to save player cache line. ${e.message}")
+            reportDatabaseFailure("Failed to save player cache line", e)
         }
     }
 
@@ -656,7 +676,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return try {
             query("SELECT data FROM playercache ORDER BY id ASC") { rs -> rs.getString("data") }
         } catch (e: Exception) {
-            logger.err("Failed to load player cache lines. ${e.message}")
+            reportDatabaseFailure("Failed to load player cache lines", e)
             emptyList()
         }
     }
@@ -759,7 +779,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
             rows.filter { plugin.punishmentManager.isPunishmentActive(it) }
         } catch (e: Exception) {
-            logger.err("Failed to get punishments for UUID: $uuid. ${e.message}")
+            reportDatabaseFailure("Failed to get punishments for UUID: $uuid", e)
             emptyList()        }
     }
 
@@ -788,7 +808,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
             }
             rows.filter { plugin.punishmentManager.isPunishmentActive(it) }
         } catch (e: Exception) {
-            logger.err("Failed to get punishments for IP: $ip. ${e.message}")
+            reportDatabaseFailure("Failed to get punishments for IP: $ip", e)
             emptyList()
         }
     }

@@ -35,6 +35,7 @@ import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
 import pl.syntaxdevteam.punisher.inits.loader.LibraryLoader
 import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
+import pl.syntaxdevteam.punisher.loader.PluginRegistrations
 import pl.syntaxdevteam.punisher.loader.PluginInitializer
 import pl.syntaxdevteam.punisher.players.*
 import pl.syntaxdevteam.punisher.reports.ReportService
@@ -157,6 +158,9 @@ class PunisherX : JavaPlugin(), Listener {
     }
 
     override fun onDisable() {
+        HandlerList.unregisterAll(this as Plugin)
+        cancelPluginTasks()
+        server.servicesManager.unregisterAll(this)
         runCatching { fastStatsBridge.shutdown() }
         if (::pluginInitializer.isInitialized) {
             pluginInitializer.onDisable()
@@ -173,15 +177,19 @@ class PunisherX : JavaPlugin(), Listener {
     }
 
     private fun reloadMyConfig() {
-        pluginInitializer.onDisable()
-        cancelPluginTasks()
-        runCatching { proxyBridgeMessenger.unregisterChannel() }
         HandlerList.unregisterAll(this as Plugin)
+        cancelPluginTasks()
+        pluginInitializer.onDisable()
+        runCatching { proxyBridgeMessenger.unregisterChannel() }
         reloadConfig()
         initializePlugin()
     }
 
     private fun initializePlugin() {
+        val removed = PluginRegistrations.clearStale(this) { owner -> cancelPluginTasks(owner) }
+        if (removed > 0) {
+            super.getLogger().warning("Removed stale registrations from $removed previous PunisherX instance(s).")
+        }
         pluginInitializer = PluginInitializer(this)
         try {
             pluginInitializer.onEnable()
@@ -192,8 +200,8 @@ class PunisherX : JavaPlugin(), Listener {
         }
     }
 
-    private fun cancelPluginTasks() {
-        server.scheduler.cancelTasks(this)
+    private fun cancelPluginTasks(owner: Plugin = this) {
+        server.scheduler.cancelTasks(owner)
     }
 
     fun getServerName(): String {

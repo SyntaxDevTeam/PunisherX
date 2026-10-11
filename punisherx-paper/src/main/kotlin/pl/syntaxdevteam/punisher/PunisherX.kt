@@ -1,6 +1,5 @@
 package pl.syntaxdevteam.punisher
 
-import io.papermc.paper.event.player.AsyncChatEvent
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.event.HandlerList
@@ -36,6 +35,7 @@ import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
 import pl.syntaxdevteam.punisher.identity.PunisherXIdentityMigrationService
 import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
+import pl.syntaxdevteam.punisher.loader.PluginRegistrations
 import pl.syntaxdevteam.punisher.loader.PluginInitializer
 import pl.syntaxdevteam.punisher.players.*
 import pl.syntaxdevteam.punisher.reports.ReportService
@@ -153,9 +153,10 @@ class PunisherX : JavaPlugin(), Listener {
     }
 
     override fun onDisable() {
+        HandlerList.unregisterAll(this as Plugin)
+        cancelPluginTasks()
         server.servicesManager.unregisterAll(this)
         runCatching { fastStatsBridge.shutdown() }
-        AsyncChatEvent.getHandlerList().unregister(this as Plugin)
         if (::pluginInitializer.isInitialized) {
             pluginInitializer.onDisable()
         }
@@ -172,15 +173,19 @@ class PunisherX : JavaPlugin(), Listener {
     }
 
     private fun reloadMyConfig() {
-        pluginInitializer.onDisable()
-        cancelPluginTasks()
-        runCatching { proxyBridgeMessenger.unregisterChannel() }
         HandlerList.unregisterAll(this as Plugin)
+        cancelPluginTasks()
+        pluginInitializer.onDisable()
+        runCatching { proxyBridgeMessenger.unregisterChannel() }
         reloadConfig()
         initializePlugin()
     }
 
     private fun initializePlugin() {
+        val removed = PluginRegistrations.clearStale(this) { owner -> cancelPluginTasks(owner) }
+        if (removed > 0) {
+            super.getLogger().warning("Removed stale registrations from $removed previous PunisherX instance(s).")
+        }
         pluginInitializer = PluginInitializer(this)
         try {
             pluginInitializer.onEnable()
@@ -191,20 +196,20 @@ class PunisherX : JavaPlugin(), Listener {
         }
     }
 
-    private fun cancelPluginTasks() {
+    private fun cancelPluginTasks(owner: Plugin = this) {
         if (ServerEnvironment.isFoliaBased()) {
-            tryCancelScheduler("getGlobalRegionScheduler")
-            tryCancelScheduler("getRegionScheduler")
-            tryCancelScheduler("getAsyncScheduler")
+            tryCancelScheduler("getGlobalRegionScheduler", owner)
+            tryCancelScheduler("getRegionScheduler", owner)
+            tryCancelScheduler("getAsyncScheduler", owner)
         } else {
-            server.scheduler.cancelTasks(this)
+            server.scheduler.cancelTasks(owner)
         }
     }
 
-    private fun tryCancelScheduler(methodName: String) {
+    private fun tryCancelScheduler(methodName: String, owner: Plugin) {
         try {
             val scheduler = server.javaClass.getMethod(methodName).invoke(server) ?: return
-            scheduler.javaClass.getMethod("cancelTasks", Plugin::class.java).invoke(scheduler, this)
+            scheduler.javaClass.getMethod("cancelTasks", Plugin::class.java).invoke(scheduler, owner)
         } catch (_: Throwable) {
             reportError(Throwable("Failed to cancel tasks using $methodName, falling back to standard cancellation."))
         }
