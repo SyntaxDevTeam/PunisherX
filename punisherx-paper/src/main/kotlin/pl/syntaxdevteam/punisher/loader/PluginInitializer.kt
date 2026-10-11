@@ -64,6 +64,7 @@ class PluginInitializer(private val plugin: PunisherX) {
     fun onDisable() {
         runCatching { plugin.onlinePunishmentWatcher.stop() }
         runCatching { plugin.punishmentActionBarNotifier.stop() }
+        runCatching { plugin.server.servicesManager.unregister(PunisherXApi::class.java, plugin.punisherXApi) }
         plugin.databaseHandler.closeConnection()
         plugin.logger.err(plugin.pluginMeta.name + " " + plugin.pluginMeta.version + " has been disabled ☹️")
     }
@@ -90,10 +91,11 @@ class PluginInitializer(private val plugin: PunisherX) {
      * Sets up the database connection and creates necessary tables.
      */
     private fun setupDatabase() {
-        plugin.databaseHandler = DatabaseHandler(plugin)
+        val databaseHandler = DatabaseHandler(plugin)
+        plugin.databaseHandler = databaseHandler
         val databaseSetupTask = Runnable {
-            plugin.databaseHandler.openConnection()
-            plugin.databaseHandler.createTables()
+            databaseHandler.openConnection()
+            databaseHandler.createTables()
         }
         plugin.logger.debug("Detected server: ${ServerEnvironment.platformName}")
         val dbTypeName = plugin.databaseHandler.databaseType().name
@@ -139,7 +141,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         t("after GeoIPHandler")
         plugin.cache = PunishmentCache(plugin)
         plugin.punishmentActionBarNotifier = PunishmentActionBarNotifier(plugin).also { it.start() }
-        plugin.punisherXApi = PunisherXApiImpl(plugin.databaseHandler)
+        plugin.punisherXApi = PunisherXApiImpl { plugin.databaseHandler }
         t("before HookHandler")
         plugin.hookHandler = HookHandler(plugin)
         t("after HookHandler")

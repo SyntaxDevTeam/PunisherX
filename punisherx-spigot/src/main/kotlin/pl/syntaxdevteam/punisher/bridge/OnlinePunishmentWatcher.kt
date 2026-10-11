@@ -10,10 +10,13 @@ import java.util.concurrent.TimeUnit
 
 class OnlinePunishmentWatcher(private val plugin: PunisherX) {
 
+    private var stopped = true
     private var asyncTask: BukkitTask? = null
 
+    @Synchronized
     fun start() {
         stop()
+        stopped = false
         val periodTicks = plugin.config.getLong("bridge.watchdog_period_ticks", DEFAULT_PERIOD_TICKS)
         asyncTask = plugin.server.scheduler.runTaskTimerAsynchronously(
             plugin,
@@ -23,12 +26,17 @@ class OnlinePunishmentWatcher(private val plugin: PunisherX) {
         )
     }
 
+    @Synchronized
     fun stop() {
+        stopped = true
         asyncTask?.cancel()
         asyncTask = null
     }
 
+    @Synchronized
     private fun checkOnlinePlayers() {
+        if (stopped || !plugin.databaseHandler.isReady()) return
+
         val onlinePlayers = plugin.server.onlinePlayers
         if (onlinePlayers.isEmpty()) return
 

@@ -11,11 +11,14 @@ import java.util.concurrent.TimeUnit
 
 class OnlinePunishmentWatcher(private val plugin: PunisherX) {
 
+    private var stopped = true
     private var asyncTask: BukkitTask? = null
     private var foliaTask: ScheduledTask? = null
 
+    @Synchronized
     fun start() {
         stop()
+        stopped = false
         val periodTicks = plugin.config.getLong("bridge.watchdog_period_ticks", DEFAULT_PERIOD_TICKS)
         if (ServerEnvironment.isFoliaBased()) {
             foliaTask = plugin.server.globalRegionScheduler.runAtFixedRate(
@@ -34,14 +37,19 @@ class OnlinePunishmentWatcher(private val plugin: PunisherX) {
         }
     }
 
+    @Synchronized
     fun stop() {
+        stopped = true
         asyncTask?.cancel()
         asyncTask = null
         foliaTask?.cancel()
         foliaTask = null
     }
 
+    @Synchronized
     private fun checkOnlinePlayers() {
+        if (stopped || !plugin.databaseHandler.isReady()) return
+
         val onlinePlayers = plugin.server.onlinePlayers
         if (onlinePlayers.isEmpty()) return
 

@@ -88,8 +88,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     /** Closes the datasource. */
     fun closeConnection() {
-        db.close()
         ready.set(false)
+        db.close()
     }
 
     /** Utility for executing update/insert/delete statements. */

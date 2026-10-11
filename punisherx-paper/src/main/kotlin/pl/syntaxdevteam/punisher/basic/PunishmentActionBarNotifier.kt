@@ -12,16 +12,19 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class PunishmentActionBarNotifier(private val plugin: PunisherX) {
 
+    private var stopped = true
     private var asyncTask: BukkitTask? = null
     private var foliaTask: ScheduledTask? = null
     private val isRunning = AtomicBoolean(false)
 
+    @Synchronized
     fun start() {
         stop()
         if (!plugin.config.getBoolean("notifications.punishment_bar.enabled", true)) {
             return
         }
 
+        stopped = false
         val periodTicks = plugin.config.getLong("notifications.punishment_bar.period_ticks", DEFAULT_PERIOD_TICKS)
         if (ServerEnvironment.isFoliaBased()) {
             foliaTask = plugin.server.globalRegionScheduler.runAtFixedRate(
@@ -40,14 +43,19 @@ class PunishmentActionBarNotifier(private val plugin: PunisherX) {
         }
     }
 
+    @Synchronized
     fun stop() {
+        stopped = true
         asyncTask?.cancel()
         asyncTask = null
         foliaTask?.cancel()
         foliaTask = null
     }
 
+    @Synchronized
     private fun notifyPlayers() {
+        if (stopped || !plugin.databaseHandler.isReady()) return
+
         if (!isRunning.compareAndSet(false, true)) {
             plugin.logger.debug("Skipping action bar update, previous run still in progress")
             return

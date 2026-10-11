@@ -71,6 +71,7 @@ class PunisherX : JavaPlugin(), Listener {
     lateinit var punishmentChecker: PunishmentChecker
     lateinit var playerJoinListener: PlayerJoinListener
 
+    @Volatile
     lateinit var databaseHandler: DatabaseHandler
     lateinit var timeHandler: TimeHandler
     lateinit var geoIPHandler: GeoIPHandler
@@ -158,9 +159,6 @@ class PunisherX : JavaPlugin(), Listener {
 
     override fun onDisable() {
         runCatching { fastStatsBridge.shutdown() }
-        if (this::databaseHandler.isInitialized) {
-            databaseHandler.closeConnection()
-        }
         if (::pluginInitializer.isInitialized) {
             pluginInitializer.onDisable()
         }

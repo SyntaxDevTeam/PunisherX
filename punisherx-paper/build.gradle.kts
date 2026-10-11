@@ -117,6 +117,9 @@ dependencies {
     compileOnly(libs.faststats.bukkit)
 
     testImplementation(libs.kotlin.test)
+    testRuntimeOnly(libs.syntaxcore) {
+        isTransitive = false
+    }
     testImplementation(libs.sqlite.jdbc)
     testImplementation(libs.paper.api)
     testImplementation(libs.messagehandler.paper)
@@ -134,6 +137,9 @@ tasks {
         dependsOn(shadowJar)
     }
     test {
+        // SyntaxCore bundles Adventure classes; use the Paper API's versions in tests.
+        val syntaxCoreJars = classpath.filter { it.name.startsWith("syntaxcore-") }
+        classpath = files(classpath - syntaxCoreJars, syntaxCoreJars)
         useJUnitPlatform()
         jvmArgs("-javaagent:${mockitoAgent.singleFile}")
     }

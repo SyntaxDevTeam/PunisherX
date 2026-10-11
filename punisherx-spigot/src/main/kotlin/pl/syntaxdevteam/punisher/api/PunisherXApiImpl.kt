@@ -5,7 +5,14 @@ import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import pl.syntaxdevteam.punisher.databases.PunishmentData
 import java.util.concurrent.CompletableFuture
 
-class PunisherXApiImpl(private val databaseHandler: DatabaseHandler) : PunisherXApi {
+class PunisherXApiImpl(private val databaseProvider: () -> DatabaseHandler) : PunisherXApi {
+
+    constructor(databaseHandler: DatabaseHandler) : this({ databaseHandler })
+
+    private val databaseHandler: DatabaseHandler
+        get() = databaseProvider().also {
+            check(it.isReady()) { "PunisherX database is not ready" }
+        }
 
     override fun getLastTenPunishmentHistory(uuid: String): CompletableFuture<List<PunishmentData>> {
         return CompletableFuture.supplyAsync {
