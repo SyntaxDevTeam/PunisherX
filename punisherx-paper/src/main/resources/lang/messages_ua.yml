@@ -76,14 +76,14 @@ ban:
   kick_message:
     # Ви можете змінити повідомлення для забаненого гравця
     - 'Назва сервера'
-    - 'PunisherX &8» &7Вас забанено'
-    - '&7'
-    - '&7'
-    - "&cПричина &8» &7<reason>"
-    - "&cТермін &8» &7<time>"
-    - '&7'
-    - '&8Ви можете подати апеляцію на:'
-    - "&eDiscord &8» &c&nhttps://vashserver.ua/discord"
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Вас забанено</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Причина </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - "<red>Термін </red><dark_gray>» </dark_gray><gray><time></gray>"
+    - '<gray></gray>'
+    - '<dark_gray>Ви можете подати апеляцію на:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://vashserver.ua/discord</underlined></red>"
   broadcast: "<dark_gray>Гравець <gray><player></gray> був забанений за <gray><reason></gray> на <gray><time></gray></dark_gray>"
     # Альтернативно можна використати цей формат повідомлення, якщо хочете більше виділити оголошення
     # broadcast:
@@ -108,14 +108,14 @@ banip:
   kick_message:
     # Ви можете змінити повідомлення для забаненого гравця
     - 'Назва сервера'
-    - 'PunisherX &8» &7Ваш IP було забанено!'
-    - '&7'
-    - '&7'
-    - "&cПричина &8» &7<reason>"
-    - "&cТермін &8» &7<time>"
-    - '&7'
-    - '&8Ви можете подати апеляцію на:'
-    - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.pl/discord"
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Ваш IP було забанено!</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Причина </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - "<red>Термін </red><dark_gray>» </dark_gray><gray><time></gray>"
+    - '<gray></gray>'
+    - '<dark_gray>Ви можете подати апеляцію на:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://SyntaxDevTeam.pl/discord</underlined></red>"
   broadcast: "<dark_gray>Гравець <gray><player></gray> був забанений за <gray><reason></gray> на <gray><time></gray></dark_gray>"
   no_reasons: "без причини"
   reasons:
@@ -201,14 +201,14 @@ kick:
   kick_message:
     # Ви можете змінити повідомлення для вигнаного гравця
     - 'Назва сервера'
-    - 'PunisherX &8» &7Вас було вигнано'
-    - '&7'
-    - '&7'
-    - "&cПричина &8» &7<reason>"
-    - '&7'
-    - '&7'
-    - '&8Ви можете подати апеляцію на:'
-    - "&eDiscord &8» &c&nhttps://vashserver.ua/discord"
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Вас було вигнано</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Причина </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - '<dark_gray>Ви можете подати апеляцію на:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://vashserver.ua/discord</underlined></red>"
   broadcast: "<dark_gray>Гравець <gray><player></gray> був вигнаний за <gray><reason></gray></dark_gray>"
     # Альтернативно можна використати цей формат повідомлення, якщо хочете більше виділити оголошення
     # broadcast:

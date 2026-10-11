@@ -76,14 +76,14 @@ ban:
   kick_message:
     # Você pode personalizar a mensagem exibida para o jogador banido
     - 'Nome do Servidor'
-    - 'PunisherX &8» &7Você foi banido'
-    - '&7'
-    - '&7'
-    - "&cMotivo &8» &7<reason>"
-    - "&cDuração &8» &7<time>"
-    - '&7'
-    - '&8Você pode apelar em:'
-    - "&eDiscord &8» &c&nhttps://seuservidor.com/discord"
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Você foi banido</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Motivo </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - "<red>Duração </red><dark_gray>» </dark_gray><gray><time></gray>"
+    - '<gray></gray>'
+    - '<dark_gray>Você pode apelar em:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://seuservidor.com/discord</underlined></red>"
   broadcast: "<dark_gray>O jogador <gray><player></gray> foi banido por <gray><reason></gray> durante <gray><time></gray></dark_gray>"
     # Alternativamente, você pode usar este formato se quiser destacar mais a mensagem
     # broadcast:
@@ -108,14 +108,14 @@ banip:
   kick_message:
     # Você pode personalizar a mensagem exibida para o jogador banido
     - 'Nome do Servidor'
-    - 'PunisherX &8» &7Seu IP foi banido!'
-    - '&7'
-    - '&7'
-    - "&cMotivo &8» &7<reason>"
-    - "&cDuração &8» &7<time>"
-    - '&7'
-    - '&8Você pode apelar em:'
-    - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.pl/discord"
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Seu IP foi banido!</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Motivo </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - "<red>Duração </red><dark_gray>» </dark_gray><gray><time></gray>"
+    - '<gray></gray>'
+    - '<dark_gray>Você pode apelar em:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://SyntaxDevTeam.pl/discord</underlined></red>"
   broadcast: "<dark_gray>O jogador <gray><player></gray> foi banido por <gray><reason></gray> durante <gray><time></gray></dark_gray>"
   no_reasons: "sem motivo"
   reasons:
@@ -201,14 +201,14 @@ kick:
   kick_message:
     # Você pode personalizar a mensagem exibida para o jogador expulso
     - 'Nome do Servidor'
-    - 'PunisherX &8» &7Você foi expulso'
-    - '&7'
-    - '&7'
-    - "&cMotivo &8» &7<reason>"
-    - '&7'
-    - '&7'
-    - '&8Você pode apelar em:'
-    - "&eDiscord &8» &c&nhttps://seuservidor.com/discord"
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Você foi expulso</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Motivo </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - '<dark_gray>Você pode apelar em:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://seuservidor.com/discord</underlined></red>"
   broadcast: "<dark_gray>O jogador <gray><player></gray> foi expulso por <gray><reason></gray></dark_gray>"
     # Alternativamente, você pode usar este formato se quiser destacar mais a mensagem
     # broadcast:

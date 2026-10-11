@@ -76,14 +76,14 @@ ban:
   kick_message:
     # Du kannst die Nachricht für den gebannten Spieler frei anpassen
     - 'Servername'
-    - 'PunisherX &8» &7Du wurdest gebannt'
-    - '&7'
-    - '&7'
-    - "&cGrund &8» &7<reason>"
-    - "&cDauer &8» &7<time>"
-    - '&7'
-    - '&8Du kannst Einspruch einlegen unter:'
-    - "&eDiscord &8» &c&nhttps://deinserver.de/discord"
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Du wurdest gebannt</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Grund </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - "<red>Dauer </red><dark_gray>» </dark_gray><gray><time></gray>"
+    - '<gray></gray>'
+    - '<dark_gray>Du kannst Einspruch einlegen unter:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://deinserver.de/discord</underlined></red>"
   broadcast: "<dark_gray>Spieler <gray><player></gray> wurde für <gray><reason></gray> für <gray><time></gray> gebannt</dark_gray>"
     # Alternativ kannst du folgendes Nachrichtenformat verwenden, wenn du die Nachricht deutlicher hervorheben möchtest
     # broadcast:
@@ -108,14 +108,14 @@ banip:
   kick_message:
     # Du kannst die Nachricht für den gebannten Spieler frei anpassen
     - 'Servername'
-    - 'PunisherX &8» &7Deine IP wurde gebannt!'
-    - '&7'
-    - '&7'
-    - "&cGrund &8» &7<reason>"
-    - "&cDauer &8» &7<time>"
-    - '&7'
-    - '&8Du kannst Einspruch einlegen unter:'
-    - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.pl/discord"
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Deine IP wurde gebannt!</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Grund </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - "<red>Dauer </red><dark_gray>» </dark_gray><gray><time></gray>"
+    - '<gray></gray>'
+    - '<dark_gray>Du kannst Einspruch einlegen unter:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://SyntaxDevTeam.pl/discord</underlined></red>"
   broadcast: "<dark_gray>Spieler <gray><player></gray> wurde für <gray><reason></gray> für <gray><time></gray> gebannt</dark_gray>"
   no_reasons: "kein Grund"
   reasons:
@@ -201,14 +201,14 @@ kick:
   kick_message:
     # Du kannst die Nachricht für den gekickten Spieler frei anpassen
     - 'Servername'
-    - 'PunisherX &8» &7Du wurdest gekickt'
-    - '&7'
-    - '&7'
-    - "&cGrund &8» &7<reason>"
-    - '&7'
-    - '&7'
-    - '&8Du kannst Einspruch einlegen unter:'
-    - "&eDiscord &8» &c&nhttps://deinserver.de/discord"
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Du wurdest gekickt</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Grund </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - '<dark_gray>Du kannst Einspruch einlegen unter:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://deinserver.de/discord</underlined></red>"
   broadcast: "<dark_gray>Spieler <gray><player></gray> wurde wegen <gray><reason></gray> gekickt</dark_gray>"
     # Alternativ kannst du folgendes Nachrichtenformat verwenden, wenn du die Nachricht deutlicher hervorheben möchtest
     # broadcast:

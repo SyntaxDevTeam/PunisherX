@@ -63,14 +63,14 @@ ban:
   usage: "Correct gebruik is: <gold>/ban <speler> (tijd) <reden>"
   kick_message:
     - 'Server Naam'
-    - 'PunisherX &8» &7Je bent verbannen'
-    - '&7'
-    - '&7'
-    - "&cReden &8» &7<reason>"
-    - "&cVoor &8» &7<time>"
-    - '&7'
-    - '&8Je kunt in beroep gaan op:'
-    - "&eDiscord &8» &c&nhttps://servername.pl/discord"
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Je bent verbannen</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Reden </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - "<red>Voor </red><dark_gray>» </dark_gray><gray><time></gray>"
+    - '<gray></gray>'
+    - '<dark_gray>Je kunt in beroep gaan op:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://servername.pl/discord</underlined></red>"
   broadcast: "<dark_gray>Speler <gray><player></gray> is verbannen voor <gray><reason></gray> voor <gray><time></gray></dark_gray>"
   no_reasons: "geen reden"
   reasons:
@@ -85,14 +85,14 @@ banip:
   usage: "Correct gebruik is: <gold>/banip <speler|ip> (tijd) <reden>"
   kick_message:
     - 'Server Naam'
-    - 'PunisherX &8» &7Je IP is verbannen!'
-    - '&7'
-    - '&7'
-    - "&cReden &8» &7<reason>"
-    - "&cVoor &8» &7<time>"
-    - '&7'
-    - '&8Je kunt in beroep gaan op:'
-    - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.pl/discord"
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Je IP is verbannen!</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Reden </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - "<red>Voor </red><dark_gray>» </dark_gray><gray><time></gray>"
+    - '<gray></gray>'
+    - '<dark_gray>Je kunt in beroep gaan op:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://SyntaxDevTeam.pl/discord</underlined></red>"
   broadcast: "<dark_gray>Speler <gray><player></gray> is verbannen voor <gray><reason></gray> voor <gray><time></gray></dark_gray>"
   no_reasons: "geen reden"
   reasons:
@@ -160,14 +160,14 @@ kick:
   usage: "Correct gebruik is: <gold>/kick <speler> <reden>"
   kick_message:
     - 'Server Naam'
-    - 'PunisherX &8» &7Je bent gekicked'
-    - '&7'
-    - '&7'
-    - "&cReden &8» &7<reason>"
-    - '&7'
-    - '&7'
-    - '&8Je kunt in beroep gaan op:'
-    - "&eDiscord &8» &c&nhttps://servername.pl/discord"
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Je bent gekicked</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Reden </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - '<dark_gray>Je kunt in beroep gaan op:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://servername.pl/discord</underlined></red>"
   broadcast: "<dark_gray>Speler <gray><player></gray> is gekicked voor <gray><reason></gray></dark_gray>"
   no_reasons: "geen reden"
   reasons:

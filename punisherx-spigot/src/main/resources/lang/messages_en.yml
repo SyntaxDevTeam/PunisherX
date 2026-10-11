@@ -122,14 +122,14 @@ ban:
   kick_message:
     # You can freely customize the message shown to the banned player
     - 'Server Name'
-    - 'PunisherX &8» &7You have been banned'
-    - '&7'
-    - '&7'
-    - "&cReason &8» &7<reason>"
-    - "&cDuration &8» &7<time>"
-    - '&7'
-    - '&8You can appeal at:'
-    - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
+    - 'PunisherX <dark_gray>» </dark_gray><gray>You have been banned</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Reason </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - "<red>Duration </red><dark_gray>» </dark_gray><gray><time></gray>"
+    - '<gray></gray>'
+    - '<dark_gray>You can appeal at:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://yourserver.com/discord</underlined></red>"
   broadcast: "<dark_gray>Player <gray><player></gray> was banned for <gray><reason></gray> for <gray><time></gray></dark_gray>"
     # Alternatively, you can use the following message format if you want to highlight this message more
     # broadcast:
@@ -154,14 +154,14 @@ banip:
   kick_message:
     # You can freely customize the message shown to the banned player
     - 'Server Name'
-    - 'PunisherX &8» &7Your IP has been banned!'
-    - '&7'
-    - '&7'
-    - "&cReason &8» &7<reason>"
-    - "&cDuration &8» &7<time>"
-    - '&7'
-    - '&8You can appeal at:'
-    - "&eDiscord &8» &c&nhttps://SyntaxDevTeam.pl/discord"
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Your IP has been banned!</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Reason </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - "<red>Duration </red><dark_gray>» </dark_gray><gray><time></gray>"
+    - '<gray></gray>'
+    - '<dark_gray>You can appeal at:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://SyntaxDevTeam.pl/discord</underlined></red>"
   broadcast: "<dark_gray>Player <gray><player></gray> was banned for <gray><reason></gray> for <gray><time></gray></dark_gray>"
   no_reasons: "no reason"
   reasons:
@@ -248,14 +248,14 @@ kick:
   kick_message:
     # You can freely customize the message shown to the kicked player
     - 'Server Name'
-    - 'PunisherX &8» &7You have been kicked'
-    - '&7'
-    - '&7'
-    - "&cReason &8» &7<reason>"
-    - '&7'
-    - '&7'
-    - '&8You can appeal at:'
-    - "&eDiscord &8» &c&nhttps://yourserver.com/discord"
+    - 'PunisherX <dark_gray>» </dark_gray><gray>You have been kicked</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Reason </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - '<dark_gray>You can appeal at:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://yourserver.com/discord</underlined></red>"
   broadcast: "<dark_gray>Player <gray><player></gray> was kicked for <gray><reason></gray></dark_gray>"
     # Alternatively, you can use the following message format if you want to highlight this message more
     # broadcast:
