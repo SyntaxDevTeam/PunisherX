@@ -8,6 +8,7 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 
 # Wiadomości obsługi błędów
 error:
+  banip_db_error: "<red>Nie udało się zapisać banów IP. Niezbanowane IP: <failed_ips>. Skutecznie zbanowane IP: <banned_ips>. Sprawdź konsolę.</red>"
   no_permission: "<red>Nie masz uprawnień do tej komendy.</red>"
   player_not_found: "<gold>Nie znaleziono gracza o nicku <player>.</gold>"
   player_not_punished: "<gold>Gracz <player> nie ma takiej kary.</gold>"

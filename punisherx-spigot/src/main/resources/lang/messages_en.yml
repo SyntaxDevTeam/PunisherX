@@ -9,6 +9,7 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 
 # Error messages
 error:
+  banip_db_error: "<red>Failed to save IP bans. IPs not banned: <failed_ips>. IPs successfully banned: <banned_ips>. Check the console.</red>"
   no_permission: "<red>You do not have permission to use this command.</red>"
   player_not_found: "<gold>No player found with the nickname <player>.</gold>"
   player_not_punished: "<gold>Player <player> does not have such a punishment.</gold>"

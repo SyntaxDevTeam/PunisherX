@@ -15,6 +15,7 @@ error:
   ip_not_found: "<gold>No se encontró ningún jugador con la IP <ip>.</gold>"
   no_data: "<red>No hay datos para mostrar.</red>"
   db_error: "Ocurrió un error al añadir el castigo a la base de datos. Usando método alternativo. ¡Revisa la consola!"
+  banip_db_error: "<red>No se pudieron guardar los bloqueos de IP. IP no bloqueadas: <failed_ips>. IP bloqueadas correctamente: <banned_ips>. Revisa la consola.</red>"
   db_not_ready: "<red>La base de datos todavía se está iniciando, inténtalo de nuevo en unos segundos.</red>"
   console: "<red>Solo un jugador puede usar este comando.</red>"
   reload: "<red>Ocurrió un error al recargar la configuración:</red>"

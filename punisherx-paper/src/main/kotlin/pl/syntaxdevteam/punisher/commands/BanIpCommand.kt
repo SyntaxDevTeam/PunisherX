@@ -64,22 +64,33 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
         val start = System.currentTimeMillis()
         val end = durationSec?.let { start + it * 1000 }
         val formattedTime = plugin.timeHandler.formatTime(timeArg)
-        var dbError = false
+        val failedIPs = mutableListOf<String>()
+        val bannedIPs = mutableListOf<String>()
         val normalizedEnd = end ?: -1
         val punishmentIds = mutableListOf<Long>()
         playerIPs.distinct().forEach { ip ->
             val punishmentId = plugin.databaseHandler.addPunishment(rawTarget, ip, reason, stack.sender.name,
                 "BANIP", start, normalizedEnd)
             if (punishmentId == null) {
-                plugin.logger.err("DB error ban-ip $ip")
-                dbError = true
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban-ip $ip")
-            } else {
-                punishmentIds.add(punishmentId)
+                plugin.logger.err("IP ban not applied: failed to persist punishment for $ip")
+                failedIPs.add(ip)
+                return@forEach
             }
+            punishmentIds.add(punishmentId)
+            bannedIPs.add(ip)
             plugin.databaseHandler.addPunishmentHistory(rawTarget, ip, reason, stack.sender.name,
                 "BANIP", start, normalizedEnd)
             plugin.proxyBridgeMessenger.notifyIpBan(ip, reason, normalizedEnd)
+        }
+        if (failedIPs.isNotEmpty()) {
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent(
+                "error", "banip_db_error", mapOf(
+                    "failed_ips" to failedIPs.joinToString(", "),
+                    "banned_ips" to bannedIPs.joinToString(", ").ifEmpty { "-" }
+                )
+            ))
+            // Some addresses may already have been persisted. Do not report full success.
+            return
         }
         val placeholders = mapOf(
             "player" to rawTarget,
@@ -94,7 +105,6 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
             }
         )
         clp.logCommand(stack.sender.name, "BANIP", rawTarget, reason)
-        if (dbError) stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
 
         if (targetPlayer != null) {
             val lines = plugin.messageHandler.getSmartMessage(

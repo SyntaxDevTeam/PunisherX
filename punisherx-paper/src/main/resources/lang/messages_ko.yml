@@ -9,6 +9,7 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 
 # Error messages
 error:
+  banip_db_error: "<red>IP 차단을 저장하지 못했습니다. 차단되지 않은 IP: <failed_ips>. 차단된 IP: <banned_ips>. 콘솔을 확인하세요.</red>"
   no_permission: "<red>당신은 이 명령어를 실행할 권한이 없습니다.</red>"
   player_not_found: "<gold>다음과 같은 닉네임을 가진 플레이어를 찾을 수 없습니다: <player>.</gold>"
   player_not_punished: "<gold><player>은(는) 처벌을 받지 않았습니다.</gold>"

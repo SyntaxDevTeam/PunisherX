@@ -9,6 +9,7 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 
 # رسائل الأخطاء
 error:
+  banip_db_error: "<red>تعذر حفظ حظر عناوين IP. العناوين غير المحظورة: <failed_ips>. العناوين المحظورة بنجاح: <banned_ips>. تحقق من وحدة التحكم.</red>"
   no_permission: "<red>ليس لديك صلاحية لاستخدام هذا الأمر.</red>"
   player_not_found: "<gold>لم يتم العثور على أي لاعب بالاسم <player>.</gold>"
   player_not_punished: "<gold>اللاعب <player> لا يملك أي عقوبة بهذا النوع.</gold>"

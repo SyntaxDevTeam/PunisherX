@@ -9,6 +9,7 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 
 # Повідомлення про помилки
 error:
+  banip_db_error: "<red>Не вдалося зберегти блокування IP. Не заблоковані: <failed_ips>. Успішно заблоковані: <banned_ips>. Перевірте консоль.</red>"
   no_permission: "<red>У вас немає дозволу на використання цієї команди.</red>"
   player_not_found: "<gold>Гравця з ніком <player> не знайдено.</gold>"
   player_not_punished: "<gold>Гравець <player> не має такого покарання.</gold>"

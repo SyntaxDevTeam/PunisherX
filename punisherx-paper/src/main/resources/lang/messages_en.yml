@@ -16,6 +16,7 @@ error:
   ip_not_found: "<gold>No player found with IP <ip>.</gold>"
   no_data: "<red>No data to display.</red>"
   db_error: "An error occurred while adding the punishment to the database. Using fallback method. Check console!"
+  banip_db_error: "<red>Failed to save IP bans. IPs not banned: <failed_ips>. IPs successfully banned: <banned_ips>. Check the console.</red>"
   db_not_ready: "<red>The database is still starting, please try again in a few seconds.</red>"
   console: "<red>Only a player can use this command.</red>"
   reload: "<red>An error occurred while reloading the configuration:</red>"

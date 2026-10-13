@@ -14,6 +14,7 @@ error:
   ip_not_found: "<gold>Nie znaleziono gracza o IP <ip>.</gold>"
   no_data: "<red>Brak danych do wyświetlenia.</red>"
   db_error: "Wystąpił błąd przy dodawaniu kary do bazy danych. Korzystanie z metody zapasowej. Sprawdź konsolę!"
+  banip_db_error: "<red>Nie udało się zapisać banów IP. Niezbanowane IP: <failed_ips>. Skutecznie zbanowane IP: <banned_ips>. Sprawdź konsolę.</red>"
   db_not_ready: "<red>Baza danych wciąż się uruchamia, spróbuj ponownie za kilka sekund.</red>"
   console: "<red>Tylko gracz może użyć tej komendy.</red>"
   reload: "<red>Wystąpił błąd podczas przeładowania konfiguracji:</red>"

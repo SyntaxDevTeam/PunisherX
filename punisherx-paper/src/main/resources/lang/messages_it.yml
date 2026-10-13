@@ -15,6 +15,7 @@ error:
   ip_not_found: "<gold>Nessun giocatore trovato con l’IP <ip>.</gold>"
   no_data: "<red>Nessun dato da mostrare.</red>"
   db_error: "Si è verificato un errore durante l’aggiunta della punizione al database. Uso del metodo di riserva. Controlla la console!"
+  banip_db_error: "<red>Impossibile salvare i ban IP. IP non bannati: <failed_ips>. IP bannati correttamente: <banned_ips>. Controlla la console.</red>"
   db_not_ready: "<red>Il database è ancora in fase di avvio, riprova tra qualche secondo.</red>"
   console: "<red>Solo un giocatore può usare questo comando.</red>"
   reload: "<red>Si è verificato un errore durante il ricaricamento della configurazione:</red>"

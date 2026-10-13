@@ -150,6 +150,13 @@ class DatabaseHandler(private val plugin: PunisherX) {
         else -> "INT AUTO_INCREMENT PRIMARY KEY"
     }
 
+    // Explicit column encoding also works when the database default is latin1.
+    // Existing columns require a separate migration; CREATE IF NOT EXISTS does not alter them.
+    private fun unicodeTextDefinition(type: String, engine: DatabaseType = dbType): String = when (engine) {
+        DatabaseType.MYSQL, DatabaseType.MARIADB -> "$type CHARACTER SET utf8mb4"
+        else -> type
+    }
+
     private fun reportReasonDefinition(): String = when (dbType) {
         DatabaseType.MYSQL, DatabaseType.MARIADB, DatabaseType.POSTGRESQL, DatabaseType.SQLITE, DatabaseType.H2 ->
             "TEXT"
@@ -172,7 +179,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                 Column("id", idDefinition()),
                 Column("name", "VARCHAR(32)"),
                 Column("uuid", "VARCHAR(36)"),
-                Column("reason", "VARCHAR(255)"),
+                Column("reason", unicodeTextDefinition("VARCHAR(255)")),
                 Column("operator", "VARCHAR(16)"),
                 Column("punishmentType", "VARCHAR(16)"),
                 Column("start", "BIGINT"),
@@ -222,7 +229,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                 Column("id", idDefinition()),
                 Column("action", "VARCHAR(16) NOT NULL"),
                 Column("target", "VARCHAR(64) NOT NULL"),
-                Column("reason", "TEXT"),
+                Column("reason", unicodeTextDefinition("TEXT")),
                 Column("endTime", "BIGINT NOT NULL"),
                 Column("processed", "TINYINT DEFAULT 0"),
                 Column("processedAt", "BIGINT")
@@ -1238,7 +1245,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                             Column("id", idDef),
                             Column("name", "VARCHAR(32)"),
                             Column("uuid", "VARCHAR(36)"),
-                            Column("reason", "VARCHAR(255)"),
+                            Column("reason", unicodeTextDefinition("VARCHAR(255)", to)),
                             Column("operator", "VARCHAR(16)"),
                             Column("punishmentType", "VARCHAR(16)"),
                             Column("start", "BIGINT"),

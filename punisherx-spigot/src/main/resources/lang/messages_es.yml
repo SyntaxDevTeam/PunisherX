@@ -9,6 +9,7 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 
 # Mensajes de error
 error:
+  banip_db_error: "<red>No se pudieron guardar los bloqueos de IP. IP no bloqueadas: <failed_ips>. IP bloqueadas correctamente: <banned_ips>. Revisa la consola.</red>"
   no_permission: "<red>No tienes permiso para usar este comando.</red>"
   player_not_found: "<gold>No se encontró al jugador con el nombre <player>.</gold>"
   player_not_punished: "<gold>El jugador <player> no tiene ese castigo.</gold>"

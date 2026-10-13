@@ -15,6 +15,7 @@ error:
   ip_not_found: "<gold>Kein Spieler mit der IP <ip> gefunden.</gold>"
   no_data: "<red>Keine Daten zum Anzeigen.</red>"
   db_error: "Beim Hinzufügen der Strafe zur Datenbank ist ein Fehler aufgetreten. Fallback-Methode wird verwendet. Überprüfe die Konsole!"
+  banip_db_error: "<red>IP-Sperren konnten nicht gespeichert werden. Nicht gesperrte IPs: <failed_ips>. Erfolgreich gesperrte IPs: <banned_ips>. Prüfe die Konsole.</red>"
   db_not_ready: "<red>Die Datenbank wird noch gestartet, bitte versuche es in ein paar Sekunden erneut.</red>"
   console: "<red>Diesen Befehl kann nur ein Spieler ausführen.</red>"
   reload: "<red>Beim Neuladen der Konfiguration ist ein Fehler aufgetreten:</red>"
