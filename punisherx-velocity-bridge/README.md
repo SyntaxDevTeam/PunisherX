@@ -43,7 +43,7 @@ Looking for the backend plugin or the BungeeCord artifact? See the **[main Punis
 
 | Component | Requirement |
 | --- | --- |
-| Proxy | **Velocity 4**; the current project targets `4.2.1-SNAPSHOT`. |
+| Proxy | **Velocity 4.3.0** (stable API). |
 | Java | **25 or newer** on the proxy. |
 | Backend plugin | PunisherX for Paper/Folia or Spigot. |
 | Storage | A shared **MySQL database**, reachable from the proxy and backends. |
@@ -108,6 +108,9 @@ From the repository root:
 ```
 
 Use a **Java 25 toolchain**. The resulting plugin JAR is written to `punisherx-velocity-bridge/build/libs/`.
+
+For the isolated Velocity 4.3.0 and MariaDB runtime test, including TCP login denial
+and player session API checks, see [runtime compatibility tests](src/runtimeTest/README.md).
 
 ## 📚 Links
 

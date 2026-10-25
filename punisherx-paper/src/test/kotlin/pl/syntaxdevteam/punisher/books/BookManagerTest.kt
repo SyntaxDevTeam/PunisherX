@@ -1,6 +1,7 @@
 package pl.syntaxdevteam.punisher.books
 
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.ClickEvent
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -9,6 +10,7 @@ import org.mockito.kotlin.whenever
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class BookManagerTest {
@@ -17,7 +19,7 @@ class BookManagerTest {
         var command = ""
         manager.open(player, Component.text("Reports"), Component.text("PunisherX")) { menu ->
             val button = menu.button(Component.text("Send"), action)
-            command = button.clickEvent()!!.value()
+            command = assertIs<ClickEvent.Payload.Text>(button.clickEvent()!!.payload()).value()
             listOf(button)
         }
         return command
@@ -58,7 +60,7 @@ class BookManagerTest {
         now = 300_001
         manager.onCommand(PlayerCommandPreprocessEvent(player, expired, emptySet()))
         val disconnected = button(manager, player) { calls++ }
-        manager.onQuit(PlayerQuitEvent(player, Component.empty()))
+        manager.onQuit(PlayerQuitEvent(player, Component.empty(), PlayerQuitEvent.QuitReason.DISCONNECTED))
         manager.onCommand(PlayerCommandPreprocessEvent(player, disconnected, emptySet()))
         assertEquals(0, calls)
     }

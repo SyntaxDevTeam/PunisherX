@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 shadow = "9.6.1"
 dokka = "2.2.0"
 hangar = "0.1.4"
@@ -8,7 +8,7 @@ plugindeployer = "1.0.6-R0.2-SNAPSHOT"
 
 paper-api = "1.21.11-R0.1-SNAPSHOT"
 spigot-api = "1.21.11-R0.2-SNAPSHOT"
-velocity-api = "4.2.1-SNAPSHOT"
+velocity-api = "4.3.0"
 bungeecord-api = "1.21-R0.4"
 brigadier = "1.0.500"
 

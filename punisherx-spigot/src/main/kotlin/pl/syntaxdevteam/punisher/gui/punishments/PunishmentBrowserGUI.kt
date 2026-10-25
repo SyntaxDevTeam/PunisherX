@@ -13,6 +13,7 @@ import pl.syntaxdevteam.punisher.databases.PunishmentData
 import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.UUID
 
 class PunishmentBrowserGUI(plugin: PunisherX) : BaseGUI(plugin) {
     private enum class Filter(val types: Set<String>) {
@@ -49,7 +50,8 @@ class PunishmentBrowserGUI(plugin: PunisherX) : BaseGUI(plugin) {
     private fun createHead(p: PunishmentData): ItemStack {
         val head = ItemStack(Material.PLAYER_HEAD)
         val meta = head.itemMeta as SkullMeta
-        meta.owningPlayer = Bukkit.getOfflinePlayer(p.name)
+        val uuid = runCatching { UUID.fromString(p.uuid) }.getOrNull()
+        meta.ownerProfile = Bukkit.createPlayerProfile(uuid, p.name)
         meta.displayName(mH.formatMixedTextToMiniMessage("<yellow>${p.name}</yellow> <gray>#${p.id}</gray>", TagResolver.empty()))
         val end = if (p.end == -1L) "permanent" else plugin.timeHandler.formatTime(((p.end - System.currentTimeMillis()).coerceAtLeast(0) / 1000).toString())
         meta.lore(listOf(mH.miniMessageFormat("<gray>Type: <yellow>${p.type}</yellow></gray>"),

@@ -11,7 +11,6 @@ repositories {
 
 dependencies {
     compileOnly(libs.velocity.api)
-    annotationProcessor(libs.velocity.api)
     implementation(libs.hikari) {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
