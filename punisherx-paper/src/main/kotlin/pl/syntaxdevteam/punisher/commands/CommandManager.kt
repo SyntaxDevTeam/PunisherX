@@ -49,6 +49,33 @@ class CommandManager(private val plugin: PunisherX) {
                 plugin.messageHandler.stringMessageToString("warn", "usage"),
                 WarnCommand(plugin)
             )
+            val unpunishCmd = UnpunishCommand(plugin)
+            val unpunishNode = Commands.literal("unpunish")
+                .requires { src -> pl.syntaxdevteam.punisher.permissions.PermissionChecker
+                    .hasWithLegacy(src.sender, pl.syntaxdevteam.punisher.permissions.PermissionChecker.PermissionKey.UNPUNISH) }
+                .executes { ctx -> unpunishCmd.execute(ctx.source, emptyArray()); 1 }
+                .then(Commands.argument("player", StringArgumentType.word())
+                    .suggests { _, builder ->
+                        plugin.server.onlinePlayers.forEach { builder.suggest(it.name) }
+                        builder.buildFuture()
+                    }
+                    .executes { ctx ->
+                        unpunishCmd.execute(ctx.source, arrayOf(StringArgumentType.getString(ctx, "player"))); 1
+                    }
+                    .then(Commands.argument("template", StringArgumentType.string())
+                        .suggests { _, builder ->
+                            plugin.punishTemplateManager.getTemplateNames().forEach {
+                                builder.suggest(StringArgumentType.escapeIfRequired(it))
+                            }
+                            builder.buildFuture()
+                        }
+                        .executes { ctx ->
+                            unpunishCmd.execute(ctx.source, arrayOf(
+                                StringArgumentType.getString(ctx, "player"), StringArgumentType.getString(ctx, "template")))
+                            1
+                        }))
+                .build()
+            commands.register(unpunishNode, "/unpunish <player> <template>", emptyList())
             // Register /punish with Brigadier — word() for player, string() for template (supports spaces via quotes)
             val punishCmd = PunishCommand(plugin)
             val punishNode = Commands.literal("punish")
@@ -211,6 +238,9 @@ class CommandManager(private val plugin: PunisherX) {
                         WarnCommand(plugin)
                     )
 /*
+                    "unpunish" -> commands.register(
+                        commandName, "/unpunish <player> <template>", UnpunishCommand(plugin)
+                    )
                     "punish" -> commands.register(
                         commandName,
                         plugin.messageHandler.stringMessageToString("punish", "usage"),

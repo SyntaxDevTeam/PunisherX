@@ -88,8 +88,10 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
 
                 punishments.forEach { punishment ->
                     val formattedDate = dateFormat.format(Date(punishment.start))
+                    val undoneMarker = if (punishment.undone)
+                        mh.stringMessageToStringNoPrefix("unpunish", "history_marker") else ""
                     val punishmentMessage =
-                        mh.miniMessageFormat("<blue>|   <white>#${punishment.id}</white> <blue>|</blue> <white>${punishment.type}</white> <blue>|</blue> <white>${punishment.reason}</white> <blue>|</blue> <white>$formattedDate</blue>")
+                        mh.miniMessageFormat("<blue>|   <white>#${punishment.id}</white> <blue>|</blue> <white>${punishment.type}</white> $undoneMarker <blue>|</blue> <white>${punishment.reason}</white> <blue>|</blue> <white>$formattedDate</blue>")
                     stack.sender.sendMessage(punishmentMessage)
                 }
                 stack.sender.sendMessage(hr)

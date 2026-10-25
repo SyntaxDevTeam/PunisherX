@@ -19,6 +19,8 @@
 ## Punishment templates and panel
 
 * `/punish <player> <template> (level)` — applies a template from `punish-templates.yml`. Without a level, the plugin selects the next escalation level from punishment history. Requires `punisherx.cmd.punish`.
+* `/unpunish <player> <template>` — reverses the latest remaining punishment in that template ladder and removes its contribution to escalation. Requires `punisherx.cmd.unpunish`. Works after expiry or a normal `/unmute`/`/unban`. Each call reverses one event; a multi-IP ban is one event. Original history is retained and marked as reversed. Names with spaces can be quoted, for example `/unpunish Alex "Chat spam"`.
+* New template history is linked to the template name, so templates sharing a reason remain separate and editing a reason does not break undo. Older history uses the original reason-based matching, including direct punishments with that reason. Renaming or deleting a template breaks the link to its new history. Undo cannot reverse a kick that already happened or external commands/actions triggered by a punishment.
 * `/panel` — opens the moderation dashboard; requires `punisherx.cmd.panel` or management access. Individual actions still check their permissions.
 * The player panel offers search, punishment details and quick template punishments. Quick punishments require `punisherx.cmd.punish`; editing duration/reason presets requires `punisherx.manage` or `punisherx.manage.*`. Presets are saved to `gui.punish.times` and `gui.punish.reasons` in `config.yml`.
 

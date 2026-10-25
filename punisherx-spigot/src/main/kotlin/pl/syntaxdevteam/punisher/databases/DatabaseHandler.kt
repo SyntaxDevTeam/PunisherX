@@ -190,6 +190,16 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
         db.createTable(punishmentSchema)
         db.createTable(historySchema)
+        db.createTable(TableSchema("punishment_undos", listOf(
+            Column("historyId", "INTEGER PRIMARY KEY"),
+            Column("undoneBy", "VARCHAR(64) NOT NULL"),
+            Column("undoneAt", "BIGINT NOT NULL")
+        )))
+        db.createTable(TableSchema("punishment_templates", listOf(
+            Column("historyId", "INTEGER PRIMARY KEY"),
+            Column("templateName", "VARCHAR(255) NOT NULL"),
+            Column("playerUuid", "VARCHAR(36) NOT NULL")
+        )))
         ensureServerScopeColumns()
 
         val playerCacheSchema = TableSchema(
@@ -451,6 +461,31 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
+    /** The original history and template identity are persisted together. */
+    fun addTemplatePunishmentHistory(
+        name: String, uuid: String, reason: String, operator: String, punishmentType: String,
+        start: Long, end: Long, templateName: String, templateUuid: String,
+        server: String = normalizedServerScope()
+    ) {
+        try {
+            PunishmentUndoStore({ db.getConnection() }, normalizedServerScope()).record(
+                name, uuid, reason, operator, punishmentType, start, end, server, templateName, templateUuid)
+        } catch (error: Exception) {
+            logger.err("Failed to add template punishment history for $name. ${error.message}")
+        }
+    }
+
+    /** Throws on read errors so a database failure cannot reset escalation to level one. */
+    fun countEscalationHistory(uuid: String, name: String, reason: String, template: String): Int =
+        PunishmentUndoStore({ db.getConnection() }, normalizedServerScope()).count(uuid, name, reason, template)
+
+    fun undoPunishment(uuid: String, name: String, reason: String, template: String, operator: String): List<PunishmentData>? = try {
+        PunishmentUndoStore({ db.getConnection() }, normalizedServerScope()).undo(uuid, name, reason, template, operator)
+    } catch (error: Exception) {
+        logger.err("Failed to undo punishment for $uuid. ${error.message}")
+        null
+    }
+
     fun removePunishment(uuidOrIp: String, punishmentType: String, removeAll: Boolean = false) {
         val params = mutableListOf<Any>(uuidOrIp, punishmentType)
         val base = appendServerFilter("DELETE FROM punishments WHERE uuid = ? AND punishmentType = ?", params, true)
@@ -498,6 +533,11 @@ class DatabaseHandler(private val plugin: PunisherX) {
             execute(punishmentsSql, *punishmentsParams.toTypedArray())
             val historyParams = mutableListOf<Any>(uuid)
             val historySql = appendServerFilter("DELETE FROM punishmenthistory WHERE uuid = ?", historyParams, true)
+            for (table in listOf("punishment_templates", "punishment_undos")) {
+                val params = mutableListOf<Any>(uuid)
+                val historyIds = appendServerFilter("SELECT id FROM punishmenthistory WHERE uuid = ?", params, true)
+                execute("DELETE FROM $table WHERE historyId IN ($historyIds)", *params.toTypedArray())
+            }
             execute(historySql, *historyParams.toTypedArray())
         } catch (e: Exception) {
             logger.err("Failed to delete player data. ${e.message}")
@@ -778,7 +818,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
         )
 
         val params = mutableListOf<Any>(uuid)
-        var sql = appendServerFilter("SELECT * FROM punishmenthistory WHERE uuid = ?", params, true)
+        var sql = appendServerFilter("SELECT *, CASE WHEN EXISTS (SELECT 1 FROM punishment_undos u " +
+            "WHERE u.historyId = punishmenthistory.id) THEN 1 ELSE 0 END AS undone FROM punishmenthistory WHERE uuid = ?", params, true)
         if (supportsOrderAndLimit && limit != null && offset != null) {
             sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
             params.add(limit)
@@ -796,7 +837,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.getLong("endTime"),
                     rs.getString("name"),
                     rs.getString("operator"),
-                    rs.getString("server")
+                    rs.getString("server"),
+                    rs.getBoolean("undone")
                 )
             }.toMutableList()
         } catch (e: Exception) {
@@ -1068,7 +1110,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
     // ---------------------------------------------------------------------
 
     fun exportDatabase() {
-        val tables = listOf("punishments", "punishmenthistory")
+        val tables = listOf("punishments", "punishmenthistory", "punishment_undos", "punishment_templates")
         try {
             val dumpDir = File(plugin.dataFolder, "dump").apply { mkdirs() }
             val writer = File(dumpDir, "backup.sql").bufferedWriter()
@@ -1171,7 +1213,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                         DatabaseType.POSTGRESQL -> "SERIAL PRIMARY KEY"
                         else -> "INT AUTO_INCREMENT PRIMARY KEY"
                     }
-                    val tables = listOf("punishments", "punishmenthistory")
+                    val tables = listOf("punishments", "punishmenthistory", "punishment_undos", "punishment_templates")
                     tables.forEach { table ->
                         try {
                             targetDb.execute("DROP TABLE IF EXISTS $table")
@@ -1197,6 +1239,17 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     val historySchema = punishmentSchema.copy(name = "punishmenthistory")
                     targetDb.createTable(punishmentSchema)
                     targetDb.createTable(historySchema)
+                    targetDb.createTable(TableSchema("punishment_undos", listOf(
+                        Column("historyId", "INTEGER PRIMARY KEY"),
+                        Column("undoneBy", "VARCHAR(64) NOT NULL"),
+                        Column("undoneAt", "BIGINT NOT NULL")
+                    )))
+
+                    targetDb.createTable(TableSchema("punishment_templates", listOf(
+                        Column("historyId", "INTEGER PRIMARY KEY"),
+                        Column("templateName", "VARCHAR(255) NOT NULL"),
+                        Column("playerUuid", "VARCHAR(36) NOT NULL")
+                    )))
 
                     val lines = backupFile.readLines()
                     val sql = StringBuilder()

@@ -23,6 +23,7 @@ object PermissionChecker {
         WARN("punisherx.cmd.warn"),
         UNWARN("punisherx.cmd.unwarn"),
         PUNISH("punisherx.cmd.punish"),
+        UNPUNISH("punisherx.cmd.unpunish"),
 
         CHANGE_REASON("punisherx.cmd.change_reason"),
         BAN_LIST("punisherx.cmd.banlist"),
@@ -89,6 +90,7 @@ object PermissionChecker {
         PermissionKey.UNMUTE -> "Allows unmuting a player, restoring their ability to send messages."
         PermissionKey.WARN -> "Allows warning a player with a specified reason."
         PermissionKey.UNWARN -> "Allows removing a warning from a player."
+        PermissionKey.UNPUNISH -> "Allows reversing a punishment and its escalation count."
         PermissionKey.PUNISH -> "Allows punishing a player using a configured template."
 
         PermissionKey.BYPASS -> "Allows bypassing all punishments."

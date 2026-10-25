@@ -60,10 +60,13 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         val computedLevel = if (requestedLevel != null) {
             requestedLevel
         } else {
-            val historyCount = plugin.databaseHandler
-                .getPunishmentHistory(uuid.toString())
-                .count { it.reason == templateReason }
-            historyCount + 1
+            try {
+                plugin.databaseHandler.countEscalationHistory(uuid.toString(), targetName, templateReason, template.name) + 1
+            } catch (error: Exception) {
+                plugin.logger.err("Failed to count punishment escalation for $targetName. ${error.message}")
+                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("punish", "history_error"))
+                return
+            }
         }
 
         val templateLevel = template.resolveLevel(computedLevel)
@@ -102,12 +105,12 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
         when (type) {
-            "BAN" -> applyBan(stack, targetName, uuid, template.reason, templateLevel)
-            "BANIP" -> applyBanIp(stack, targetName, uuid, template.reason, templateLevel)
-            "MUTE" -> applyMute(stack, targetName, uuid, template.reason, templateLevel)
-            "WARN" -> applyWarn(stack, targetName, uuid, template.reason, templateLevel)
-            "KICK" -> applyKick(stack, targetName, uuid, template.reason, templateLevel)
-            "JAIL" -> applyJail(stack, targetName, uuid, template.reason, templateLevel)
+            "BAN" -> applyBan(stack, targetName, uuid, template, templateLevel)
+            "BANIP" -> applyBanIp(stack, targetName, uuid, template, templateLevel)
+            "MUTE" -> applyMute(stack, targetName, uuid, template, templateLevel)
+            "WARN" -> applyWarn(stack, targetName, uuid, template, templateLevel)
+            "KICK" -> applyKick(stack, targetName, uuid, template, templateLevel)
+            "JAIL" -> applyJail(stack, targetName, uuid, template, templateLevel)
             else -> stack.sender.sendMessage(
                 plugin.messageHandler.stringMessageToComponent(
                     "punish",
@@ -154,9 +157,10 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         stack: CommandSourceStack,
         targetName: String,
         uuid: UUID,
-        reason: String,
+        template: PunishTemplate,
         templateLevel: PunishTemplateLevel
     ) {
+        val reason = template.reason
         val parsedTemplateTime = parseTemplateTime(stack, templateLevel.time) ?: return
         val parsedSeconds = parsedTemplateTime.seconds
         val start = System.currentTimeMillis()
@@ -173,7 +177,7 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
             banList.addBan(playerProfile, reason, banEndDate, stack.sender.name)
         }
 
-        plugin.databaseHandler.addPunishmentHistory(targetName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end)
+        plugin.databaseHandler.addTemplatePunishmentHistory(targetName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end, templateName = template.name, templateUuid = uuid.toString())
         plugin.proxyBridgeMessenger.notifyBan(uuid, reason, end)
 
         val formattedTime = plugin.timeHandler.formatTime(templateLevel.time)
@@ -197,9 +201,10 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         stack: CommandSourceStack,
         targetName: String,
         uuid: UUID,
-        reason: String,
+        template: PunishTemplate,
         templateLevel: PunishTemplateLevel
     ) {
+        val reason = template.reason
         val parsedTemplateTime = parseTemplateTime(stack, templateLevel.time) ?: return
         val parsedSeconds = parsedTemplateTime.seconds
         val playerIps = (
@@ -227,7 +232,7 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
             } else {
                 punishmentIds.add(punishmentId)
             }
-            plugin.databaseHandler.addPunishmentHistory(targetName, ip, reason, stack.sender.name, punishmentType, start, end)
+            plugin.databaseHandler.addTemplatePunishmentHistory(targetName, ip, reason, stack.sender.name, punishmentType, start, end, templateName = template.name, templateUuid = uuid.toString())
             plugin.proxyBridgeMessenger.notifyIpBan(ip, reason, end)
         }
 
@@ -262,9 +267,10 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         stack: CommandSourceStack,
         targetName: String,
         uuid: UUID,
-        reason: String,
+        template: PunishTemplate,
         templateLevel: PunishTemplateLevel
     ) {
+        val reason = template.reason
         val parsedTemplateTime = parseTemplateTime(stack, templateLevel.time) ?: return
         val parsedSeconds = parsedTemplateTime.seconds
         val start = System.currentTimeMillis()
@@ -276,7 +282,7 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
             return
         }
-        plugin.databaseHandler.addPunishmentHistory(targetName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end)
+        plugin.databaseHandler.addTemplatePunishmentHistory(targetName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end, templateName = template.name, templateUuid = uuid.toString())
 
         val formattedTime = plugin.timeHandler.formatTime(templateLevel.time)
         val placeholders = PunishmentCommandUtils.buildPlaceholders(
@@ -298,9 +304,10 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         stack: CommandSourceStack,
         targetName: String,
         uuid: UUID,
-        reason: String,
+        template: PunishTemplate,
         templateLevel: PunishTemplateLevel
     ) {
+        val reason = template.reason
         val parsedTemplateTime = parseTemplateTime(stack, templateLevel.time) ?: return
         val parsedSeconds = parsedTemplateTime.seconds
         val start = System.currentTimeMillis()
@@ -312,7 +319,7 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
             return
         }
-        plugin.databaseHandler.addPunishmentHistory(targetName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end)
+        plugin.databaseHandler.addTemplatePunishmentHistory(targetName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end, templateName = template.name, templateUuid = uuid.toString())
 
         val warnCount = plugin.databaseHandler.getActiveWarnCount(uuid.toString())
         val formattedTime = plugin.timeHandler.formatTime(templateLevel.time)
@@ -338,24 +345,25 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         stack: CommandSourceStack,
         targetName: String,
         uuid: UUID,
-        reason: String,
+        template: PunishTemplate,
         templateLevel: PunishTemplateLevel
     ) {
+        val reason = template.reason
         val punishmentType = "KICK"
         val start = System.currentTimeMillis()
         val formattedTime = plugin.timeHandler.formatTime(null)
-        val history = plugin.config.getBoolean("kick.history", false)
-        if (history) {
-            plugin.databaseHandler.addPunishmentHistory(
-                targetName,
-                uuid.toString(),
-                reason,
-                stack.sender.name,
-                punishmentType,
-                start,
-                start
-            )
-        }
+        // Template kicks always contribute to escalation, even if direct /kick history is disabled.
+        plugin.databaseHandler.addTemplatePunishmentHistory(
+            targetName,
+            uuid.toString(),
+            reason,
+            stack.sender.name,
+            punishmentType,
+            start,
+            start,
+            templateName = template.name,
+            templateUuid = uuid.toString()
+        )
         val placeholders = PunishmentCommandUtils.buildPlaceholders(
             player = targetName,
             operator = stack.sender.name,
@@ -375,9 +383,10 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         stack: CommandSourceStack,
         targetName: String,
         uuid: UUID,
-        reason: String,
+        template: PunishTemplate,
         templateLevel: PunishTemplateLevel
     ) {
+        val reason = template.reason
         val parsedTemplateTime = parseTemplateTime(stack, templateLevel.time) ?: return
         val parsedSeconds = parsedTemplateTime.seconds
         val start = System.currentTimeMillis()
@@ -416,7 +425,7 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
                 stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
                 return
             }
-            plugin.databaseHandler.addPunishmentHistory(targetName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end)
+            plugin.databaseHandler.addTemplatePunishmentHistory(targetName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end, templateName = template.name, templateUuid = uuid.toString())
             plugin.cache.addOrUpdatePunishment(uuid, end, previousLocation)
             val placeholders = basePlaceholders + ("id" to punishmentId.toString())
 

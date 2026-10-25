@@ -19,6 +19,8 @@
 ## Szablony kar i panel
 
 * `/punish <gracz> <szablon> (poziom)` — nakłada karę z `punish-templates.yml`. Bez podania poziomu wybiera kolejny poziom eskalacji na podstawie historii kar. Wymaga `punisherx.cmd.punish`.
+* `/unpunish <gracz> <szablon>` — cofa ostatnią niecofniętą karę z tej drabinki i usuwa jej wpływ na eskalację. Wymaga `punisherx.cmd.unpunish`. Działa również po wygaśnięciu kary lub zwykłym `/unmute`/`/unban`. Każde wywołanie cofa jedno zdarzenie; ban kilku IP jest jednym zdarzeniem. Historia pozostaje i otrzymuje oznaczenie cofnięcia. Nazwy ze spacjami można podać w cudzysłowie, np. `/unpunish Alex "Spam na czacie"`.
+* Nowe wpisy historii są powiązane z nazwą szablonu, więc szablony o takim samym powodzie mają osobne liczniki, a zmiana powodu nie psuje cofania. Starsze wpisy zachowują dopasowanie po powodzie, również dla kar ręcznych o tym powodzie. Zmiana nazwy lub usunięcie szablonu zrywa powiązanie z jego nową historią. Cofnięcie nie odwraca wykonanego wyrzucenia gracza ani zewnętrznych komend/akcji wywołanych karą.
 * `/panel` — otwiera panel moderacji; wymaga `punisherx.cmd.panel` lub uprawnień zarządzania. Poszczególne akcje nadal sprawdzają własne uprawnienia.
 * Panel gracza udostępnia wyszukiwanie, szczegóły kar i szybkie nakładanie kar z szablonów. Szybkie kary wymagają `punisherx.cmd.punish`, a edycja presetów czasu i powodu — `punisherx.manage` lub `punisherx.manage.*`. Presety są zapisywane w `gui.punish.times` i `gui.punish.reasons` w `config.yml`.
 

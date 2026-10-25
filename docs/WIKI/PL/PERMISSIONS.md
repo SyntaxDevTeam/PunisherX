@@ -16,6 +16,7 @@ Rekomendowany plugin do uprawnień: [LuckPerms](https://luckperms.net/)
 | `punisherx.cmd.unwarn` | Pozwala usunąć ostrzeżenie gracza. |
 | `punisherx.cmd.kick` | Pozwala wyrzucić gracza z serwera z podanym powodem. |
 | `punisherx.cmd.punish` | Pozwala używać szablonów przez `/punish` oraz szybkich kar z szablonów w GUI gracza. |
+| `punisherx.cmd.unpunish` | Pozwala cofnąć ostatnią karę oraz jej wpływ na licznik drabinki. |
 | `punisherx.cmd.change_reason` | Pozwala zmienić powód kary. |
 | `punisherx.cmd.banlist` | Wyświetla listę wszystkich zbanowanych graczy. |
 | `punisherx.cmd.check` | Sprawdza kary gracza. Nie jest wymagane, gdy gracz sprawdza samego siebie. |

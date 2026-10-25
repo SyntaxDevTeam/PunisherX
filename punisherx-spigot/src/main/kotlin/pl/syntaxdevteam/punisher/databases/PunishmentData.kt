@@ -23,5 +23,6 @@ data class PunishmentData(
     val end: Long,
     val name: String,
     val operator: String,
-    val server: String
+    val server: String,
+    val undone: Boolean = false
 )

@@ -7,6 +7,7 @@
 
 prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>"
 
+
 # Mensagens de erro
 error:
   banip_db_error: "<red>Não foi possível salvar os banimentos de IP. IPs não banidos: <failed_ips>. IPs banidos com sucesso: <banned_ips>. Verifique o console.</red>"
@@ -21,6 +22,7 @@ error:
   reload: "<red>Ocorreu um erro ao recarregar a configuração:</red>"
   bypass: "<red><b>ATENÇÃO!</b> O jogador <gold><player></gold> não pode ser punido devido às suas permissões (OP ou bypass).</red><newline><dark_gray>Talvez haja uma forma de contornar isso...</dark_gray>"
 
+
 # Mensagens do comando /setjail
 setjail:
   usage: "Uso correto: <gold>/setjail <raio>"
@@ -28,11 +30,13 @@ setjail:
   set_error: "<red>Não foi possível definir a prisão.</red>"
   invalid_radius: "<red>Insira um raio válido (número maior que 0).</red>"
 
+
 # Mensagens do comando /setunjail
 setunjail:
   usage: "Uso correto: <gold>/setunjail</gold>"
   set: "<green>O ponto de spawn foi definido em: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
   set_error: "<red>Não foi possível definir o ponto de spawn.</red>"
+
 
 # Mensagens do comando /jail
 jail:
@@ -61,6 +65,7 @@ jail:
     - "Ofensa a jogador"
     - "Linguagem ofensiva"
 
+
 # Mensagens do comando /unjail
 unjail:
   unjail: "<green>Você libertou o jogador <gold><player></gold> da prisão</green>"
@@ -69,6 +74,7 @@ unjail:
   teleport_failed: "<red>Teleportation cancelled: the configured spawn location is unsafe.</red>"
   success: "<green>O jogador <gold><player></gold> foi libertado com sucesso da prisão.</green>"
   broadcast: "O jogador <gold><player></gold> foi libertado da prisão. Cuidado..."
+
 
 # Mensagens do comando /ban
 ban:
@@ -102,6 +108,7 @@ ban:
     - "Spam"
     - "Linguagem ofensiva"
 
+
 # Mensagens do comando /banip
 banip:
   ban: "<green>Você baniu o IP do jogador por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
@@ -125,11 +132,13 @@ banip:
     - "Spam"
     - "Linguagem ofensiva"
 
+
 # Mensagens do comando /unban
 unban:
   unban: "<green>O jogador <gold><player></gold> foi desbanido</green>"
   usage: "Uso correto: <gold>/unban <nome_do_jogador>"
   broadcast: "<dark_gray>O jogador <gray><player></gray> foi desbanido</dark_gray>"
+
 # Mensagens do comando /mute
 mute:
   mute: "<green>Você silenciou o jogador <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
@@ -154,11 +163,13 @@ mute:
     - "Ofensa a jogador"
     - "Linguagem ofensiva"
 
+
 # Mensagens do comando /unmute
 unmute:
   unmute: "<green>Você removeu o silêncio do jogador <gold><player></gold></green>"
   usage: "Uso correto: <gold>/unmute <nome_do_jogador>"
   unmute_message: "<green>Seu silêncio foi removido!</green>"
+
 
 # Mensagens do comando /warn
 warn:
@@ -182,18 +193,31 @@ warn:
     - "Ofensa a jogador"
     - "Linguagem ofensiva"
 
+
 # Mensagens do comando /punish
 punish:
+  history_error: "<red>Não foi possível ler o histórico de progressão. Nenhuma punição foi aplicada. Verifique o console.</red>"
   usage: "Uso correto: <gold>/punish <nome_do_jogador> <modelo> (lvl)"
   template_not_found: "<red>Modelo <gold><template></gold> não encontrado.</red>"
   invalid_level: "<red>Nível de modelo inválido: <gold><level></gold>.</red>"
   invalid_time: "<red>Tempo do modelo inválido: <gold><time></gold>.</red>"
   invalid_type: "<red>Tipo de punição não suportado no modelo: <gold><type></gold>.</red>"
 
+
+# Reverse the latest punishment from a template ladder.
+unpunish:
+  usage: "Uso: <gold>/unpunish <player> <template></gold>"
+  success: "<green>A punição #<id> de <player> em <template> e seu efeito na progressão foram anulados.</green>"
+  not_found: "<red>Não há punições restantes para <player> em <template> neste âmbito do servidor.</red>"
+  history_marker: "<gray>[anulada]</gray>"
+  db_error: "<red>Não foi possível anular a punição devido a um erro no banco de dados. Verifique o console.</red>"
+
+
 # Mensagens do comando /unwarn
 unwarn:
   unwarn: "<green>Você removeu um aviso do jogador <gold><player></gold></green>"
   usage: "Uso correto: <gold>/unwarn <nome_do_jogador>"
+
 
 # Mensagens do comando /kick
 kick:
@@ -225,6 +249,7 @@ kick:
     - "Spam"
     - "Linguagem ofensiva"
 
+
 # Mensagens do comando /check
 check:
   usage: "Uso correto: <gold>/check <nome_do_jogador> <all|ban|jail|mute|warn>"
@@ -236,6 +261,7 @@ check:
   reason: "<dark_gray>Motivo</dark_gray>"
   time: "<dark_gray>Tempo restante</dark_gray>"
 
+
 # Mensagens do comando /history
 history:
   usage: "Uso correto: <gold>/history <nome_do_jogador>"
@@ -246,6 +272,7 @@ history:
   reason: "<dark_gray>Motivo</dark_gray>"
   time: "<dark_gray>Tempo</dark_gray>"
 
+
 # Mensagens do comando /banlist
 banlist:
   usage: "Uso correto: <gold>/banlist"
@@ -255,6 +282,7 @@ banlist:
   table_header: "<blue>|    Nome         |          Tipo           |          Quando</blue>"
   ban_list: "<blue>|   <hover:show_text:'<white>UUID:</white> <gold><uuid></gold>'><white><player></white></hover>   |   <hover:show_text:'<white>ID:</white> <gold>#<id><newline><white>Operador:</white> <gold><operator></gold><newline><white>Motivo:</white> <gold><reason></gold>'><white><type></white></hover>   |   <white><time></white></blue>"
 
+
 # Mensagens do comando /change-reason
 change-reason:
   usage: "Uso correto: <gold>/change-reason <ID_punição> <novo_motivo>"
@@ -262,11 +290,13 @@ change-reason:
   success: "<green>O motivo da punição com ID <gold><id></gold> foi alterado para \"<gold><reason></gold>\".</green>"
   failure: "<red>Não foi possível atualizar o motivo da punição com ID <gold><id></gold>.</red>"
 
+
 # Mensagens do comando /clearall
 clear:
   usage: "Uso correto: <gold>/clearall <nome_do_jogador>"
   clearall: "<green>Todas as punições ativas do jogador <gold><player></gold> foram removidas.</green>"
   clear_message: "<green>Todas as suas punições ativas foram anuladas!</green> <gray>Pssst! Você tem contatos na staff?</gray>"
+
 
 # Mensagens da GUI
 punishment-dialog:
@@ -274,6 +304,7 @@ punishment-dialog:
   entry: "<gold>#<id></gold> <dark_gray>•</dark_gray> <yellow><player></yellow> <dark_gray>•</dark_gray> <aqua><type></aqua>"
   tooltip: "<gray><reason></gray>"
   details: "<gold><player></gold> <dark_gray>(<uuid>)</dark_gray><newline><yellow>#<id></yellow> <dark_gray>•</dark_gray> <aqua><type></aqua><newline><newline><white><reason></white><newline><newline><gray><start></gray> <dark_gray>→</dark_gray> <gray><end></gray><newline><gold><operator></gold> <dark_gray>•</dark_gray> <gray><server></gray>"
+
 
 reports:
   dialog-list-entry: "<gold>#<id></gold> <dark_gray>•</dark_gray> <yellow><target></yellow> <dark_gray>•</dark_gray> <white><reason></white>"
@@ -310,6 +341,38 @@ reports:
   dialog-reason-label: "<yellow>Reason</yellow>"
   dialog-submit: "<green>Submit report</green>"
   dialog-cancel: "<red>Cancel</red>"
+
+
+# Book report interface. Edit headings, entries and navigation labels here.
+report-book:
+  title: "Reports"
+  author: "PunisherX"
+  players-heading: "<dark_red><bold>Report a player</bold></dark_red><newline>"
+  player-entry: "<blue>• <target></blue>"
+  reasons-heading: "<dark_red><bold>Report: <target></bold></dark_red><newline>"
+  reason-entry: "<blue>• <reason></blue>"
+  confirmation: "<dark_red><bold>Report: <target></bold></dark_red><newline><newline><reason>"
+  confirm-heading: "<dark_red><bold>Send this report?</bold></dark_red><newline>"
+  submit: "<dark_green>[Send report]</dark_green>"
+  previous: "<blue>[Previous]</blue>"
+  next: "<blue>[Next]</blue>"
+  back: "<blue>[Back]</blue>"
+  empty: "No entries."
+  inbox-heading: "<dark_red><bold>Open reports — <page></bold></dark_red><newline>"
+  history-heading: "<dark_red><bold>Report history — <page></bold></dark_red><newline>"
+  report-entry: "<blue>#<id>: <target></blue>"
+  inbox: "<blue>[Open reports]</blue>"
+  history: "<blue>[History]</blue>"
+  details: "<dark_red><bold>Report #<id></bold></dark_red><newline><newline>Reporter: <reporter><newline>Player: <target><newline>Status: <status>"
+  reason-page: "<dark_red><bold>Reason</bold></dark_red><newline><newline><reason>"
+  resolution: "<dark_red><bold>Resolution</bold></dark_red><newline><newline>By: <handled_by><newline>Date: <handled_at>"
+  note-page: "<dark_red><bold>Note</bold></dark_red><newline><newline><note>"
+  actions-heading: "<dark_red><bold>Actions</bold></dark_red><newline>"
+  resolve: "<dark_green>[Resolve]</dark_green>"
+  reject: "<dark_red>[Reject]</dark_red>"
+  decision-prompt: "<gray>Click here and enter the reason in chat: </gray>"
+  filed-at: "<dark_red><bold>Filed at</bold></dark_red><newline><newline><filed_at>"
+
 
 GUI:
   PunisherMain:
@@ -399,6 +462,7 @@ GUI:
     previous: "<gray>Página anterior</gray>"
     back: "<gray>Voltar ao menu anterior</gray>"
 
+
 # Mensagens para o webhook do Discord
 webhook:
   title: "Nova punição no servidor"
@@ -408,6 +472,7 @@ webhook:
   type: "Tipo de punição"
   time: "Hora de término"
   app_name: "PunisherX • "
+
 
 # Mensagens para PlaceholderAPI
 placeholders:
@@ -421,6 +486,7 @@ placeholders:
   punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
   punishment_list_empty: "<gray>Nenhuma punição encontrada.</gray>"
   punishment_list_permanent: "indefinido"
+
 # Formatação de tempo
 formatTime:
   undefined: "indefinido"
@@ -440,33 +506,3 @@ formatTime:
     one: "dia"
     few: "dias"
     many: "dias"
-
-# Book report interface. Edit headings, entries and navigation labels here.
-report-book:
-  title: "Reports"
-  author: "PunisherX"
-  players-heading: "<dark_red><bold>Report a player</bold></dark_red><newline>"
-  player-entry: "<blue>• <target></blue>"
-  reasons-heading: "<dark_red><bold>Report: <target></bold></dark_red><newline>"
-  reason-entry: "<blue>• <reason></blue>"
-  confirmation: "<dark_red><bold>Report: <target></bold></dark_red><newline><newline><reason>"
-  confirm-heading: "<dark_red><bold>Send this report?</bold></dark_red><newline>"
-  submit: "<dark_green>[Send report]</dark_green>"
-  previous: "<blue>[Previous]</blue>"
-  next: "<blue>[Next]</blue>"
-  back: "<blue>[Back]</blue>"
-  empty: "No entries."
-  inbox-heading: "<dark_red><bold>Open reports — <page></bold></dark_red><newline>"
-  history-heading: "<dark_red><bold>Report history — <page></bold></dark_red><newline>"
-  report-entry: "<blue>#<id>: <target></blue>"
-  inbox: "<blue>[Open reports]</blue>"
-  history: "<blue>[History]</blue>"
-  details: "<dark_red><bold>Report #<id></bold></dark_red><newline><newline>Reporter: <reporter><newline>Player: <target><newline>Status: <status>"
-  reason-page: "<dark_red><bold>Reason</bold></dark_red><newline><newline><reason>"
-  resolution: "<dark_red><bold>Resolution</bold></dark_red><newline><newline>By: <handled_by><newline>Date: <handled_at>"
-  note-page: "<dark_red><bold>Note</bold></dark_red><newline><newline><note>"
-  actions-heading: "<dark_red><bold>Actions</bold></dark_red><newline>"
-  resolve: "<dark_green>[Resolve]</dark_green>"
-  reject: "<dark_red>[Reject]</dark_red>"
-  decision-prompt: "<gray>Click here and enter the reason in chat: </gray>"
-  filed-at: "<dark_red><bold>Filed at</bold></dark_red><newline><newline><filed_at>"

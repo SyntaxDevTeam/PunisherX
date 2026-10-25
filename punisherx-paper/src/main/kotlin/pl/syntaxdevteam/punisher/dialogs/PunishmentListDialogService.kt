@@ -35,7 +35,7 @@ class PunishmentListDialogService(private val plugin: PunisherX) {
                 message("entry", mapOf(
                     "id" to punishment.id.toString(),
                     "player" to punishment.name,
-                    "type" to punishment.type
+                    "type" to displayedType(punishment)
                 )),
                 message("tooltip", mapOf("reason" to punishment.reason.take(120)))
             ) { openDetails(player, title, punishment) { loadPage(safePage) } }
@@ -62,7 +62,7 @@ class PunishmentListDialogService(private val plugin: PunisherX) {
             "player" to data.name,
             "uuid" to data.uuid,
             "id" to data.id.toString(),
-            "type" to data.type,
+            "type" to displayedType(data),
             "reason" to data.reason,
             "start" to dateFormat.format(Date(data.start)),
             "end" to end,
@@ -75,6 +75,10 @@ class PunishmentListDialogService(private val plugin: PunisherX) {
         val backButton = button(gui("Nav.back")) { back() }
         player.showDialog(Dialog.create { it.empty().base(base).type(DialogType.notice(backButton)) })
     }
+
+    private fun displayedType(data: PunishmentData): String = if (data.undone)
+        "${data.type} ${plugin.messageHandler.stringMessageToStringNoPrefix("unpunish", "history_marker")}"
+    else data.type
 
     private fun button(label: Component, tooltip: Component? = null, callback: () -> Unit): ActionButton =
         ActionButton.create(label, tooltip, 210, DialogAction.customClick(

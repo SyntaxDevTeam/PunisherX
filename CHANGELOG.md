@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+## [1.8.1] Unreleased
+
+* Added `/unpunish <player> <template>` on Paper and Spigot to reverse the latest punishment and its escalation step, preserving an audited history entry. Works with expired or previously revoked punishments and groups multi-IP bans as one step.
+* Template history now tracks template identity separately from the reason; kicks in ladders always enter history. Existing history retains reason-based matching.
 
 * Routed name parsing, component serialization and literal book placeholders through MessageHandler R0.3; removed the separate formatting pipeline from PunisherX.
 
@@ -9,7 +12,7 @@
 * Added a reusable BookManager with player-bound, single-use, expiring menu actions; existing GUI/dialog choices remain available.
 * Added configuration migration 168, Polish/English book messages and automated coverage for formatting and book action sessions.
 
-## [1.8.0-SNAPSHOT] - 2026-10-08
+## [1.8.0] - 2026-10-08
 
 PunisherX takes a major step forward in everyday moderation: a native Spigot edition, a complete report workflow, faster access to punishment templates, and safer configuration handling. This update brings together the changes on `main` since 1.7.2.
 

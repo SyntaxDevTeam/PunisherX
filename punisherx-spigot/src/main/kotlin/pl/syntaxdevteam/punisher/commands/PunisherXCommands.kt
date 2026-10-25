@@ -226,6 +226,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             "  <gold>/prx diag <gray>- <white>Runs diagnostics and prints results.",
             "  <gold>/kick <player> <reason> <gray>- <white>Kicks a player from the server",
             "  <gold>/warn <player> (time) <reason> <gray>- <white>Warns a player.",
+            "  <gold>/unpunish <player> <template> <gray>- <white>Reverses the last punishment and ladder step.",
             "  <gold>/unwarn <player> <gray>- <white>Removes a player's warning.",
             "  <gold>/mute <player> (time) <reason> <gray>- <white>Mutes a player.",
             "  <gold>/unmute <player> <gray>- <white>Unmutes a player.",

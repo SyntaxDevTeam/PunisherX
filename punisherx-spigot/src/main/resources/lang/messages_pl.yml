@@ -6,6 +6,7 @@
 
 prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>"
 
+
 # Wiadomości obsługi błędów
 error:
   banip_db_error: "<red>Nie udało się zapisać banów IP. Niezbanowane IP: <failed_ips>. Skutecznie zbanowane IP: <banned_ips>. Sprawdź konsolę.</red>"
@@ -20,12 +21,14 @@ error:
   reload: "<red>Wystąpił błąd podczas przeładowania konfiguracji:</red>"
   bypass: "<red><b>UWAGA!</b> Gracz <gold><player></gold> nie może otrzymać kary ze względu na swoje uprawnienia (OP lub bypass).</red><newline><dark_gray>Może dałoby się to obejść...</dark_gray>"
 
+
 # Wiadomości komendy /report
 punishment-dialog:
   close: "<red>Zamknij</red>"
   entry: "<gold>#<id></gold> <dark_gray>•</dark_gray> <yellow><player></yellow> <dark_gray>•</dark_gray> <aqua><type></aqua>"
   tooltip: "<gray><reason></gray>"
   details: "<gold><player></gold> <dark_gray>(<uuid>)</dark_gray><newline><yellow>#<id></yellow> <dark_gray>•</dark_gray> <aqua><type></aqua><newline><newline><white><reason></white><newline><newline><gray><start></gray> <dark_gray>→</dark_gray> <gray><end></gray><newline><gold><operator></gold> <dark_gray>•</dark_gray> <gray><server></gray>"
+
 
 reports:
   dialog-list-entry: "<gold>#<id></gold> <dark_gray>•</dark_gray> <yellow><target></yellow> <dark_gray>•</dark_gray> <white><reason></white>"
@@ -63,6 +66,38 @@ reports:
   dialog-submit: "<green>Wyślij zgłoszenie</green>"
   dialog-cancel: "<red>Anuluj</red>"
 
+
+# Book report interface. Edit headings, entries and navigation labels here.
+report-book:
+  title: "Zgłoszenia"
+  author: "PunisherX"
+  players-heading: "<dark_red><bold>Zgłoś gracza</bold></dark_red><newline>"
+  player-entry: "<blue>• <target></blue>"
+  reasons-heading: "<dark_red><bold>Zgłoś: <target></bold></dark_red><newline>"
+  reason-entry: "<blue>• <reason></blue>"
+  confirmation: "<dark_red><bold>Zgłoś: <target></bold></dark_red><newline><newline><reason>"
+  confirm-heading: "<dark_red><bold>Wysłać zgłoszenie?</bold></dark_red><newline>"
+  submit: "<dark_green>[Wyślij]</dark_green>"
+  previous: "<blue>[Poprzednia]</blue>"
+  next: "<blue>[Następna]</blue>"
+  back: "<blue>[Wróć]</blue>"
+  empty: "Brak wpisów."
+  inbox-heading: "<dark_red><bold>Zgłoszenia — <page></bold></dark_red><newline>"
+  history-heading: "<dark_red><bold>Historia — <page></bold></dark_red><newline>"
+  report-entry: "<blue>#<id>: <target></blue>"
+  inbox: "<blue>[Otwarte zgłoszenia]</blue>"
+  history: "<blue>[Historia]</blue>"
+  details: "<dark_red><bold>Zgłoszenie #<id></bold></dark_red><newline><newline>Autor: <reporter><newline>Gracz: <target><newline>Status: <status>"
+  reason-page: "<dark_red><bold>Powód</bold></dark_red><newline><newline><reason>"
+  resolution: "<dark_red><bold>Rozpatrzenie</bold></dark_red><newline><newline>Przez: <handled_by><newline>Data: <handled_at>"
+  note-page: "<dark_red><bold>Uzasadnienie</bold></dark_red><newline><newline><note>"
+  actions-heading: "<dark_red><bold>Działania</bold></dark_red><newline>"
+  resolve: "<dark_green>[Rozpatrz]</dark_green>"
+  reject: "<dark_red>[Odrzuć]</dark_red>"
+  decision-prompt: "<gray>Kliknij tutaj i wpisz uzasadnienie na czacie: </gray>"
+  filed-at: "<dark_red><bold>Data zgłoszenia</bold></dark_red><newline><newline><filed_at>"
+
+
 # Wiadomości komendy /setjail
 setjail:
   usage: "Poprawne użycie to: <gold>/setjail <promień>"
@@ -70,11 +105,13 @@ setjail:
   set_error: "<red>Nie udało się ustawić lokalizacji więzienia.</red>"
   invalid_radius: "<red>Podaj prawidłowy promień (liczba większa od 0).</red>"
 
+
 # Wiadomości komendy /setunjail
 setunjail:
   usage: "Poprawne użycie to: <gold>/setunjail</gold>"
   set: "<green>Lokalizacja respawnu została ustawiona: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
   set_error: "<red>Nie udało się ustawić lokalizacji respawnu.</red>"
+
 
 
 # Wiadomości komendy /jail
@@ -104,6 +141,7 @@ jail:
     - "Obraza gracza"
     - "Wulgarny język"
 
+
 # Wiadomości komendy /unjail
 unjail:
   unjail: "<green>Uwolniłeś/aś gracza <gold><player></gold> z więzienia</green>"
@@ -112,6 +150,7 @@ unjail:
   teleport_failed: "<red>Teleportacja przerwana: skonfigurowana lokalizacja respawnu jest niebezpieczna.</red>"
   success: "<green>Gracz <gold><player></gold> został pomyślnie wypuszczony z więzienia.</green>"
   broadcast: "Gracz <gold><player></gold> został wypuszczony z więzienia. Lepiej uważajcie..."
+
 
 # Wiadomości komendy /ban
 ban:
@@ -145,6 +184,7 @@ ban:
     - "Spamowanie"
     - "Wulgarny język"
 
+
 # Wiadomości komendy /banip
 banip:
   ban: "<green>Zbanowałeś IP gracza za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
@@ -168,11 +208,13 @@ banip:
     - "Spamowanie"
     - "Wulgarny język"
 
+
 # Wiadomości komendy /unban
 unban:
   unban: "<green>Gracz <gold><player></gold> został odbanowany</green>"
   usage: "Poprawne użycie to: <gold>/unban <nazwa_gracza>"
   broadcast: "<dark_gray>Gracz <gray><player></gray> został odbanowany</dark_gray>"
+
 
 # Wiadomości komendy /mute
 mute:
@@ -198,11 +240,13 @@ mute:
     - "Obraza gracza"
     - "Wulgarny język"
 
+
 # Wiadomości komendy /unmute
 unmute:
   unmute: "<green>Odwyciszyłeś gracza <gold><player></gold></green>"
   usage: "Poprawne użycie to: <gold>/unmute <nazwa_gracza>"
   unmute_message: "<green>Zostałeś/aś odwyciszony/a!</green>"
+
 
 # Wiadomości komendy /warn
 warn:
@@ -225,17 +269,30 @@ warn:
     - "Spam"
     - "Obraza gracza"
     - "Wulgarny język"
+
 # Wiadomości komendy /punish
 punish:
+  history_error: "<red>Nie udało się odczytać historii drabinki. Kara nie została nałożona. Sprawdź konsolę.</red>"
   usage: "Poprawne użycie to: <gold>/punish <nazwa_gracza> <szablon> (lvl)"
   template_not_found: "<red>Nie znaleziono szablonu <gold><template></gold>.</red>"
   invalid_level: "<red>Nieprawidłowy poziom szablonu: <gold><level></gold>.</red>"
   invalid_time: "<red>Nieprawidłowy czas w szablonie: <gold><time></gold>.</red>"
   invalid_type: "<red>Nieobsługiwany typ kary w szablonie: <gold><type></gold>.</red>"
+
+
+# Cofnięcie ostatniej kary z wybranej drabinki.
+unpunish:
+  usage: "Poprawne użycie: <gold>/unpunish <player> <template></gold>"
+  success: "<green>Cofnięto karę #<id> gracza <player> z drabinki <template> i jej wpływ na licznik drabinki.</green>"
+  not_found: "<red>Nie znaleziono niecofniętej kary gracza <player> z drabinki <template> w tym zakresie serwera.</red>"
+  history_marker: "<gray>[cofnięta]</gray>"
+  db_error: "<red>Nie udało się cofnąć kary z powodu błędu bazy danych. Sprawdź konsolę.</red>"
+
 # Wiadomości komendy /unwarn
 unwarn:
   unwarn: "<green>Usunąłeś ostrzeżenie dla gracza <gold><player></gold></green>"
   usage: "Poprawne użycie to: <gold>/unwarn <nazwa_gracza>"
+
 
 # Wiadomości komendy /kick
 kick:
@@ -267,6 +324,7 @@ kick:
     - "Spamowanie"
     - "Wulgarny język"
 
+
 # Wiadomości komendy /check
 check:
   usage: "Poprawne użycie to: <gold>/check <nazwa_gracza> <all|ban|jail|mute|warn>"
@@ -278,6 +336,7 @@ check:
   reason: "<dark_gray>Powód</dark_gray>"
   time: "<dark_gray>Pozostały czas</dark_gray>"
 
+
 # Wiadomości komendy /history
 history:
   usage: "Poprawne użycie to: <gold>/history <nazwa_gracza>"
@@ -288,6 +347,7 @@ history:
   reason: "<dark_gray>Powód</dark_gray>"
   time: "<dark_gray>Czas</dark_gray>"
 
+
 # Wiadomości komendy /banlist
 banlist:
   usage: "Poprawne użycie to: <gold>/banlist"
@@ -297,6 +357,7 @@ banlist:
   table_header: "<blue>|    Nick          |          Typ           |          Kiedy</blue>"
   ban_list: "<blue>|   <hover:show_text:'<white>UUID:</white> <gold><uuid></gold>'><white><player></white></hover>   |   <hover:show_text:'<white>ID:</white> <gold>#<id><newline><white>Operator:</white> <gold><operator></gold><newline><white>Powód:</white> <gold><reason></gold>'><white><type></white></hover>   |   <white><time></white></blue>"
 
+
 # Wiadomości komendy /change-reason
 change-reason:
   usage: "Poprawne użycie to: <gold>/change-reason <ID_kary> <nowy_powód>"
@@ -305,11 +366,13 @@ change-reason:
   success: "<green>Zmieniono dotychczasowy powód kary o ID <gold><id></gold> na \"<gold><reason></gold>\".</green>"
   failure: "<red>Nie udało się zaktualizować powodu kary o ID <gold><id></gold>.</red>"
 
+
 # Wiadomości komendy /clearall
 clear:
   usage: "Poprawne użycie to: <gold>/clearall <nazwa_gracza>"
   clearall: "<green>Wszystkie aktywne kary gracza <gold><player></gold> zostały wyczyszczone.</green>"
   clear_message: "<green>Wszystkie Twoje aktywne kary zostały anulowane!</green> <gray>Pssst! Masz jakieś układy z administracją czy coś?</gray>"
+
 
 # Obsługa wiadomości z GUI
 GUI:
@@ -433,6 +496,7 @@ GUI:
     previous: "<gray>Poprzednia strona</gray>"
     back: "<gray>Wróć do poprzedniego menu</gray>"
 
+
 # Wiadomości dla Discord webhook
 webhook:
   title: "Nowa kara na serwerze"
@@ -442,6 +506,7 @@ webhook:
   type: "Typ kary"
   time: "Czas zakończenia"
   app_name: "PunisherX • "
+
 
 # Wiadomości dla PlaceholderAPI
 placeholders:
@@ -455,6 +520,7 @@ placeholders:
   punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
   punishment_list_empty: "<gray>Brak znalezionych kar.</gray>"
   punishment_list_permanent: "nieokreślony"
+
 
 # Formatowanie czasu
 formatTime:
@@ -475,33 +541,3 @@ formatTime:
     one: "dzień"
     few: "dni"
     many: "dni"
-
-# Book report interface. Edit headings, entries and navigation labels here.
-report-book:
-  title: "Zgłoszenia"
-  author: "PunisherX"
-  players-heading: "<dark_red><bold>Zgłoś gracza</bold></dark_red><newline>"
-  player-entry: "<blue>• <target></blue>"
-  reasons-heading: "<dark_red><bold>Zgłoś: <target></bold></dark_red><newline>"
-  reason-entry: "<blue>• <reason></blue>"
-  confirmation: "<dark_red><bold>Zgłoś: <target></bold></dark_red><newline><newline><reason>"
-  confirm-heading: "<dark_red><bold>Wysłać zgłoszenie?</bold></dark_red><newline>"
-  submit: "<dark_green>[Wyślij]</dark_green>"
-  previous: "<blue>[Poprzednia]</blue>"
-  next: "<blue>[Następna]</blue>"
-  back: "<blue>[Wróć]</blue>"
-  empty: "Brak wpisów."
-  inbox-heading: "<dark_red><bold>Zgłoszenia — <page></bold></dark_red><newline>"
-  history-heading: "<dark_red><bold>Historia — <page></bold></dark_red><newline>"
-  report-entry: "<blue>#<id>: <target></blue>"
-  inbox: "<blue>[Otwarte zgłoszenia]</blue>"
-  history: "<blue>[Historia]</blue>"
-  details: "<dark_red><bold>Zgłoszenie #<id></bold></dark_red><newline><newline>Autor: <reporter><newline>Gracz: <target><newline>Status: <status>"
-  reason-page: "<dark_red><bold>Powód</bold></dark_red><newline><newline><reason>"
-  resolution: "<dark_red><bold>Rozpatrzenie</bold></dark_red><newline><newline>Przez: <handled_by><newline>Data: <handled_at>"
-  note-page: "<dark_red><bold>Uzasadnienie</bold></dark_red><newline><newline><note>"
-  actions-heading: "<dark_red><bold>Działania</bold></dark_red><newline>"
-  resolve: "<dark_green>[Rozpatrz]</dark_green>"
-  reject: "<dark_red>[Odrzuć]</dark_red>"
-  decision-prompt: "<gray>Kliknij tutaj i wpisz uzasadnienie na czacie: </gray>"
-  filed-at: "<dark_red><bold>Data zgłoszenia</bold></dark_red><newline><newline><filed_at>"

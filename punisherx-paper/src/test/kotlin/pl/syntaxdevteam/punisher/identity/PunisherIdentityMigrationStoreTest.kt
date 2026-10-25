@@ -27,6 +27,7 @@ class PunisherIdentityMigrationStoreTest {
             )
             assertEquals(target.toString(), scalar(connection, "SELECT uuid FROM punishments WHERE id = 1"))
             assertEquals(target.toString(), scalar(connection, "SELECT uuid FROM punishmenthistory WHERE id = 2"))
+            assertEquals(target.toString(), scalar(connection, "SELECT playerUuid FROM punishment_templates WHERE historyId = 2"))
             assertEquals(target.toString(), scalar(connection, "SELECT player FROM reports WHERE id = 3"))
             assertEquals(target.toString(), scalar(connection, "SELECT suspect FROM reports WHERE id = 4"))
             assertEquals(target.toString(), scalar(connection, "SELECT target FROM bridge_events WHERE id = 5"))
@@ -42,6 +43,7 @@ class PunisherIdentityMigrationStoreTest {
             )
             assertEquals(source.toString(), scalar(connection, "SELECT uuid FROM punishments WHERE id = 1"))
             assertEquals(source.toString(), scalar(connection, "SELECT uuid FROM punishmenthistory WHERE id = 2"))
+            assertEquals(source.toString(), scalar(connection, "SELECT playerUuid FROM punishment_templates WHERE historyId = 2"))
             assertEquals(source.toString(), scalar(connection, "SELECT player FROM reports WHERE id = 3"))
             assertEquals(source.toString(), scalar(connection, "SELECT suspect FROM reports WHERE id = 4"))
             assertEquals(source.toString(), scalar(connection, "SELECT target FROM bridge_events WHERE id = 5"))
@@ -65,6 +67,7 @@ class PunisherIdentityMigrationStoreTest {
         connection.createStatement().use { statement ->
             statement.executeUpdate("INSERT INTO punishments(id, uuid) VALUES (1, '$source')")
             statement.executeUpdate("INSERT INTO punishmenthistory(id, uuid) VALUES (2, '$source')")
+            statement.executeUpdate("INSERT INTO punishment_templates(historyId, templateName, playerUuid) VALUES (2, 'spam', '$source')")
             statement.executeUpdate("INSERT INTO reports(id, player, suspect) VALUES (3, '$source', '33333333-3333-4333-8333-333333333333')")
             statement.executeUpdate("INSERT INTO reports(id, player, suspect) VALUES (4, '44444444-4444-4444-8444-444444444444', '$source')")
             statement.executeUpdate("INSERT INTO bridge_events(id, target) VALUES (5, '$source')")

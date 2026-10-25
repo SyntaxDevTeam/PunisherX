@@ -80,6 +80,7 @@ Open `/panel` to investigate a player, `/reports` to review reports, or use `/pu
 | --- | --- | --- |
 | Apply punishments | `/ban`, `/banip`, `/mute`, `/warn`, `/kick`, `/jail` | Corresponding `punisherx.cmd.*` nodes. |
 | Revoke punishments | `/unban`, `/unmute`, `/unwarn`, `/unjail`, `/clearall` | Corresponding command permissions. |
+| Undo a template punishment | `/unpunish <player> <template>` | `punisherx.cmd.unpunish`; reverses the last punishment and its escalation step. |
 | Use punishment templates | `/punish <player> <template> (level)` | `punisherx.cmd.punish` |
 | Open the moderation panel | `/panel` | `punisherx.cmd.panel` or management access. |
 | Submit a player report | `/report (player) (reason)` | Players; no dedicated permission. |

@@ -70,6 +70,10 @@ commands:
     description: Removes the last warning issued to a player.
     usage: /unwarn <player>
     permission: punisherx.cmd.unwarn
+  unpunish:
+    description: Reverses a punishment and removes its contribution to escalation.
+    usage: /unpunish <player> <template>
+    permission: punisherx.cmd.unpunish
   punish:
     description: Issues a punishment using predefined templates.
     usage: /punish <player> <template> (lvl)
@@ -162,6 +166,9 @@ permissions:
     default: op
   punisherx.cmd.unwarn:
     description: Allows removing the last warning from a player.
+    default: op
+  punisherx.cmd.unpunish:
+    description: Allows reversing a punishment and its escalation count.
     default: op
   punisherx.cmd.punish:
     description: Allows punishing a player using templates.
