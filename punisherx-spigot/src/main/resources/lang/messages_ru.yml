@@ -37,6 +37,7 @@ setunjail:
 
 # Сообщения команды /jail
 jail:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Вы посадили игрока <gold><player></gold> в тюрьму за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   jail: "<green>Вы посадили игрока <gold><player></gold> в тюрьму за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильное использование: <gold>/jail <игрок> (время) <причина>"
   jail_message: "<red>Вы были посажены в тюрьму за <b><reason></b> на <b><time></b></red>"
@@ -65,6 +66,7 @@ jail:
 
 # Сообщения команды /unjail
 unjail:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Игрок <gold><player></gold> был успешно освобождён из тюрьмы."
   unjail: "<green>Вы освободили игрока <gold><player></gold> из тюрьмы</green>"
   usage: "Правильное использование: <gold>/unjail <игрок>"
   unjail_message: "<green>Ваш срок заключения закончился! Не упустите этот шанс!</green>"
@@ -75,6 +77,7 @@ unjail:
 
 # Сообщения команды /ban
 ban:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Вы забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   ban: "<green>Вы забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильное использование: <gold>/ban <игрок> (время) <причина>"
   kick_message:
@@ -108,6 +111,7 @@ ban:
 
 # Сообщения команды /banip
 banip:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Вы забанили IP игрока за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray> <dark_gray>(<player>)</dark_gray>"
   ban: "<green>Вы забанили IP игрока за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильное использование: <gold>/banip <игрок|ip> (время) <причина>"
   kick_message:
@@ -132,6 +136,7 @@ banip:
 
 # Сообщения команды /unban
 unban:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Игрок <gold><player></gold> был разбанен</green>"
   unban: "<green>Игрок <gold><player></gold> был разбанен</green>"
   usage: "Правильное использование: <gold>/unban <игрок>"
   broadcast: "<dark_gray>Игрок <gray><player></gray> был разбанен</dark_gray>"
@@ -139,6 +144,7 @@ unban:
 
 # Сообщения команды /mute
 mute:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Вы заглушили игрока <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   mute: "<green>Вы заглушили игрока <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильное использование: <gold>/mute <игрок> (время) <причина>"
   mute_message: "<red>Вы были заглушены за <b><reason></b> на <b><time></b></red>"
@@ -164,6 +170,7 @@ mute:
 
 # Сообщения команды /unmute
 unmute:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Вы сняли заглушение с игрока <gold><player></gold></green>"
   unmute: "<green>Вы сняли заглушение с игрока <gold><player></gold></green>"
   usage: "Правильное использование: <gold>/unmute <игрок>"
   unmute_message: "<green>С вас снято заглушение!</green>"
@@ -171,6 +178,7 @@ unmute:
 
 # Сообщения команды /warn
 warn:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Вы выдали предупреждение (<warn_no> раз) игроку <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   warn: "<green>Вы выдали предупреждение (<warn_no> раз) игроку <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильное использование: <gold>/warn <игрок> (время) <причина>"
   warn_message: "<red>Вы получили <b><warn_no></b> предупреждение!</red>"
@@ -204,6 +212,7 @@ punish:
 
 # Reverse the latest punishment from a template ladder.
 unpunish:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Наказание #<id> игрока <player> из шаблона <template> отменено вместе с его влиянием на счётчик.</green>"
   usage: "Использование: <gold>/unpunish <player> <template></gold>"
   success: "<green>Наказание #<id> игрока <player> из шаблона <template> отменено вместе с его влиянием на счётчик.</green>"
   not_found: "<red>В этой области сервера нет неотменённых наказаний игрока <player> из шаблона <template>.</red>"
@@ -213,12 +222,14 @@ unpunish:
 
 # Сообщения команды /unwarn
 unwarn:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Вы сняли предупреждение с игрока <gold><player></gold></green>"
   unwarn: "<green>Вы сняли предупреждение с игрока <gold><player></gold></green>"
   usage: "Правильное использование: <gold>/unwarn <игрок>"
 
 
 # Сообщения команды /kick
 kick:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Вы выгнали <gold><player></gold> по причине <gold><reason></gold></green>"
   kick: "<green>Вы выгнали <gold><player></gold> по причине <gold><reason></gold></green>"
   usage: "Правильное использование: <gold>/kick <игрок> <причина>"
   kick_message:
@@ -291,6 +302,7 @@ change-reason:
 
 # Сообщения для команды /clearall
 clear:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Все активные наказания для игрока </green><gold><player></gold><green> были сняты</green>"
   usage: "Правильное использование: <gold>/clearall <игрок>"
   clearall: "<green>Все активные наказания для игрока </green><gold><player></gold><green> были сняты</green>"
   clear_message: "<green>Все ваши активные наказания были отменены! </green><dark_gray>Псс! У тебя что, есть связи с администрацией?"

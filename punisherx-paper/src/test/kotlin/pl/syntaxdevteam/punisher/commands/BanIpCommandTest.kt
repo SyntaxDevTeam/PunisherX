@@ -90,9 +90,11 @@ class BanIpCommandTest {
             eq("BANIP"), any(), any(), any())
         verify(plugin.proxyBridgeMessenger, times(2)).notifyIpBan(any(), eq(reason), any())
         verify(player).kick(any<Component>())
-        verify(sender, never()).sendMessage(any<Component>())
+        verify(sender).sendMessage(Component.text("Banned"))
         verify(player, never()).sendMessage(any<Component>())
         verify(plugin.messageHandler, never()).getSmartMessage(eq("banip"), eq("ban"), any())
+        verify(plugin.messageHandler).getSmartMessage(eq("banip"), eq("silent_success"),
+            argThat { get("player") == "target" && get("reason") == reason && get("time") == "999 dni" })
         verify(plugin.actionExecutor).executeAction(eq("ip_banned"), eq("target"), any(), eq(true))
     }
 

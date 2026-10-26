@@ -43,13 +43,17 @@ class UnpunishCommandTest {
             mapOf("player" to "Target", "template" to "Chat spam", "operator" to "Reviewer", "id" to "42"))
     }
 
-    @Test fun `silent undo removes punishment and escalation without chat success`() {
+    @Test fun `silent undo removes punishment and escalation with a private confirmation`() {
+        whenever(plugin.messageHandler.stringMessageToComponent(eq("unpunish"), eq("silent_success"), any<Map<String, String>>()))
+            .thenReturn(Component.text("Silent undo"))
         whenever(plugin.databaseHandler.undoPunishment(any(), any(), any(), any(), any())).thenReturn(listOf(entry))
         UnpunishCommand(plugin).execute(source, arrayOf("Target", "Chat spam", "--silent"))
         verify(plugin.databaseHandler).undoPunishment(uuid.toString(), "Target", "Spam", "Chat spam", "Reviewer")
         verify(plugin.commandLoggerPlugin).logCommand("Reviewer", "UNPUNISH", "Target", "Chat spam: history #42")
-        verifyNoInteractions(plugin.messageHandler)
-        verify(sender, never()).sendMessage(any<Component>())
+        verify(plugin.messageHandler).stringMessageToComponent("unpunish", "silent_success",
+            mapOf("player" to "Target", "template" to "Chat spam", "operator" to "Reviewer", "id" to "42"))
+        verify(sender).sendMessage(Component.text("Silent undo"))
+        verifyNoMoreInteractions(plugin.messageHandler)
     }
 
     @Test fun `no matching history reports empty ladder without recording success`() {

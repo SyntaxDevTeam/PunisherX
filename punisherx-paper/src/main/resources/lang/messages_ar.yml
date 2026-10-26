@@ -42,6 +42,7 @@ setunjail:
 
 # رسائل أمر /jail
 jail:
+  silent_success: "<dark_gray>[الوضع الصامت]</dark_gray> <green>لقد سجنت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   jail: "<green>لقد سجنت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "الاستخدام الصحيح: <gold>/jail <player_name> (المدة) <السبب>"
   jail_message: "<red>لقد تم سجنك بسبب <b><reason></b> لمدة <b><time></b></red>"
@@ -70,6 +71,7 @@ jail:
 
 # رسائل أمر /unjail
 unjail:
+  silent_success: "<dark_gray>[الوضع الصامت]</dark_gray> <green>تم الإفراج عن اللاعب <gold><player></gold> بنجاح من السجن.</green>"
   unjail: "<green>لقد أفرجت عن اللاعب <gold><player></gold> من السجن</green>"
   usage: "الاستخدام الصحيح: <gold>/unjail <player_name>"
   unjail_message: "<green>انتهت فترة سجنك! لا تُضِع هذه الفرصة!</green>"
@@ -80,6 +82,7 @@ unjail:
 
 # رسائل أمر /ban
 ban:
+  silent_success: "<dark_gray>[الوضع الصامت]</dark_gray> <green>لقد حظرت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   ban: "<green>لقد حظرت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "الاستخدام الصحيح: <gold>/ban <player_name> (المدة) <السبب>"
   kick_message:
@@ -113,6 +116,7 @@ ban:
 
 # رسائل أمر /banip
 banip:
+  silent_success: "<dark_gray>[الوضع الصامت]</dark_gray> <green>لقد حظرت عنوان IP الخاص باللاعب بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray> <dark_gray>(<player>)</dark_gray>"
   ban: "<green>لقد حظرت عنوان IP الخاص باللاعب بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "الاستخدام الصحيح: <gold>/banip <player|ip> (المدة) <السبب>"
   kick_message:
@@ -136,6 +140,7 @@ banip:
 
 # رسائل أمر /unban
 unban:
+  silent_success: "<dark_gray>[الوضع الصامت]</dark_gray> <green>تم إلغاء حظر اللاعب <gold><player></gold></green>"
   unban: "<green>تم إلغاء حظر اللاعب <gold><player></gold></green>"
   usage: "الاستخدام الصحيح: <gold>/unban <player_name>"
   broadcast: "<dark_gray>تم إلغاء حظر اللاعب <gray><player></gray></dark_gray>"
@@ -143,6 +148,7 @@ unban:
 
 # /mute command messages
 mute:
+  silent_success: "<dark_gray>[الوضع الصامت]</dark_gray> <green>لقد كمّمت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   mute: "<green>لقد كمّمت اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "الاستخدام الصحيح: <gold>/mute <player_name> (المدة) <السبب>"
   mute_message: "<red>لقد تم كمّك بسبب <b><reason></b> لمدة <b><time></b></red>"
@@ -169,6 +175,7 @@ mute:
 
 # رسائل أمر /unmute
 unmute:
+  silent_success: "<dark_gray>[الوضع الصامت]</dark_gray> <green>لقد أزلت الكمامة عن اللاعب <gold><player></gold></green>"
   unmute: "<green>لقد أزلت الكمامة عن اللاعب <gold><player></gold></green>"
   usage: "الاستخدام الصحيح: <gold>/unmute <player_name>"
   unmute_message: "<green>لقد تمت إزالة الكمامة عنك!</green>"
@@ -176,6 +183,7 @@ unmute:
 
 # رسائل أمر /warn
 warn:
+  silent_success: "<dark_gray>[الوضع الصامت]</dark_gray> <green>لقد حذّرت (<warn_no> مرة) اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   warn: "<green>لقد حذّرت (<warn_no> مرة) اللاعب <gold><player></gold> بسبب <gold><reason></gold> لمدة <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "الاستخدام الصحيح: <gold>/warn <player_name> (المدة) <السبب>"
   warn_message: "<red>لقد تلقيت تحذيرًا رقم <b><warn_no></b>!</red>"
@@ -209,6 +217,7 @@ punish:
 
 # Reverse the latest punishment from a template ladder.
 unpunish:
+  silent_success: "<dark_gray>[الوضع الصامت]</dark_gray> <green>تم إلغاء العقوبة #<id> للاعب <player> من القالب <template> وتأثيرها على التصعيد.</green>"
   usage: "الاستخدام: <gold>/unpunish <player> <template></gold>"
   success: "<green>تم إلغاء العقوبة #<id> للاعب <player> من القالب <template> وتأثيرها على التصعيد.</green>"
   not_found: "<red>لا توجد عقوبة متبقية للاعب <player> من القالب <template> في نطاق هذا الخادم.</red>"
@@ -218,12 +227,14 @@ unpunish:
 
 # رسائل أمر /unwarn
 unwarn:
+  silent_success: "<dark_gray>[الوضع الصامت]</dark_gray> <green>لقد أزلت تحذيرًا من اللاعب <gold><player></gold></green>"
   unwarn: "<green>لقد أزلت تحذيرًا من اللاعب <gold><player></gold></green>"
   usage: "الاستخدام الصحيح: <gold>/unwarn <player_name>"
 
 
 # رسائل أمر /kick
 kick:
+  silent_success: "<dark_gray>[الوضع الصامت]</dark_gray> <green>لقد طردت اللاعب <gold><player></gold> بسبب <gold><reason></gold></green>"
   kick: "<green>لقد طردت اللاعب <gold><player></gold> بسبب <gold><reason></gold></green>"
   usage: "الاستخدام الصحيح: <gold>/kick <player_name> <السبب>"
   kick_message:
@@ -296,6 +307,7 @@ change-reason:
 
 # رسائل أمر /clearall
 clear:
+  silent_success: "<dark_gray>[الوضع الصامت]</dark_gray> <green>تم مسح جميع العقوبات الفعّالة عن اللاعب <gold><player></gold>.</green>"
   usage: "الاستخدام الصحيح: <gold>/clearall <player_name>"
   clearall: "<green>تم مسح جميع العقوبات الفعّالة عن اللاعب <gold><player></gold>.</green>"
   clear_message: "<green>تمت إزالة جميع عقوباتك الفعّالة!</green> <gray>هممم... هل لديك اتفاق سري مع الطاقم؟</gray>"

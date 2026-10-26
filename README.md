@@ -93,14 +93,16 @@ For exact syntax, all permission nodes, parent permissions and Spigot dispatch d
 
 Add `--silent` to `/kick` (including `all`), `/jail`, `/warn`, `/mute`, `/ban`, `/banip`,
 `/unjail`, `/unwarn`, `/unmute`, `/unban` (players or IPs), `/clearall`, or `/unpunish` to suppress
-PunisherX chat confirmations, target notifications and staff broadcasts for that invocation.
+target chat notifications and staff broadcasts for that invocation. The operator receives a private
+confirmation marked as silent; its text can be customized using `silent_success` in each command’s language section.
 Errors are still reported to the operator. Kick/ban disconnect screens, punishment enforcement,
 history, logs and configured follow-up actions remain active. Follow-up PunisherX punishment
 commands inherit `--silent`; messages from other plugins and custom actions follow their own settings.
 
 `/punish <player> <template> [level] [--force] [--silent]` supports both flags, together
 or independently, before or after the optional level. `--force` bypasses punishment immunity;
-`--silent` suppresses chat messages for any punishment type in the template. For example:
+`--silent` suppresses target chat messages and broadcasts for any punishment type in the template,
+while retaining a private silent confirmation for the operator. For example:
 
 ```text
 /punish Steve spam --force --silent

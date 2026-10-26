@@ -68,8 +68,9 @@ Aliasy w `config.yml` udostępniają alternatywne nazwy obsługiwanych komend. N
 
 `<argument>` jest wymagany, `(argument)` opcjonalny, a `[--force]` to opcjonalna flaga. Przykłady czasu: `30s`, `10m`, `2h`, `7d`. Pominięcie czasu oznacza karę bezterminową. W obsługujących tę flagę komendach kar `--force` pomija ochronę celu; przy migracji bazy pomija potwierdzenie.
 
-`--silent` wycisza potwierdzenia dla wykonującego, wiadomości dla ukaranego i ogłoszenia
-kary na czacie. Działa również dla `kick all`, cofania kar oraz wszystkich typów kar
+`--silent` wycisza wiadomości dla ukaranego i ogłoszenia kary na czacie. Wykonujący
+otrzymuje prywatne potwierdzenie z informacją o trybie cichym. Jego treść można zmienić
+w polu `silent_success` w sekcji danej komendy w pliku językowym. Działa również dla `kick all`, cofania kar oraz wszystkich typów kar
 z `/punish`. Błędy pozostają widoczne dla wykonującego. Ekran rozłączenia przy kicku
 lub banie, egzekwowanie kary, historia i logi pozostają aktywne. Kolejne komendy kar
 PunisherX uruchamiane przez skonfigurowane akcje dziedziczą `--silent`; komunikaty

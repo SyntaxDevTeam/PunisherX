@@ -37,6 +37,7 @@ setjail:
 
 # /jail commando berichten
 jail:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt speler <gold><player></gold> opgesloten voor <gold><reason></gold> voor <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   jail: "<green>Je hebt speler <gold><player></gold> opgesloten voor <gold><reason></gold> voor <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct gebruik is: <gold>/jail <speler_naam> (tijd) <reden>"
   jail_message: "<red>Je bent opgesloten voor <b><reason></b> voor <b><time></b></red>"
@@ -56,6 +57,7 @@ jail:
 
 # /unjail commando berichten
 unjail:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Speler <gold><player></gold> is succesvol uit de gevangenis vrijgelaten.</green>"
   unjail: "<green>Je hebt speler <gold><player></gold> uit de gevangenis vrijgelaten</green>"
   usage: "Correct gebruik is: <gold>/unjail <speler_naam>"
   unjail_message: "<green>Je gevangenisstraf is beëindigd! Verspil deze kans niet!</green>"
@@ -66,6 +68,7 @@ unjail:
 
 # /ban commando berichten
 ban:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt <gold><player></gold> verbannen voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
   ban: "<green>Je hebt <gold><player></gold> verbannen voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct gebruik is: <gold>/ban <speler> (tijd) <reden>"
   kick_message:
@@ -89,6 +92,7 @@ ban:
 
 # /banip commando berichten
 banip:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt het IP van de speler verbannen voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray> <dark_gray>(<player>)</dark_gray>"
   ban: "<green>Je hebt het IP van de speler verbannen voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct gebruik is: <gold>/banip <speler|ip> (tijd) <reden>"
   kick_message:
@@ -112,6 +116,7 @@ banip:
 
 # /unban commando berichten
 unban:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Speler <gold><player></gold> is uit de ban gehaald</green>"
   unban: "<green>Speler <gold><player></gold> is uit de ban gehaald</green>"
   usage: "Correct gebruik is: <gold>/unban <speler>"
   broadcast: "<dark_gray>Speler <gray><player></gray> is uit de ban gehaald</dark_gray>"
@@ -119,6 +124,7 @@ unban:
 
 # /mute commando berichten
 mute:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt speler <gold><player></gold> gemute voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
   mute: "<green>Je hebt speler <gold><player></gold> gemute voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct gebruik is: <gold>/mute <speler> (tijd) <reden>"
   mute_message: "<red>Je bent gemute voor <b><reason></b> voor <b><time></b></red>"
@@ -135,6 +141,7 @@ mute:
 
 # /unmute commando berichten
 unmute:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt speler <gold><player></gold> gedemute</green>"
   unmute: "<green>Je hebt speler <gold><player></gold> gedemute</green>"
   usage: "Correct gebruik is: <gold>/unmute <speler>"
   unmute_message: "<green>Je bent gedemute!</green>"
@@ -142,6 +149,7 @@ unmute:
 
 # /warn commando berichten
 warn:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt speler <gold><player></gold> gewaarschuwd (<warn_no> keer) voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
   warn: "<green>Je hebt speler <gold><player></gold> gewaarschuwd (<warn_no> keer) voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct gebruik is: <gold>/warn <speler> (tijd) <reden>"
   warn_message: "<red>Je hebt <b><warn_no></b> waarschuwing(en) ontvangen!</red>"
@@ -166,6 +174,7 @@ punish:
 
 # Reverse the latest punishment from a template ladder.
 unpunish:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Straf #<id> voor <player> uit <template> en de bijdrage aan de escalatie zijn teruggedraaid.</green>"
   usage: "Gebruik: <gold>/unpunish <player> <template></gold>"
   success: "<green>Straf #<id> voor <player> uit <template> en de bijdrage aan de escalatie zijn teruggedraaid.</green>"
   not_found: "<red>Geen resterende straf voor <player> uit <template> binnen dit serverbereik.</red>"
@@ -175,12 +184,14 @@ unpunish:
 
 # /unwarn commando berichten
 unwarn:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt de waarschuwing voor speler <gold><player></gold> verwijderd</green>"
   unwarn: "<green>Je hebt de waarschuwing voor speler <gold><player></gold> verwijderd</green>"
   usage: "Correct gebruik is: <gold>/unwarn <speler>"
 
 
 # /kick commando berichten
 kick:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt speler <gold><player></gold> gekicked voor <gold><reason></gold></green>"
   kick: "<green>Je hebt speler <gold><player></gold> gekicked voor <gold><reason></gold></green>"
   usage: "Correct gebruik is: <gold>/kick <speler> <reden>"
   kick_message:
@@ -244,6 +255,7 @@ change-reason:
 
 # Berichten voor het /clearall commando
 clear:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Alle actieve straffen voor speler </green><gold><player></gold><green> zijn gewist</green>"
   usage: "Correct gebruik is: <gold>/clearall <speler>"
   clearall: "<green>Alle actieve straffen voor speler </green><gold><player></gold><green> zijn gewist</green>"
   clear_message: "<green>Alle actieve straffen zijn geannuleerd! </green><dark_gray>Pssst! Heb je misschien wat connecties met de beheerders of zo?</dark_gray>"

@@ -66,13 +66,12 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
             }
         }
 
-        if (unbanned && !silent) {
-            plugin.messageHandler.getSmartMessage(
-                "unban",
-                "unban",
-                mapOf("player" to playerName, "operator" to stack.sender.name)
-            ).forEach { stack.sender.sendMessage(it) }
-            broadcastUnban(playerName, stack.sender.name)
+        if (unbanned) {
+            PunishmentCommandUtils.sendSenderMessages(
+                plugin, stack, "unban", "unban",
+                mapOf("player" to playerName, "operator" to stack.sender.name), silent = silent
+            )
+            if (!silent) broadcastUnban(playerName, stack.sender.name)
         }
 
         return unbanned
@@ -96,13 +95,12 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
             }
         }
 
-        if (unbanned && !silent) {
-            plugin.messageHandler.getSmartMessage(
-                "unban",
-                "unban",
-                mapOf("player" to ip, "operator" to stack.sender.name)
-            ).forEach { stack.sender.sendMessage(it) }
-            broadcastUnban(ip, stack.sender.name)
+        if (unbanned) {
+            PunishmentCommandUtils.sendSenderMessages(
+                plugin, stack, "unban", "unban",
+                mapOf("player" to ip, "operator" to stack.sender.name), silent = silent
+            )
+            if (!silent) broadcastUnban(ip, stack.sender.name)
         }
 
         return unbanned

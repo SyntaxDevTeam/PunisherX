@@ -118,6 +118,7 @@ setunjail:
 
 # /jail command messages
 jail:
+  silent_success: "<dark_gray>[조용한 모드]</dark_gray> <green>당신은 <gold><player></gold>을(를) <gold><reason></gold>의 사유로 <gold><time></gold></green> 동안 감옥에 수감시켰습니다. <dark_gray>(ID: <id>)</dark_gray>"
   jail: "<green>당신은 <gold><player></gold>을(를) <gold><reason></gold>의 사유로 <gold><time></gold></green> 동안 감옥에 수감시켰습니다. <dark_gray>(ID: <id>)</dark_gray>"
   usage: "올바른 사용법: <gold>/jail <player_name> (시간) <사유></gold>"
   jail_message: "<red>당신은 <b><reason></b> 의 사유로 <b><time></b></red> 동안 감옥에 수감되었습니다."
@@ -146,6 +147,7 @@ jail:
 
 # /unjail command messages
 unjail:
+  silent_success: "<dark_gray>[조용한 모드]</dark_gray> <green><gold><player></gold>이(가) 석방되었습니다.</green>"
   unjail: "<green>당신은 <gold><player></gold>을(를) 석방시켰습니다.</green>"
   usage: "올바른 사용법: <gold>/unjail <석방시킬 플레이어></gold>"
   unjail_message: "<green>수감 기간이 모두 지났습니다!</green>"
@@ -156,6 +158,7 @@ unjail:
 
 # /ban command messages
 ban:
+  silent_success: "<dark_gray>[조용한 모드]</dark_gray> <green>당신은 <gold><player></gold>을(를) <gold><reason></gold>의 사유로 <gold><time></gold></green> 동안 밴했습니다.<dark_gray>(ID: <id>)</dark_gray>"
   ban: "<green>당신은 <gold><player></gold>을(를) <gold><reason></gold>의 사유로 <gold><time></gold></green> 동안 밴했습니다.<dark_gray>(ID: <id>)</dark_gray>"
   usage: "올바른 사용법: <gold>/ban <밴할 플레이어> (기간) <reason></gold>"
   kick_message:
@@ -189,6 +192,7 @@ ban:
 
 # /banip command messages
 banip:
+  silent_success: "<dark_gray>[조용한 모드]</dark_gray> <green>당신은 해당 IP를 <gold><reason></gold>의 사유로 <gold><time></gold> 동안 밴했습니다.</green> <dark_gray>(ID: <id>)</dark_gray> <dark_gray>(<player>)</dark_gray>"
   ban: "<green>당신은 해당 IP를 <gold><reason></gold>의 사유로 <gold><time></gold> 동안 밴했습니다.</green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "올바른 사용법: <gold>/banip <ip 주소> (기간) <사유></gold>"
   kick_message:
@@ -213,6 +217,7 @@ banip:
 
 # /unban command messages
 unban:
+  silent_success: "<dark_gray>[조용한 모드]</dark_gray> <green>당신은 <gold><player></gold>을(를) 밴 해제했습니다.</green>"
   unban: "<green>당신은 <gold><player></gold>을(를) 밴 해제했습니다.</green>"
   usage: "올바른 사용법: <gold>/unban <플레이어></gold>"
   broadcast: "<dark_gray><gray><player></gray>이(가) 밴 해제되었습니다.</dark_gray>"
@@ -220,6 +225,7 @@ unban:
 
 # /mute command messages
 mute:
+  silent_success: "<dark_gray>[조용한 모드]</dark_gray> <green>당신은 <gold><player></gold>을(를) <gold><reason></gold>의 사유로 <gold><time></gold> 동안 타임아웃했습니다.</green> <dark_gray>(ID: <id>)</dark_gray>"
   mute: "<green>당신은 <gold><player></gold>을(를) <gold><reason></gold>의 사유로 <gold><time></gold> 동안 타임아웃했습니다.</green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "올바른 사용법: <gold>/mute <플레이어> (기간) <사유></gold>"
   mute_message: "<red>당신은 <b><reason></b> 의 사유로 <b><time></b></red> 동안 타임아웃되었습니다."
@@ -245,6 +251,7 @@ mute:
 
 # /unmute command messages
 unmute:
+  silent_success: "<dark_gray>[조용한 모드]</dark_gray> <green>당신은 <gold><player></gold>을(를) 타임아웃 해제했습니다.</green>"
   unmute: "<green>당신은 <gold><player></gold>을(를) 타임아웃 해제했습니다.</green>"
   usage: "올바른 사용법: <gold>/unmute <플레이어></gold>"
   unmute_message: "<green>당신은 타임아웃 해제되었습니다.</green>"
@@ -252,6 +259,7 @@ unmute:
 
 # /warn command messages
 warn:
+  silent_success: "<dark_gray>[조용한 모드]</dark_gray> <green>당신은 (<warn_no>회) <gold><player></gold>에게 <gold><reason></gold>의 사유로 <gold><time></gold> 동안 경고를 부여했습니다.</green> <dark_gray>(ID: <id>)</dark_gray>"
   warn: "<green>당신은 (<warn_no>회) <gold><player></gold>에게 <gold><reason></gold>의 사유로 <gold><time></gold> 동안 경고를 부여했습니다.</green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "올바른 사용법: <gold>/warn <플레이어> (기간) <사유></gold>"
   warn_message: "<red>당신은 <b><warn_no></b> 개의 경고를 받았습니다!</red>"
@@ -285,6 +293,7 @@ punish:
 
 # Reverse the latest punishment from a template ladder.
 unpunish:
+  silent_success: "<dark_gray>[조용한 모드]</dark_gray> <green><player>의 <template> 처벌 #<id> 및 단계 상승 기록을 취소했습니다.</green>"
   usage: "사용법: <gold>/unpunish <player> <template></gold>"
   success: "<green><player>의 <template> 처벌 #<id> 및 단계 상승 기록을 취소했습니다.</green>"
   not_found: "<red>이 서버 범위에서 <player>의 <template>에 취소할 처벌이 없습니다.</red>"
@@ -294,12 +303,14 @@ unpunish:
 
 # /unwarn command messages
 unwarn:
+  silent_success: "<dark_gray>[조용한 모드]</dark_gray> <green>당신은 <gold><player></gold>에게서 경고를 제거했습니다.</green>"
   unwarn: "<green>당신은 <gold><player></gold>에게서 경고를 제거했습니다.</green>"
   usage: "올바른 사용법: <gold>/unwarn <플레이어></gold>"
 
 
 # /kick command messages
 kick:
+  silent_success: "<dark_gray>[조용한 모드]</dark_gray> <green>당신은 <gold><player></gold>을(를) <gold><reason></gold>의 사유로 추방했습니다.</green>"
   kick: "<green>당신은 <gold><player></gold>을(를) <gold><reason></gold>의 사유로 추방했습니다.</green>"
   usage: "올바른 사용법: <gold>/kick <플레이어> <사유></gold>"
   kick_message:
@@ -379,6 +390,7 @@ change-reason:
 
 # /clearall command messages
 clear:
+  silent_success: "<dark_gray>[조용한 모드]</dark_gray> <green><gold><player></gold>에 대한 모든 적용 중인 처벌이 해제되었습니다.</green>"
   usage: "올바른 사용법: <gold>/clearall <플레이어></gold>"
   clearall: "<green><gold><player></gold>에 대한 모든 적용 중인 처벌이 해제되었습니다.</green>"
   clear_message: "<green>당신의 모든 적용 중인 처벌이 해제되었습니다.</green> <gray>혹시 관리자에게 뇌물을 드린 건 아니겠죠...?</gray>"

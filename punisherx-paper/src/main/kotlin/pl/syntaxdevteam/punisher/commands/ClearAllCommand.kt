@@ -24,8 +24,9 @@ class ClearAllCommand(private val plugin: PunisherX) : BasicCommand {
                             plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
                         }
                     }
+                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent(
+                        "clear", if (silent) "silent_success" else "clearall", mapOf("player" to player)))
                     if (!silent) {
-                        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("clear", "clearall", mapOf("player" to player)))
                         val targetPlayer = Bukkit.getPlayer(player)
                         val getMessage = plugin.messageHandler.stringMessageToComponent("clear", "clear_message")
                         targetPlayer?.sendMessage(getMessage)

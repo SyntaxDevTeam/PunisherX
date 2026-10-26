@@ -52,8 +52,8 @@ internal object PunishmentCommandUtils {
         placeholders: Map<String, String>,
         silent: Boolean = false
     ) {
-        if (silent) return
-        plugin.messageHandler.getSmartMessage(section, key, placeholders).forEach { stack.sender.sendMessage(it) }
+        val messageKey = if (silent) "silent_success" else key
+        plugin.messageHandler.getSmartMessage(section, messageKey, placeholders).forEach { stack.sender.sendMessage(it) }
     }
 
     fun sendTargetMessages(

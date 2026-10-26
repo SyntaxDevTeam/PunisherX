@@ -43,7 +43,7 @@ class UnpunishCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.cache.removePunishment(uuid, notify = false, removeDatabase = false)
         }
         plugin.commandLoggerPlugin.logCommand(stack.sender.name, "UNPUNISH", arguments[0], "${template.name}: history #${undone.first().id}")
-        if (!silent) stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unpunish", "success", placeholders + ("id" to undone.first().id.toString())))
+        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unpunish", if (silent) "silent_success" else "success", placeholders + ("id" to undone.first().id.toString())))
     }
 
     override fun suggest(stack: CommandSourceStack, args: Array<String>): List<String> {

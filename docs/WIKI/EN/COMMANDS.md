@@ -68,8 +68,9 @@ Aliases in `config.yml` provide alternate names for supported core commands. On 
 
 `<argument>` is required; `(argument)` is optional; `[--force]` is an optional flag. Duration examples: `30s`, `10m`, `2h`, `7d`. Omitting the duration gives an indefinite punishment. For supported punishment commands, `--force` bypasses target protection; for database migration it skips confirmation.
 
-`--silent` suppresses operator confirmations, target chat notifications and punishment
-broadcasts. It also works with `kick all`, punishment removal and all `/punish` types.
+`--silent` suppresses target chat notifications and punishment broadcasts. The operator
+receives a private confirmation marked as silent. Customize it with `silent_success`
+in each command’s language section. It also works with `kick all`, punishment removal and all `/punish` types.
 Errors remain visible to the operator. Disconnect screens, enforcement, history and
 logs remain active. Configured follow-up PunisherX punishment commands inherit
 `--silent`; messages from other plugins and custom actions follow their own settings.
