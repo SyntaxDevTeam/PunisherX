@@ -54,6 +54,7 @@ private data class LibraryDiagnostic(
 
 class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
     private val mH = plugin.messageHandler
+    private val backupCommands = DatabaseBackupCommands(plugin)
     private var pendingMigration: Pair<DatabaseType, DatabaseType>? = null
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
@@ -76,10 +77,9 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        val pluginMeta = (plugin as LifecycleEventOwner).pluginMeta
-
         when {
             args[0].equals("version", ignoreCase = true) -> {
+                val pluginMeta = (plugin as LifecycleEventOwner).pluginMeta
                 stack.sender.sendMessage(
                     mH.miniMessageFormat(
                         "\n<gray>-------------------------------------------------\n" +
@@ -111,11 +111,11 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             }
 
             args[0].equals("export", ignoreCase = true) -> {
-                plugin.databaseHandler.exportDatabase()
+                backupCommands.execute(stack.sender, importing = false)
             }
 
             args[0].equals("import", ignoreCase = true) -> {
-                plugin.databaseHandler.importDatabase()
+                backupCommands.execute(stack.sender, importing = true)
             }
 
             args[0].equals("diagnostics", ignoreCase = true) || args[0].equals("diag", ignoreCase = true) -> {

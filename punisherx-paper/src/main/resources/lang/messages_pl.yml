@@ -559,3 +559,13 @@ formatTime:
     one: "dzień"
     few: "dni"
     many: "dni"
+
+# Komendy kopii zapasowej (/prx export i /prx import).
+database-backup:
+  busy: "<yellow>Eksport lub import bazy już trwa. Poczekaj na zakończenie.</yellow>"
+  export-started: "<yellow>Trwa eksport bazy danych. Proszę czekać...</yellow>"
+  export-success: "<green>Wyeksportowano bazę do plugins/PunisherX/dump/backup.sql.</green>"
+  export-failed: "<red>Eksport bazy nie powiódł się. Poprzednia kopia została zachowana. Szczegóły znajdziesz w konsoli.</red>"
+  import-started: "<yellow>Trwa import plugins/PunisherX/dump/backup.sql. Import dopisuje rekordy bez czyszczenia bazy i nadpisywania istniejących danych. Proszę czekać...</yellow>"
+  import-success: "<green>Import bazy zakończony. Dopisano rekordy z kopii zapasowej.</green>"
+  import-failed: "<red>Import bazy nie powiódł się. Żadne rekordy z tego importu nie zostały zatwierdzone. Sprawdź konsolę; ponowny import tej samej kopii może powodować konflikt klucza.</red>"

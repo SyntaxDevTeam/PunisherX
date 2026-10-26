@@ -468,3 +468,13 @@ formatTime:
     one: "dag"
     few: "dagen"
     many: "dagen"
+
+# Database backup commands (/prx export and /prx import).
+database-backup:
+  busy: "<yellow>A database export or import is already running. Please wait.</yellow>"
+  export-started: "<yellow>Exporting the database. Please wait...</yellow>"
+  export-success: "<green>Database exported to plugins/PunisherX/dump/backup.sql.</green>"
+  export-failed: "<red>Database export failed. The previous backup has been preserved. Check the console for details.</red>"
+  import-started: "<yellow>Importing plugins/PunisherX/dump/backup.sql. This adds records without clearing or overwriting existing data. Please wait...</yellow>"
+  import-success: "<green>Database import completed. Records from the backup have been added.</green>"
+  import-failed: "<red>Database import failed. No records from this import were committed. Check the console for details; importing the same backup again can cause a key conflict.</red>"
