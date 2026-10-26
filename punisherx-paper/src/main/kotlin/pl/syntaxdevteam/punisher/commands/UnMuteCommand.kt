@@ -10,9 +10,12 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 class UnMuteCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+        val options = PunishmentCommandOptions.parse(args)
+        val arguments = options.arguments
+        val silent = options.silent
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNMUTE)) {
-            if (args.isNotEmpty()) {
-                val player = args[0]
+            if (arguments.isNotEmpty()) {
+                val player = arguments[0]
                 val uuid = plugin.resolvePlayerUuid(player).toString()
                 val punishments = plugin.databaseHandler.getPunishments(uuid)
                 if (punishments.isNotEmpty()) {
@@ -21,10 +24,9 @@ class UnMuteCommand(private val plugin: PunisherX) : BasicCommand {
                             plugin.databaseHandler.removePunishment(uuid, punishment.type)
                         }
                     }
-                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unmute", "unmute", mapOf("player" to player, "operator" to stack.sender.name)))
-                    val targetPlayer = Bukkit.getPlayer(player)
-                    val muteMessage = plugin.messageHandler.stringMessageToComponent("unmute", "unmute_message", mapOf("player" to player, "operator" to stack.sender.name))
-                    targetPlayer?.sendMessage(muteMessage)
+                    val placeholders = mapOf("player" to player, "operator" to stack.sender.name)
+                    PunishmentCommandUtils.sendSenderMessages(plugin, stack, "unmute", "unmute", placeholders, silent = silent)
+                    PunishmentCommandUtils.sendTargetMessages(plugin, Bukkit.getPlayer(player), "unmute", "unmute_message", placeholders, silent = silent)
                     plugin.logger.info("Player $player ($uuid) has been unmuted")
                 } else {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_found", mapOf("player" to player, "operator" to stack.sender.name)))

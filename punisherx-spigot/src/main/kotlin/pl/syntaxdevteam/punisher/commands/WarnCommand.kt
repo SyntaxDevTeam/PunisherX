@@ -9,20 +9,23 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 class WarnCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+        val options = PunishmentCommandOptions.parse(args)
+        val arguments = options.arguments
+        val silent = options.silent
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.WARN)) {
-            if (args.isNotEmpty()) {
-                if (args.size < 2) {
+            if (arguments.isNotEmpty()) {
+                if (arguments.size < 2) {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("warn", "usage"))
                 } else {
-                    val player = args[0]
+                    val player = arguments[0]
                     val uuid = plugin.resolvePlayerUuid(player)
                     val targetPlayer = Bukkit.getPlayer(uuid)
-                    val isForce = args.contains("--force")
+                    val isForce = options.force
                     if (!isForce && targetPlayer != null && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_WARN)) {
                         stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "bypass", mapOf("player" to player)))
                         return
                     }
-                    val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, args, 1)
+                    val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, arguments, 1)
 
                     val punishmentType = "WARN"
                     val start = System.currentTimeMillis()
@@ -49,13 +52,13 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                         )
                     )
 
-                    PunishmentCommandUtils.sendSenderMessages(plugin, stack, "warn", "warn", placeholders)
-                    PunishmentCommandUtils.sendTargetMessages(plugin, targetPlayer, "warn", "warn_message", placeholders)
-                    PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_WARN, "warn", "broadcast", placeholders)
+                    PunishmentCommandUtils.sendSenderMessages(plugin, stack, "warn", "warn", placeholders, silent = silent)
+                    PunishmentCommandUtils.sendTargetMessages(plugin, targetPlayer, "warn", "warn_message", placeholders, silent = silent)
+                    PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_WARN, "warn", "broadcast", placeholders, silent = silent)
                     if (isForce) {
                         plugin.logger.warning("Force-warned by ${stack.sender.name} on $player")
                     }
-                    plugin.actionExecutor.executeWarnCountActions(player, warnCount)
+                    plugin.actionExecutor.executeWarnCountActions(player, warnCount, silent = silent)
                 }
             } else {
                 stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("warn", "usage"))

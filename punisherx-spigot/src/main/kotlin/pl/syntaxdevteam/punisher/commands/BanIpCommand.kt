@@ -18,17 +18,20 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
     private val clp = plugin.commandLoggerPlugin
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+        val options = PunishmentCommandOptions.parse(args)
+        val arguments = options.arguments
+        val silent = options.silent
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BANIP)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
-        if (args.size < 2) {
+        if (arguments.size < 2) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("banip", "usage"))
             return
         }
 
-        val rawTarget = args[0]
-        val isForce = args.contains("--force")
+        val rawTarget = arguments[0]
+        val isForce = options.force
         val playerIPs: List<String> = when {
             IP_REGEX.matches(rawTarget) -> listOf(rawTarget)
             UUID_REGEX.matches(rawTarget) -> plugin.playerIPManager.getPlayerIPsByUUID(rawTarget)
@@ -53,7 +56,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        val filtered = args.filterNot { it == "--force" }
+        val filtered = arguments.toList()
         val timeArg = filtered.getOrNull(1)
         val durationSec = timeArg?.let {
             try { plugin.timeHandler.parseTime(it) } catch (_: Exception) { null }
@@ -116,19 +119,9 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
             targetPlayer.kick(builder.build())
         }
 
-        val msgLines = plugin.messageHandler.getSmartMessage(
-            "banip",
-            "ban",
-            placeholders
-        )
-        msgLines.forEach { stack.sender.sendMessage(it) }
-
-        plugin.actionExecutor.executeAction("ip_banned", rawTarget, placeholders)
-
-        plugin.server.onlinePlayers
-            .filterNot { it.name == stack.sender.name }
-            .filter { PermissionChecker.hasWithSee(it, PermissionChecker.PermissionKey.SEE_BANIP) }
-            .forEach { player -> msgLines.forEach { player.sendMessage(it) } }
+        PunishmentCommandUtils.sendSenderMessages(plugin, stack, "banip", "ban", placeholders, silent = silent)
+        plugin.actionExecutor.executeAction("ip_banned", rawTarget, placeholders, silent = silent)
+        PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_BANIP, "banip", "ban", placeholders, silent = silent)
 
         if (isForce) plugin.logger.warning("Force by ${stack.sender.name} on $rawTarget")
     }

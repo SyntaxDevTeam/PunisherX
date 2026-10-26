@@ -22,7 +22,7 @@ class BanIpCommandTest {
     private val ips = listOf("192.0.2.1", "192.0.2.2")
     private val reason = "Toksyczna atmosfera w społeczności"
 
-    private fun execute(firstId: Long?, secondId: Long?) {
+    private fun execute(firstId: Long?, secondId: Long?, vararg flags: String) {
         whenever(plugin.logger).thenReturn(mock())
         whenever(plugin.commandLoggerPlugin).thenReturn(mock())
         whenever(plugin.playerIPManager).thenReturn(mock())
@@ -53,7 +53,7 @@ class BanIpCommandTest {
             .thenReturn(secondId)
         mockStatic(Bukkit::class.java).use { bukkit ->
             bukkit.`when`<Player?> { Bukkit.getPlayer(uuid) }.thenReturn(player)
-            BanIpCommand(plugin).execute(source, arrayOf("target", "999d", reason))
+            BanIpCommand(plugin).execute(source, arrayOf("target", *flags, "999d", reason))
             bukkit.verify { Bukkit.getPlayer(uuid) }
             // In particular, the command must never dispatch vanilla's permanent ban-ip.
             bukkit.verifyNoMoreInteractions()
@@ -84,6 +84,26 @@ class BanIpCommandTest {
     }
 
     @Test
+    fun `silent bans persist and disconnect without chat announcements`() {
+        execute(42, 43, "--silent", "--force")
+        verify(plugin.databaseHandler, times(2)).addPunishment(eq("target"), any(), eq(reason), eq("Admin"),
+            eq("BANIP"), any(), any(), any())
+        verify(plugin.proxyBridgeMessenger, times(2)).notifyIpBan(any(), eq(reason), any())
+        verify(player).kick(any<Component>())
+        verify(sender, never()).sendMessage(any<Component>())
+        verify(player, never()).sendMessage(any<Component>())
+        verify(plugin.messageHandler, never()).getSmartMessage(eq("banip"), eq("ban"), any())
+        verify(plugin.actionExecutor).executeAction(eq("ip_banned"), eq("target"), any(), eq(true))
+    }
+
+    @Test
+    fun `silent database errors remain visible to the operator`() {
+        execute(null, null, "--silent")
+        verify(sender).sendMessage(Component.text("Database error"))
+        verify(player, never()).kick(any<Component>())
+    }
+
+    @Test
     fun `successful bans preserve expiration and announce success`() {
         execute(42, 43)
         val starts = argumentCaptor<Long>()
@@ -95,7 +115,7 @@ class BanIpCommandTest {
         }
         verify(plugin.proxyBridgeMessenger, times(2)).notifyIpBan(any(), eq(reason), any())
         verify(player).kick(any<Component>())
-        verify(plugin.actionExecutor).executeAction(eq("ip_banned"), eq("target"), any())
+        verify(plugin.actionExecutor).executeAction(eq("ip_banned"), eq("target"), any(), eq(false))
         verify(plugin.messageHandler, never()).stringMessageToComponent(eq("error"), eq("banip_db_error"), any<Map<String, String>>())
     }
 }

@@ -9,20 +9,23 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+        val options = PunishmentCommandOptions.parse(args)
+        val arguments = options.arguments
+        val silent = options.silent
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNBAN)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
 
-        if (args.isEmpty()) {
+        if (arguments.isEmpty()) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unban", "usage"))
             return
         }
 
-        val playerOrIpOrUUID = args[0]
+        val playerOrIpOrUUID = arguments[0]
 
         if (playerOrIpOrUUID.matches(Regex("\\d+\\.\\d+\\.\\d+\\.\\d+"))) {
-            if (!unbanIP(stack, playerOrIpOrUUID)) {
+            if (!unbanIP(stack, playerOrIpOrUUID, silent)) {
                 stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "ip_not_found", mapOf("ip" to playerOrIpOrUUID)))
             }
             return
@@ -32,20 +35,20 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
 
         plugin.logger.debug("UUID for player $playerOrIpOrUUID: [$uuid]")
 
-        if (unbanPlayer(stack, playerOrIpOrUUID, uuid)) {
+        if (unbanPlayer(stack, playerOrIpOrUUID, uuid, silent)) {
             return
         }
 
         val ips = plugin.playerIPManager.getPlayerIPsByName(playerOrIpOrUUID)
         plugin.logger.debug("Assigned IPs for player $playerOrIpOrUUID: $ips")
 
-        val anyUnbanned = ips.map { ip -> unbanIP(stack, ip) }.any { it }
+        val anyUnbanned = ips.map { ip -> unbanIP(stack, ip, silent) }.any { it }
         if (!anyUnbanned) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_punished", mapOf("player" to playerOrIpOrUUID, "operator" to stack.sender.name)))
         }
     }
 
-    private fun unbanPlayer(stack: CommandSourceStack, playerName: String, uuid: String): Boolean {
+    private fun unbanPlayer(stack: CommandSourceStack, playerName: String, uuid: String, silent: Boolean): Boolean {
         val punishments = plugin.databaseHandler.getPunishments(uuid)
 
         if (punishments.isEmpty()) {
@@ -63,7 +66,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
             }
         }
 
-        if (unbanned) {
+        if (unbanned && !silent) {
             plugin.messageHandler.getSmartMessage(
                 "unban",
                 "unban",
@@ -75,7 +78,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
         return unbanned
     }
 
-    private fun unbanIP(stack: CommandSourceStack, ip: String): Boolean {
+    private fun unbanIP(stack: CommandSourceStack, ip: String, silent: Boolean): Boolean {
         val punishments = plugin.databaseHandler.getPunishmentsByIP(ip)
 
         if (punishments.isEmpty()) {
@@ -93,7 +96,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
             }
         }
 
-        if (unbanned) {
+        if (unbanned && !silent) {
             plugin.messageHandler.getSmartMessage(
                 "unban",
                 "unban",

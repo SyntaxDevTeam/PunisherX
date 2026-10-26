@@ -8,24 +8,27 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 /** Reverses a history entry, including its contribution to template escalation. */
 class UnpunishCommand(private val plugin: PunisherX) : BasicCommand {
     override fun execute(stack: CommandSourceStack, args: Array<String>) {
+        val options = PunishmentCommandOptions.parse(args)
+        val arguments = options.arguments
+        val silent = options.silent
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNPUNISH)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
-        if (args.size < 2) {
+        if (arguments.size < 2) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unpunish", "usage"))
             return
         }
-        val templateName = args.drop(1).joinToString(" ").removeSurrounding("\"")
+        val templateName = arguments.drop(1).joinToString(" ").removeSurrounding("\"")
         val template = plugin.punishTemplateManager.getTemplate(templateName)
         if (template == null) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent(
                 "punish", "template_not_found", mapOf("template" to templateName)))
             return
         }
-        val uuid = plugin.resolvePlayerUuid(args[0])
-        val placeholders = mapOf("player" to args[0], "template" to template.name, "operator" to stack.sender.name)
-        val undone = plugin.databaseHandler.undoPunishment(uuid.toString(), args[0], template.reason, template.name, stack.sender.name)
+        val uuid = plugin.resolvePlayerUuid(arguments[0])
+        val placeholders = mapOf("player" to arguments[0], "template" to template.name, "operator" to stack.sender.name)
+        val undone = plugin.databaseHandler.undoPunishment(uuid.toString(), arguments[0], template.reason, template.name, stack.sender.name)
         if (undone == null) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unpunish", "db_error"))
             return
@@ -39,8 +42,8 @@ class UnpunishCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.databaseHandler.getPunishments(uuid.toString()).none { it.type == "JAIL" }) {
             plugin.cache.removePunishment(uuid, notify = false, removeDatabase = false)
         }
-        plugin.commandLoggerPlugin.logCommand(stack.sender.name, "UNPUNISH", args[0], "${template.name}: history #${undone.first().id}")
-        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unpunish", "success", placeholders + ("id" to undone.first().id.toString())))
+        plugin.commandLoggerPlugin.logCommand(stack.sender.name, "UNPUNISH", arguments[0], "${template.name}: history #${undone.first().id}")
+        if (!silent) stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unpunish", "success", placeholders + ("id" to undone.first().id.toString())))
     }
 
     override fun suggest(stack: CommandSourceStack, args: Array<String>): List<String> {

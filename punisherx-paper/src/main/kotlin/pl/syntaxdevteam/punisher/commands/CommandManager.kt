@@ -1,6 +1,5 @@
 package pl.syntaxdevteam.punisher.commands
 
-import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager
@@ -73,7 +72,19 @@ class CommandManager(private val plugin: PunisherX) {
                             unpunishCmd.execute(ctx.source, arrayOf(
                                 StringArgumentType.getString(ctx, "player"), StringArgumentType.getString(ctx, "template")))
                             1
-                        }))
+                        }
+                        .then(Commands.argument("flags", StringArgumentType.greedyString())
+                            .suggests { _, builder ->
+                                if ("--silent".startsWith(builder.remaining)) builder.suggest("--silent")
+                                builder.buildFuture()
+                            }
+                            .executes { ctx ->
+                                val flags = StringArgumentType.getString(ctx, "flags").trim().split(Regex("\\s+"))
+                                unpunishCmd.execute(ctx.source, arrayOf(
+                                    StringArgumentType.getString(ctx, "player"),
+                                    StringArgumentType.getString(ctx, "template"), *flags.toTypedArray()))
+                                1
+                            })))
                 .build()
             commands.register(unpunishNode, "/unpunish <player> <template>", emptyList())
             // Register /punish with Brigadier — word() for player, string() for template (supports spaces via quotes)
@@ -84,40 +95,46 @@ class CommandManager(private val plugin: PunisherX) {
                 .then(
                     Commands.argument("player", StringArgumentType.word())
                         .suggests { _, builder ->
-                            plugin.server.onlinePlayers.forEach { builder.suggest(it.name) }
+                            plugin.server.onlinePlayers.filter { it.name.startsWith(builder.remaining, ignoreCase = true) }
+                                .forEach { builder.suggest(it.name) }
                             builder.buildFuture()
                         }
                         .then(
                             Commands.argument("template", StringArgumentType.string())
                                 .suggests { _, builder ->
-                                    plugin.punishTemplateManager.getTemplateNames().forEach { name ->
-                                        builder.suggest("\"$name\"")
-                                    }
+                                    PunishCommandCompletion.templates(
+                                        plugin.punishTemplateManager.getTemplateNames(), builder.remaining
+                                    ).forEach { builder.suggest(it) }
                                     builder.buildFuture()
                                 }
                                 .executes { ctx ->
                                     val player = StringArgumentType.getString(ctx, "player")
                                     val template = StringArgumentType.getString(ctx, "template")
-                                        .trim('"')
-                                    punishCmd.execute(ctx.source, arrayOf(player, template))
+                                    punishCmd.executeParsed(ctx.source, arrayOf(player, template))
                                     com.mojang.brigadier.Command.SINGLE_SUCCESS
                                 }
                                 .then(
-                                    Commands.argument("level", IntegerArgumentType.integer(1))
+                                    Commands.argument("options", StringArgumentType.greedyString())
                                         .suggests { ctx, builder ->
-                                            val tmplName = StringArgumentType.getString(ctx, "template")
-                                                .trim('"')
-                                            plugin.punishTemplateManager.getTemplate(tmplName)
-                                                ?.levels?.keys?.sorted()
-                                                ?.forEach { builder.suggest(it) }
-                                            builder.buildFuture()
+                                            val tokens = builder.remaining.split(Regex("\\s+"))
+                                            val input = tokens.last()
+                                            val suggestions = builder.createOffset(builder.start + builder.remaining.length - input.length)
+                                            val used = tokens.dropLast(1)
+                                            if (used.none { it.toIntOrNull() != null }) {
+                                                plugin.punishTemplateManager.getTemplate(StringArgumentType.getString(ctx, "template"))
+                                                    ?.levels?.keys?.sorted()?.forEach {
+                                                        if (it.toString().startsWith(input)) suggestions.suggest(it)
+                                                    }
+                                            }
+                                            listOf("--force", "--silent").filter { it !in used && it.startsWith(input) }
+                                                .forEach { suggestions.suggest(it) }
+                                            suggestions.buildFuture()
                                         }
                                         .executes { ctx ->
                                             val player = StringArgumentType.getString(ctx, "player")
                                             val template = StringArgumentType.getString(ctx, "template")
-                                                .trim('"')
-                                            val level = IntegerArgumentType.getInteger(ctx, "level")
-                                            punishCmd.execute(ctx.source, arrayOf(player, template, level.toString()))
+                                            val options = StringArgumentType.getString(ctx, "options").trim().split(Regex("\\s+"))
+                                            punishCmd.executeParsed(ctx.source, arrayOf(player, template, *options.toTypedArray()))
                                             com.mojang.brigadier.Command.SINGLE_SUCCESS
                                         }
                                 )

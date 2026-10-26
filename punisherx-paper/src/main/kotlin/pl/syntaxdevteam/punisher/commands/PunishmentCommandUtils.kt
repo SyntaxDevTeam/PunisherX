@@ -49,8 +49,10 @@ internal object PunishmentCommandUtils {
         stack: CommandSourceStack,
         section: String,
         key: String,
-        placeholders: Map<String, String>
+        placeholders: Map<String, String>,
+        silent: Boolean = false
     ) {
+        if (silent) return
         plugin.messageHandler.getSmartMessage(section, key, placeholders).forEach { stack.sender.sendMessage(it) }
     }
 
@@ -59,8 +61,10 @@ internal object PunishmentCommandUtils {
         targetPlayer: Player?,
         section: String,
         key: String,
-        placeholders: Map<String, String>
+        placeholders: Map<String, String>,
+        silent: Boolean = false
     ) {
+        if (silent) return
         if (targetPlayer == null) return
         plugin.messageHandler.getSmartMessage(section, key, placeholders).forEach { targetPlayer.sendMessage(it) }
     }
@@ -82,8 +86,10 @@ internal object PunishmentCommandUtils {
         permissionKey: PermissionChecker.PermissionKey,
         section: String,
         key: String,
-        placeholders: Map<String, String>
+        placeholders: Map<String, String>,
+        silent: Boolean = false
     ) {
+        if (silent) return
         val broadcastMessages = plugin.messageHandler.getSmartMessage(section, key, placeholders)
         val operator = placeholders["operator"]
         plugin.server.onlinePlayers.filterNot { it.name == operator }.forEach { onlinePlayer ->

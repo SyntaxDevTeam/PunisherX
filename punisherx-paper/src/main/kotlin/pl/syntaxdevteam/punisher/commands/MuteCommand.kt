@@ -10,14 +10,17 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 class MuteCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+        val options = PunishmentCommandOptions.parse(args)
+        val arguments = options.arguments
+        val silent = options.silent
         if(PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.MUTE)) {
-            if (args.isNotEmpty()) {
-                if (args.size < 2) {
+            if (arguments.isNotEmpty()) {
+                if (arguments.size < 2) {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("mute", "usage"))
                 } else {
-                    val player = args[0]
+                    val player = arguments[0]
                     val targetPlayer = Bukkit.getPlayer(player)
-                    val isForce = args.contains("--force")
+                    val isForce = options.force
                     if (targetPlayer != null) {
                         if (!isForce && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_MUTE)) {
                             stack.sender.sendMessage(
@@ -32,7 +35,7 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                     }
                     val uuid = plugin.resolvePlayerUuid(player).toString()
 
-                    val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, args, 1)
+                    val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, arguments, 1)
 
                     val punishmentType = "MUTE"
                     val start = System.currentTimeMillis()
@@ -54,10 +57,10 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                         type = punishmentType,
                         extra = mapOf("id" to punishmentId.toString())
                     )
-                    PunishmentCommandUtils.sendSenderMessages(plugin, stack, "mute", "mute", placeholders)
-                    plugin.actionExecutor.executeAction("muted", player, placeholders)
-                    PunishmentCommandUtils.sendTargetMessages(plugin, targetPlayer, "mute", "mute_message", placeholders)
-                    PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_MUTE, "mute", "broadcast", placeholders)
+                    PunishmentCommandUtils.sendSenderMessages(plugin, stack, "mute", "mute", placeholders, silent = silent)
+                    plugin.actionExecutor.executeAction("muted", player, placeholders, silent = silent)
+                    PunishmentCommandUtils.sendTargetMessages(plugin, targetPlayer, "mute", "mute_message", placeholders, silent = silent)
+                    PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_MUTE, "mute", "broadcast", placeholders, silent = silent)
                 }
             } else {
                 stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("mute", "usage"))
