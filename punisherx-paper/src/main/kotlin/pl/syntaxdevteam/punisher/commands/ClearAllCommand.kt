@@ -10,9 +10,12 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 class ClearAllCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+        val options = PunishmentCommandOptions.parse(args)
+        val arguments = options.arguments
+        val silent = options.silent
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.CLEAR_ALL)) {
-            if (args.isNotEmpty()) {
-                val player = args[0]
+            if (arguments.isNotEmpty()) {
+                val player = arguments[0]
                 val uuid = plugin.resolvePlayerUuid(player).toString()
                 val punishments = plugin.databaseHandler.getPunishments(uuid)
                 if (punishments.isNotEmpty()) {
@@ -21,10 +24,13 @@ class ClearAllCommand(private val plugin: PunisherX) : BasicCommand {
                             plugin.databaseHandler.removePunishment(uuid, punishment.type, true)
                         }
                     }
-                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("clear", "clearall", mapOf("player" to player)))
-                    val targetPlayer = Bukkit.getPlayer(player)
-                    val getMessage = plugin.messageHandler.stringMessageToComponent("clear", "clear_message")
-                    targetPlayer?.sendMessage(getMessage)
+                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent(
+                        "clear", if (silent) "silent_success" else "clearall", mapOf("player" to player)))
+                    if (!silent) {
+                        val targetPlayer = Bukkit.getPlayer(player)
+                        val getMessage = plugin.messageHandler.stringMessageToComponent("clear", "clear_message")
+                        targetPlayer?.sendMessage(getMessage)
+                    }
                     plugin.logger.success("Player $player ($uuid) has been cleared of all punishments")
                 } else {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_found", mapOf("player" to player)))

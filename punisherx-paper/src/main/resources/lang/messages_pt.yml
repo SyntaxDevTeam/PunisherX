@@ -40,6 +40,7 @@ setunjail:
 
 # Mensagens do comando /jail
 jail:
+  silent_success: "<dark_gray>[Modo silencioso]</dark_gray> <green>Você prendeu o jogador <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   jail: "<green>Você prendeu o jogador <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Uso correto: <gold>/jail <nome_do_jogador> (tempo) <motivo>"
   jail_message: "<red>Você foi preso por <b><reason></b> durante <b><time></b></red>"
@@ -68,6 +69,7 @@ jail:
 
 # Mensagens do comando /unjail
 unjail:
+  silent_success: "<dark_gray>[Modo silencioso]</dark_gray> <green>O jogador <gold><player></gold> foi libertado com sucesso da prisão.</green>"
   unjail: "<green>Você libertou o jogador <gold><player></gold> da prisão</green>"
   usage: "Uso correto: <gold>/unjail <nome_do_jogador>"
   unjail_message: "<green>Sua pena de prisão acabou! Não desperdice essa chance!</green>"
@@ -78,6 +80,7 @@ unjail:
 
 # Mensagens do comando /ban
 ban:
+  silent_success: "<dark_gray>[Modo silencioso]</dark_gray> <green>Você baniu <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   ban: "<green>Você baniu <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Uso correto: <gold>/ban <nome_do_jogador> (tempo) <motivo>"
   kick_message:
@@ -111,6 +114,7 @@ ban:
 
 # Mensagens do comando /banip
 banip:
+  silent_success: "<dark_gray>[Modo silencioso]</dark_gray> <green>Você baniu o IP do jogador por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray> <dark_gray>(<player>)</dark_gray>"
   ban: "<green>Você baniu o IP do jogador por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Uso correto: <gold>/banip <jogador|ip> (tempo) <motivo>"
   kick_message:
@@ -135,12 +139,14 @@ banip:
 
 # Mensagens do comando /unban
 unban:
+  silent_success: "<dark_gray>[Modo silencioso]</dark_gray> <green>O jogador <gold><player></gold> foi desbanido</green>"
   unban: "<green>O jogador <gold><player></gold> foi desbanido</green>"
   usage: "Uso correto: <gold>/unban <nome_do_jogador>"
   broadcast: "<dark_gray>O jogador <gray><player></gray> foi desbanido</dark_gray>"
 
 # Mensagens do comando /mute
 mute:
+  silent_success: "<dark_gray>[Modo silencioso]</dark_gray> <green>Você silenciou o jogador <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   mute: "<green>Você silenciou o jogador <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Uso correto: <gold>/mute <nome_do_jogador> (tempo) <motivo>"
   mute_message: "<red>Você foi silenciado por <b><reason></b> durante <b><time></b></red>"
@@ -166,6 +172,7 @@ mute:
 
 # Mensagens do comando /unmute
 unmute:
+  silent_success: "<dark_gray>[Modo silencioso]</dark_gray> <green>Você removeu o silêncio do jogador <gold><player></gold></green>"
   unmute: "<green>Você removeu o silêncio do jogador <gold><player></gold></green>"
   usage: "Uso correto: <gold>/unmute <nome_do_jogador>"
   unmute_message: "<green>Seu silêncio foi removido!</green>"
@@ -173,6 +180,7 @@ unmute:
 
 # Mensagens do comando /warn
 warn:
+  silent_success: "<dark_gray>[Modo silencioso]</dark_gray> <green>Você advertiu (<warn_no> vez) o jogador <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   warn: "<green>Você advertiu (<warn_no> vez) o jogador <gold><player></gold> por <gold><reason></gold> durante <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Uso correto: <gold>/warn <nome_do_jogador> (tempo) <motivo>"
   warn_message: "<red>Você recebeu o aviso nº <b><warn_no></b>!</red>"
@@ -206,6 +214,7 @@ punish:
 
 # Reverse the latest punishment from a template ladder.
 unpunish:
+  silent_success: "<dark_gray>[Modo silencioso]</dark_gray> <green>A punição #<id> de <player> em <template> e seu efeito na progressão foram anulados.</green>"
   usage: "Uso: <gold>/unpunish <player> <template></gold>"
   success: "<green>A punição #<id> de <player> em <template> e seu efeito na progressão foram anulados.</green>"
   not_found: "<red>Não há punições restantes para <player> em <template> neste âmbito do servidor.</red>"
@@ -215,12 +224,14 @@ unpunish:
 
 # Mensagens do comando /unwarn
 unwarn:
+  silent_success: "<dark_gray>[Modo silencioso]</dark_gray> <green>Você removeu um aviso do jogador <gold><player></gold></green>"
   unwarn: "<green>Você removeu um aviso do jogador <gold><player></gold></green>"
   usage: "Uso correto: <gold>/unwarn <nome_do_jogador>"
 
 
 # Mensagens do comando /kick
 kick:
+  silent_success: "<dark_gray>[Modo silencioso]</dark_gray> <green>Você expulsou <gold><player></gold> por <gold><reason></gold></green>"
   kick: "<green>Você expulsou <gold><player></gold> por <gold><reason></gold></green>"
   usage: "Uso correto: <gold>/kick <nome_do_jogador> <motivo>"
   kick_message:
@@ -293,6 +304,7 @@ change-reason:
 
 # Mensagens do comando /clearall
 clear:
+  silent_success: "<dark_gray>[Modo silencioso]</dark_gray> <green>Todas as punições ativas do jogador <gold><player></gold> foram removidas.</green>"
   usage: "Uso correto: <gold>/clearall <nome_do_jogador>"
   clearall: "<green>Todas as punições ativas do jogador <gold><player></gold> foram removidas.</green>"
   clear_message: "<green>Todas as suas punições ativas foram anuladas!</green> <gray>Pssst! Você tem contatos na staff?</gray>"
@@ -506,3 +518,13 @@ formatTime:
     one: "dia"
     few: "dias"
     many: "dias"
+
+# Database backup commands (/prx export and /prx import).
+database-backup:
+  busy: "<yellow>A database export or import is already running. Please wait.</yellow>"
+  export-started: "<yellow>Exporting the database. Please wait...</yellow>"
+  export-success: "<green>Database exported to plugins/PunisherX/dump/backup.sql.</green>"
+  export-failed: "<red>Database export failed. The previous backup has been preserved. Check the console for details.</red>"
+  import-started: "<yellow>Importing plugins/PunisherX/dump/backup.sql. This adds records without clearing or overwriting existing data. Please wait...</yellow>"
+  import-success: "<green>Database import completed. Records from the backup have been added.</green>"
+  import-failed: "<red>Database import failed. No records from this import were committed. Check the console for details; importing the same backup again can cause a key conflict.</red>"

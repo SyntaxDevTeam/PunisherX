@@ -33,6 +33,12 @@ public final class SyntaxLoader implements PluginLoader {
                 if (repository != null) {
                     createdResolver.addRepository(repository);
                 }
+                // A private snapshot can depend on Hikari/JDBC artifacts from Maven Central.
+                libraryConfig.repositories().forEach((fallbackId, fallback) -> {
+                    if (!fallbackId.equals(id)) {
+                        createdResolver.addRepository(fallback);
+                    }
+                });
                 return createdResolver;
             });
             resolver.addDependency(new Dependency(new DefaultArtifact(library.coordinate()), null));

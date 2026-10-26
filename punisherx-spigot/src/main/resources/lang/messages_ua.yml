@@ -40,6 +40,7 @@ setunjail:
 
 # Повідомлення команди /jail
 jail:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Ви ув'язнили гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   jail: "<green>Ви ув'язнили гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильне використання: <gold>/jail <нік_гравця> (час) <причина>"
   jail_message: "<red>Вас було ув'язнено за <b><reason></b> на <b><time></b></red>"
@@ -68,6 +69,7 @@ jail:
 
 # Повідомлення команди /unjail
 unjail:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Гравця <gold><player></gold> успішно звільнено з в'язниці.</green>"
   unjail: "<green>Ви звільнили гравця <gold><player></gold> з в'язниці</green>"
   usage: "Правильне використання: <gold>/unjail <нік_гравця>"
   unjail_message: "<green>Ваш термін у в'язниці закінчився! Не марнуйте цей шанс!</green>"
@@ -78,6 +80,7 @@ unjail:
 
 # Повідомлення команди /ban
 ban:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Ви забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   ban: "<green>Ви забанили <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильне використання: <gold>/ban <нік_гравця> (час) <причина>"
   kick_message:
@@ -111,6 +114,7 @@ ban:
 
 # Повідомлення команди /banip
 banip:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Ви забанили IP гравця за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray> <dark_gray>(<player>)</dark_gray>"
   ban: "<green>Ви забанили IP гравця за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильне використання: <gold>/banip <гравець|ip> (час) <причина>"
   kick_message:
@@ -135,12 +139,14 @@ banip:
 
 # Повідомлення команди /unban
 unban:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Гравець <gold><player></gold> був розбанений</green>"
   unban: "<green>Гравець <gold><player></gold> був розбанений</green>"
   usage: "Правильне використання: <gold>/unban <нік_гравця>"
   broadcast: "<dark_gray>Гравець <gray><player></gray> був розбанений</dark_gray>"
 
 # Повідомлення команди /mute
 mute:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Ви заглушили гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   mute: "<green>Ви заглушили гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильне використання: <gold>/mute <нік_гравця> (час) <причина>"
   mute_message: "<red>Вас було заглушено за <b><reason></b> на <b><time></b></red>"
@@ -166,6 +172,7 @@ mute:
 
 # Повідомлення команди /unmute
 unmute:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Ви зняли заглушення з гравця <gold><player></gold></green>"
   unmute: "<green>Ви зняли заглушення з гравця <gold><player></gold></green>"
   usage: "Правильне використання: <gold>/unmute <нік_гравця>"
   unmute_message: "<green>З вас знято заглушення!</green>"
@@ -173,6 +180,7 @@ unmute:
 
 # Повідомлення команди /warn
 warn:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Ви попередили (<warn_no> раз) гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   warn: "<green>Ви попередили (<warn_no> раз) гравця <gold><player></gold> за <gold><reason></gold> на <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Правильне використання: <gold>/warn <нік_гравця> (час) <причина>"
   warn_message: "<red>Ви отримали попередження №<b><warn_no></b>!</red>"
@@ -206,6 +214,7 @@ punish:
 
 # Reverse the latest punishment from a template ladder.
 unpunish:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Покарання #<id> гравця <player> із шаблону <template> скасовано разом із його впливом на лічильник.</green>"
   usage: "Використання: <gold>/unpunish <player> <template></gold>"
   success: "<green>Покарання #<id> гравця <player> із шаблону <template> скасовано разом із його впливом на лічильник.</green>"
   not_found: "<red>У цій області сервера немає нескaсованих покарань гравця <player> із шаблону <template>.</red>"
@@ -215,12 +224,14 @@ unpunish:
 
 # Повідомлення команди /unwarn
 unwarn:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Ви зняли попередження з гравця <gold><player></gold></green>"
   unwarn: "<green>Ви зняли попередження з гравця <gold><player></gold></green>"
   usage: "Правильне використання: <gold>/unwarn <нік_гравця>"
 
 
 # Повідомлення команди /kick
 kick:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Ви вигнали <gold><player></gold> за <gold><reason></gold></green>"
   kick: "<green>Ви вигнали <gold><player></gold> за <gold><reason></gold></green>"
   usage: "Правильне використання: <gold>/kick <нік_гравця> <причина>"
   kick_message:
@@ -293,6 +304,7 @@ change-reason:
 
 # Повідомлення команди /clearall
 clear:
+  silent_success: "<dark_gray>[Тихий режим]</dark_gray> <green>Усі активні покарання гравця <gold><player></gold> були очищені.</green>"
   usage: "Правильне використання: <gold>/clearall <нік_гравця>"
   clearall: "<green>Усі активні покарання гравця <gold><player></gold> були очищені.</green>"
   clear_message: "<green>Усі ваші активні покарання було скасовано!</green> <gray>Псс! У вас зв'язки з адміністрацією?</gray>"
@@ -506,3 +518,13 @@ formatTime:
     one: "день"
     few: "дні"
     many: "днів"
+
+# Database backup commands (/prx export and /prx import).
+database-backup:
+  busy: "<yellow>A database export or import is already running. Please wait.</yellow>"
+  export-started: "<yellow>Exporting the database. Please wait...</yellow>"
+  export-success: "<green>Database exported to plugins/PunisherX/dump/backup.sql.</green>"
+  export-failed: "<red>Database export failed. The previous backup has been preserved. Check the console for details.</red>"
+  import-started: "<yellow>Importing plugins/PunisherX/dump/backup.sql. This adds records without clearing or overwriting existing data. Please wait...</yellow>"
+  import-success: "<green>Database import completed. Records from the backup have been added.</green>"
+  import-failed: "<red>Database import failed. No records from this import were committed. Check the console for details; importing the same backup again can cause a key conflict.</red>"

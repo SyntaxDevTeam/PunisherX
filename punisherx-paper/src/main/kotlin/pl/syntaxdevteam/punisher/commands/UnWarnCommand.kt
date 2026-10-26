@@ -9,15 +9,18 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 class UnWarnCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+        val options = PunishmentCommandOptions.parse(args)
+        val arguments = options.arguments
+        val silent = options.silent
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNWARN)) {
-            if (args.isNotEmpty()) {
-                val player = args[0]
+            if (arguments.isNotEmpty()) {
+                val player = arguments[0]
                 val uuid = plugin.resolvePlayerUuid(player).toString()
                 val punishments = plugin.databaseHandler.getPunishments(uuid)
                 val warnPunishments = punishments.filter { it.type == "WARN" }
                 if (warnPunishments.isNotEmpty()) {
                     plugin.databaseHandler.removePunishment(uuid, "WARN")
-                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unwarn", "unwarn", mapOf("player" to player, "operator" to stack.sender.name)))
+                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unwarn", if (silent) "silent_success" else "unwarn", mapOf("player" to player, "operator" to stack.sender.name)))
                     plugin.logger.info("Player $player ($uuid) has been unwarned")
                 } else {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_found", mapOf("player" to player, "operator" to stack.sender.name)))

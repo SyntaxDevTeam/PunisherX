@@ -116,6 +116,7 @@ setunjail:
 
 # Wiadomości komendy /jail
 jail:
+  silent_success: "<green>W trybie cichym osadzono gracza <gold><player></gold> w więzieniu na czas <gold><time></gold>. Powód: <gold><reason></gold>.</green> <dark_gray>(ID: <id>)</dark_gray>"
   jail: "<green>Zamknąłeś gracza <gold><player></gold> w więzieniu za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Poprawne użycie to: <gold>/jail <nazwa_gracza> (czas) <powód>"
   jail_message: "<red>Zostałeś/aś zesłany/a do więzienia za <b><reason></b> na czas <b><time></b></red>"
@@ -144,6 +145,7 @@ jail:
 
 # Wiadomości komendy /unjail
 unjail:
+  silent_success: "<green>W trybie cichym zwolniono gracza <gold><player></gold> z więzienia.</green>"
   unjail: "<green>Uwolniłeś/aś gracza <gold><player></gold> z więzienia</green>"
   usage: "Poprawne użycie to: <gold>/unjail <nazwa_gracza>"
   unjail_message: "<green>Twoja kara więzienia się zakończyła! Nie zmarnuj tej szansy!</green>"
@@ -154,6 +156,7 @@ unjail:
 
 # Wiadomości komendy /ban
 ban:
+  silent_success: "<green>W trybie cichym zbanowano gracza <gold><player></gold> na czas <gold><time></gold>. Powód: <gold><reason></gold>.</green> <dark_gray>(ID: <id>)</dark_gray>"
   ban: "<green>Zbanowałeś <gold><player></gold> za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Poprawne użycie to: <gold>/ban <nazwa_gracza> (czas) <powód>"
   kick_message:
@@ -187,6 +190,7 @@ ban:
 
 # Wiadomości komendy /banip
 banip:
+  silent_success: "<green>W trybie cichym zbanowano adresy IP celu <gold><player></gold> na czas <gold><time></gold>. Powód: <gold><reason></gold>.</green> <dark_gray>(ID: <id>)</dark_gray>"
   ban: "<green>Zbanowałeś IP gracza za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Poprawne użycie to: <gold>/banip <player|ip> (czas) <powód>"
   kick_message:
@@ -211,6 +215,7 @@ banip:
 
 # Wiadomości komendy /unban
 unban:
+  silent_success: "<green>W trybie cichym usunięto bana dla <gold><player></gold>.</green>"
   unban: "<green>Gracz <gold><player></gold> został odbanowany</green>"
   usage: "Poprawne użycie to: <gold>/unban <nazwa_gracza>"
   broadcast: "<dark_gray>Gracz <gray><player></gray> został odbanowany</dark_gray>"
@@ -218,6 +223,7 @@ unban:
 
 # Wiadomości komendy /mute
 mute:
+  silent_success: "<green>W trybie cichym wyciszono gracza <gold><player></gold> na czas <gold><time></gold>. Powód: <gold><reason></gold>.</green> <dark_gray>(ID: <id>)</dark_gray>"
   mute: "<green>Wyciszyłeś gracza <gold><player></gold> za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Poprawne użycie to: <gold>/mute <nazwa_gracza> (time) <reason>"
   mute_message: "<red>Zostałeś/aś wyciszony/a za <b><reason></b> na czas <b><time></b></red>"
@@ -243,6 +249,7 @@ mute:
 
 # Wiadomości komendy /unmute
 unmute:
+  silent_success: "<green>W trybie cichym przywrócono graczowi <gold><player></gold> możliwość pisania na czacie.</green>"
   unmute: "<green>Odwyciszyłeś gracza <gold><player></gold></green>"
   usage: "Poprawne użycie to: <gold>/unmute <nazwa_gracza>"
   unmute_message: "<green>Zostałeś/aś odwyciszony/a!</green>"
@@ -250,6 +257,7 @@ unmute:
 
 # Wiadomości komendy /warn
 warn:
+  silent_success: "<green>W trybie cichym nadano graczowi <gold><player></gold> ostrzeżenie na czas <gold><time></gold>. Powód: <gold><reason></gold>. Liczba ostrzeżeń: <gold><warn_no></gold>.</green> <dark_gray>(ID: <id>)</dark_gray>"
   warn: "<green>Ostrzegłeś (<warn_no> raz) <gold><player></gold> za <gold><reason></gold> na czas <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Poprawne użycie to: <gold>/warn <nazwa_gracza> (czas) <powód>"
   warn_message: "<red>Dostałeś/aś <b><warn_no></b> ostrzeżenie!</red>"
@@ -282,6 +290,7 @@ punish:
 
 # Cofnięcie ostatniej kary z wybranej drabinki.
 unpunish:
+  silent_success: "<green>W trybie cichym cofnięto karę <gold>#<id></gold> gracza <gold><player></gold> z drabinki <gold><template></gold> oraz jej wpływ na poziom eskalacji.</green>"
   usage: "Poprawne użycie: <gold>/unpunish <player> <template></gold>"
   success: "<green>Cofnięto karę #<id> gracza <player> z drabinki <template> i jej wpływ na licznik drabinki.</green>"
   not_found: "<red>Nie znaleziono niecofniętej kary gracza <player> z drabinki <template> w tym zakresie serwera.</red>"
@@ -290,12 +299,14 @@ unpunish:
 
 # Wiadomości komendy /unwarn
 unwarn:
+  silent_success: "<green>W trybie cichym usunięto ostrzeżenia gracza <gold><player></gold>.</green>"
   unwarn: "<green>Usunąłeś ostrzeżenie dla gracza <gold><player></gold></green>"
   usage: "Poprawne użycie to: <gold>/unwarn <nazwa_gracza>"
 
 
 # Wiadomości komendy /kick
 kick:
+  silent_success: "<green>W trybie cichym wyrzucono gracza <gold><player></gold> z serwera. Powód: <gold><reason></gold>.</green>"
   kick: "<green>Wyrzuciłeś <gold><player></gold> za <gold><reason></gold></green>"
   usage: "Poprawne użycie to: <gold>/kick <nazwa_gracza> <powód>"
   kick_message:
@@ -369,6 +380,7 @@ change-reason:
 
 # Wiadomości komendy /clearall
 clear:
+  silent_success: "<green>W trybie cichym usunięto wszystkie aktywne kary gracza <gold><player></gold>.</green>"
   usage: "Poprawne użycie to: <gold>/clearall <nazwa_gracza>"
   clearall: "<green>Wszystkie aktywne kary gracza <gold><player></gold> zostały wyczyszczone.</green>"
   clear_message: "<green>Wszystkie Twoje aktywne kary zostały anulowane!</green> <gray>Pssst! Masz jakieś układy z administracją czy coś?</gray>"
@@ -541,3 +553,13 @@ formatTime:
     one: "dzień"
     few: "dni"
     many: "dni"
+
+# Komendy kopii zapasowej (/prx export i /prx import).
+database-backup:
+  busy: "<yellow>Eksport lub import bazy już trwa. Poczekaj na zakończenie.</yellow>"
+  export-started: "<yellow>Trwa eksport bazy danych. Proszę czekać...</yellow>"
+  export-success: "<green>Wyeksportowano bazę do plugins/PunisherX/dump/backup.sql.</green>"
+  export-failed: "<red>Eksport bazy nie powiódł się. Poprzednia kopia została zachowana. Szczegóły znajdziesz w konsoli.</red>"
+  import-started: "<yellow>Trwa import plugins/PunisherX/dump/backup.sql. Import dopisuje rekordy bez czyszczenia bazy i nadpisywania istniejących danych. Proszę czekać...</yellow>"
+  import-success: "<green>Import bazy zakończony. Dopisano rekordy z kopii zapasowej.</green>"
+  import-failed: "<red>Import bazy nie powiódł się. Żadne rekordy z tego importu nie zostały zatwierdzone. Sprawdź konsolę; ponowny import tej samej kopii może powodować konflikt klucza.</red>"

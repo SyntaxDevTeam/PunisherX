@@ -40,7 +40,7 @@ It works on standalone servers and networks, with a dedicated **Paper/Folia edit
 * **Automated follow-up:** configure punishment actions and warning escalation, with action-bar countdowns for active mute and jail punishments.
 * **Custom messages:** MiniMessage, legacy and plain-text formatting, bundled translations including Korean, and defaults for missing translation keys.
 * **Integrations:** Discord webhooks, PlaceholderAPI and asynchronous MaxMind GeoIP lookups when a license key is configured.
-* **Database choices:** SQLite, H2, MySQL, MariaDB and PostgreSQL, with export, import and migration tools.
+* **Database choices:** SQLite, MySQL, MariaDB (MySQL driver), PostgreSQL and SQL Server through SyntaxDB, with export, import and migration tools.
 * **Network moderation:** server-scoped punishments and proxy bridges; the Velocity bridge also checks active network-wide bans at login.
 
 ### Safer configuration updates
@@ -67,7 +67,7 @@ The server editions currently recognize Minecraft **1.20.6**, **1.21–1.21.11**
 ## 🚀 Quick start
 
 1. Download the Paper/Folia or Spigot artifact matching your server and place it in `plugins/`.
-2. Start the server to generate the configuration and language files.
+2. Start the server to generate the configuration and language files. See [SyntaxDB migration notes](docs/SYNTAXDB_MIGRATION.md) before upgrading an existing installation.
 3. Configure `config.yml` and your database connection. For a network, configure punishment scope and the proxy bridge's database connection as described in the administrator guide.
 4. Grant staff the permissions they need. Start with `punisherx.cmd.panel` for panel access; individual actions require their own permissions.
 5. Run `/prx validate`, then `/prx reload` after configuration changes. Restart the server when replacing the plugin JAR.
@@ -90,6 +90,26 @@ Open `/panel` to investigate a player, `/reports` to review reports, or use `/pu
 | Edit GUI duration/reason presets | Preset editor in the punishment GUI. | `punisherx.manage` or `punisherx.manage.*` |
 
 For exact syntax, all permission nodes, parent permissions and Spigot dispatch differences, use the **[command reference](docs/WIKI/EN/COMMANDS.md)** and **[permission reference](docs/WIKI/EN/PERMISSIONS.md)**.
+
+Add `--silent` to `/kick` (including `all`), `/jail`, `/warn`, `/mute`, `/ban`, `/banip`,
+`/unjail`, `/unwarn`, `/unmute`, `/unban` (players or IPs), `/clearall`, or `/unpunish` to suppress
+target chat notifications and staff broadcasts for that invocation. The operator receives a private
+confirmation marked as silent; its text can be customized using `silent_success` in each command’s language section.
+Errors are still reported to the operator. Kick/ban disconnect screens, punishment enforcement,
+history, logs and configured follow-up actions remain active. Follow-up PunisherX punishment
+commands inherit `--silent`; messages from other plugins and custom actions follow their own settings.
+
+`/punish <player> <template> [level] [--force] [--silent]` supports both flags, together
+or independently, before or after the optional level. `--force` bypasses punishment immunity;
+`--silent` suppresses target chat messages and broadcasts for any punishment type in the template,
+while retaining a private silent confirmation for the operator. For example:
+
+```text
+/punish Steve spam --force --silent
+/punish Steve spam 2 --silent --force
+/mute Steve --silent 10m Spam
+/unban Steve --silent
+```
 
 ## 📚 Documentation
 

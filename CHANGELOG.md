@@ -2,15 +2,46 @@
 
 ## [1.8.1] Unreleased
 
-* Added `/unpunish <player> <template>` on Paper and Spigot to reverse the latest punishment and its escalation step, preserving an audited history entry. Works with expired or previously revoked punishments and groups multi-IP bans as one step.
-* Template history now tracks template identity separately from the reason; kicks in ladders always enter history. Existing history retains reason-based matching.
+### Functional changes:
 
-* Routed name parsing, component serialization and literal book placeholders through MessageHandler R0.3; removed the separate formatting pipeline from PunisherX.
-
+* **Added `/unpunish <player> <template> [--silent]` on Paper and Spigot.** It reverses the latest punishment and its escalation step while preserving an audited history entry. It also works with expired or previously revoked punishments and treats a multi-IP ban as one escalation step.
+* **Added `--silent` to punishment and removal commands**, including `kick all`, `/punish`, `/unpunish` and `/clearall`. Target chat notifications and staff broadcasts are suppressed, while the operator receives a private confirmation marked as silent. Errors, disconnect screens, enforcement, history and logs remain active.
+* Added independent `--force` and `--silent` options to `/punish` for every template punishment type. Both flags can appear before or after the optional level; configured follow-up PunisherX punishment commands inherit silent mode.
 * Added optional LuckPerms display, prefix and suffix placeholders for player and operator names on Paper and Spigot, including configurable nickname color metadata and independent display name layouts.
-* Added configurable book interfaces for submitting and managing reports, with paginated menus, confirmation, history and existing decision commands.
-* Added a reusable BookManager with player-bound, single-use, expiring menu actions; existing GUI/dialog choices remain available.
-* Added configuration migration 168, Polish/English book messages and automated coverage for formatting and book action sessions.
+* Added configurable book interfaces for submitting and managing reports, with paginated menus, confirmation, history and existing decision commands. Existing GUI and dialog choices remain available.
+
+### Configuration and language safety:
+
+* Added separate, customizable `silent_success` messages for punishment and removal commands in all bundled languages. Silent confirmations include the relevant target, reason, duration and punishment ID where applicable.
+* Added configuration migration 168 and Polish/English messages for the report book interfaces.
+* Preserved existing `database.type`, `database.sql.*`, table names and SQLite file paths when switching the database layer to SyntaxDB. Added default database ports, a MariaDB alias and optional `database.sql.jdbc-url` configuration.
+* **Removed H2 support from the new database layer.** Existing H2 installations must export and transfer their data to a supported engine before upgrading; selecting another database type alone does not migrate data.
+* New MySQL/MariaDB tables use `utf8mb4`, with UTF-8 connection encoding for server plugins. Existing table encodings are preserved and may require a separate conversion to store Unicode punishment reasons.
+
+### Technical changes:
+
+* **Replaced SyntaxCore database access with SyntaxDB across the Paper, Spigot, Velocity and BungeeCord modules**, covering pooled connections, queries, generated IDs, transactions and schema initialization.
+* Expanded database exports to all ten PunisherX tables, including reports, decisions, player cache, bridge events and identity migration records. Backup files are replaced atomically; imports validate supported INSERT statements and restore records in one transaction without executing arbitrary SQL from the file. Imports append data without clearing or overwriting existing records; importing the same backup again can cause a key conflict and roll back the entire transaction. Only PunisherX backups are supported, not arbitrary mysqldump or pg_dump files.
+* Moved `/prx export` and `/prx import` off the server thread on Paper/Folia and Spigot, with start, success and handled-error messages for the command sender. Another export/import command is rejected while one is running. Added command regression tests and a 100,000-record SQLite backup/restore test. Backup operations still process data in memory; real PostgreSQL and SQL Server export/import tests remain required before a stable release.
+* Improved database-engine migration with source validation, a backup snapshot, refusal to overwrite populated target tables, row-count checks and generated-ID restoration. Configuration switches only after a successful transfer; migrations require a maintenance window.
+* Paper and Spigot now download the required SyntaxDB runtime and JDBC drivers through their library loaders instead of bundling them in the server JARs. Proxy bridges retain bundled database dependencies; build checks verify both packaging contracts.
+* Routed name parsing, component serialization and literal book placeholders through MessageHandler R0.3; removed the separate formatting pipeline from PunisherX.
+* Added a reusable BookManager with player-bound, single-use, expiring menu actions.
+* Template history now tracks template identity separately from the reason, and kicks in template ladders always enter history. Existing history retains reason-based matching.
+* Expanded automated coverage for database compatibility, backup/import, command behavior, transaction rollback, runtime dependencies, template flags, private silent confirmations and Velocity database operations. Added a Velocity runtime test harness and CI checks for the MessageHandler source version.
+
+### Bug fixes:
+
+* **Fixed `/punish` suggestions on Paper and Spigot.** Template names match the entered prefix without case sensitivity, names requiring quotes are escaped correctly, and basic command entry points suggest configured levels and unused flags.
+* **Fixed failed `/banip` writes creating permanent vanilla IP bans.** Direct and template IP bans now record history and publish bridge events only for successfully persisted addresses; partial failures report both saved and failed IPs without an overall success message or follow-up action.
+* Fixed expired punishment cleanup removing a newer active punishment of the same type; cleanup now removes the expired record by ID.
+* Made punishment and history pagination deterministic when timestamps match, and corrected row-count checks and server scoping when deleting punishments or editing history reasons.
+* Made player-data deletion and report/decision deletion transactional to prevent partial cleanup and orphaned records.
+* Improved database startup failure reporting and cleanup. A failed schema initialization no longer leaves the database marked as ready, and punishment checks skip an unavailable database.
+* Improved reload cleanup of listeners, services and repeating punishment tasks, and ensured the active database handler is used after reinitialization.
+* Fixed Velocity 4 login ban enforcement by denying login through the event result and checking bans asynchronously before backend connections. Proxy plugin metadata now uses the Gradle-expanded descriptor.
+* Fixed Spigot component conversion with Adventure 5 while preserving text, colors, hover text and clickable commands.
+* Improved kick and ban disconnect message formatting across bundled translations.
 
 ## [1.8.0] - 2026-10-08
 

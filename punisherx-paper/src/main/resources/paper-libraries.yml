@@ -22,7 +22,15 @@ libraries:
   - com.maxmind.geoip2:geoip2:${geoipVersion}
   - org.apache.ant:ant:${antVersion}
   # Database libraries
-  # All databases libraries is implemented in SyntaxCore
+  # Explicit dependencies also work with Libby, which does not resolve transitive POMs.
+  - coordinate: pl.syntaxdevteam:syntaxdb-core:${syntaxdbVersion}
+    repository: syntaxdevteam-snapshots
+  - com.zaxxer:HikariCP:${hikariVersion}
+  - com.mysql:mysql-connector-j:${mysqlVersion}
+  - com.google.protobuf:protobuf-java:${protobufVersion}
+  - org.postgresql:postgresql:${postgresqlVersion}
+  - com.microsoft.sqlserver:mssql-jdbc:${mssqlVersion}
+  - org.xerial:sqlite-jdbc:${sqliteVersion}
 
   # FastStats dependencies
   - coordinate: dev.faststats.metrics:bukkit:${faststatsVersion}

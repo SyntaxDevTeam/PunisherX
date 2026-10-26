@@ -6,7 +6,8 @@ import java.lang.management.ManagementFactory
 import java.net.HttpURLConnection
 import java.net.URI
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.core.database.DatabaseType
+import pl.syntaxdevteam.syntaxdb.config.DatabaseType
+import pl.syntaxdevteam.punisher.databases.PunisherDatabaseSettings
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 private data class ConnectivityCheckResult(
@@ -17,6 +18,7 @@ private data class ConnectivityCheckResult(
 
 class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
     private val mH = plugin.messageHandler
+    private val backupCommands = DatabaseBackupCommands(plugin)
     private var pendingMigration: Pair<DatabaseType, DatabaseType>? = null
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
@@ -39,10 +41,9 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        val pluginMeta = plugin.description
-
         when {
             args[0].equals("version", ignoreCase = true) -> {
+                val pluginMeta = plugin.description
                 stack.sender.sendMessage(
                     mH.miniMessageFormat(
                         "\n<gray>-------------------------------------------------\n" +
@@ -74,11 +75,11 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             }
 
             args[0].equals("export", ignoreCase = true) -> {
-                plugin.databaseHandler.exportDatabase()
+                backupCommands.execute(stack.sender, importing = false)
             }
 
             args[0].equals("import", ignoreCase = true) -> {
-                plugin.databaseHandler.importDatabase()
+                backupCommands.execute(stack.sender, importing = true)
             }
 
             args[0].equals("diagnostics", ignoreCase = true) || args[0].equals("diag", ignoreCase = true) -> {
@@ -96,8 +97,8 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
                     stack.sender.sendMessage(mH.miniMessageFormat("$prefix <red>Usage: /prx migrate <from> <to></red>"))
                     return
                 }
-                val fromType = runCatching { DatabaseType.valueOf(from.uppercase()) }.getOrNull()
-                val toType = runCatching { DatabaseType.valueOf(to.uppercase()) }.getOrNull()
+                val fromType = runCatching { PunisherDatabaseSettings.parseType(from) }.getOrNull()
+                val toType = runCatching { PunisherDatabaseSettings.parseType(to) }.getOrNull()
                 if (fromType == null || toType == null) {
                     stack.sender.sendMessage(mH.miniMessageFormat("$prefix <red>Unknown database type.</red>"))
                     return
@@ -108,7 +109,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
                         pendingMigration = fromType to toType
                         stack.sender.sendMessage(
                             mH.miniMessageFormat(
-                                "$prefix <yellow>Update the connection details for <gold>${toType.name.lowercase()}</gold> in config.yml, then rerun this command. " +
+                                "$prefix <yellow>Stop player access and database writes on all connected servers and proxies. Back up the source, then update the connection details for <gold>${toType.name.lowercase()}</gold> in config.yml, then rerun this command. " +
                                         "Use <gold>--force</gold> to skip this confirmation."
                             )
                         )
@@ -320,9 +321,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             return baseSuggestions
         }
         if (args[0].equals("migrate", ignoreCase = true)) {
-            val types = DatabaseType::class.java.enumConstants
-                ?.map { it.name.lowercase() }
-                ?: emptyList()
+            val types = listOf("mysql", "mariadb", "postgresql", "mssql", "sqlite")
             when (args.size) {
                 2 -> {
                     val current = args[1]

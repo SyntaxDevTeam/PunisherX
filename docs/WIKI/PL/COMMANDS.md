@@ -1,16 +1,16 @@
 ## Podstawowe komendy
 
-* `/ban <gracz> (czas) <powód> [--force]` — banuje i natychmiast wyrzuca gracza, jeśli jest online; przy problemie z bazą używa listy banów Paper `PROFILE` jako fallback.
-* `/banip <ip|gracz|uuid> (czas) <powód> [--force]` — banuje wszystkie IP powiązane z celem, a przy błędach bazy uruchamia komendę Paper `ban-ip`; dodatkowo wyrzuca cele online.
-* `/unban <ip|gracz|uuid>` — zdejmuje bany po nazwie gracza, IP lub UUID, łącznie z powiązanymi IP w bazie.
-* `/jail <gracz> (czas) <powód> [--force]` — teleportuje gracza do skonfigurowanego więzienia (z uwzględnieniem bypassa, chyba że użyto `--force`) i zapisuje poprzednią pozycję do zwolnienia.
-* `/unjail <gracz>` — usuwa aktywną karę więzienia z cache i teleportuje gracza do lokalizacji wyjścia z więzienia, jeśli jest ustawiona.
+* `/ban <gracz> (czas) <powód> [--force] [--silent]` — banuje i natychmiast wyrzuca gracza, jeśli jest online; przy problemie z bazą używa listy banów Paper `PROFILE` jako fallback.
+* `/banip <ip|gracz|uuid> (czas) <powód> [--force] [--silent]` — banuje wszystkie IP powiązane z celem, a przy błędach bazy uruchamia komendę Paper `ban-ip`; dodatkowo wyrzuca cele online.
+* `/unban <ip|gracz|uuid> [--silent]` — zdejmuje bany po nazwie gracza, IP lub UUID, łącznie z powiązanymi IP w bazie.
+* `/jail <gracz> (czas) <powód> [--force] [--silent]` — teleportuje gracza do skonfigurowanego więzienia (z uwzględnieniem bypassa, chyba że użyto `--force`) i zapisuje poprzednią pozycję do zwolnienia.
+* `/unjail <gracz> [--silent]` — usuwa aktywną karę więzienia z cache i teleportuje gracza do lokalizacji wyjścia z więzienia, jeśli jest ustawiona.
 * `/setjail <radius>` — zapisuje lokalizację nadawcy i promień jako obszar więzienia w `config.yml`.
 * `/setunjail` — zapisuje lokalizację nadawcy jako punkt po wyjściu z więzienia używany przez `/unjail`.
-* `/mute <gracz> (czas) <powód> [--force]` / `/unmute <gracz>` — nakłada/zdejmuje muta na czat, z opcjonalnym `--force`, który ignoruje bypass dla graczy online.
-* `/warn <gracz> (czas) <powód>` / `/unwarn <gracz>` — dodaje lub usuwa ostrzeżenia, obsługując ostrzeżenia czasowe wyzwalające akcje z konfiguracji.
-* `/kick <gracz> <powód> [--force]` — natychmiast wyrzuca gracza z serwera z podanym powodem.
-* `/clearall <gracz>` — usuwa aktywne kary gracza oraz powiadamia go, jeśli jest online.
+* `/mute <gracz> (czas) <powód> [--force] [--silent]` / `/unmute <gracz> [--silent]` — nakłada/zdejmuje muta na czat, z opcjonalnym `--force`, który ignoruje bypass dla graczy online.
+* `/warn <gracz> (czas) <powód> [--force] [--silent]` / `/unwarn <gracz> [--silent]` — dodaje lub usuwa ostrzeżenia, obsługując ostrzeżenia czasowe wyzwalające akcje z konfiguracji.
+* `/kick <gracz> <powód> [--force] [--silent]` — natychmiast wyrzuca gracza z serwera z podanym powodem.
+* `/clearall <gracz> [--silent]` — usuwa aktywne kary gracza oraz powiadamia go, jeśli jest online.
 * `/change-reason <penalty_id> <new_reason>` — aktualizuje zapisany powód istniejącej kary.
 * `/check <gracz> <all|warn|mute|ban|jail>` — wyświetla aktywne kary (lub dane własne gracza), filtrowane po typie.
 * `/history <gracz> (strona)` — stronicowana historia wszystkich kar danego gracza.
@@ -18,8 +18,8 @@
 
 ## Szablony kar i panel
 
-* `/punish <gracz> <szablon> (poziom)` — nakłada karę z `punish-templates.yml`. Bez podania poziomu wybiera kolejny poziom eskalacji na podstawie historii kar. Wymaga `punisherx.cmd.punish`.
-* `/unpunish <gracz> <szablon>` — cofa ostatnią niecofniętą karę z tej drabinki i usuwa jej wpływ na eskalację. Wymaga `punisherx.cmd.unpunish`. Działa również po wygaśnięciu kary lub zwykłym `/unmute`/`/unban`. Każde wywołanie cofa jedno zdarzenie; ban kilku IP jest jednym zdarzeniem. Historia pozostaje i otrzymuje oznaczenie cofnięcia. Nazwy ze spacjami można podać w cudzysłowie, np. `/unpunish Alex "Spam na czacie"`.
+* `/punish <gracz> <szablon> (poziom) [--force] [--silent]` — nakłada karę z `punish-templates.yml`. Bez podania poziomu wybiera kolejny poziom eskalacji na podstawie historii kar. Wymaga `punisherx.cmd.punish`.
+* `/unpunish <gracz> <szablon> [--silent]` — cofa ostatnią niecofniętą karę z tej drabinki i usuwa jej wpływ na eskalację. Wymaga `punisherx.cmd.unpunish`. Działa również po wygaśnięciu kary lub zwykłym `/unmute`/`/unban`. Każde wywołanie cofa jedno zdarzenie; ban kilku IP jest jednym zdarzeniem. Historia pozostaje i otrzymuje oznaczenie cofnięcia. Nazwy ze spacjami można podać w cudzysłowie, np. `/unpunish Alex "Spam na czacie"`.
 * Nowe wpisy historii są powiązane z nazwą szablonu, więc szablony o takim samym powodzie mają osobne liczniki, a zmiana powodu nie psuje cofania. Starsze wpisy zachowują dopasowanie po powodzie, również dla kar ręcznych o tym powodzie. Zmiana nazwy lub usunięcie szablonu zrywa powiązanie z jego nową historią. Cofnięcie nie odwraca wykonanego wyrzucenia gracza ani zewnętrznych komend/akcji wywołanych karą.
 * `/panel` — otwiera panel moderacji; wymaga `punisherx.cmd.panel` lub uprawnień zarządzania. Poszczególne akcje nadal sprawdzają własne uprawnienia.
 * Panel gracza udostępnia wyszukiwanie, szczegóły kar i szybkie nakładanie kar z szablonów. Szybkie kary wymagają `punisherx.cmd.punish`, a edycja presetów czasu i powodu — `punisherx.manage` lub `punisherx.manage.*`. Presety są zapisywane w `gui.punish.times` i `gui.punish.reasons` w `config.yml`.
@@ -67,3 +67,15 @@ Paper 1.21.7+ może używać natywnych dialogów dla zgłoszeń, `/banlist`, `/h
 Aliasy w `config.yml` udostępniają alternatywne nazwy obsługiwanych komend. Na Spigot rejestracja komend dodatkowo sprawdza uprawnienia z `plugin.yml`; różnice dotyczące starszych węzłów opisuje strona [Uprawnienia](PERMISSIONS.md).
 
 `<argument>` jest wymagany, `(argument)` opcjonalny, a `[--force]` to opcjonalna flaga. Przykłady czasu: `30s`, `10m`, `2h`, `7d`. Pominięcie czasu oznacza karę bezterminową. W obsługujących tę flagę komendach kar `--force` pomija ochronę celu; przy migracji bazy pomija potwierdzenie.
+
+`--silent` wycisza wiadomości dla ukaranego i ogłoszenia kary na czacie. Wykonujący
+otrzymuje prywatne potwierdzenie z informacją o trybie cichym. Jego treść można zmienić
+w polu `silent_success` w sekcji danej komendy w pliku językowym. Działa również dla `kick all`, cofania kar oraz wszystkich typów kar
+z `/punish`. Błędy pozostają widoczne dla wykonującego. Ekran rozłączenia przy kicku
+lub banie, egzekwowanie kary, historia i logi pozostają aktywne. Kolejne komendy kar
+PunisherX uruchamiane przez skonfigurowane akcje dziedziczą `--silent`; komunikaty
+innych pluginów i własnych akcji podlegają ich ustawieniom.
+
+W `/punish` można łączyć obie flagi i podać je przed lub po opcjonalnym poziomie:
+`/punish Alex spam --force --silent` lub `/punish Alex spam 2 --silent --force`.
+`--force` omija odporność celu; samo `--silent` nie zmienia sprawdzania uprawnień.

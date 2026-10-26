@@ -10,20 +10,23 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 class KickCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+        val options = PunishmentCommandOptions.parse(args)
+        val arguments = options.arguments
+        val silent = options.silent
         val history: Boolean = plugin.config.getBoolean("kick.history", false)
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.KICK)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
 
-        if (args.isEmpty()) {
+        if (arguments.isEmpty()) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("kick", "usage"))
             return
         }
 
-        val targetArg = args[0]
-        val isForce = args.contains("--force")
-        val reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
+        val targetArg = arguments[0]
+        val isForce = options.force
+        val reason = arguments.drop(1).joinToString(" ")
         val punishmentType = "KICK"
         val start = System.currentTimeMillis()
         val formattedTime = plugin.timeHandler.formatTime(null)
@@ -61,8 +64,8 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                     type = punishmentType
                 )
                 PunishmentCommandUtils.sendKickMessage(plugin, target, "kick", "kick_message", placeholders)
-                PunishmentCommandUtils.sendSenderMessages(plugin, stack, "kick", "kick", placeholders)
-                plugin.actionExecutor.executeAction("kicked", target.name, placeholders)
+                PunishmentCommandUtils.sendSenderMessages(plugin, stack, "kick", "kick", placeholders, silent = silent)
+                plugin.actionExecutor.executeAction("kicked", target.name, placeholders, silent = silent)
             }
 
             val allPlaceholders = PunishmentCommandUtils.buildPlaceholders(
@@ -72,7 +75,7 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                 time = formattedTime,
                 type = punishmentType
             )
-            PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_KICK, "kick", "broadcast", allPlaceholders)
+            PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_KICK, "kick", "broadcast", allPlaceholders, silent = silent)
             return
         }
 
@@ -109,9 +112,9 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
             type = punishmentType
         )
         PunishmentCommandUtils.sendKickMessage(plugin, targetPlayer, "kick", "kick_message", placeholders)
-        PunishmentCommandUtils.sendSenderMessages(plugin, stack, "kick", "kick", placeholders)
-        plugin.actionExecutor.executeAction("kicked", targetArg, placeholders)
-        PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_KICK, "kick", "broadcast", placeholders)
+        PunishmentCommandUtils.sendSenderMessages(plugin, stack, "kick", "kick", placeholders, silent = silent)
+        plugin.actionExecutor.executeAction("kicked", targetArg, placeholders, silent = silent)
+        PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_KICK, "kick", "broadcast", placeholders, silent = silent)
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {

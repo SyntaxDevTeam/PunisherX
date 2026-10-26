@@ -11,7 +11,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import pl.syntaxdevteam.core.database.DatabaseType
+import pl.syntaxdevteam.syntaxdb.config.DatabaseType
 import pl.syntaxdevteam.core.logging.Logger
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler

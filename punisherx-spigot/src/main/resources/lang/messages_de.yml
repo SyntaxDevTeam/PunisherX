@@ -40,6 +40,7 @@ setunjail:
 
 # Nachrichten für den Befehl /jail
 jail:
+  silent_success: "<dark_gray>[Stiller Modus]</dark_gray> <green>Du hast Spieler <gold><player></gold> für <gold><reason></gold> für <gold><time></gold> ins Gefängnis gesteckt</green> <dark_gray>(ID: <id>)</dark_gray>"
   jail: "<green>Du hast Spieler <gold><player></gold> für <gold><reason></gold> für <gold><time></gold> ins Gefängnis gesteckt</green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Richtige Verwendung: <gold>/jail <spielername> (zeit) <grund>"
   jail_message: "<red>Du wurdest für <b><reason></b> für <b><time></b> ins Gefängnis gesteckt</red>"
@@ -68,6 +69,7 @@ jail:
 
 # Nachrichten für den Befehl /unjail
 unjail:
+  silent_success: "<dark_gray>[Stiller Modus]</dark_gray> <green>Spieler <gold><player></gold> wurde erfolgreich aus dem Gefängnis entlassen.</green>"
   unjail: "<green>Du hast Spieler <gold><player></gold> aus dem Gefängnis entlassen</green>"
   usage: "Richtige Verwendung: <gold>/unjail <spielername>"
   unjail_message: "<green>Deine Gefängnisstrafe ist vorbei! Verschwende diese Chance nicht!</green>"
@@ -78,6 +80,7 @@ unjail:
 
 # Nachrichten für den Befehl /ban
 ban:
+  silent_success: "<dark_gray>[Stiller Modus]</dark_gray> <green>Du hast <gold><player></gold> für <gold><reason></gold> für <gold><time></gold> gebannt</green> <dark_gray>(ID: <id>)</dark_gray>"
   ban: "<green>Du hast <gold><player></gold> für <gold><reason></gold> für <gold><time></gold> gebannt</green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Richtige Verwendung: <gold>/ban <spielername> (zeit) <grund>"
   kick_message:
@@ -111,6 +114,7 @@ ban:
 
 # Nachrichten für den Befehl /banip
 banip:
+  silent_success: "<dark_gray>[Stiller Modus]</dark_gray> <green>Du hast die IP eines Spielers für <gold><reason></gold> für <gold><time></gold> gebannt</green> <dark_gray>(ID: <id>)</dark_gray> <dark_gray>(<player>)</dark_gray>"
   ban: "<green>Du hast die IP eines Spielers für <gold><reason></gold> für <gold><time></gold> gebannt</green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Richtige Verwendung: <gold>/banip <spieler|ip> (zeit) <grund>"
   kick_message:
@@ -135,6 +139,7 @@ banip:
 
 # Nachrichten für den Befehl /unban
 unban:
+  silent_success: "<dark_gray>[Stiller Modus]</dark_gray> <green>Spieler <gold><player></gold> wurde entbannt</green>"
   unban: "<green>Spieler <gold><player></gold> wurde entbannt</green>"
   usage: "Richtige Verwendung: <gold>/unban <spielername>"
   broadcast: "<dark_gray>Spieler <gray><player></gray> wurde entbannt</dark_gray>"
@@ -142,6 +147,7 @@ unban:
 
 # Nachrichten für den Befehl /mute
 mute:
+  silent_success: "<dark_gray>[Stiller Modus]</dark_gray> <green>Du hast Spieler <gold><player></gold> für <gold><reason></gold> für <gold><time></gold> stummgeschaltet</green> <dark_gray>(ID: <id>)</dark_gray>"
   mute: "<green>Du hast Spieler <gold><player></gold> für <gold><reason></gold> für <gold><time></gold> stummgeschaltet</green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Richtige Verwendung: <gold>/mute <spielername> (zeit) <grund>"
   mute_message: "<red>Du wurdest wegen <b><reason></b> für <b><time></b> stummgeschaltet</red>"
@@ -166,6 +172,7 @@ mute:
 
 # Nachrichten für den Befehl /unmute
 unmute:
+  silent_success: "<dark_gray>[Stiller Modus]</dark_gray> <green>Du hast Spieler <gold><player></gold> entstummt</green>"
   unmute: "<green>Du hast Spieler <gold><player></gold> entstummt</green>"
   usage: "Richtige Verwendung: <gold>/unmute <spielername>"
   unmute_message: "<green>Du wurdest entstummt!</green>"
@@ -173,6 +180,7 @@ unmute:
 
 # Nachrichten für den Befehl /warn
 warn:
+  silent_success: "<dark_gray>[Stiller Modus]</dark_gray> <green>Du hast (<warn_no> mal) Spieler <gold><player></gold> für <gold><reason></gold> für <gold><time></gold> verwarnt</green> <dark_gray>(ID: <id>)</dark_gray>"
   warn: "<green>Du hast (<warn_no> mal) Spieler <gold><player></gold> für <gold><reason></gold> für <gold><time></gold> verwarnt</green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Richtige Verwendung: <gold>/warn <spielername> (zeit) <grund>"
   warn_message: "<red>Du hast eine <b><warn_no></b> Verwarnung erhalten!</red>"
@@ -206,6 +214,7 @@ punish:
 
 # Reverse the latest punishment from a template ladder.
 unpunish:
+  silent_success: "<dark_gray>[Stiller Modus]</dark_gray> <green>Strafe #<id> für <player> aus <template> und ihr Beitrag zur Eskalation wurden zurückgenommen.</green>"
   usage: "Verwendung: <gold>/unpunish <player> <template></gold>"
   success: "<green>Strafe #<id> für <player> aus <template> und ihr Beitrag zur Eskalation wurden zurückgenommen.</green>"
   not_found: "<red>Keine verbleibende Strafe für <player> aus <template> in diesem Serverbereich.</red>"
@@ -215,12 +224,14 @@ unpunish:
 
 # Nachrichten für den Befehl /unwarn
 unwarn:
+  silent_success: "<dark_gray>[Stiller Modus]</dark_gray> <green>Du hast die Verwarnung von Spieler <gold><player></gold> entfernt</green>"
   unwarn: "<green>Du hast die Verwarnung von Spieler <gold><player></gold> entfernt</green>"
   usage: "Richtige Verwendung: <gold>/unwarn <spielername>"
 
 
 # Nachrichten für den Befehl /kick
 kick:
+  silent_success: "<dark_gray>[Stiller Modus]</dark_gray> <green>Du hast <gold><player></gold> wegen <gold><reason></gold> gekickt</green>"
   kick: "<green>Du hast <gold><player></gold> wegen <gold><reason></gold> gekickt</green>"
   usage: "Richtige Verwendung: <gold>/kick <spielername> <grund>"
   kick_message:
@@ -293,6 +304,7 @@ change-reason:
 
 # Nachrichten für den Befehl /clearall
 clear:
+  silent_success: "<dark_gray>[Stiller Modus]</dark_gray> <green>Alle aktiven Strafen von Spieler <gold><player></gold> wurden entfernt.</green>"
   usage: "Richtige Verwendung: <gold>/clearall <spielername>"
   clearall: "<green>Alle aktiven Strafen von Spieler <gold><player></gold> wurden entfernt.</green>"
   clear_message: "<green>Alle deine aktiven Strafen wurden aufgehoben!</green> <gray>Pssst! Hast du vielleicht Absprachen mit der Administration?</gray>"
@@ -506,3 +518,13 @@ formatTime:
     one: "Tag"
     few: "Tage"
     many: "Tage"
+
+# Database backup commands (/prx export and /prx import).
+database-backup:
+  busy: "<yellow>A database export or import is already running. Please wait.</yellow>"
+  export-started: "<yellow>Exporting the database. Please wait...</yellow>"
+  export-success: "<green>Database exported to plugins/PunisherX/dump/backup.sql.</green>"
+  export-failed: "<red>Database export failed. The previous backup has been preserved. Check the console for details.</red>"
+  import-started: "<yellow>Importing plugins/PunisherX/dump/backup.sql. This adds records without clearing or overwriting existing data. Please wait...</yellow>"
+  import-success: "<green>Database import completed. Records from the backup have been added.</green>"
+  import-failed: "<red>Database import failed. No records from this import were committed. Check the console for details; importing the same backup again can cause a key conflict.</red>"

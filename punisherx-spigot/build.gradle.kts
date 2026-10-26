@@ -104,10 +104,15 @@ repositories {
     }
 }
 
+val mockitoAgent = configurations.create("mockitoAgent")
+
 dependencies {
     compileOnly(libs.spigot.api)
     implementation(libs.libby.bukkit)
 
+    compileOnly(libs.syntaxdb.core) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
     compileOnly(libs.syntaxcore)
     compileOnly(libs.messagehandler.spigot)
 
@@ -148,7 +153,16 @@ dependencies {
     compileOnly(libs.faststats.bukkit)
 
     testImplementation(libs.kotlin.test)
+    testImplementation(libs.syntaxdb)
     testImplementation(libs.spigot.api)
+    testImplementation(libs.adventure.gson)
+    testImplementation(libs.syntaxcore) { isTransitive = false }
+    testImplementation(libs.messagehandler.spigot)
+    testImplementation(libs.caffeine)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.mockito.kotlin)
+    mockitoAgent(libs.byte.buddy.agent) { isTransitive = false }
 }
 
 extensions.configure<KotlinJvmProjectExtension> {
@@ -156,6 +170,14 @@ extensions.configure<KotlinJvmProjectExtension> {
 }
 
 val runtimeLibraryVersions = mapOf(
+    "kotlinVersion" to libs.versions.kotlin.get(),
+    "syntaxdbVersion" to libs.versions.syntaxdb.get(),
+    "hikariVersion" to libs.versions.hikari.get(),
+    "mysqlVersion" to libs.versions.mysql.get(),
+    "postgresqlVersion" to libs.versions.postgresql.get(),
+    "mssqlVersion" to libs.versions.mssql.get(),
+    "sqliteVersion" to libs.versions.sqlite.get(),
+    "protobufVersion" to libs.versions.protobuf.get(),
     "aetherVersion" to libs.versions.aether.get(),
     "snakeyamlVersion" to libs.versions.snakeyaml.get(),
     "gsonVersion" to libs.versions.gson.get(),
@@ -180,7 +202,7 @@ tasks.processResources {
     inputs.properties(props + runtimeLibraryVersions)
     filteringCharset = "UTF-8"
     filesMatching(listOf("plugin.yml")) {
-        expand(props)
+        expand(props + runtimeLibraryVersions)
     }
     filesMatching("spigot-libraries.yml") {
         expand(runtimeLibraryVersions)
@@ -189,6 +211,7 @@ tasks.processResources {
 
 tasks.test {
     useJUnitPlatform()
+    jvmArgs("-javaagent:${mockitoAgent.singleFile}")
 }
 
 tasks.build {
@@ -201,6 +224,13 @@ tasks.named<ShadowJar>("shadowJar") {
     archiveVersion.set(project.version.toString())
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    // Bukkit loads Kotlin before constructing our Kotlin plugin entry point.
+    dependencies {
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8"))
+    }
 
     mergeServiceFiles()
 
@@ -217,13 +247,7 @@ tasks.named<ShadowJar>("shadowJar") {
         "pl.syntaxdevteam.punisher.libs.libby"
     )
 
-    dependencies {
-        include(dependency("net.byteflux:libby-bukkit"))
-        include(dependency("net.byteflux:libby-core"))
-        include(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
-        include(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7"))
-        include(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8"))
-    }
+
 }
 
 plugindeployer {

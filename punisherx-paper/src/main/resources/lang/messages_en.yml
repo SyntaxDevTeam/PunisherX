@@ -118,6 +118,7 @@ setunjail:
 
 # /jail command messages
 jail:
+  silent_success: "<dark_gray>[Silent mode]</dark_gray> <green>You jailed player <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   jail: "<green>You jailed player <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct usage: <gold>/jail <player_name> (time) <reason>"
   jail_message: "<red>You have been jailed for <b><reason></b> for <b><time></b></red>"
@@ -146,6 +147,7 @@ jail:
 
 # /unjail command messages
 unjail:
+  silent_success: "<dark_gray>[Silent mode]</dark_gray> <green>Player <gold><player></gold> has been successfully released from jail.</green>"
   unjail: "<green>You released player <gold><player></gold> from jail</green>"
   usage: "Correct usage: <gold>/unjail <player_name>"
   unjail_message: "<green>Your jail time is over! Do not waste this chance!</green>"
@@ -156,6 +158,7 @@ unjail:
 
 # /ban command messages
 ban:
+  silent_success: "<dark_gray>[Silent mode]</dark_gray> <green>You banned <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   ban: "<green>You banned <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct usage: <gold>/ban <player_name> (time) <reason>"
   kick_message:
@@ -189,6 +192,7 @@ ban:
 
 # /banip command messages
 banip:
+  silent_success: "<dark_gray>[Silent mode]</dark_gray> <green>You banned a player's IP for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray> <dark_gray>(<player>)</dark_gray>"
   ban: "<green>You banned a player's IP for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct usage: <gold>/banip <player|ip> (time) <reason>"
   kick_message:
@@ -213,6 +217,7 @@ banip:
 
 # /unban command messages
 unban:
+  silent_success: "<dark_gray>[Silent mode]</dark_gray> <green>Player <gold><player></gold> has been unbanned</green>"
   unban: "<green>Player <gold><player></gold> has been unbanned</green>"
   usage: "Correct usage: <gold>/unban <player_name>"
   broadcast: "<dark_gray>Player <gray><player></gray> has been unbanned</dark_gray>"
@@ -220,6 +225,7 @@ unban:
 
 # /mute command messages
 mute:
+  silent_success: "<dark_gray>[Silent mode]</dark_gray> <green>You muted player <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   mute: "<green>You muted player <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct usage: <gold>/mute <player_name> (time) <reason>"
   mute_message: "<red>You have been muted for <b><reason></b> for <b><time></b></red>"
@@ -245,6 +251,7 @@ mute:
 
 # /unmute command messages
 unmute:
+  silent_success: "<dark_gray>[Silent mode]</dark_gray> <green>You unmuted player <gold><player></gold></green>"
   unmute: "<green>You unmuted player <gold><player></gold></green>"
   usage: "Correct usage: <gold>/unmute <player_name>"
   unmute_message: "<green>You have been unmuted!</green>"
@@ -252,6 +259,7 @@ unmute:
 
 # /warn command messages
 warn:
+  silent_success: "<dark_gray>[Silent mode]</dark_gray> <green>You warned (<warn_no> time) <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   warn: "<green>You warned (<warn_no> time) <gold><player></gold> for <gold><reason></gold> for <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
   usage: "Correct usage: <gold>/warn <player_name> (time) <reason>"
   warn_message: "<red>You received a <b><warn_no></b> warning!</red>"
@@ -285,6 +293,7 @@ punish:
 
 # Reverse the latest punishment from a template ladder.
 unpunish:
+  silent_success: "<dark_gray>[Silent mode]</dark_gray> <green>Reversed punishment #<id> for <player> from <template> and removed its contribution to escalation.</green>"
   usage: "Usage: <gold>/unpunish <player> <template></gold>"
   success: "<green>Reversed punishment #<id> for <player> from <template> and removed its contribution to escalation.</green>"
   not_found: "<red>No remaining punishment for <player> from <template> in this server scope.</red>"
@@ -294,12 +303,14 @@ unpunish:
 
 # /unwarn command messages
 unwarn:
+  silent_success: "<dark_gray>[Silent mode]</dark_gray> <green>You removed a warning for player <gold><player></gold></green>"
   unwarn: "<green>You removed a warning for player <gold><player></gold></green>"
   usage: "Correct usage: <gold>/unwarn <player_name>"
 
 
 # /kick command messages
 kick:
+  silent_success: "<dark_gray>[Silent mode]</dark_gray> <green>You kicked <gold><player></gold> for <gold><reason></gold></green>"
   kick: "<green>You kicked <gold><player></gold> for <gold><reason></gold></green>"
   usage: "Correct usage: <gold>/kick <player_name> <reason>"
   kick_message:
@@ -372,6 +383,7 @@ change-reason:
 
 # /clearall command messages
 clear:
+  silent_success: "<dark_gray>[Silent mode]</dark_gray> <green>All active punishments for player <gold><player></gold> have been cleared.</green>"
   usage: "Correct usage: <gold>/clearall <player_name>"
   clearall: "<green>All active punishments for player <gold><player></gold> have been cleared.</green>"
   clear_message: "<green>All your active punishments have been removed!</green> <gray>Pssst! Do you have some deals with the staff or something?</gray>"
@@ -543,3 +555,13 @@ formatTime:
     one: "day"
     few: "days"
     many: "days"
+
+# Database backup commands (/prx export and /prx import).
+database-backup:
+  busy: "<yellow>A database export or import is already running. Please wait.</yellow>"
+  export-started: "<yellow>Exporting the database. Please wait...</yellow>"
+  export-success: "<green>Database exported to plugins/PunisherX/dump/backup.sql.</green>"
+  export-failed: "<red>Database export failed. The previous backup has been preserved. Check the console for details.</red>"
+  import-started: "<yellow>Importing plugins/PunisherX/dump/backup.sql. This adds records without clearing or overwriting existing data. Please wait...</yellow>"
+  import-success: "<green>Database import completed. Records from the backup have been added.</green>"
+  import-failed: "<red>Database import failed. No records from this import were committed. Check the console for details; importing the same backup again can cause a key conflict.</red>"

@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.gradle.api.file.DuplicatesStrategy
 
 repositories {
+    maven("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/")
+    maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
     mavenCentral()
     maven("https://oss.sonatype.org/content/repositories/releases/")
     maven("https://oss.sonatype.org/content/repositories/snapshots/")
@@ -12,8 +14,7 @@ repositories {
 
 dependencies {
     compileOnly(libs.bungeecord.api)
-    implementation(libs.hikari)
-    implementation(libs.mysql.connector)
+    implementation(libs.syntaxdb)
 }
 
 val brigadierCoordinates = libs.brigadier.get().toString()

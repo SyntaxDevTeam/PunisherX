@@ -12,20 +12,23 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 class JailCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+        val options = PunishmentCommandOptions.parse(args)
+        val arguments = options.arguments
+        val silent = options.silent
 
         if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.JAIL)) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
-        if (args.isEmpty() || args.size < 2) {
+        if (arguments.isEmpty() || arguments.size < 2) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("jail", "usage"))
             return
         }
 
-        val playerName = args[0]
+        val playerName = arguments[0]
         val uuid = plugin.resolvePlayerUuid(playerName)
         val targetPlayer = Bukkit.getPlayer(uuid)
-        val isForce = args.contains("--force")
+        val isForce = options.force
 
         if (targetPlayer != null && !isForce && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_JAIL)) {
             stack.sender.sendMessage(
@@ -33,16 +36,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             )
             return
         }
-        var gtime: String?
-        var reason: String
-        try {
-            gtime = args[1]
-            plugin.timeHandler.parseTime(gtime)
-            reason = args.slice(2 until args.size).filterNot { it == "--force" }.joinToString(" ")
-        } catch (_: NumberFormatException) {
-            gtime = null
-            reason = args.slice(1 until args.size).filterNot { it == "--force" }.joinToString(" ")
-        }
+        val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, arguments, 1)
 
         val punishmentType = "JAIL"
         val start = System.currentTimeMillis()
@@ -75,31 +69,10 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.cache.addOrUpdatePunishment(uuid, end ?: -1, previousLocation)
             val placeholders = basePlaceholders + ("id" to punishmentId.toString())
 
-            targetPlayer?.sendMessage(
-                plugin.messageHandler.stringMessageToComponent(
-                    "jail", "jail_message",
-                    placeholders
-                )
-            )
-
-            val broadcastMessages = plugin.messageHandler.getSmartMessage(
-                "jail", "broadcast",
-                placeholders
-            )
-            plugin.server.onlinePlayers.forEach { onlinePlayer ->
-                if (PermissionChecker.hasWithSee(onlinePlayer, PermissionChecker.PermissionKey.SEE_JAIL)) {
-                    broadcastMessages.forEach { message ->
-                        onlinePlayer.sendMessage(message)
-                    }
-                }
-            }
-
-            plugin.messageHandler.getSmartMessage(
-                "jail",
-                "jail",
-                placeholders
-            ).forEach { stack.sender.sendMessage(it) }
-            plugin.actionExecutor.executeAction("jailed", playerName, placeholders)
+            PunishmentCommandUtils.sendTargetMessages(plugin, targetPlayer, "jail", "jail_message", placeholders, silent = silent)
+            PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_JAIL, "jail", "broadcast", placeholders, silent = silent)
+            PunishmentCommandUtils.sendSenderMessages(plugin, stack, "jail", "jail", placeholders, silent = silent)
+            plugin.actionExecutor.executeAction("jailed", playerName, placeholders, silent = silent)
         }
 
         if (targetPlayer != null) {
