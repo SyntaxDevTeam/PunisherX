@@ -90,7 +90,7 @@ val mockitoAgent = configurations.create("mockitoAgent")
 
 dependencies {
     compileOnly(libs.paper.api)
-    implementation(libs.syntaxdb) {
+    compileOnly(libs.syntaxdb.core) {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
     compileOnly(libs.syntaxcore)
@@ -120,6 +120,7 @@ dependencies {
     compileOnly(libs.faststats.bukkit)
 
     testImplementation(libs.kotlin.test)
+    testImplementation(libs.syntaxdb)
     testImplementation(libs.syntaxcore) {
         isTransitive = false
     }
@@ -160,6 +161,13 @@ tasks {
 
 val runtimeLibraryVersions = mapOf(
     "kotlinVersion" to libs.versions.kotlin.get(),
+    "syntaxdbVersion" to libs.versions.syntaxdb.get(),
+    "hikariVersion" to libs.versions.hikari.get(),
+    "mysqlVersion" to libs.versions.mysql.get(),
+    "postgresqlVersion" to libs.versions.postgresql.get(),
+    "mssqlVersion" to libs.versions.mssql.get(),
+    "sqliteVersion" to libs.versions.sqlite.get(),
+    "protobufVersion" to libs.versions.protobuf.get(),
     "aetherVersion" to libs.versions.aether.get(),
     "snakeyamlVersion" to libs.versions.snakeyaml.get(),
     "gsonVersion" to libs.versions.gson.get(),

@@ -1,3 +1,7 @@
+# Loaded by Bukkit before the Kotlin plugin entry point and Libby are constructed.
+libraries:
+  - org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}
+
 name: PunisherX
 version: ${version}
 description: ${description}

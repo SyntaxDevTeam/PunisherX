@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import java.util.zip.ZipFile
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
@@ -11,10 +12,12 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.8.1-DEV"
+version = "1.8.1-EXPERIMENTAL"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val bridgeVersion = "1.1.3-R0.1-SNAPSHOT"
+val databaseRuntimeDependencies = listOf(libs.syntaxdb.core, libs.hikari, libs.mysql.jdbc, libs.protobuf,
+    libs.postgresql.jdbc, libs.mssql.jdbc, libs.sqlite.jdbc, libs.kotlin.stdlib)
 
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
@@ -24,6 +27,26 @@ subprojects {
 
     group = rootProject.group
     version = if (name.endsWith("-bridge")) bridgeVersion else rootProject.version
+
+    if (name in setOf("punisherx-paper", "punisherx-spigot")) {
+        extensions.configure<KotlinJvmProjectExtension> {
+            sourceSets.named("test") {
+                kotlin.srcDir(rootProject.file("tests/server/kotlin"))
+            }
+        }
+        // Mirrors the explicit runtime manifests, without optional mapping/coroutine modules.
+        val databaseRuntimeLibraries = configurations.create("databaseRuntimeLibraries")
+        databaseRuntimeDependencies.forEach {
+            dependencies.add(databaseRuntimeLibraries.name, it)
+        }
+        tasks.withType<Test>().configureEach {
+            inputs.files(databaseRuntimeLibraries)
+            inputs.property("mysqlTestUrl", providers.environmentVariable("PUNISHERX_TEST_MYSQL_URL").orElse(""))
+            doFirst {
+                systemProperty("punisherx.database.runtimeClasspath", databaseRuntimeLibraries.asPath)
+            }
+        }
+    }
 }
 
 tasks.register("buildAll") {
@@ -45,11 +68,11 @@ tasks.register("deploySpigotOnly") {
     dependsOn(":punisherx-spigot:deployPluginToSpigot")
 }
 
-// Compilation alone does not prove that the runtime database toolkit reached the plugin JAR.
+// Server plugins download their DB runtime; proxies currently bundle it (no runtime loader).
 subprojects {
     val verifyDatabaseBundle = tasks.register("verifyDatabaseBundle") {
         group = "verification"
-        description = "Checks that the plugin JAR contains SyntaxDB, its pool and JDBC drivers"
+        description = "Checks the database runtime packaging contract for server and proxy JARs"
         val bundle = tasks.named<ShadowJar>("shadowJar")
         dependsOn(bundle)
         doLast {
@@ -63,8 +86,28 @@ subprojects {
                 "META-INF/services/java.sql.Driver",
             )
             ZipFile(bundle.get().archiveFile.get().asFile).use { jar ->
-                required.forEach { entry ->
-                    check(jar.getEntry(entry) != null) { "Database runtime is incomplete: missing $entry in ${project.name}" }
+                if (project.name in setOf("punisherx-paper", "punisherx-spigot")) {
+                    val forbidden = listOf("pl/syntaxdevteam/syntaxdb/", "com/zaxxer/hikari/", "org/sqlite/",
+                        "com/mysql/", "org/postgresql/", "com/microsoft/sqlserver/", "kotlin/", "kotlinx/coroutines/")
+                    check(jar.entries().asSequence().none { entry -> forbidden.any { entry.name.startsWith(it) } }) {
+                        "Downloaded libraries must not be bundled in ${project.name}"
+                    }
+                    val platform = project.name.removePrefix("punisherx-")
+                    val manifest = requireNotNull(jar.getEntry("$platform-libraries.yml"))
+                    val text = jar.getInputStream(manifest).bufferedReader().use { it.readText() }
+                    check(!text.contains("\${")) { "Unexpanded runtime library versions in ${project.name}" }
+                    listOf("pl.syntaxdevteam:syntaxdb-core:", "com.zaxxer:HikariCP:",
+                        "com.mysql:mysql-connector-j:", "com.google.protobuf:protobuf-java:",
+                        "org.postgresql:postgresql:", "com.microsoft.sqlserver:mssql-jdbc:", "org.xerial:sqlite-jdbc:")
+                        .forEach { check(text.contains(it)) { "Missing runtime library $it in ${project.name}" } }
+                    if (platform == "spigot") {
+                        val descriptor = jar.getInputStream(jar.getEntry("plugin.yml")).bufferedReader().use { it.readText() }
+                        check(descriptor.contains("org.jetbrains.kotlin:kotlin-stdlib:")) { "Spigot must bootstrap Kotlin before Libby" }
+                    }
+                } else {
+                    required.forEach { entry ->
+                        check(jar.getEntry(entry) != null) { "Database runtime is incomplete: missing $entry in ${project.name}" }
+                    }
                 }
             }
         }

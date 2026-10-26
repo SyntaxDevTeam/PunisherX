@@ -16,7 +16,11 @@ dependencies {
     implementation(libs.syntaxdb) {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.velocity.api)
 }
+
+tasks.test { useJUnitPlatform() }
 
 extensions.configure<KotlinJvmProjectExtension> {
     jvmToolchain(25)

@@ -258,8 +258,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return try {
             val params = mutableListOf<Any>(id)
             val sql = appendServerFilter("DELETE FROM punishments WHERE id = ?", params, true)
-            execute(sql, *params.toTypedArray())
-            true
+            db.execute(sql, params) > 0
         } catch (e: Exception) {
             logger.err("Failed to remove punishment id $id. ${e.message}")
             false
@@ -268,17 +267,19 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun deletePlayerData(uuid: String) {
         try {
-            val punishmentsParams = mutableListOf<Any>(uuid)
-            val punishmentsSql = appendServerFilter("DELETE FROM punishments WHERE uuid = ?", punishmentsParams, true)
-            execute(punishmentsSql, *punishmentsParams.toTypedArray())
-            val historyParams = mutableListOf<Any>(uuid)
-            val historySql = appendServerFilter("DELETE FROM punishmenthistory WHERE uuid = ?", historyParams, true)
-            for (table in listOf("punishment_templates", "punishment_undos")) {
-                val params = mutableListOf<Any>(uuid)
-                val historyIds = appendServerFilter("SELECT id FROM punishmenthistory WHERE uuid = ?", params, true)
-                execute("DELETE FROM $table WHERE historyId IN ($historyIds)", *params.toTypedArray())
+            db.transaction {
+                val punishmentsParams = mutableListOf<Any>(uuid)
+                val punishmentsSql = appendServerFilter("DELETE FROM punishments WHERE uuid = ?", punishmentsParams, true)
+                execute(punishmentsSql, punishmentsParams)
+                val historyParams = mutableListOf<Any>(uuid)
+                val historySql = appendServerFilter("DELETE FROM punishmenthistory WHERE uuid = ?", historyParams, true)
+                for (table in listOf("punishment_templates", "punishment_undos")) {
+                    val params = mutableListOf<Any>(uuid)
+                    val historyIds = appendServerFilter("SELECT id FROM punishmenthistory WHERE uuid = ?", params, true)
+                    execute("DELETE FROM $table WHERE historyId IN ($historyIds)", params)
+                }
+                execute(historySql, historyParams)
             }
-            execute(historySql, *historyParams.toTypedArray())
         } catch (e: Exception) {
             logger.err("Failed to delete player data. ${e.message}")
         }
@@ -366,8 +367,10 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun deleteReport(id: Int): Boolean {
         return try {
-            execute("DELETE FROM reports WHERE id = ?", id)
-            true
+            db.transaction {
+                execute("DELETE FROM report_resolutions WHERE reportId = ?", listOf(id))
+                execute("DELETE FROM reports WHERE id = ?", listOf(id)) > 0
+            }
         } catch (e: Exception) {
             logger.err("Failed to delete report with ID $id. ${e.message}")
             false
@@ -428,8 +431,9 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun updatePunishmentReason(id: Int, newReason: String): Boolean {
         return try {
-            execute("UPDATE punishmenthistory SET reason = ? WHERE id = ?", newReason, id)
-            true
+            val params = mutableListOf<Any>(newReason, id)
+            val sql = appendServerFilter("UPDATE punishmenthistory SET reason = ? WHERE id = ?", params, true)
+            db.execute(sql, params) > 0
         } catch (e: Exception) {
             logger.err("Failed to update punishment reason for ID: $id. ${e.message}")
             false
@@ -503,7 +507,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         var sql = appendServerFilter("SELECT * FROM punishments WHERE uuid = ?", params, true)
 
         if (limit != null && offset != null) {
-            sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
+            sql += " ORDER BY start DESC, id DESC LIMIT ? OFFSET ?"
             params.add(limit)
             params.add(offset)
         }
@@ -523,7 +527,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                 )
             }
             val punishmentsToRemove = rows.filterNot { plugin.punishmentManager.isPunishmentActive(it) }
-            punishmentsToRemove.forEach { removePunishment(it.uuid, it.type) }
+            punishmentsToRemove.forEach { removePunishmentById(it.id) }
 
             rows.filter { plugin.punishmentManager.isPunishmentActive(it) }
         } catch (e: Exception) {
@@ -566,7 +570,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         var sql = appendServerFilter("SELECT *, CASE WHEN EXISTS (SELECT 1 FROM punishment_undos u " +
             "WHERE u.historyId = punishmenthistory.id) THEN 1 ELSE 0 END AS undone FROM punishmenthistory WHERE uuid = ?", params, true)
         if (limit != null && offset != null) {
-            sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
+            sql += " ORDER BY start DESC, id DESC LIMIT ? OFFSET ?"
             params.add(limit)
             params.add(offset)
         }
@@ -599,7 +603,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
             params,
             true
         )
-        sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
+        sql += " ORDER BY start DESC, id DESC LIMIT ? OFFSET ?"
         params.add(limit)
         params.add(offset)
 
@@ -643,7 +647,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         var sql = "SELECT * FROM punishments"
         if (conditions.isNotEmpty()) sql += " WHERE " + conditions.joinToString(" AND ")
         sql = appendServerFilter(sql, params, conditions.isNotEmpty())
-        sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
+        sql += " ORDER BY start DESC, id DESC LIMIT ? OFFSET ?"
         params += limit
         params += offset
         return try {
@@ -667,7 +671,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
             params,
             true
         )
-        sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
+        sql += " ORDER BY start DESC, id DESC LIMIT ? OFFSET ?"
         params.add(limit)
         params.add(offset)
 
@@ -698,7 +702,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
             params,
             true
         )
-        sql += " ORDER BY start DESC LIMIT ? OFFSET ?"
+        sql += " ORDER BY start DESC, id DESC LIMIT ? OFFSET ?"
         params.add(limit)
         params.add(offset)
 
@@ -808,7 +812,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                 params,
                 true
             )
-            sql += " ORDER BY start DESC LIMIT 10"
+            sql += " ORDER BY start DESC, id DESC LIMIT 10"
             query(sql, *params.toTypedArray()) { rs ->
                 PunishmentData(
                     (rs.int("id") ?: 0),

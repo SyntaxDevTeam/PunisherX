@@ -245,23 +245,29 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         val end = parsedSeconds?.let { start + it * 1000 } ?: -1
         val punishmentType = "BANIP"
         val punishmentIds = mutableListOf<Long>()
-        var dbError = false
+        val failedIps = mutableListOf<String>()
+        val bannedIps = mutableListOf<String>()
 
         playerIps.forEach { ip ->
             val punishmentId = plugin.databaseHandler.addPunishment(targetName, ip, reason, stack.sender.name, punishmentType, start, end)
             if (punishmentId == null) {
                 plugin.logger.err("Failed to add IP ban to database for $ip.")
-                dbError = true
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban-ip $ip")
-            } else {
-                punishmentIds.add(punishmentId)
+                failedIps.add(ip)
+                return@forEach
             }
+            punishmentIds.add(punishmentId)
+            bannedIps.add(ip)
             plugin.databaseHandler.addTemplatePunishmentHistory(targetName, ip, reason, stack.sender.name, punishmentType, start, end, templateName = template.name, templateUuid = uuid.toString())
             plugin.proxyBridgeMessenger.notifyIpBan(ip, reason, end)
         }
 
-        if (dbError) {
-            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
+        if (failedIps.isNotEmpty()) {
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent(
+                "error", "banip_db_error", mapOf(
+                    "failed_ips" to failedIps.joinToString(", "),
+                    "banned_ips" to bannedIps.joinToString(", ").ifEmpty { "-" }
+                )))
+            return
         }
 
         val formattedTime = plugin.timeHandler.formatTime(templateLevel.time)

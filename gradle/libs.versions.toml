@@ -39,6 +39,11 @@ dscbridge = "1.0.0-R0.7-SNAPSHOT"
 faststats = "0.30.2"
 
 sqlite = "3.53.4.0"
+hikari = "7.1.0"
+mysql = "26.7.0"
+postgresql = "42.7.14"
+mssql = "13.6.0.jre11"
+protobuf = "4.31.1"
 mockito = "5.23.0"
 mockito-inline = "5.2.0"
 mockito-kotlin = "6.3.0"
@@ -57,6 +62,12 @@ velocity-api = { module = "com.velocitypowered:velocity-api", version.ref = "vel
 bungeecord-api = { module = "net.md-5:bungeecord-api", version.ref = "bungeecord-api" }
 brigadier = { module = "com.mojang:brigadier", version.ref = "brigadier" }
 
+syntaxdb-core = { module = "pl.syntaxdevteam:syntaxdb-core", version.ref = "syntaxdb" }
+hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+mysql-jdbc = { module = "com.mysql:mysql-connector-j", version.ref = "mysql" }
+postgresql-jdbc = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+mssql-jdbc = { module = "com.microsoft.sqlserver:mssql-jdbc", version.ref = "mssql" }
+protobuf = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf" }
 syntaxdb = { module = "pl.syntaxdevteam:syntaxdb", version.ref = "syntaxdb" }
 syntaxcore = { module = "pl.syntaxdevteam:syntaxcore", version.ref = "syntaxcore" }
 messagehandler-paper = { module = "pl.syntaxdevteam:messageHandler-paper", version.ref = "messagehandler" }

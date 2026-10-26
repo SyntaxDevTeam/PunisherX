@@ -1,7 +1,9 @@
 package pl.syntaxdevteam.punisher.compatibility
 
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import net.md_5.bungee.chat.ComponentSerializer
+import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.ChatMessageType
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
@@ -23,8 +25,12 @@ import pl.syntaxdevteam.message.SyntaxMessages
 private fun Component.toSpigotString(): String =
     SyntaxMessages.messages.legacyComponentSerializer(this)
 
+// The old adventure-platform Bungee serializer calls APIs removed in Adventure 5.
+internal fun Component.toSpigotComponents(): Array<BaseComponent> =
+    ComponentSerializer.parse(GsonComponentSerializer.gson().serialize(this))
+
 fun CommandSender.sendMessage(component: Component) {
-    spigot().sendMessage(*BungeeComponentSerializer.get().serialize(component))
+    spigot().sendMessage(*component.toSpigotComponents())
 }
 
 fun Player.kick(component: Component) {
@@ -34,7 +40,7 @@ fun Player.kick(component: Component) {
 fun Player.sendActionBar(component: Component) {
     spigot().sendMessage(
         ChatMessageType.ACTION_BAR,
-        *BungeeComponentSerializer.get().serialize(component)
+        *component.toSpigotComponents()
     )
 }
 

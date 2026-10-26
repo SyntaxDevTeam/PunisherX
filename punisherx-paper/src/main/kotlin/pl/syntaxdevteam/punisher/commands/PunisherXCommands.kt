@@ -494,7 +494,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             LibraryProbe("com.github.milkbowl:VaultAPI", "net.milkbowl.vault.chat.Chat"),
             LibraryProbe("net.milkbowl.vault:VaultUnlockedAPI", "net.milkbowl.vault2.chat.Chat"),
             LibraryProbe("net.essentialsx:EssentialsXSpawn", "com.earth2me.essentials.spawn.IEssentialsSpawn"),
-            LibraryProbe("pl.syntaxdevteam:syntaxdb", "pl.syntaxdevteam.syntaxdb.Database"),
+            LibraryProbe("pl.syntaxdevteam:syntaxdb-core", "pl.syntaxdevteam.syntaxdb.Database"),
             LibraryProbe("pl.syntaxdevteam:syntaxcore", "pl.syntaxdevteam.core.SyntaxCore"),
             LibraryProbe("pl.syntaxdevteam:messageHandler-paper", "pl.syntaxdevteam.message.MessageHandler"),
             LibraryProbe("pl.syntaxdevteam:DscBridgeAPI", "pl.syntaxdevteam.dscbridgeapi.external.model.BridgeSlashCommand")

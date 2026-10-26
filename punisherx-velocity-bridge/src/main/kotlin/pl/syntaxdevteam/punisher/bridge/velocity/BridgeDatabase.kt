@@ -6,8 +6,8 @@ import java.util.UUID
 
 data class ActiveBan(val reason: String, val endTime: Long)
 
-class BridgeDatabase(private val logger: Logger, config: BridgeConfig) {
-    private val database = Database.create("mysql") {
+class BridgeDatabase internal constructor(private val logger: Logger, private val database: Database) {
+    constructor(logger: Logger, config: BridgeConfig) : this(logger, Database.create("mysql") {
         jdbcUrl = config.jdbcUrl
         username = config.username
         password = config.password
@@ -17,7 +17,7 @@ class BridgeDatabase(private val logger: Logger, config: BridgeConfig) {
             connectionTimeoutMs = 5_000; validationTimeoutMs = 2_000
             idleTimeoutMs = 120_000; maxLifetimeMs = 300_000
         }
-    }
+    })
 
     fun ensureSchema() {
         try {
