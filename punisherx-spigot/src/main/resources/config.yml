@@ -19,7 +19,8 @@ language: "EN"
 # /********************************************/
 
 database:
-  # Available options: mariadb, mysql, mssql, postgresql, sqlite, h2
+  # Available options: mysql, mariadb (MySQL driver), mssql, postgresql, sqlite
+  # H2 is not supported by SyntaxDB; export/convert it before upgrading.
   type: "sqlite"
   sql:
     host: "localhost"

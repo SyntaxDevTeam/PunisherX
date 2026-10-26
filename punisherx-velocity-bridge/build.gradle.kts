@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.gradle.api.file.DuplicatesStrategy
 
 repositories {
+    maven("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/")
+    maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://oss.sonatype.org/content/repositories/releases/")
@@ -11,10 +13,9 @@ repositories {
 
 dependencies {
     compileOnly(libs.velocity.api)
-    implementation(libs.hikari) {
+    implementation(libs.syntaxdb) {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-    implementation(libs.mysql.connector)
 }
 
 extensions.configure<KotlinJvmProjectExtension> {

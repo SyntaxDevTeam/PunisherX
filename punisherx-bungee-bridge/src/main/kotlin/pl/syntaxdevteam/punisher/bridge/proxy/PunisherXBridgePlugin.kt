@@ -1,8 +1,7 @@
 package pl.syntaxdevteam.punisher.bridge.proxy
 
 import com.google.common.io.ByteStreams
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
+import pl.syntaxdevteam.syntaxdb.Database
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.connection.ProxiedPlayer
@@ -24,19 +23,20 @@ class PunisherXBridgePlugin : Plugin(), Listener {
         const val CHANNEL = "punisherx:bridge"
     }
 
-    private lateinit var dataSource: HikariDataSource
+    private var database: Database? = null
 
     override fun onEnable() {
         proxy.registerChannel(CHANNEL)
         proxy.pluginManager.registerListener(this, this)
-        dataSource = HikariDataSource(buildHikariConfig(loadConfig()))
+        database = connectDatabase(loadConfig())
         proxy.logger.info("PunisherX proxy bridge ready for channel $CHANNEL")
     }
 
     override fun onDisable() {
         proxy.unregisterChannel(CHANNEL)
         proxy.pluginManager.unregisterListener(this)
-        runCatching { dataSource.close() }
+        database?.close()
+        database = null
     }
 
     @EventHandler
@@ -97,30 +97,12 @@ class PunisherXBridgePlugin : Plugin(), Listener {
 
     private fun findActiveBan(uuid: UUID): ActiveBan? {
         return runCatching {
-            dataSource.connection.use { connection ->
-                connection.prepareStatement(
-                    """
-                    SELECT reason, endTime
-                    FROM punishments
-                    WHERE uuid = ?
-                      AND punishmentType = 'BAN'
-                      AND server = 'network'
-                      AND (endTime = -1 OR endTime > ?)
-                    ORDER BY start DESC
-                    LIMIT 1
-                    """.trimIndent()
-                ).use { statement ->
-                    statement.setString(1, uuid.toString())
-                    statement.setLong(2, System.currentTimeMillis())
-                    statement.executeQuery().use { resultSet ->
-                        if (!resultSet.next()) return@use null
-                        ActiveBan(
-                            reason = resultSet.getString("reason") ?: "",
-                            endTime = resultSet.getLong("endTime")
-                        )
-                    }
-                }
-            }
+            database?.query(
+                """SELECT reason, endTime FROM punishments
+                    WHERE uuid = ? AND punishmentType = 'BAN' AND server = 'network'
+                    AND (endTime = -1 OR endTime > ?) ORDER BY start DESC LIMIT 1""".trimIndent(),
+                listOf(uuid.toString(), System.currentTimeMillis())
+            )?.firstOrNull()?.let { ActiveBan(it.string("reason").orEmpty(), it.long("endTime") ?: 0L) }
         }.onFailure { ex ->
             proxy.logger.warning("Failed to check active BAN for $uuid: ${ex.message}")
         }.getOrNull()
@@ -140,21 +122,20 @@ class PunisherXBridgePlugin : Plugin(), Listener {
         }
     }
 
-    private fun buildHikariConfig(properties: Properties): HikariConfig {
-        return HikariConfig().apply {
+    private fun connectDatabase(properties: Properties): Database {
+        return Database.connect("mysql") {
             val host = properties.getProperty("host", "localhost")
             val port = properties.getProperty("port", "3306").toIntOrNull() ?: 3306
             val database = properties.getProperty("database", "punisherx")
             jdbcUrl = "jdbc:mysql://$host:$port/$database"
-            driverClassName = "com.mysql.cj.jdbc.Driver"
             username = properties.getProperty("username", "root")
             password = properties.getProperty("password", "change_me")
-            maximumPoolSize = 4
-            minimumIdle = 1
-            connectionTimeout = 5000
-            validationTimeout = 2000
-            idleTimeout = 120_000
-            maxLifetime = 300_000
+            property("characterEncoding", "UTF-8")
+            pool {
+                maximumPoolSize = 4; minimumIdle = 1
+                connectionTimeoutMs = 5_000; validationTimeoutMs = 2_000
+                idleTimeoutMs = 120_000; maxLifetimeMs = 300_000
+            }
         }
     }
 

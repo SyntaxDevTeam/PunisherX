@@ -11,7 +11,8 @@ import java.net.URI
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import pl.syntaxdevteam.punisher.PunisherX
-import pl.syntaxdevteam.core.database.DatabaseType
+import pl.syntaxdevteam.syntaxdb.config.DatabaseType
+import pl.syntaxdevteam.punisher.databases.PunisherDatabaseSettings
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 private data class ConnectivityCheckResult(
@@ -132,8 +133,8 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
                     stack.sender.sendMessage(mH.miniMessageFormat("$prefix <red>Usage: /prx migrate <from> <to></red>"))
                     return
                 }
-                val fromType = runCatching { DatabaseType.valueOf(from.uppercase()) }.getOrNull()
-                val toType = runCatching { DatabaseType.valueOf(to.uppercase()) }.getOrNull()
+                val fromType = runCatching { PunisherDatabaseSettings.parseType(from) }.getOrNull()
+                val toType = runCatching { PunisherDatabaseSettings.parseType(to) }.getOrNull()
                 if (fromType == null || toType == null) {
                     stack.sender.sendMessage(mH.miniMessageFormat("$prefix <red>Unknown database type.</red>"))
                     return
@@ -144,7 +145,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
                         pendingMigration = fromType to toType
                         stack.sender.sendMessage(
                             mH.miniMessageFormat(
-                                "$prefix <yellow>Update the connection details for <gold>${toType.name.lowercase()}</gold> in config.yml, then rerun this command. " +
+                                "$prefix <yellow>Stop player access and database writes on all connected servers and proxies. Back up the source, then update the connection details for <gold>${toType.name.lowercase()}</gold> in config.yml, then rerun this command. " +
                                         "Use <gold>--force</gold> to skip this confirmation."
                             )
                         )
@@ -448,9 +449,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             return baseSuggestions
         }
         if (args[0].equals("migrate", ignoreCase = true)) {
-            val types = DatabaseType::class.java.enumConstants
-                ?.map { it.name.lowercase() }
-                ?: emptyList()
+            val types = listOf("mysql", "mariadb", "postgresql", "mssql", "sqlite")
             when (args.size) {
                 2 -> {
                     val current = args[1]
@@ -495,6 +494,7 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
             LibraryProbe("com.github.milkbowl:VaultAPI", "net.milkbowl.vault.chat.Chat"),
             LibraryProbe("net.milkbowl.vault:VaultUnlockedAPI", "net.milkbowl.vault2.chat.Chat"),
             LibraryProbe("net.essentialsx:EssentialsXSpawn", "com.earth2me.essentials.spawn.IEssentialsSpawn"),
+            LibraryProbe("pl.syntaxdevteam:syntaxdb", "pl.syntaxdevteam.syntaxdb.Database"),
             LibraryProbe("pl.syntaxdevteam:syntaxcore", "pl.syntaxdevteam.core.SyntaxCore"),
             LibraryProbe("pl.syntaxdevteam:messageHandler-paper", "pl.syntaxdevteam.message.MessageHandler"),
             LibraryProbe("pl.syntaxdevteam:DscBridgeAPI", "pl.syntaxdevteam.dscbridgeapi.external.model.BridgeSlashCommand")

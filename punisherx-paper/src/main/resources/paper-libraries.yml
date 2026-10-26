@@ -22,7 +22,7 @@ libraries:
   - com.maxmind.geoip2:geoip2:${geoipVersion}
   - org.apache.ant:ant:${antVersion}
   # Database libraries
-  # All databases libraries is implemented in SyntaxCore
+  # SyntaxDB and its transitive database dependencies are bundled in the plugin JAR.
 
   # FastStats dependencies
   - coordinate: dev.faststats.metrics:bukkit:${faststatsVersion}

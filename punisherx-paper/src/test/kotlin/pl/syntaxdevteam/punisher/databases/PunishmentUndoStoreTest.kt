@@ -1,6 +1,7 @@
 package pl.syntaxdevteam.punisher.databases
 
 import java.nio.file.Files
+import pl.syntaxdevteam.syntaxdb.Database
 import java.sql.Connection
 import java.sql.DriverManager
 import kotlin.test.*
@@ -8,7 +9,8 @@ import kotlin.test.*
 class PunishmentUndoStoreTest {
     private val file = Files.createTempFile("punisher-undo-", ".sqlite")
     private fun connection(): Connection = DriverManager.getConnection("jdbc:sqlite:$file")
-    private fun store(scope: String = "network") = PunishmentUndoStore(::connection, scope)
+    private val database = Database.connect("sqlite") { file = this@PunishmentUndoStoreTest.file.toString() }
+    private fun store(scope: String = "network") = PunishmentUndoStore(database, scope)
     private val uuid = "00000000-0000-0000-0000-000000000001"
 
     init {
@@ -24,7 +26,7 @@ class PunishmentUndoStoreTest {
         }
     }
 
-    @AfterTest fun cleanup() { Files.deleteIfExists(file) }
+    @AfterTest fun cleanup() { database.close(); Files.deleteIfExists(file) }
 
     private fun sql(sql: String) = connection().use { conn -> conn.createStatement().use { it.executeUpdate(sql) } }
     private fun count(table: String) = connection().use { conn ->

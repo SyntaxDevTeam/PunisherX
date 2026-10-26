@@ -1,3 +1,6 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import java.util.zip.ZipFile
+
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.shadow) apply false
@@ -40,4 +43,31 @@ tasks.register("deploySpigotOnly") {
     group = "deployment"
     description = "Deploys only the Spigot module artifact"
     dependsOn(":punisherx-spigot:deployPluginToSpigot")
+}
+
+// Compilation alone does not prove that the runtime database toolkit reached the plugin JAR.
+subprojects {
+    val verifyDatabaseBundle = tasks.register("verifyDatabaseBundle") {
+        group = "verification"
+        description = "Checks that the plugin JAR contains SyntaxDB, its pool and JDBC drivers"
+        val bundle = tasks.named<ShadowJar>("shadowJar")
+        dependsOn(bundle)
+        doLast {
+            val required = listOf(
+                "pl/syntaxdevteam/syntaxdb/Database.class",
+                "com/zaxxer/hikari/HikariDataSource.class",
+                "com/mysql/cj/jdbc/Driver.class",
+                "org/postgresql/Driver.class",
+                "org/sqlite/JDBC.class",
+                "com/microsoft/sqlserver/jdbc/SQLServerDriver.class",
+                "META-INF/services/java.sql.Driver",
+            )
+            ZipFile(bundle.get().archiveFile.get().asFile).use { jar ->
+                required.forEach { entry ->
+                    check(jar.getEntry(entry) != null) { "Database runtime is incomplete: missing $entry in ${project.name}" }
+                }
+            }
+        }
+    }
+    tasks.named("check") { dependsOn(verifyDatabaseBundle) }
 }

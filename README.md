@@ -40,7 +40,7 @@ It works on standalone servers and networks, with a dedicated **Paper/Folia edit
 * **Automated follow-up:** configure punishment actions and warning escalation, with action-bar countdowns for active mute and jail punishments.
 * **Custom messages:** MiniMessage, legacy and plain-text formatting, bundled translations including Korean, and defaults for missing translation keys.
 * **Integrations:** Discord webhooks, PlaceholderAPI and asynchronous MaxMind GeoIP lookups when a license key is configured.
-* **Database choices:** SQLite, H2, MySQL, MariaDB and PostgreSQL, with export, import and migration tools.
+* **Database choices:** SQLite, MySQL, MariaDB (MySQL driver), PostgreSQL and SQL Server through SyntaxDB, with export, import and migration tools.
 * **Network moderation:** server-scoped punishments and proxy bridges; the Velocity bridge also checks active network-wide bans at login.
 
 ### Safer configuration updates
@@ -67,7 +67,7 @@ The server editions currently recognize Minecraft **1.20.6**, **1.21–1.21.11**
 ## 🚀 Quick start
 
 1. Download the Paper/Folia or Spigot artifact matching your server and place it in `plugins/`.
-2. Start the server to generate the configuration and language files.
+2. Start the server to generate the configuration and language files. See [SyntaxDB migration notes](docs/SYNTAXDB_MIGRATION.md) before upgrading an existing installation.
 3. Configure `config.yml` and your database connection. For a network, configure punishment scope and the proxy bridge's database connection as described in the administrator guide.
 4. Grant staff the permissions they need. Start with `punisherx.cmd.panel` for panel access; individual actions require their own permissions.
 5. Run `/prx validate`, then `/prx reload` after configuration changes. Restart the server when replacing the plugin JAR.

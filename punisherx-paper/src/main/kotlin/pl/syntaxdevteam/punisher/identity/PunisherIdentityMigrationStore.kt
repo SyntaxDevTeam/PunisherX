@@ -35,12 +35,17 @@ internal object PunisherIdentityMigrationStore {
                 entity_key VARCHAR(64) NOT NULL,
                 PRIMARY KEY (migration_id, entity_type, entity_key)
             )""".trimIndent(),
-        ).forEach { sql -> connection.createStatement().use { it.execute(sql) } }
+        ).forEach { sql ->
+            val ddl = if (connection.metaData.databaseProductName.contains("Microsoft SQL Server", true)) {
+                val table = sql.substringAfter("CREATE TABLE IF NOT EXISTS ").substringBefore(" ").substringBefore("(")
+                "IF OBJECT_ID('$table', 'U') IS NULL " + sql.replace("CREATE TABLE IF NOT EXISTS", "CREATE TABLE")
+            } else sql
+            connection.createStatement().use { it.execute(ddl) }
+        }
     }
 
     fun inspect(connection: Connection, migrationId: UUID, source: UUID, target: UUID): PunisherIdentityMigrationBridgeResult {
         require(source != target)
-        migrateSchema(connection)
         val existing = migration(connection, migrationId)
         if (existing != null && (existing.source != source || existing.target != target)) {
             return PunisherIdentityMigrationBridgeResult(
@@ -65,7 +70,6 @@ internal object PunisherIdentityMigrationStore {
 
     fun migrate(connection: Connection, migrationId: UUID, source: UUID, target: UUID): PunisherIdentityMigrationBridgeResult =
         transaction(connection) {
-            migrateSchema(connection)
             val existing = migration(connection, migrationId)
             if (existing != null) {
                 if (existing.source != source || existing.target != target) {
@@ -124,8 +128,7 @@ internal object PunisherIdentityMigrationStore {
 
     fun rollback(connection: Connection, migrationId: UUID, source: UUID, target: UUID): PunisherIdentityMigrationBridgeResult =
         transaction(connection) {
-            migrateSchema(connection)
-            val row = migration(connection, migrationId)
+                val row = migration(connection, migrationId)
                 ?: return@transaction PunisherIdentityMigrationBridgeResult(
                     PunisherIdentityMigrationStatus.NO_DATA,
                     "PUNISHERX_NO_MIGRATION",

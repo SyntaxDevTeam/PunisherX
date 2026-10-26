@@ -90,6 +90,9 @@ val mockitoAgent = configurations.create("mockitoAgent")
 
 dependencies {
     compileOnly(libs.paper.api)
+    implementation(libs.syntaxdb) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
     compileOnly(libs.syntaxcore)
     compileOnly(libs.messagehandler.paper)
 
@@ -206,9 +209,6 @@ tasks.named<ShadowJar>("shadowJar") {
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7"))
         exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8"))
-        exclude(dependency("org.jetbrains.kotlin:kotlin-reflect"))
-        exclude(dependency("org.jetbrains.kotlinx:kotlinx-coroutines-core"))
-        exclude(dependency("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8"))
     }
 }
 

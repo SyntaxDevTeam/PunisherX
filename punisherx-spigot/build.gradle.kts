@@ -104,10 +104,15 @@ repositories {
     }
 }
 
+val mockitoAgent = configurations.create("mockitoAgent")
+
 dependencies {
     compileOnly(libs.spigot.api)
     implementation(libs.libby.bukkit)
 
+    implementation(libs.syntaxdb) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
     compileOnly(libs.syntaxcore)
     compileOnly(libs.messagehandler.spigot)
 
@@ -149,6 +154,13 @@ dependencies {
 
     testImplementation(libs.kotlin.test)
     testImplementation(libs.spigot.api)
+    testImplementation(libs.syntaxcore) { isTransitive = false }
+    testImplementation(libs.messagehandler.spigot)
+    testImplementation(libs.caffeine)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.mockito.kotlin)
+    mockitoAgent(libs.byte.buddy.agent) { isTransitive = false }
 }
 
 extensions.configure<KotlinJvmProjectExtension> {
@@ -189,6 +201,7 @@ tasks.processResources {
 
 tasks.test {
     useJUnitPlatform()
+    jvmArgs("-javaagent:${mockitoAgent.singleFile}")
 }
 
 tasks.build {
@@ -217,13 +230,7 @@ tasks.named<ShadowJar>("shadowJar") {
         "pl.syntaxdevteam.punisher.libs.libby"
     )
 
-    dependencies {
-        include(dependency("net.byteflux:libby-bukkit"))
-        include(dependency("net.byteflux:libby-core"))
-        include(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
-        include(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7"))
-        include(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8"))
-    }
+
 }
 
 plugindeployer {
