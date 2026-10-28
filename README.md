@@ -5,8 +5,9 @@
   <p>
     <a href="#-download"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3.2.0/assets/cozy/supported/paper_vector.svg" alt="Supports Paper" height="56"></a>
     <a href="#-download"><img src="assets/badges/folia.svg" alt="Supports Folia" height="56"></a>
+    <a href="#-download"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3.2.0/assets/cozy/supported/purpur_vector.svg" alt="Supports Purpur" height="56"></a>
+    <a href="#-download"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3.2.0/assets/cozy/supported/spigot_vector.svg" alt="Supports Spigot" height="56"></a><br>
     <a href="#-download"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3.2.0/assets/cozy/supported/velocity_vector.svg" alt="Supports Velocity" height="56"></a>
-    <a href="#-download"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3.2.0/assets/cozy/supported/spigot_vector.svg" alt="Supports Spigot" height="56"></a>
     <a href="#-download"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3.2.0/assets/cozy/supported/bungeecord_vector.svg" alt="Supports BungeeCord" height="56"></a>
   </p>
 
@@ -150,5 +151,7 @@ Join our **[Discord](https://discord.gg/Zk6mxv7eMh)** for support, or report a r
 Contributions, translations and feedback are welcome. PunisherX is released under the **[MIT License](LICENSE)**.
 
 <p align="center">
-  <img src="assets/syntaxdevteam_logo.png" alt="SyntaxDevTeam" width="200">
+  <!-- SVG version -->
+<a href="https://buymeacoffee.com/syntaxdevteam"><img alt="buymeacoffee-singular" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/donate/buymeacoffee-singular_vector.svg"></a>
+
 </p>
