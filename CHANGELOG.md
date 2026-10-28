@@ -1,14 +1,31 @@
 # Changelog
 
-## [1.8.1] Unreleased
+## [1.9.0] Unreleased
 
 ### Functional changes:
 
 * **Added `/unpunish <player> <template> [--silent]` on Paper and Spigot.** It reverses the latest punishment and its escalation step while preserving an audited history entry. It also works with expired or previously revoked punishments and treats a multi-IP ban as one escalation step.
 * **Added `--silent` to punishment and removal commands**, including `kick all`, `/punish`, `/unpunish` and `/clearall`. Target chat notifications and staff broadcasts are suppressed, while the operator receives a private confirmation marked as silent. Errors, disconnect screens, enforcement, history and logs remain active.
 * Added independent `--force` and `--silent` options to `/punish` for every template punishment type. Both flags can appear before or after the optional level; configured follow-up PunisherX punishment commands inherit silent mode.
-* Added optional LuckPerms display, prefix and suffix placeholders for player and operator names on Paper and Spigot, including configurable nickname color metadata and independent display name layouts.
+* Added configurable nickname color metadata and independent display name layouts for LuckPerms-based player and operator names on Paper and Spigot.
 * Added configurable book interfaces for submitting and managing reports, with paginated menus, confirmation, history and existing decision commands. Existing GUI and dialog choices remain available.
+
+* Added player and operator display name, prefix and suffix placeholders for punishment messages:
+
+| Placeholder | Displays |
+| --- | --- |
+| `<player_display>` | Prefix + nickname + suffix of the punished player |
+| `<operator_display>` | Prefix + nickname + suffix of the operator |
+| `<player_prefix>`, `<operator_prefix>` | The prefix only |
+| `<player_suffix>`, `<operator_suffix>` | The suffix only |
+
+* Added punishment start/end timestamps and remaining-time placeholders to Discord webhooks on Paper and Spigot:
+
+| Placeholder | Displays |
+| --- | --- |
+| `{t_start}` | The date and time the punishment was issued |
+| `{t_end}` | The punishment end date and time, or the configured permanent-punishment label |
+| `{time}` | The remaining punishment time when the webhook is sent, or the configured permanent-punishment label |
 
 ### Configuration and language safety:
 

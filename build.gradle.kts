@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.8.1-R0.1-SNAPSHOT"
+version = "1.9.0-DEV"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val bridgeVersion = "1.1.3-R0.1-SNAPSHOT"

@@ -1,6 +1,6 @@
 # Dziennik zmian
 
-## [1.8.1] — Jeszcze niewydane
+## [1.9.0] — Jeszcze niewydane
 
 ### Zmiany funkcjonalne:
 
