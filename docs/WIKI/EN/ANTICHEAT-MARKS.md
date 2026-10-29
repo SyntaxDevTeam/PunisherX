@@ -1,4 +1,6 @@
-# Anti-cheat marks
+# Anti-cheat integration and marked penalties
+
+[Wiki home](HOME.md) · [Commands](COMMANDS.md) · [Polski](../PL/ANTICHEAT-MARKS.md)
 
 PunisherX on Paper/Folia and Spigot can associate penalties with an anti-cheat check. Configure the anti-cheat to run ordinary PunisherX commands with `--mark` or `--mark=<check>`. A marked command enforces the same penalty as its unmarked equivalent unless that check is paused.
 
@@ -7,6 +9,8 @@ ban Steve 7d Cheating --mark=grim.speed --silent
 warn Steve Suspicious movement --mark=grim.speed
 punish Steve "Movement cheats" --mark=grim.speed
 ```
+
+Anti-cheat command lists usually omit the leading `/`; follow that plugin's syntax. The example template `Movement cheats` must exist in `punish-templates.yml`. Choose your own check labels; no dedicated adapter is required. Issuing a marked penalty requires the usual permission for that punishment command.
 
 Supported commands: `/ban`, `/banip`, `/mute`, `/warn`, `/jail`, `/kick` (including `all`), and `/punish`. Marks are independent of the displayed reason. `--mark` uses the name `default`. Named marks are case insensitive, contain 1–64 ASCII letters, digits, `_`, `.`, `:`, or `-`, and start with a letter or digit. Supply exactly one mark option; an invalid or repeated mark aborts the command. `--force` bypasses player exemptions but does not bypass a paused check.
 
@@ -45,8 +49,6 @@ Marked kicks are recorded even if ordinary kick history is disabled. The result 
 
 Automatic PunisherX punishment commands configured under `actions` or legacy warning thresholds inherit the originating mark, including aliases and the `punisherx:` namespace. The originating mark replaces any mark configured on that follow-up. Commands belonging to other plugins and removal commands are dispatched as configured; external effects such as economy deductions are outside `/unmark`.
 
-## Persistence
+## Backups and reliability
 
-New metadata is stored in `punishment_marks` and `punishment_mark_pauses`; the existing `punishment_undos` audit is reused. Existing punishment tables and rows are retained. Marked active/history/metadata writes are atomic. A failed marked database write never falls back to an untracked platform ban. Issuance and marked reversals use a database transaction lock shared by server instances.
-
-Exports, imports and database-engine migration include marks and pauses. The internal `punishment_mark_lock` table contains no player data and is initialized by the schema rather than exported. Paper identity migration and rollback also transfer mark ownership.
+Exports, imports and database-engine migrations preserve marks and pauses. A failed marked database write does not create an untracked platform ban. Keep a database backup before maintenance.

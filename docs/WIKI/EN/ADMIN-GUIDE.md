@@ -1,223 +1,54 @@
-# Admin Guide (EN)
+# Administrator guide
 
-> A practical guide for server owners and junior moderators: from installation and configuration to debugging and troubleshooting.
+[Wiki home](HOME.md) · [Commands](COMMANDS.md) · [Permissions](PERMISSIONS.md) · [Polski](../PL/ADMIN-GUIDE.md)
 
-<img width="25%" height="25%" alt="PunisherX" src="../../../assets/PunisherX.png" />
+## Installation and upgrades
 
----
+1. Choose the Paper/Folia or Spigot edition as described on the [home page](HOME.md). Install the JAR in `plugins/` and start the server.
+2. Set `language: EN`, the database connection, templates in `punish-templates.yml` and staff permissions.
+3. Run `/prx validate`, then `/prx reload`. Check `/prx version` and `/prx diag`.
+4. Always restart the server after replacing a JAR.
 
-## 1) Who is this guide for?
+Before upgrading, back up `plugins/PunisherX` and the database. The first startup needs access to library repositories; no separate SyntaxDB plugin is required. SQLite suits a standalone server. Networks can use MySQL/MariaDB, PostgreSQL or SQL Server. H2 is unsupported: export or convert an older H2 database before upgrading.
 
-This material is for administrators who want to:
-- quickly launch PunisherX,
-- safely assign permissions to moderators,
-- efficiently use commands and `/punish` templates,
-- know what to check when “something doesn’t work”.
+## Networks and backups
 
-If you are a beginner, read section by section.  
-If you are advanced, jump to **Debug** and **Known issues**.
+Configure backends to use the same database and matching connection settings in proxy bridges. `server: network` selects the shared punishment scope; local names such as `survival` separate scopes. Install the bridge on the proxy as well. Reports are shared across the database. [Velocity bridge instructions](../../../punisherx-velocity-bridge/README.md).
 
----
+`/prx export` and `/prx import` run in the background and report their result. Only one such operation runs at a time in an instance. Import appends records rather than replacing the database; a conflict rolls back the transaction. Keep an independent database backup before importing. `/prx migrate <from> <to>` changes database engines: configure the target connection first, then repeat the command to confirm, or use `--force`. These operations require `punisherx.cmd.prx`.
 
-## 2) Quick start (install in 10 minutes)
+## Staff permissions
 
-### Requirements
-- Paper/Folia (latest builds recommended),
-- Java 21+,
-- access to the `plugins/` folder.
+Grant specific nodes from the [permission reference](PERMISSIONS.md) rather than global `*`. `punisherx.cmd.panel` or management access opens `/panel`, but each action checks its own permission. Quick template punishments require `punisherx.cmd.punish`; editing time/reason presets requires `punisherx.manage` or `punisherx.manage.*`.
 
-### Steps
-1. Download the [latest PunisherX release](https://github.com/SyntaxDevTeam/PunisherX/blob/main/README.md#-download).
-2. Upload the `.jar` file to `plugins/`.
-3. Start the server and wait until the plugin generates files.
-4. Configure `plugins/PunisherX/config.yml`.
-5. Restart the server.
-6. Join as admin and verify:
-   - `/punisherx version`
-   - `/punisherx reload`
+Grant `punisherx.see.reports` for report reading and notifications, plus `punisherx.manage.reports` for decisions. Reserve `/unmark` access (`punisherx.cmd.unmark`) for staff responsible for the anti-cheat integration. On Spigot also check the command dispatch permissions in the reference.
 
----
+## Daily moderation and the panel
 
-## 3) First configuration
+Open `/panel`, search for a player and inspect active punishments and history. Alternatively use `/check Steve all`, `/history Steve` and `/banlist`. The panel is available now and supports online and offline players.
 
-### 3.1 Language and messages
-- Open `config.yml` and set `language: en` (or another available language).
-- In the lang folder, you will find language files (e.g., `messages_en.yml`).
-- Edit them to match your needs.
-- Keep message style consistent (short and without caps lock).
+Configure escalation ladders in `punish-templates.yml`. `/punish Steve spam` selects the next level from history; `/punish Steve spam 2` specifies a level. `/unpunish Steve spam` reverses the latest unreversed template event and its escalation contribution while retaining history. Each call reverses one event; delivered kicks and external plugin effects cannot be undone. Renaming or deleting a template breaks its link to new history.
 
-### 3.2 Database
-For a small server, SQLite/H2 is enough.  
-For a network or heavier traffic, move to MySQL/MariaDB/PostgreSQL.
+`--silent` suppresses chat notifications and broadcasts for supported commands while retaining private operator confirmation. Disconnect screens, enforcement and history remain active. `--force` bypasses target protection; the flags can be combined. See [Commands](COMMANDS.md) for full syntax and behaviour.
 
-> Check our proxy add-on [PunisherX-Proxy-Bridge](https://modrinth.com/plugin/punisherx-proxy-bridge) if you run a network and want synchronized bans across servers.
-<img width="25%" height="25%" alt="PunisherX_Velocity_Bridge" src="../../../assets/PunisherX_Velocity_Bridge_mini.png" />
+## Reports: from submission to decision
 
-### 3.3 Permissions (most common mistake)
-Do not give `*` to every moderator. Split roles! Example:
-- **JuniorMod**: `warn`, `mute`, `check`, `history`
-- **Mod**: + `kick`, `jail`, `unjail`
-- **Admin**: full operational access
-- **Owner/TechAdmin**: migrations, import/export, critical actions
+Players use `/report`, `/report Steve` or `/report Steve Reason for reporting`. Staff open `/reports`, investigate, apply any justified punishment separately and close the report using `resolve` or `reject` with an explanation. `/reports history` retains decisions.
 
-This lowers the risk of accidental mass punishments.
+The [complete report guide](REPORTS.md) covers limits, console commands, permissions, books, GUIs and dialogs. Choose player and staff presentation independently through `reports.player-interface` and `reports.admin-interface`.
 
----
+## Anti-cheat integration
 
-## 4) Practical command usage (moderator workflow)
+**Mark automatically issued penalties**, for example `ban Steve 7d Cheating --mark=grim.speed`. For false positives, `/unmark pause grim.speed` reverses marked penalties and suppresses future ones from that check. After fixing the check, use `/unmark resume grim.speed`. Ordinary unmarked penalties remain active.
 
-### 4.1 Typical scenario
-1. Check player history:
-   - `/check <name> all`
-   - `/history <name>`
-2. Choose an adequate punishment:
-   - warning (`/warn`) for minor violations,
-   - temporary mute (`/mute`) for spam/profanity,
-   - ban (`/ban`) for severe and repeated violations.
-3. Use a clear reason (specific rule point).
-4. After an appeal: verify and then `/unmute`/`/unban` if justified.
+The [dedicated anti-cheat guide](ANTICHEAT-MARKS.md) explains server scopes, IP ban reversal, inherited marks and limitations. Pauses survive restarts and cannot be bypassed with `--force`.
 
-### 4.2 Commands worth memorizing
-- `/warn <player> (time) <reason>`
-- `/mute <player> (time) <reason>`
-- `/jail <player> (time) <reason>`
-- `/ban <player> (time) <reason>`
-- `/unwarn`, `/unmute`, `/unjail`, `/unban`
-- `/check`, `/history`, `/banlist`
-- `/change-reason <id> <new_reason>`
-- `/clearall <player>` (careful, this is a bulk operation)
+## Safe configuration and troubleshooting
 
-Time format: `Xs`, `Xm`, `Xh`, `Xd` (seconds/minutes/hours/days).
+- Run `/prx validate` before reloading. Invalid YAML aborts `/prx reload` before the working instance is dismantled.
+- Missing language keys use bundled defaults. An invalid language file at startup is preserved with a safety copy in `lang/backups/`; the plugin can use the bundled translation.
+- If a command fails, check permissions, aliases and `/prx version`.
+- For synchronization issues, check the database connection, `server` and bridge logs. For MySQL/MariaDB character write errors, check column and connection encoding.
+- If book buttons stop working, reopen the menu. Dialogs require Paper 1.21.7+; use GUI or BOOK on Spigot.
 
----
-
-## 5) `/punish` templates – how to use them wisely
-
-Templates provide consistency and speed. They help junior moderators avoid “inventing” punishments manually each time.
-
-### Prepare your templates
-- Review the examples in `punish-templates.yml`.
-- Edit them to match your needs, save them on the server, and restart the server.
-- Test them in practice with `/punish <player> <template_name>`.
-
-### Best practices for templates
-- One template = one specific violation type.
-- Keep names short and clear (e.g., `spam_1`, `cheats_perm`).
-- Reason should always map to your rules (e.g., “Rules 3.2 – spam”).
-- Separate escalation levels (1h → 1d → 7d → perm).
-
-### Example escalation logic
-- First offense: `punish: warn`
-- Second offense: `punish: mute` `time: 1h`
-- Third offense: `punish: mute` `time: 1d`
-- Fourth offense: `punish: ban` `time: 7d`
-
-### Using `/punish` in practice
-- With predefined punishment templates, you can quickly apply punishments and their escalation level: `/punish <player> <template_name> <escalation_level>`.
-
-The biggest value of templates: consistent punishment policy across moderator shifts.
-
----
-
-# Planned:
-## 6) GUI panel and click-based workflow
-
-PunisherX offers a GUI that speeds up daily moderation — effectively `/punish`, but graphical:
-- player selection,
-- punishment type selection,
-- time and reason selection,
-- quick jump to history.
-
-![PunisherX](../../../assets/PunisherX.webp)
-
-If your staff is young/inexperienced, GUI + predefined templates is the best combination (fewer mistakes, fewer typos).
-
----
-
-## 7) Step-by-step debug (checklist)
-
-When commands do not work correctly:
-
-1. **Plugin version and status**
-   - `/punisherx version`
-   - check startup logs.
-
-2. **Permissions**
-   - does the player/mod have the correct permission nodes,
-   - is there a conflict with your permission manager.
-
-3. **Configuration**
-   - check whether `config.yml` and language files have syntax errors,
-   - after changes use `/punisherx reload` (or preferably restart the server).
-
-4. **Database**
-   - verify credentials,
-   - verify database availability and connection stability.
-
-5. **Integrations**
-   - PlaceholderAPI, webhooks, proxy bridge — test separately, not all at once.
-   - check if another plugin conflicts (e.g., another punishment system).
-
-6. **Cache and diagnostics**
-   - use `/prx diag` when you need a quick test and support-ready data.
-
-> Rule of thumb: verify version + permissions + database first, then hunt “exotic bugs”.
-
----
-
-## 8) Known issues and quick fixes
-
-### Issue: “Command exists, but does not work”
-Most often missing permissions or an alias conflict with another plugin.  
-**Fix:** check permission nodes and alias list in `config.yml`.
-
-### Issue: “Punishment is not synchronized across the network”
-Usually a database or bridge problem.  
-**Fix:** run a DB connection test and inspect bridge logs.
-
-### Issue: “Wrong colors/message formatting”
-Invalid MiniMessage/Legacy syntax in language files.  
-**Fix:** rollback recent edits and re-edit section by section.
-
-### Issue: “Moderators punish inconsistently”
-No operational standard.  
-**Fix:** implement `/punish` templates, an escalation table, and a short SOP for staff.
-
----
-
-## 9) Short SOP for moderation team
-
-This is a simple standard operating procedure for moderators.
-
-1. Always start with `/check` and `/history`.  
-2. Never punish “from memory”; use facts.
-3. Use templates instead of free-typing reasons.
-4. Every severe punishment must be justified by the rules.
-5. If in doubt, escalate to Admin instead of guessing.
-
-This is the difference between “chaotic moderation” and a professional team.
-
----
-
-## 10) Contact the author and community
-**SyntaxDevTeam** is open to feedback, questions, and issue reports.  
-### Contact us:
-- Community Discord: **https://discord.gg/Zk6mxv7eMh**
-- Repository: **https://github.com/SyntaxDevTeam/PunisherX**
-- Issue reports: GitHub Issues (preferably with logs and server/plugin versions)
-
-### Always include in your report:
-- PunisherX version,
-- Paper/Folia version,
-- Java version,
-- log excerpt,
-- reproduction steps.
-
----
-
-## 11) Experience-based summary
-
-If you want professional moderation, “having a good plugin” is not enough.  
-You need: **good configuration + sensible permissions + punishment policy + a debugging procedure**.
-
-PunisherX gives you the tools. Moderation quality depends on the standard you enforce in your team. Invest time in moderator training and clear rules, and the results will show immediately. **Good luck!**
+See [Configuration](CONFIGS.md) for settings. When requesting help on [Discord](https://discord.gg/Zk6mxv7eMh) or GitHub Issues, include the plugin version, server platform/version, Java version, relevant logs and reproduction steps.

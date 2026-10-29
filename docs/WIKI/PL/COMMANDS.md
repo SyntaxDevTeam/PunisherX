@@ -1,7 +1,7 @@
 ## Podstawowe komendy
 
 * `/ban <gracz> (czas) <powód> [--force] [--silent]` — banuje i natychmiast wyrzuca gracza, jeśli jest online; przy problemie z bazą używa listy banów Paper `PROFILE` jako fallback.
-* `/banip <ip|gracz|uuid> (czas) <powód> [--force] [--silent]` — banuje wszystkie IP powiązane z celem, a przy błędach bazy uruchamia komendę Paper `ban-ip`; dodatkowo wyrzuca cele online.
+* `/banip <ip|gracz|uuid> (czas) <powód> [--force] [--silent]` — banuje IP powiązane z celem i wyrzuca cele online. Nieudany zapis IP w bazie nie tworzy zastępczego bana platformy.
 * `/unban <ip|gracz|uuid> [--silent]` — zdejmuje bany po nazwie gracza, IP lub UUID, łącznie z powiązanymi IP w bazie.
 * `/jail <gracz> (czas) <powód> [--force] [--silent]` — teleportuje gracza do skonfigurowanego więzienia (z uwzględnieniem bypassa, chyba że użyto `--force`) i zapisuje poprzednią pozycję do zwolnienia.
 * `/unjail <gracz> [--silent]` — usuwa aktywną karę więzienia z cache i teleportuje gracza do lokalizacji wyjścia z więzienia, jeśli jest ustawiona.
@@ -33,13 +33,14 @@
 | `/report <gracz> <powód>` | Wysłanie zgłoszenia z własnym powodem. | Dostępne graczom. |
 | `/reports` | Otwarcie skrzynki zgłoszeń; w konsoli lista. | `punisherx.see.reports` lub uprawnienia zarządzania zgłoszeniami. |
 | `/reports gui (strona)` | Otwarcie przeglądarki zgłoszeń. | Ten sam dostęp do odczytu; tylko gracze. |
+| `/reports book (strona)` | Książkowa skrzynka zgłoszeń niezależnie od konfiguracji. | Odczyt zgłoszeń; tylko gracz. |
 | `/reports list (strona)` | Przegląd otwartych zgłoszeń. | Ten sam dostęp do odczytu. |
 | `/reports view <id>` | Szczegóły zgłoszenia i decyzji, jeśli zostało zamknięte. | Ten sam dostęp do odczytu. |
 | `/reports history (strona)` | Historia rozpatrzonych i odrzuconych zgłoszeń. | Ten sam dostęp do odczytu. |
 | `/reports resolve <id> <uzasadnienie>` | Zamknięcie zgłoszenia jako rozpatrzonego. | `punisherx.manage.reports` lub uprawnienia zarządzania. |
 | `/reports reject <id> <uzasadnienie>` | Zamknięcie zgłoszenia jako odrzuconego. | Ten sam dostęp do zarządzania. |
 
-Powód i uzasadnienie decyzji muszą mieć 3–255 znaków. Nie można zgłosić siebie ani ponownie zgłosić tego samego gracza, gdy wcześniejsze zgłoszenie pozostaje otwarte. `reports.max-open-per-reporter` ogranicza liczbę otwartych zgłoszeń autora (domyślnie `3`). Zamknięcie zwalnia miejsce i nie nakłada automatycznie kary. Strony są numerowane od `1`. Wszystkie operacje administracyjne poza `gui` działają również w konsoli.
+Powód i uzasadnienie decyzji muszą mieć 3–255 znaków. Nie można zgłosić siebie ani ponownie zgłosić tego samego gracza, gdy wcześniejsze zgłoszenie pozostaje otwarte. `reports.max-open-per-reporter` ogranicza liczbę otwartych zgłoszeń autora (domyślnie `3`). Zamknięcie zwalnia miejsce i nie nakłada automatycznie kary. Strony są numerowane od `1`. Wszystkie operacje administracyjne poza `gui` i `book` działają również w konsoli.
 
 ## Narzędzia administracyjne
 
@@ -92,4 +93,6 @@ Przykład: `ban Steve 7d Cheating --mark=grim.speed --silent`, a po wykryciu fal
 
 Wymagane uprawnienie: `punisherx.cmd.unmark`. Blokady przetrwają restart. Ręczne kary pozostają aktywne, historia zachowuje audyt cofnięcia, a cofnięte kary z szablonów przestają zwiększać poziom eskalacji. Automatyczne kary PunisherX dziedziczą znacznik checku. Wyrzuconego gracza nie można automatycznie połączyć ponownie; cofnięcie kicka dotyczy wpisu historii. `--force` nie omija blokady checku. Wznowienie usuwa blokadę tylko w bieżącym zakresie serwera; blokadę `network` należy wznowić w zakresie `network`.
 
-[Szczegóły, zakresy serwerów i ograniczenia](../../ANTICHEAT-MARKS.md).
+[Szczegóły, zakresy serwerów i ograniczenia](ANTICHEAT-MARKS.md).
+
+Pełny przebieg, książki i ustawienia interfejsu: [Zgłoszenia graczy](REPORTS.md).

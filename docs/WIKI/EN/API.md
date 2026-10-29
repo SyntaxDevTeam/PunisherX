@@ -14,7 +14,7 @@ repositories {
     }
 }
 dependencies {
-    compileOnly("pl.syntaxdevteam.punisher:PunisherX:1.7.0") // use latest release
+    compileOnly("pl.syntaxdevteam.punisher:PunisherX:<version>") // use latest release
 }
 ```
 
@@ -28,7 +28,7 @@ dependencies {
 <dependency>
   <groupId>pl.syntaxdevteam.punisher</groupId>
   <artifactId>PunisherX</artifactId>
-  <version>1.6.0</version>
+  <version>VERSION</version>
   <scope>provided</scope>
 </dependency>
 ```
@@ -137,3 +137,11 @@ Each method returns a list of `PunishmentData` objects:
 Use these to create custom punishment dashboards or integrate PunisherX data into other systems.
 
 **Happy coding!**
+
+## Additional available methods
+
+- `getJailedPlayers(limit: Int, offset: Int)` — `CompletableFuture<List<PunishmentData>>`
+- `isMuted(uuid: String)` — `CompletableFuture<Boolean>`
+- `isJailed(uuid: String)` — `CompletableFuture<Boolean>`
+
+Replace `<version>` / `VERSION` with a published version matching the server. This page is for integration developers; plugin operation is covered by the [administrator guide](ADMIN-GUIDE.md).

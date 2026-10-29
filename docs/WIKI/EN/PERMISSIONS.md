@@ -90,3 +90,5 @@ Console and OP senders, `punisherx.owner`, `punisherx.*` and global `*` are acce
 Spigot also checks command permissions declared in `plugin.yml` before running handlers. The current manifest uses `punisherx.cmd.setjail` for `/setjail`, `punisherx.cmd.clearall` for `/clearall`, and `punisherx.check` for `/check`. When granting these commands individually on Spigot, also grant those dispatch nodes alongside `punisherx.manage.set_jail`, `punisherx.cmd.clear_all`, and `punisherx.cmd.check`, respectively. `/check` and `/history` handlers allow self-lookups, but Spigot's command permission gate can still require access to the command.
 
 GUI preset editing uses `punisherx.manage` / `punisherx.manage.*`; there is no separate preset-edit permission. Quick template actions use `punisherx.cmd.punish`. `/cache` is console-only and cannot be enabled for players through a permission.
+
+`punisherx.manage.reports` alone grants reading and decisions; notifications additionally require `punisherx.see.reports` or parent visibility access. [Report workflow and interfaces](REPORTS.md).

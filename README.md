@@ -29,7 +29,7 @@ It works on standalone servers and networks, with a dedicated **Paper/Folia edit
 | Tool | What your staff can do |
 | --- | --- |
 | **Punishments** | Ban players or IPs, mute, warn, kick and jail; use timed or indefinite punishments where applicable, and revoke them when needed. |
-| **Anti-cheat support** | Mark penalties by check with `--mark=check`, reverse them with `/unmark`, and pause faulty checks until fixed. See [Anti-cheat marks](docs/ANTICHEAT-MARKS.md). |
+| **Anti-cheat support** | Mark penalties by check with `--mark=check`, reverse them with `/unmark`, and pause faulty checks until fixed. See [Anti-cheat marks](docs/WIKI/EN/ANTICHEAT-MARKS.md). |
 | **Moderation panel** | Search players, inspect active punishments and history, and work with online and offline player lists through `/panel`. |
 | **Quick punishments** | Apply templates from `punish-templates.yml`, with escalation levels selected from punishment history. Edit GUI duration and reason presets in-game. |
 | **Player reports** | Accept `/report` submissions, browse the staff inbox, resolve or reject reports with an explanation, and retain a history of decisions. |
@@ -49,7 +49,7 @@ It works on standalone servers and networks, with a dedicated **Paper/Folia edit
 
 Run `/prx validate` to check configuration and language YAML without modifying the files. `/prx reload` validates first and keeps the working instance running if a checked YAML file is invalid.
 
-Custom language files use bundled defaults for missing keys instead of being rewritten. An invalid language file at startup can fall back to the bundled translation, preserving the original and creating a safety copy. Read more in [Language and YAML safety](docs/LANGUAGE-SAFETY.md).
+Custom language files use bundled defaults for missing keys instead of being rewritten. An invalid language file at startup can fall back to the bundled translation, preserving the original and creating a safety copy. Read more in [Language and YAML safety](docs/WIKI/EN/CONFIGS.md#safe-yaml-and-database-upgrades).
 
 ## 📦 Download
 
@@ -69,7 +69,7 @@ The server editions currently recognize Minecraft **1.20.6**, **1.21–1.21.11**
 ## 🚀 Quick start
 
 1. Download the Paper/Folia or Spigot artifact matching your server and place it in `plugins/`.
-2. Start the server to generate the configuration and language files. See [SyntaxDB migration notes](docs/SYNTAXDB_MIGRATION.md) before upgrading an existing installation.
+2. Start the server to generate the configuration and language files. Back up the plugin folder and database before upgrading; see the [administrator guide](docs/WIKI/EN/ADMIN-GUIDE.md).
 3. Configure `config.yml` and your database connection. For a network, configure punishment scope and the proxy bridge's database connection as described in the administrator guide.
 4. Grant staff the permissions they need. Start with `punisherx.cmd.panel` for panel access; individual actions require their own permissions.
 5. Run `/prx validate`, then `/prx reload` after configuration changes. Restart the server when replacing the plugin JAR.
@@ -118,13 +118,15 @@ while retaining a private silent confirmation for the operator. For example:
 | Reference | English | Polski |
 | --- | --- | --- |
 | Administrator guide | [Setup and workflows](docs/WIKI/EN/ADMIN-GUIDE.md) | [Konfiguracja i obsługa](docs/WIKI/PL/ADMIN-GUIDE.md) |
+| Player reports | [Player and staff workflow](docs/WIKI/EN/REPORTS.md) | [Zgłoszenia i ich obsługa](docs/WIKI/PL/REPORTS.md) |
+| Anti-cheat integration | [Marks and false positives](docs/WIKI/EN/ANTICHEAT-MARKS.md) | [Oznaczenia i fałszywe detekcje](docs/WIKI/PL/ANTICHEAT-MARKS.md) |
 | Commands | [Command reference](docs/WIKI/EN/COMMANDS.md) | [Komendy](docs/WIKI/PL/COMMANDS.md) |
 | Permissions | [Permission reference](docs/WIKI/EN/PERMISSIONS.md) | [Uprawnienia](docs/WIKI/PL/PERMISSIONS.md) |
 | Configuration | [Configuration reference](docs/WIKI/EN/CONFIGS.md) | [Konfiguracja](docs/WIKI/PL/CONFIGS.md) |
 | Placeholders | [Placeholder reference](docs/WIKI/EN/PLACEHOLDERS.md) | [Placeholdery](docs/WIKI/PL/PLACEHOLDERS.md) |
 | API | [API reference](docs/WIKI/EN/API.md) | [API](docs/WIKI/PL/API.md) |
 
-Additional references: [LuckPerms display names](docs/LUCKPERMS-NAMES.md), [language safety](docs/LANGUAGE-SAFETY.md), [report workflow](docs/REPORTS.md), [Paper UUID migration integration](docs/IDENTITY_MIGRATION.md), and the [GitHub Wiki](https://github.com/SyntaxDevTeam/PunisherX/wiki).
+Additional references: [LuckPerms display names](docs/WIKI/EN/PLACEHOLDERS.md#luckperms-names-in-messages), [language safety](docs/WIKI/EN/CONFIGS.md#safe-yaml-and-database-upgrades), [report workflow](docs/WIKI/EN/REPORTS.md), and the [GitHub Wiki](https://github.com/SyntaxDevTeam/PunisherX/wiki).
 
 ## 🛠️ Build from source
 

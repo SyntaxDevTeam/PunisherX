@@ -83,3 +83,50 @@ placeholders:
   punishment_list_empty: "<gray>No punishments found.</gray>"
   punishment_list_permanent: "undefined"
 ```
+
+## LuckPerms names in messages
+
+Paper and Spigot provide these placeholders in PunisherX messages with a player or operator context:
+
+| Placeholder | Value |
+| --- | --- |
+| `<operator_display>` | Staff member's prefix, coloured name and suffix |
+| `<player_display>` | Player's prefix, coloured name and suffix |
+| `<operator_prefix>`, `<player_prefix>` | Prefix only |
+| `<operator_suffix>`, `<player_suffix>` | Suffix only |
+
+`<operator>` and `<player>` keep their plain names. Values come directly from the LuckPerms API; PlaceholderAPI is not required. They belong to the person named in the message, regardless of the recipient. Prefix changes affect subsequent messages.
+
+Example in `messages_en.yml`:
+
+```yaml
+mute:
+  broadcast: "<player_display> <gray>was muted by</gray> <operator_display><gray>. Reason: <reason></gray>"
+```
+
+Prefixes and suffixes accept MiniMessage and legacy formatting (`&`, `§`, `&#RRGGBB`, `§x…`). Include any required space after the prefix in its LuckPerms value. Without a separate name colour, the name inherits the final prefix colour.
+
+Configure the two name layouts independently in `config.yml`:
+
+```yaml
+name-formatting:
+  operator-display: "$prefix $name $suffix"
+  player-display: "$name <gray>($prefix)</gray>"
+  name-color-meta: name-color
+```
+
+Tokens are `$prefix`, `$name` and `$suffix`. `$player` and `$operator` are aliases for `$name`: both refer to the person whose name the current layout formats. Reorder or omit tokens and add text, MiniMessage or legacy formatting as needed. Metadata colour applies at the name position. Tokens inside inserted prefixes, suffixes or names are not expanded again. `$$` produces a literal dollar sign.
+
+Spaces are preserved exactly. The default `$prefix$name$suffix` preserves spacing from LuckPerms. If you add layout spaces, remove redundant spaces from prefix/suffix values. Without LuckPerms data, prefixes and suffixes are empty but the layout still applies. Configuration migration to version 168 adds the default layouts.
+
+The optional `name-formatting.name-color-meta` setting selects the LuckPerms metadata key used for name colour; its default is `name-color`. For example:
+
+```text
+/lp group admin meta set name-color "#ff5555"
+```
+
+Values can also be `red`, `&c` or `<red>`. LuckPerms has no universal name-colour metadata key, so configure the key to match your setup.
+
+Without LuckPerms or available user data, the placeholders use the plain name with empty prefixes and suffixes. PunisherX uses already loaded LuckPerms data and does not wait for offline user data while rendering messages. History messages use the currently available prefix, rather than the prefix at the time of punishment. The console normally has no LuckPerms data and displays its ordinary name.
+
+After replacing the JAR, restart the server. Check messages from a prefixed staff account and the console, legacy and hex colours, operation without LuckPerms, and prefix changes without restarting.

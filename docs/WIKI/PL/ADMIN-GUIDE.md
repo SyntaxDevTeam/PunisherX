@@ -1,222 +1,54 @@
-# Poradnik dla Admina (PL)
+# Poradnik administratora
 
-> Praktyczny przewodnik dla właścicieli serwerów i młodszej kadry moderatorskiej: od instalacji, przez konfigurację, aż po debug i rozwiązywanie problemów.
+[Strona główna](HOME.md) · [Komendy](COMMANDS.md) · [Uprawnienia](PERMISSIONS.md) · [English](../EN/ADMIN-GUIDE.md)
 
-<img width="25%" height="25%" alt="PunisherX" src="../../../assets/PunisherX.png" />
+## Instalacja i aktualizacja
 
----
+1. Wybierz edycję Paper/Folia albo Spigot zgodnie ze [stroną główną](HOME.md). Zainstaluj JAR w `plugins/` i uruchom serwer.
+2. Ustaw `language: PL`, połączenie bazy, szablony w `punish-templates.yml` i uprawnienia kadry.
+3. Wykonaj `/prx validate`, następnie `/prx reload`. Sprawdź `/prx version` i `/prx diag`.
+4. Po wymianie JAR zawsze uruchamiaj serwer ponownie.
 
-## 1) Dla kogo jest ten poradnik?
+Przed aktualizacją zachowaj kopię katalogu `plugins/PunisherX` i bazy. Pierwszy start wymaga dostępu do repozytoriów bibliotek; nie trzeba instalować osobnego pluginu SyntaxDB. SQLite wystarczy do samodzielnego serwera. Sieć może używać MySQL/MariaDB, PostgreSQL albo SQL Server. H2 nie jest obsługiwane — przed aktualizacją wyeksportuj lub przekonwertuj dotychczasową bazę.
 
-Ten materiał jest dla administratora, który chce:
-- szybko uruchomić PunisherX,
-- bezpiecznie nadać uprawnienia moderatorom,
-- sprawnie używać komend i szablonów `/punish`,
-- wiedzieć, co sprawdzić gdy „coś nie działa”.
+## Sieć i kopie danych
 
-Jeśli jesteś początkujący: czytaj sekcje po kolei.  
-Jeśli jesteś zaawansowany: skocz do sekcji **Debug** i **Znane problemy**.
+Ustaw tę samą bazę na backendach, a w mostach proxy zgodne dane połączenia. `server: network` oznacza wspólny zakres kar; nazwy lokalne, np. `survival`, rozdzielają zakresy. Most instaluje się dodatkowo na proxy. Zgłoszenia są wspólne dla całej bazy. [Instrukcja mostu Velocity](../../../punisherx-velocity-bridge/README.md).
 
----
+`/prx export` i `/prx import` wykonują pracę w tle i zgłaszają wynik. W danej instancji może trwać jedna taka operacja naraz. Import dopisuje rekordy i nie zastępuje istniejącej bazy; konflikt powoduje wycofanie transakcji. Zachowaj również niezależną kopię bazy przed importem. `/prx migrate <z> <do>` zmienia silnik bazy: najpierw skonfiguruj połączenie docelowe, następnie powtórz komendę, aby potwierdzić, albo użyj `--force`. Wszystkie te operacje wymagają `punisherx.cmd.prx`.
 
-## 2) Szybki start (instalacja w 10 minut)
+## Uprawnienia kadry
 
-### Wymagania
-- Paper/Folia (zalecane aktualne buildy),
-- Java 21+,
-- dostęp do folderu `plugins/`.
+Nadaj konkretne węzły z [listy uprawnień](PERMISSIONS.md), zamiast globalnego `*`. Dostęp do `/panel` daje `punisherx.cmd.panel` lub zarządzanie, ale każda akcja sprawdza własne uprawnienie. Szybkie kary szablonowe wymagają `punisherx.cmd.punish`; edycja presetów czasu i powodów wymaga `punisherx.manage` lub `punisherx.manage.*`.
 
-### Kroki
-1. Pobierz [aktualne wydanie PunisherX](https://github.com/SyntaxDevTeam/PunisherX/blob/main/README.md#-download).
-2. Wgraj plik `.jar` do `plugins/`.
-3. Uruchom serwer i poczekaj, aż plugin wygeneruje pliki.
-4. Skonfiguruj `plugins/PunisherX/config.yml`.
-5. Uruchom serwer ponownie.
-6. Wejdź jako admin i sprawdź:
-   - `/punisherx version`
-   - `/punisherx reload`
----
+Do odczytu zgłoszeń i powiadomień nadaj `punisherx.see.reports`, a do decyzji dodatkowo `punisherx.manage.reports`. Dostęp do `/unmark` (`punisherx.cmd.unmark`) pozostaw osobom odpowiedzialnym za integrację Anti-cheata. Na Spigot sprawdź również uprawnienia dyspozytora komend opisane w referencji.
 
-## 3) Pierwsza konfiguracja
+## Codzienna moderacja i panel
 
-### 3.1 Język i komunikaty
-- Otwórz `config.yml` i ustaw `language: pl` lub wybrany inny z dostępnych.
-- W folderze lang znajdziesz plik językowy (np. `messages_pl.yml`).
-- Edytuj do własnych potrzeb.
-- Utrzymuj jednolity styl komunikatów (krótko, bez caps-locka).
+Otwórz `/panel`, wyszukaj gracza, sprawdź aktywne kary i historię. Możesz też użyć `/check Steve all`, `/history Steve` i `/banlist`. Panel działa obecnie i obsługuje graczy online oraz offline.
 
-### 3.2 Baza danych
-Dla małego serwera wystarczy SQLite/H2.  
-Dla sieci lub większego ruchu przejdź na MySQL/MariaDB/PostgreSQL.
+Skonfiguruj drabiny kar w `punish-templates.yml`. `/punish Steve spam` dobiera kolejny poziom z historii; `/punish Steve spam 2` wskazuje poziom jawnie. `/unpunish Steve spam` cofa ostatnie niecofnięte zdarzenie szablonu i jego udział w eskalacji, zachowując historię. Każde wywołanie cofa jedno zdarzenie; wykonany kick i efekty zewnętrznych pluginów nie są odwracane. Zmiana nazwy lub usunięcie szablonu zrywa jego powiązanie z nową historią.
 
-> Sprawdź nasz dodatek dla proxy [PunisherX-Proxy-Bridge](https://modrinth.com/plugin/punisherx-proxy-bridge), jeśli masz sieć i chcesz synchronizować bany między serwerami.
-<img width="25%" height="25%" alt="PunisherX_Velocity_Bridge" src="../../../assets/PunisherX_Velocity_Bridge_mini.png" />
+`--silent` wycisza powiadomienia czatu i ogłoszenia dla obsługiwanych komend, zachowując prywatne potwierdzenie operatora. Ekrany rozłączenia, egzekwowanie kar i historia nadal działają. `--force` omija ochronę gracza; obie flagi można łączyć. Szczegóły i składnia: [Komendy](COMMANDS.md).
 
-### 3.3 Uprawnienia (najczęstszy błąd)
-Nie dawaj `*` każdemu moderatorowi. Rozdziel role! Przykładowo:
-- **JuniorMod**: `warn`, `mute`, `check`, `history`
-- **Mod**: + `kick`, `jail`, `unjail`
-- **Admin**: pełny dostęp operacyjny
-- **Owner/TechAdmin**: migracje, import/export, krytyczne akcje
+## Zgłoszenia — od gracza do decyzji
 
-To obniża ryzyko przypadkowych masowych kar.
+Gracz używa `/report`, `/report Steve` lub `/report Steve Powód zgłoszenia`. Administrator otwiera `/reports`, weryfikuje dowody, osobno nakłada ewentualną karę i zamyka zgłoszenie przez `resolve` albo `reject` z uzasadnieniem. Historia decyzji jest dostępna przez `/reports history`.
 
----
+[Pełna instrukcja zgłoszeń](REPORTS.md) obejmuje limity, komendy konsolowe, uprawnienia, książki, GUI i dialogi. Interfejs gracza i administracji wybiera się niezależnie przez `reports.player-interface` i `reports.admin-interface`.
 
-## 4) Praktyczne użycie komend (workflow moderatora)
+## Integracja z Anti-cheatami
 
-### 4.1 Typowy scenariusz
-1. Sprawdź historię gracza:
-   - `/check <nick> all`
-   - `/history <nick>`
-2. Wybierz adekwatną karę:
-   - ostrzeżenie (`/warn`) dla lekkich naruszeń,
-   - czasowy mute (`/mute`) za spam/wulgaryzmy,
-   - ban (`/ban`) dla ciężkich i powtarzalnych naruszeń.
-3. Użyj jasnego powodu (konkretny punkt regulaminu).
-4. Po odwołaniu gracza: weryfikacja + ewentualne `/unmute`/`/unban`.
+**Przypisz oznaczenie do automatycznych kar**, np. `ban Steve 7d Cheating --mark=grim.speed`. W razie fałszywych detekcji `/unmark pause grim.speed` cofa oznaczone kary i blokuje kolejne tej detekcji. Po naprawie użyj `/unmark resume grim.speed`. Zwykłe kary bez oznaczenia pozostają aktywne.
 
-### 4.2 Komendy, które warto znać na pamięć
-- `/warn <gracz> (czas) <powód>`
-- `/mute <gracz> (czas) <powód>`
-- `/jail <gracz> (czas) <powód>`
-- `/ban <gracz> (czas) <powód>`
-- `/unwarn`, `/unmute`, `/unjail`, `/unban`
-- `/check`, `/history`, `/banlist`
-- `/change-reason <id> <nowy_powód>`
-- `/clearall <gracz>` (ostrożnie, to operacja masowa)
+[Osobny poradnik Anti-cheat](ANTICHEAT-MARKS.md) opisuje zakresy serwerowe, cofanie kar IP, dziedziczenie oznaczeń i ograniczenia. Wstrzymanie przetrwa restart i nie jest omijane przez `--force`.
 
-Format czasu: `Xs`, `Xm`, `Xh`, `Xd` (sekundy/minuty/godziny/dni).
+## Bezpieczna konfiguracja i rozwiązywanie problemów
 
----
+- Wykonaj `/prx validate` przed przeładowaniem. Błędny YAML zatrzymuje `/prx reload` przed wyłączeniem działającej instancji.
+- Brakujące klucze tłumaczeń korzystają z wersji dołączonej do JAR. Błędny plik językowy przy starcie pozostaje zachowany, otrzymuje kopię w `lang/backups/`, a plugin może użyć wbudowanego tłumaczenia.
+- Gdy komenda nie działa, sprawdź uprawnienia, aliasy i wersję przez `/prx version`.
+- Przy problemach z synchronizacją sprawdź połączenie bazy, `server` i logi mostu. Przy błędach zapisu znaków MySQL/MariaDB sprawdź kodowanie kolumn i połączenia.
+- Jeśli stare przyciski książki nie reagują, otwórz menu ponownie. Dialogi wymagają Paper 1.21.7+; na Spigot użyj GUI lub BOOK.
 
-## 5) Szablony `/punish` – jak ich używać mądrze
-
-Szablony dają powtarzalność i szybkość działania. Dzięki nim młodszy moderator nie „wymyśla” kary samodzielnie za każdym razem.
-
-### Przygotuj swoje templatki
-- Zapoznaj się z przykłami w pliku `punish-templates.yml`
-- Edytuj zgodnie z własnymi potrzebami, zapisz na serwerze i zrestartuj serwer.
-- Sprawdź działanie w praktyce używając `/punish <gracz> <nazwa_templatki>`
-
-### Dobre praktyki dla templatek
-- Jeden szablon = jeden konkretny typ naruszenia.
-- Nazwy krótkie i jednoznaczne (np. `spam_1`, `cheaty_perm`).
-- Powód zawsze zgodny z regulaminem (np. „Reg. 3.2 – spam”).
-- Rozdziel poziomy eskalacji (1h → 1d → 7d → perm).
-
-### Przykładowa logika progresji
-- Pierwsze wykroczenie: `punish: warn`
-- Drugie wykroczenie: `punish: mute` `time: 1h`
-- Trzecie wykroczenie: `punish: mute` `time: 1d`
-- Czwarte wykroczenie: `punish: ban` `time: 7d`
-
-### Użycie `/punish` w praktyce
-- Dzięki z góry ustalonym szablonom kar możesz w szybko sposób wymierzać kary oraz ich stopien eskalacji `/punish <gracz> <nazwa_templatki> <poziom_eskalacji>`
-
-Największa wartość templatek: jednolita polityka kar między zmianami moderatorów.
-
----
-
-# Planowane:
-## 6) Panel GUI i praca „klikana”
-
-PunisherX oferuje GUI, które przyspiesza codzienną moderację czyli /punish ale graficznie:
-- wybór gracza,
-- wybór typu kary,
-- wybór czasu i powodu,
-- szybkie przejście do historii.
-
-![PunisherX](../../../assets/PunisherX.webp)
-
-Jeśli kadra jest młoda, GUI + predefiniowane szablony to najlepsze połączenie (mniej błędów, mniej literówek).
-
----
-
-## 7) Debug krok po kroku (checklista)
-
-Gdy komendy nie działają poprawnie:
-
-1. **Wersja i status pluginu**
-   - `/punisherx version`
-   - sprawdź logi przy starcie serwera.
-
-2. **Uprawnienia**
-   - czy gracz/mod ma właściwe permission nodes,
-   - czy nie ma konfliktu z managerem permisji.
-
-3. **Konfiguracja**
-   - czy `config.yml` i pliki językowe nie mają błędów składni,
-   - po zmianach użyj `/punisherx reload` lub bardziej zalecane restart serwera
-
-4. **Baza danych**
-   - czy dane dostępowe są poprawne,
-   - czy baza odpowiada i nie blokuje połączeń.
-
-5. **Integracje**
-   - PlaceholderAPI, webhooki, bridge proxy – testuj osobno, nie wszystko naraz.
-   - Sprawdź, czy inny plugin nie powoduje konfliktów (np. inny system kar).
-
-6. **Cache i diagnostyka**
-   - użyj `/prx diag` gdy potrzebujesz szybkiego testu i danych dla supportu.
-
-> Zasada: najpierw potwierdź wersję + permisje + bazę, dopiero później szukaj „egzotycznych bugów”.
-
----
-
-## 8) Znane problemy i szybkie rozwiązania
-
-### Problem: „Komenda istnieje, ale nie działa”
-Najczęściej brak permisji albo konflikt aliasu z innym pluginem.  
-**Rozwiązanie:** sprawdź permission nodes i listę aliasów w `config.yml`.
-
-### Problem: „Kara nie zapisuje się globalnie na sieci”
-Zwykle problem z bazą lub bridge.
-**Rozwiązanie:** test połączenia DB + logi modułu bridge.
-
-### Problem: „Niepoprawne kolory/format komunikatów”
-Błędna składnia MiniMessage/Legacy w plikach językowych.
-**Rozwiązanie:** cofnięcie ostatnich zmian i edycja sekcja po sekcji.
-
-### Problem: „Moderatorzy karzą nierówno”
-Brak standardu pracy.
-**Rozwiązanie:** wdroż szablony `/punish`, tabelę eskalacji i krótkie SOP dla kadry.
-
----
-
-## 9) Krótka procedura pracy dla zespołu moderatorskiego
-
-To jest odpowiednik SOP (Standard Operating Procedure), czyli prosty, stały schemat działania dla moderatora.
-
-1. Zawsze zaczynaj od `/check` i `/history`.  
-2. Nigdy nie karz „z pamięci”, tylko na podstawie faktów.  
-3. Używaj templatek zamiast wolnego wpisywania powodów.  
-4. Każda surowa kara musi mieć uzasadnienie w regulaminie.  
-5. Wątpliwość = eskalacja do Admina, nie zgadywanie.
-
-To jest różnica między „chaotyczną moderacją” a profesjonalnym zespołem.
-
----
-
-## 10) Kontakt z autorem i społecznością
-**SyntaxDevTeam** jest otwarty na feedback, pytania i zgłoszenia problemów.  
-### Skontaktuj się z nami:
-- Discord społeczności: **https://discord.gg/Zk6mxv7eMh**
-- Repozytorium: **https://github.com/SyntaxDevTeam/PunisherX**
-- Zgłoszenia problemów: Issues na GitHub (najlepiej z logiem i wersją serwera/pluginu)
-
-### Przy zgłoszeniu zawsze podaj:
-- wersję PunisherX,
-- wersję Paper/Folia,
-- wersję Java,
-- fragment logu,
-- kroki odtworzenia błędu.
-
----
-
-## 11) Podsumowanie z doświadczenia
-
-Jeśli chcesz profesjonalnej moderacji, nie wystarczy „mieć dobry plugin”.  
-Musisz mieć: **dobrą konfigurację + sensowne permisje + politykę kar + procedurę debugowania**.
-
-PunisherX daje narzędzia. Jakość moderacji zależy od standardu, który narzucisz zespołowi. Zainwestuj czas w szkolenie moderatorów i ustalenie jasnych zasad, a efekty będą widoczne od razu! **Powodzenia!**
+[Konfiguracja](CONFIGS.md) opisuje ustawienia. Zgłaszając problem na [Discordzie](https://discord.gg/Zk6mxv7eMh) lub GitHub Issues, podaj wersję pluginu, platformę i wersję serwera, Javę, fragment logu oraz kroki odtworzenia.

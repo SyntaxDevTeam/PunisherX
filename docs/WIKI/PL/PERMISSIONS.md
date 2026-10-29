@@ -90,3 +90,5 @@ Checker uprawnień dopuszcza konsolę i OP oraz `punisherx.owner`, `punisherx.*`
 Spigot przed uruchomieniem komendy dodatkowo sprawdza permisję zadeklarowaną w `plugin.yml`. Obecny manifest używa `punisherx.cmd.setjail` dla `/setjail`, `punisherx.cmd.clearall` dla `/clearall` i `punisherx.check` dla `/check`. Przy nadawaniu pojedynczych komend na Spigot dodaj te węzły rejestracji obok, odpowiednio, `punisherx.manage.set_jail`, `punisherx.cmd.clear_all` i `punisherx.cmd.check`. Logika `/check` i `/history` pozwala sprawdzać własne dane, ale bramka uprawnień Spigot może nadal wymagać dostępu do samej komendy.
 
 Edycja presetów GUI używa `punisherx.manage` / `punisherx.manage.*`; nie ma osobnej permisji edycji presetów. Szybkie kary z szablonów używają `punisherx.cmd.punish`. `/cache` jest dostępne tylko z konsoli — permisja nie udostępni go graczom.
+
+Samo `punisherx.manage.reports` daje odczyt i decyzje; powiadomienia wymagają również `punisherx.see.reports` lub nadrzędnego dostępu widoczności. [Instrukcja zgłoszeń i interfejsów](REPORTS.md).

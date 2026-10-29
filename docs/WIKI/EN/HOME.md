@@ -1,51 +1,32 @@
-# Welcome!
+# PunisherX Wiki
 
-PunisherX is a comprehensive punishment system for Paper/Folia-based Minecraft servers. It covers commands such as `kick`, `warn`, `mute`, `jail`, `ban`, and `ban-ip` (temporary or permanent), plus utilities like `/check`, `/history`, and `/banlist` for quick monitoring. Customizable punishment templates ensure consistent enforcement, and a fully translatable message file supports MiniMessage, Legacy, and plain Minecraft formatting. The plugin includes a rich configuration file and supports MySQL/MariaDB or PostgreSQL for multi-server synchronization, with SQLite or H2 available for lightweight standalone use.
+This Wiki describes the current `main` branch. Check the [changelog](../../../CHANGELOG.md) for features in a particular release. PunisherX provides punishments, player investigations, a moderation panel and player reports on Paper/Folia and Spigot, with optional Velocity and BungeeCord bridges.
 
-## Technical information
-- Designed for compatibility with Minecraft 1.20.6 - 26.1+, optimized for Paper, Pufferfish, Purple, and Leaves forks (while maintaining full compatibility with Folia and its forks!)
-- Written in modern Kotlin requires Java 21 or newer
-- Language file with full MiniMessage and Legacy formatting support
-- Supports MySQL/MariaDB, MSSQL, PostgreSQL, SQLite, and H2 databases
-- Extensive configuration file [see the default settings here](https://github.com/SyntaxDevTeam/PunisherX/blob/main/punisherx-paper/src/main/resources/config.yml)
-- **Automatic migrations** in case of changes in the config file - you always have the latest version without losing your current settings
-- Optional update checker with automatic plugin updates
-- IP geolocation lookup (requires a free MaxMind license key)
-- **Discord webhook** integration and **PlaceholderAPI** support with a list of helpful placeholders available
-- Simple database export/import/migrate commands, fallback ban system, and one-command penalty clearance
-- Full jail system via command or configuration
+## Start here
 
-If you have questions, join our [Discord](https://discord.gg/Zk6mxv7eMh).
+| Topic | Guide |
+| --- | --- |
+| Installation and daily operations | [Administrator guide](ADMIN-GUIDE.md) |
+| Reporting a player and handling reports | [Player and staff report guide](REPORTS.md) |
+| Command syntax and flags | [Commands](COMMANDS.md) |
+| Player and staff access | [Permissions](PERMISSIONS.md) |
+| Settings and safe updates | [Configuration](CONFIGS.md) |
+| PlaceholderAPI and LuckPerms names | [Placeholders](PLACEHOLDERS.md) |
+| Integrating your own plugin | [Developer API](API.md) |
 
-## Get started
+## Anti-cheat integration
 
-### Download
-* Always up-to-date stable version available for download on:
-    * Modrinth ![Modrinth Downloads](https://img.shields.io/modrinth/dt/VCNRcwC2)
-    * Hangar   [![Available on Hangar](https://img.shields.io/hangar/dt/PunisherX)](https://hangar.papermc.io/SyntaxDevTeam/PunisherX)
-* SNAPSHOT and DEV versions available immediately on Github [![GitHub Release Date](https://img.shields.io/github/release-date/SyntaxDevTeam/PunisherX)](https://github.com/SyntaxDevTeam/PunisherX/releases)
-* You can also build the development version yourself [![Available on GitHub](https://img.shields.io/badge/GitHub.com-PunisherX-green)](https://github.com/SyntaxDevTeam/PunisherX) or download the last valid build [![Build Plugin](https://github.com/SyntaxDevTeam/PunisherX/actions/workflows/gradle.yml/badge.svg?branch=main)](https://github.com/SyntaxDevTeam/PunisherX/actions/workflows/gradle.yml)
+**Mark automatic penalties by check and reverse false positives.** `--mark=grim.speed` links a penalty to a check, `/unmark` reverses it, and `/unmark pause grim.speed` also suppresses further marked penalties until the check is fixed. [Full setup, examples and limitations](ANTICHEAT-MARKS.md).
 
-### Installation
-1. Download the latest PunisherX release
-2. Place the JAR file in your server’s `plugins` folder
-3. Start your Minecraft server
-4. Configure the plugin through `config.yml`
-5. Restart your Minecraft server
-6. Enjoy.
+## Platforms and installation
 
-## Documentation
+Choose `PunisherX-Paper-<version>.jar` for Paper/Folia or `PunisherX-Spigot-<version>.jar` for Spigot. Use Java 21+ and meet your server platform's requirements. The Velocity bridge requires Java 25+, and BungeeCord Java 21+; install the bridge on the proxy in addition to backend server plugins.
 
-Looking for a practical setup and operations walkthrough? Start with:
+1. Download from [Hangar](https://hangar.papermc.io/SyntaxDevTeam/PunisherX), [Modrinth](https://modrinth.com/plugin/punisherx) or [GitHub Releases](https://github.com/SyntaxDevTeam/PunisherX/releases).
+2. Place the matching JAR in `plugins/` and start the server to generate files.
+3. Set the language, database and permissions using the administrator guide.
+4. Run `/prx validate`, then `/prx reload`. Restart the server when replacing the JAR.
 
-* **Admin Guide (EN)**: [ADMIN-GUIDE.md](ADMIN-GUIDE.md)
+Native dialogs require Paper 1.21.7+; older Paper and Spigot use inventory/chat interfaces. Report books are available on both editions. Databases: SQLite, MySQL, MariaDB, PostgreSQL and SQL Server. **H2 is unsupported** — export or convert an older H2 database before upgrading.
 
-
----
-## Contact
-Need help or have questions? Reach out on our [Discord](https://discord.gg/Zk6mxv7eMh).
-
-## License
-This plugin is licensed under the MIT License. See the [LICENSE](https://github.com/SyntaxDevTeam/PunisherX/blob/main/LICENSE) file for details.
-
-**Thank you for using PunisherX! We hope it meets your expectations. 😊**
+[Polski](../PL/HOME.md) · [Discord support](https://discord.gg/Zk6mxv7eMh) · [MIT License](../../../LICENSE)

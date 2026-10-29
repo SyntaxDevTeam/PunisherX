@@ -1,7 +1,7 @@
 ## Basic commands
 
 * `/ban <player> (time) <reason> [--force] [--silent]` — bans and immediately kicks the player if online, falling back to the Paper `PROFILE` ban list when the database is unavailable.
-* `/banip <ip|player|uuid> (time) <reason> [--force] [--silent]` — bans every IP associated with the target, dispatching Paper's `ban-ip` command as a fallback on database errors and kicking online targets.
+* `/banip <ip|player|uuid> (time) <reason> [--force] [--silent]` — bans IPs associated with the target and kicks online targets. A failed database write does not create a fallback platform IP ban.
 * `/unban <ip|player|uuid> [--silent]` — lifts bans by player name, IP, or UUID, including linked IPs in the database.
 * `/jail <player> (time) <reason> [--force] [--silent]` — teleports the player to the configured jail location (respecting bypass unless `--force`) and caches their previous position for release.
 * `/unjail <player> [--silent]` — removes the cached jail punishment and teleports the player to the configured unjail location when available.
@@ -28,18 +28,19 @@
 
 | Command | Action | Permission |
 | --- | --- | --- |
-| `/report` | Select a player and reason in a form or inventory GUI. | Available to players; no dedicated permission. |
+| `/report` | Select a player and reason in a form, book or inventory GUI. | Available to players; no dedicated permission. |
 | `/report <player>` | Select a reason for the target. | Available to players. |
 | `/report <player> <reason>` | Submit a report with a custom reason. | Available to players. |
 | `/reports` | Open the staff inbox; show a list in the console. | `punisherx.see.reports` or report management access. |
 | `/reports gui (page)` | Open the staff report browser. | Same read access; players only. |
+| `/reports book (page)` | Open the book inbox regardless of configuration. | Report read access; players only. |
 | `/reports list (page)` | Browse open reports. | Same read access. |
 | `/reports view <id>` | Inspect a report and its decision, if closed. | Same read access. |
 | `/reports history (page)` | Browse resolved and rejected reports. | Same read access. |
 | `/reports resolve <id> <explanation>` | Close a report as resolved. | `punisherx.manage.reports` or management access. |
 | `/reports reject <id> <explanation>` | Close a report as rejected. | Same management access. |
 
-Reasons and decision explanations must contain 3–255 characters. Players cannot report themselves or submit another open report against the same target. `reports.max-open-per-reporter` limits open submissions (default: `3`). Closing a report frees a slot; it does not automatically punish the target. Page numbers start at `1`. All staff operations except `gui` also work in the console.
+Reasons and decision explanations must contain 3–255 characters. Players cannot report themselves or submit another open report against the same target. `reports.max-open-per-reporter` limits open submissions (default: `3`). Closing a report frees a slot; it does not automatically punish the target. Page numbers start at `1`. All staff operations except `gui` and `book` also work in the console.
 
 ## Administrative utilities
 
@@ -89,4 +90,6 @@ Add `--mark` or `--mark=grim.speed` to `/ban`, `/banip`, `/mute`, `/warn`, `/jai
 
 Requires `punisherx.cmd.unmark`. Manual penalties remain active. Reversals retain audit history and remove template escalation contributions. Automatic PunisherX penalties inherit the check mark. Kicks cannot reconnect players; reversal audits their history. `--force` cannot bypass a paused check.
 
-[Examples, server scopes and limitations](../../ANTICHEAT-MARKS.md).
+[Examples, server scopes and limitations](ANTICHEAT-MARKS.md).
+
+For the full workflow, books and interface settings, see [Player reports](REPORTS.md).
