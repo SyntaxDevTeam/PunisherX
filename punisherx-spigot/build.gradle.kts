@@ -249,6 +249,46 @@ tasks.named<ShadowJar>("shadowJar") {
 
 
 }
+publishing {
+    publications {
+        create<MavenPublication>("punisherx") {
+            artifact(tasks.named("shadowJar").get()) {
+                classifier = null
+            }
+            pom {
+                name.set("punisherx")
+                description.set(project.description)
+                url.set("https://github.com/SyntaxDevTeam/PunisherX")
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://opensource.org/licenses/MIT")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("WieszczY85")
+                        name.set("WieszczY")
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "Nexus"
+            val releasesRepoUrl = uri("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
+            val snapshotsRepoUrl = uri("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/")
+            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+            credentials {
+                username = findProperty("nexusUser")?.toString()
+                    ?: throw GradleException("Właściwość 'nexusUser' nie jest ustawiona w gradle.properties")
+                password = findProperty("nexusPassword")?.toString()
+                    ?: throw GradleException("Właściwość 'nexusPassword' nie jest ustawiona w gradle.properties")
+            }
+        }
+    }
+}
 
 plugindeployer {
     paper { dir = "/home/debian/server/Paper/26.2/plugins" } //ostatnia wersja dla Paper

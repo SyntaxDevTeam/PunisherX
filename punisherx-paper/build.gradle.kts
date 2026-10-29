@@ -223,12 +223,12 @@ tasks.named<ShadowJar>("shadowJar") {
 
 publishing {
     publications {
-        create<MavenPublication>("PunisherX") {
+        create<MavenPublication>("punisherx") {
             artifact(tasks.named("shadowJar").get()) {
                 classifier = null
             }
             pom {
-                name.set("PunisherX")
+                name.set("punisherx-api")
                 description.set(project.description)
                 url.set("https://github.com/SyntaxDevTeam/PunisherX")
                 licenses {
@@ -249,7 +249,9 @@ publishing {
     repositories {
         maven {
             name = "Nexus"
-            url = uri("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
+            val releasesRepoUrl = uri("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
+            val snapshotsRepoUrl = uri("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/")
+            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
             credentials {
                 username = findProperty("nexusUser")?.toString()
                     ?: throw GradleException("Właściwość 'nexusUser' nie jest ustawiona w gradle.properties")
