@@ -17,6 +17,8 @@ internal object DatabaseBackup {
         "punishments" to listOf("id", "name", "uuid", "reason", "operator", "punishmentType", "start", "endTime", "server"),
         "punishmenthistory" to listOf("id", "name", "uuid", "reason", "operator", "punishmentType", "start", "endTime", "server"),
         "punishment_undos" to listOf("historyId", "undoneBy", "undoneAt"),
+        "punishment_marks" to listOf("historyId", "activeId", "mark", "playerUuid"),
+        "punishment_mark_pauses" to listOf("mark", "server", "pausedBy", "pausedAt"),
         "punishment_templates" to listOf("historyId", "templateName", "playerUuid"),
         "playercache" to listOf("id", "data"),
         "reports" to listOf("id", "player", "suspect", "reason", "filedAt"),
@@ -69,7 +71,7 @@ internal object DatabaseBackup {
                             if (name.equals("filedAt", true) && value is String && database.dialect.type != DatabaseType.SQLITE)
                                 java.sql.Timestamp.valueOf(LocalDateTime.parse(value.replace(' ', 'T')))
                             else if (value is String && name.lowercase(Locale.ROOT) in setOf(
-                                "id", "historyid", "reportid", "start", "endtime", "processed", "processedat", "undoneat", "handledat"
+                                "id", "historyid", "reportid", "start", "endtime", "processed", "processedat", "undoneat", "handledat", "activeid", "pausedat"
                             )) value.toLong() // Compatibility with old exports that quoted every scalar.
                             else value
                         }

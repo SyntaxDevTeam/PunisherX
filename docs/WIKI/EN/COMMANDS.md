@@ -78,3 +78,15 @@ logs remain active. Configured follow-up PunisherX punishment commands inherit
 Both `/punish` flags can be combined before or after the optional level:
 `/punish Alex spam --force --silent` or `/punish Alex spam 2 --silent --force`.
 `--force` bypasses target immunity; `--silent` alone does not change permission checks.
+
+## Anti-cheat marks
+
+Add `--mark` or `--mark=grim.speed` to `/ban`, `/banip`, `/mute`, `/warn`, `/jail`, `/kick`, or `/punish`. Bare `--mark` uses `default`; named checks are case insensitive.
+
+- `/unmark <player|all> [check] [--silent]` reverses existing marked penalties.
+- `/unmark pause <check>` reverses the check's marked penalties and persistently suppresses future ones.
+- `/unmark resume <check>` allows new penalties after fixing the anti-cheat.
+
+Requires `punisherx.cmd.unmark`. Manual penalties remain active. Reversals retain audit history and remove template escalation contributions. Automatic PunisherX penalties inherit the check mark. Kicks cannot reconnect players; reversal audits their history. `--force` cannot bypass a paused check.
+
+[Examples, server scopes and limitations](../../ANTICHEAT-MARKS.md).

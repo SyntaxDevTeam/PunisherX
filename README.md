@@ -29,6 +29,7 @@ It works on standalone servers and networks, with a dedicated **Paper/Folia edit
 | Tool | What your staff can do |
 | --- | --- |
 | **Punishments** | Ban players or IPs, mute, warn, kick and jail; use timed or indefinite punishments where applicable, and revoke them when needed. |
+| **Anti-cheat support** | Mark penalties by check with `--mark=check`, reverse them with `/unmark`, and pause faulty checks until fixed. See [Anti-cheat marks](docs/ANTICHEAT-MARKS.md). |
 | **Moderation panel** | Search players, inspect active punishments and history, and work with online and offline player lists through `/panel`. |
 | **Quick punishments** | Apply templates from `punish-templates.yml`, with escalation levels selected from punishment history. Edit GUI duration and reason presets in-game. |
 | **Player reports** | Accept `/report` submissions, browse the staff inbox, resolve or reject reports with an explanation, and retain a history of decisions. |

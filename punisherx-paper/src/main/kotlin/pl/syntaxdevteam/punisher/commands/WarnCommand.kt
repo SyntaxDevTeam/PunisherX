@@ -14,6 +14,7 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
         val arguments = options.arguments
         val silent = options.silent
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.WARN)) {
+            if (!options.allowMark(plugin, stack)) return
             if (arguments.isNotEmpty()) {
                 if (arguments.size < 2) {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("warn", "usage"))
@@ -32,12 +33,12 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                     val start = System.currentTimeMillis()
                     val end: Long? = if (gtime != null) (System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
 
-                    val punishmentId = plugin.databaseHandler.addPunishment(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    val punishmentId = options.persist(plugin, player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
                     if (punishmentId == null) {
                         stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
                         return
                     }
-                    plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    if (options.mark == null) plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
 
                     val warnCount = plugin.databaseHandler.getActiveWarnCount(uuid.toString())
                     val formattedTime = plugin.timeHandler.formatTime(gtime)
@@ -59,7 +60,7 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                     if (isForce) {
                         plugin.logger.warning("Force-warned by ${stack.sender.name} on $player")
                     }
-                    plugin.actionExecutor.executeWarnCountActions(player, warnCount, silent = silent)
+                    plugin.actionExecutor.executeWarnCountActions(player, warnCount, silent = silent, mark = options.mark)
                 }
             } else {
                 stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("warn", "usage"))
@@ -74,6 +75,9 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
             return emptyList()
         }
         val input = args.lastOrNull().orEmpty()
+        if (input.startsWith("--")) return listOf("--force", "--silent", "--mark", "--mark=")
+            .filter { it.startsWith(input) && it !in args.dropLast(1) }
+
         return when (args.size) {
             0, 1 -> plugin.server.onlinePlayers
                 .map { it.name }

@@ -19,6 +19,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
+        if (!options.allowMark(plugin, stack)) return
         if (arguments.isEmpty() || arguments.size < 2) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("jail", "usage"))
             return
@@ -41,6 +42,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         val start = System.currentTimeMillis()
         val end: Long? = if (gtime != null) start + plugin.timeHandler.parseTime(gtime) * 1000 else null
         val previousLocation = targetPlayer?.location?.clone()
+        val previousGameMode = targetPlayer?.gameMode
 
         val jailLocation = JailUtils.getJailLocation(plugin.config)
         if (jailLocation == null) {
@@ -59,19 +61,25 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
         )
 
         fun finalizePunishment() {
-            val punishmentId = plugin.databaseHandler.addPunishment(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+            val punishmentId = options.persist(plugin, playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
             if (punishmentId == null) {
+                if (options.mark != null && targetPlayer != null && previousLocation != null) {
+                    if (previousGameMode != null) targetPlayer.gameMode = previousGameMode
+                    plugin.safeTeleportService.teleportSafely(targetPlayer, previousLocation) { restored ->
+                        if (!restored) plugin.logger.err("Could not restore $targetPlayer after a failed marked jail write")
+                    }
+                }
                 stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
                 return
             }
-            plugin.databaseHandler.addPunishmentHistory(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
+            if (options.mark == null) plugin.databaseHandler.addPunishmentHistory(playerName, uuid.toString(), reason, stack.sender.name, punishmentType, start, end ?: -1)
             plugin.cache.addOrUpdatePunishment(uuid, end ?: -1, previousLocation)
             val placeholders = basePlaceholders + ("id" to punishmentId.toString())
 
             PunishmentCommandUtils.sendTargetMessages(plugin, targetPlayer, "jail", "jail_message", placeholders, silent = silent)
             PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_JAIL, "jail", "broadcast", placeholders, silent = silent)
             PunishmentCommandUtils.sendSenderMessages(plugin, stack, "jail", "jail", placeholders, silent = silent)
-            plugin.actionExecutor.executeAction("jailed", playerName, placeholders, silent = silent)
+            plugin.actionExecutor.executeAction("jailed", playerName, placeholders, silent = silent, mark = options.mark)
         }
 
         if (targetPlayer != null) {
@@ -102,6 +110,9 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             return emptyList()
         }
         val input = args.lastOrNull().orEmpty()
+        if (input.startsWith("--")) return listOf("--force", "--silent", "--mark", "--mark=")
+            .filter { it.startsWith(input) && it !in args.dropLast(1) }
+
         return when (args.size) {
             0, 1 -> plugin.server.onlinePlayers.map { it.name }.filter { it.startsWith(input, ignoreCase = true) }
             2 -> TimeSuggestionProvider.generateTimeSuggestions().filter { it.startsWith(input, ignoreCase = true) }

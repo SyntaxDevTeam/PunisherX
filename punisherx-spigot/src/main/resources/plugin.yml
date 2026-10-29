@@ -74,6 +74,10 @@ commands:
     description: Removes the last warning issued to a player.
     usage: /unwarn <player>
     permission: punisherx.cmd.unwarn
+  unmark:
+    description: Reverses marked penalties and pauses or resumes anti-cheat checks.
+    usage: /unmark <player|all> [mark] or /unmark <pause|resume> <mark>
+    permission: punisherx.cmd.unmark
   unpunish:
     description: Reverses a punishment and removes its contribution to escalation.
     usage: /unpunish <player> <template>
@@ -136,6 +140,9 @@ commands:
     permission: punisherx.cmd.prx
 
 permissions:
+  punisherx.cmd.unmark:
+    description: Reverse marked penalties and manage check pauses.
+    default: op
   punisherx.manage.reports:
     description: Allows resolving and rejecting player reports.
     default: op

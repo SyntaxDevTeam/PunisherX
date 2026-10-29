@@ -18,6 +18,12 @@ internal object PunisherIdentityMigrationStore {
 
     fun migrateSchema(connection: Connection) {
         listOf(
+            """CREATE TABLE IF NOT EXISTS punishment_marks (
+                historyId INTEGER PRIMARY KEY,
+                activeId BIGINT,
+                mark VARCHAR(64) NOT NULL,
+                playerUuid VARCHAR(36) NOT NULL
+            )""".trimIndent(),
             """CREATE TABLE IF NOT EXISTS punishment_templates (
                 historyId INTEGER PRIMARY KEY,
                 templateName VARCHAR(255) NOT NULL,
@@ -59,8 +65,9 @@ internal object PunisherIdentityMigrationStore {
         val suspect = count(connection, "SELECT COUNT(*) FROM reports WHERE suspect = ?", source)
         val bridge = count(connection, "SELECT COUNT(*) FROM bridge_events WHERE target = ?", source)
         val templates = count(connection, "SELECT COUNT(*) FROM punishment_templates WHERE playerUuid = ?", source)
+        val marks = count(connection, "SELECT COUNT(*) FROM punishment_marks WHERE playerUuid = ?", source)
         val journal = existing?.let { itemCount(connection, migrationId) } ?: 0
-        val evidence = active + history + reporter + suspect + bridge + templates + journal > 0
+        val evidence = active + history + reporter + suspect + bridge + templates + marks + journal > 0
         return PunisherIdentityMigrationBridgeResult(
             if (evidence) PunisherIdentityMigrationStatus.READY else PunisherIdentityMigrationStatus.NO_DATA,
             "PUNISHERX_ACTIVE_${active}_HISTORY_${history}_REPORTER_${reporter}_SUSPECT_${suspect}_BRIDGE_${bridge}",
@@ -109,6 +116,7 @@ internal object PunisherIdentityMigrationStore {
             }
 
             journalIds(connection, migrationId, "PUNISHMENT", "SELECT id FROM punishments WHERE uuid = ?", source)
+            journalIds(connection, migrationId, "MARK", "SELECT historyId FROM punishment_marks WHERE playerUuid = ?", source)
             journalIds(connection, migrationId, "TEMPLATE", "SELECT historyId FROM punishment_templates WHERE playerUuid = ?", source)
             journalIds(connection, migrationId, "HISTORY", "SELECT id FROM punishmenthistory WHERE uuid = ?", source)
             journalIds(connection, migrationId, "REPORTER", "SELECT id FROM reports WHERE player = ?", source)
@@ -116,6 +124,7 @@ internal object PunisherIdentityMigrationStore {
             journalIds(connection, migrationId, "BRIDGE", "SELECT id FROM bridge_events WHERE target = ?", source)
 
             replaceUuid(connection, "punishments", "uuid", source, target)
+            replaceUuid(connection, "punishment_marks", "playerUuid", source, target)
             replaceUuid(connection, "punishment_templates", "playerUuid", source, target)
             replaceUuid(connection, "punishmenthistory", "uuid", source, target)
             replaceUuid(connection, "reports", "player", source, target)
@@ -148,6 +157,7 @@ internal object PunisherIdentityMigrationStore {
             for (item in items(connection, migrationId)) {
                 when (item.type) {
                     "PUNISHMENT" -> restore(connection, "punishments", "id", item.key, "uuid", source, target)
+                    "MARK" -> restore(connection, "punishment_marks", "historyId", item.key, "playerUuid", source, target)
                     "TEMPLATE" -> restore(connection, "punishment_templates", "historyId", item.key, "playerUuid", source, target)
                     "HISTORY" -> restore(connection, "punishmenthistory", "id", item.key, "uuid", source, target)
                     "REPORTER" -> restore(connection, "reports", "id", item.key, "player", source, target)

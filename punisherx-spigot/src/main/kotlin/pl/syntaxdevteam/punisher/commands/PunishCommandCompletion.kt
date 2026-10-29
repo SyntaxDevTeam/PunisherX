@@ -2,7 +2,7 @@ package pl.syntaxdevteam.punisher.commands
 
 /** Completion and quoted argument handling for the basic command/Spigot entry points. */
 internal object PunishCommandCompletion {
-    private val flags = listOf("--force", "--silent")
+    private val flags = listOf("--force", "--silent", "--mark")
     private data class Token(val value: String, val start: Int, val quoted: Boolean, val closed: Boolean = true)
 
     private fun tokens(input: String): List<Token> {
@@ -60,7 +60,7 @@ internal object PunishCommandCompletion {
         val inQuote = last?.quoted == true && !last.closed
         val current = if (last == null || (input.endsWith(' ') && !inQuote)) Token("", input.length, false) else last
         val completed = if (current === last) parsed.dropLast(1) else parsed
-        val positional = completed.filter { it.value !in flags }
+        val positional = completed.filter { it.value !in flags && !it.value.startsWith("--mark=") }
         val candidates = when (positional.size) {
             0 -> players.filter { it.startsWith(current.value, ignoreCase = true) }.sorted()
             1 -> templates(names, input.substring(current.start))

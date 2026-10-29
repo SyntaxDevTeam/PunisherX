@@ -48,6 +48,7 @@ class CommandManager(private val plugin: PunisherX) {
                 plugin.messageHandler.stringMessageToString("warn", "usage"),
                 WarnCommand(plugin)
             )
+            commands.register("unmark", "/unmark <player|all> [mark] | pause/resume <mark>", UnmarkCommand(plugin))
             val unpunishCmd = UnpunishCommand(plugin)
             val unpunishNode = Commands.literal("unpunish")
                 .requires { src -> pl.syntaxdevteam.punisher.permissions.PermissionChecker
@@ -126,7 +127,7 @@ class CommandManager(private val plugin: PunisherX) {
                                                         if (it.toString().startsWith(input)) suggestions.suggest(it)
                                                     }
                                             }
-                                            listOf("--force", "--silent").filter { it !in used && it.startsWith(input) }
+                                            listOf("--force", "--silent", "--mark", "--mark=").filter { it !in used && it.startsWith(input) }
                                                 .forEach { suggestions.suggest(it) }
                                             suggestions.buildFuture()
                                         }

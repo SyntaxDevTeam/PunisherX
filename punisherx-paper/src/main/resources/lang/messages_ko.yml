@@ -572,3 +572,13 @@ database-backup:
   import-started: "<yellow>Importing plugins/PunisherX/dump/backup.sql. This adds records without clearing or overwriting existing data. Please wait...</yellow>"
   import-success: "<green>Database import completed. Records from the backup have been added.</green>"
   import-failed: "<red>Database import failed. No records from this import were committed. Check the console for details; importing the same backup again can cause a key conflict.</red>"
+
+unmark:
+  usage: '<red>Usage: /unmark <player|all> [mark] [--silent] or /unmark <pause|resume> <mark>'
+  invalid_mark: '<red>Use one mark: --mark or --mark=check. Check names must contain 1-64 letters, digits, _, ., :, or - and start with a letter or digit.'
+  paused: '<yellow>Marked punishment skipped: check <gold>{mark}</gold> is paused.'
+  db_error: '<red>Could not process marked punishments. Check the server log.'
+  success: '<green>Reversed {count} marked history entries for {player} (mark: {mark}).'
+  silent_success: '<gray>Reversed {count} marked history entries for {player} (mark: {mark}).'
+  pause_success: '<green>Paused check {mark} and reversed {count} marked history entries. Use /unmark resume {mark} after fixing the check.'
+  resumed: '<green>Check {mark} can issue marked punishments again.'

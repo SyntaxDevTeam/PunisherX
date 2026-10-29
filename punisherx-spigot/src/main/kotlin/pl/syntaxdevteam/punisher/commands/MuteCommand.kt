@@ -13,6 +13,7 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
         val arguments = options.arguments
         val silent = options.silent
         if(PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.MUTE)) {
+            if (!options.allowMark(plugin, stack)) return
             if (arguments.isNotEmpty()) {
                 if (arguments.size < 2) {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("mute", "usage"))
@@ -40,12 +41,12 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                     val start = System.currentTimeMillis()
                     val end: Long? = if (gtime != null) (System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
 
-                    val punishmentId = plugin.databaseHandler.addPunishment(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    val punishmentId = options.persist(plugin, player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
                     if (punishmentId == null) {
                         stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
                         return
                     }
-                    plugin.databaseHandler.addPunishmentHistory(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    if (options.mark == null) plugin.databaseHandler.addPunishmentHistory(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
 
                     val formattedTime = plugin.timeHandler.formatTime(gtime)
                     val placeholders = PunishmentCommandUtils.buildPlaceholders(
@@ -57,7 +58,7 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                         extra = mapOf("id" to punishmentId.toString())
                     )
                     PunishmentCommandUtils.sendSenderMessages(plugin, stack, "mute", "mute", placeholders, silent = silent)
-                    plugin.actionExecutor.executeAction("muted", player, placeholders, silent = silent)
+                    plugin.actionExecutor.executeAction("muted", player, placeholders, silent = silent, mark = options.mark)
                     PunishmentCommandUtils.sendTargetMessages(plugin, targetPlayer, "mute", "mute_message", placeholders, silent = silent)
                     PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_MUTE, "mute", "broadcast", placeholders, silent = silent)
                 }
@@ -74,6 +75,9 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
             return emptyList()
         }
         val input = args.lastOrNull().orEmpty()
+        if (input.startsWith("--")) return listOf("--force", "--silent", "--mark", "--mark=")
+            .filter { it.startsWith(input) && it !in args.dropLast(1) }
+
         return when (args.size) {
             0, 1 -> plugin.server.onlinePlayers.map { it.name }.filter { it.startsWith(input, ignoreCase = true) }
             2 -> TimeSuggestionProvider.generateTimeSuggestions().filter { it.startsWith(input, ignoreCase = true) }

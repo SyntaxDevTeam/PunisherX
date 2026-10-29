@@ -28,12 +28,12 @@ class PunishCommandCompletionTest {
     }
 
     @Test fun `levels come from the selected template and flags do not repeat`() {
-        assertEquals(listOf("1", "3", "12", "--force", "--silent"), suggest("Steve Spam "))
+        assertEquals(listOf("1", "3", "12", "--force", "--silent", "--mark"), suggest("Steve Spam "))
         assertEquals(listOf("1", "12"), suggest("Steve Spam 1"))
-        assertEquals(listOf("1", "3", "12", "--silent"), suggest("Steve Spam --force "))
-        assertEquals(listOf("--force"), suggest("Steve Spam --silent 3 --"))
-        assertEquals(emptyList(), suggest("Steve Spam --silent 3 --force "))
-        assertEquals(listOf("1", "3", "12", "--force", "--silent"), suggest("Steve \"Chat spam\" "))
+        assertEquals(listOf("1", "3", "12", "--silent", "--mark"), suggest("Steve Spam --force "))
+        assertEquals(listOf("--force", "--mark"), suggest("Steve Spam --silent 3 --"))
+        assertEquals(listOf("--mark"), suggest("Steve Spam --silent 3 --force "))
+        assertEquals(listOf("1", "3", "12", "--force", "--silent", "--mark"), suggest("Steve \"Chat spam\" "))
     }
 
     @Test fun `player prefixes are filtered and configured names are read each time`() {

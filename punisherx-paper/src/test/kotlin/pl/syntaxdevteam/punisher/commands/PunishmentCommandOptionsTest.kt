@@ -29,4 +29,12 @@ class PunishmentCommandOptionsTest {
         assertFalse(next.force)
         assertEquals(listOf("Steve", "reason--silent", "--unknown"), next.arguments.toList())
     }
+    @Test fun `mark defaults and named check are invocation local and stripped from reasons`() {
+        val named = PunishmentCommandOptions.parse(arrayOf("Target", "--mark=Grim.Speed", "10m", "reason", "--silent"))
+        assertEquals("grim.speed", named.mark)
+        assertEquals(listOf("Target", "10m", "reason"), named.arguments.toList())
+        assertTrue(named.silent)
+        assertEquals("default", PunishmentCommandOptions.parse(arrayOf("--mark", "Target", "reason")).mark)
+        assertEquals(null, PunishmentCommandOptions.parse(arrayOf("Target", "reason")).mark)
+    }
 }

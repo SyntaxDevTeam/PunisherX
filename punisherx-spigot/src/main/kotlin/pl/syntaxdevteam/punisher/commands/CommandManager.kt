@@ -15,6 +15,7 @@ class CommandManager(private val plugin: PunisherX) {
         register("warn", WarnCommand(plugin))
         register("punish", PunishCommand(plugin))
         register("unpunish", UnpunishCommand(plugin))
+        register("unmark", UnmarkCommand(plugin))
         register("unwarn", UnWarnCommand(plugin))
         register("mute", MuteCommand(plugin))
         register("unmute", UnMuteCommand(plugin))

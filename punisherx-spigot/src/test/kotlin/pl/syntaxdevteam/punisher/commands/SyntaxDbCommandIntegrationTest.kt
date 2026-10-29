@@ -18,6 +18,7 @@ class SyntaxDbCommandIntegrationTest : SyntaxDbCommandContract() {
             "clearall" -> ClearAllCommand(plugin)
             "change-reason" -> ChangeReasonCommand(plugin)
             "punish" -> PunishCommand(plugin)
+            "unmark" -> UnmarkCommand(plugin)
             "unpunish" -> UnpunishCommand(plugin)
             "history" -> HistoryCommand(plugin, plugin.playerIPManager)
             "check" -> CheckCommand(plugin, plugin.playerIPManager)

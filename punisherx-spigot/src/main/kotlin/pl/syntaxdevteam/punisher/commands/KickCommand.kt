@@ -17,6 +17,7 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
+        if (!options.allowMark(plugin, stack)) return
 
         if (arguments.isEmpty()) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("kick", "usage"))
@@ -43,8 +44,13 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                     )
                     return@forEach
                 }
+                if (options.mark != null && plugin.databaseHandler.addMarkedPunishment(
+                    target.name, uuid.toString(), reason, stack.sender.name, punishmentType, start, start, options.mark) == null) {
+                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
+                    return@forEach
+                }
                 if(history) {
-                    plugin.databaseHandler.addPunishmentHistory(
+                    if (options.mark == null) plugin.databaseHandler.addPunishmentHistory(
                         target.name,
                         uuid.toString(),
                         reason,
@@ -64,7 +70,7 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                 )
                 PunishmentCommandUtils.sendKickMessage(plugin, target, "kick", "kick_message", placeholders)
                 PunishmentCommandUtils.sendSenderMessages(plugin, stack, "kick", "kick", placeholders, silent = silent)
-                plugin.actionExecutor.executeAction("kicked", target.name, placeholders, silent = silent)
+                plugin.actionExecutor.executeAction("kicked", target.name, placeholders, silent = silent, mark = options.mark)
             }
 
             val allPlaceholders = PunishmentCommandUtils.buildPlaceholders(
@@ -91,8 +97,13 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
                 return
             }
         }
+        if (options.mark != null && plugin.databaseHandler.addMarkedPunishment(
+            targetArg, uuid.toString(), reason, stack.sender.name, punishmentType, start, start, options.mark) == null) {
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
+            return
+        }
         if(history) {
-            plugin.databaseHandler.addPunishmentHistory(
+            if (options.mark == null) plugin.databaseHandler.addPunishmentHistory(
                 targetArg,
                 uuid.toString(),
                 reason,
@@ -112,7 +123,7 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
         )
         PunishmentCommandUtils.sendKickMessage(plugin, targetPlayer, "kick", "kick_message", placeholders)
         PunishmentCommandUtils.sendSenderMessages(plugin, stack, "kick", "kick", placeholders, silent = silent)
-        plugin.actionExecutor.executeAction("kicked", targetArg, placeholders, silent = silent)
+        plugin.actionExecutor.executeAction("kicked", targetArg, placeholders, silent = silent, mark = options.mark)
         PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_KICK, "kick", "broadcast", placeholders, silent = silent)
     }
 
@@ -121,6 +132,9 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
             return emptyList()
         }
         val input = args.lastOrNull().orEmpty()
+        if (input.startsWith("--")) return listOf("--force", "--silent", "--mark", "--mark=")
+            .filter { it.startsWith(input) && it !in args.dropLast(1) }
+
         return when (args.size) {
             0, 1 -> (listOf("all") + plugin.server.onlinePlayers.map { it.name }).filter { it.startsWith(input, ignoreCase = true) }
             2 -> plugin.messageHandler.getMessageStringList("kick", "reasons").filter { it.startsWith(input, ignoreCase = true) }

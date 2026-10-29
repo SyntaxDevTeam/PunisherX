@@ -235,6 +235,41 @@ class DatabaseHandler(private val plugin: PunisherX) {
         null
     }
 
+    fun isMarkPaused(mark: String): Boolean = MarkedPunishmentStore(db, normalizedServerScope()).isPaused(mark)
+
+    fun addMarkedPunishment(name: String, uuid: String, reason: String, operator: String, type: String,
+                            start: Long, end: Long, mark: String, playerUuid: String = uuid,
+                            template: String? = null): Long? {
+        val id = try {
+            MarkedPunishmentStore(db, normalizedServerScope()).record(
+                name, uuid, reason, operator, type, start, end, mark, playerUuid, template)
+        } catch (error: Exception) {
+            logger.err("Failed to persist marked punishment for $name. ${error.message}")
+            return null
+        }
+        // Delivery is external to the committed transaction and cannot invalidate persistence.
+        runCatching {
+            plugin.discordWebhook.sendPunishmentWebhook(id.toString(), name, operator, reason, type, start, end)
+        }.onFailure { logger.err("Failed to send marked punishment webhook for $name. ${it.message}") }
+        return id
+    }
+
+    fun undoMarkedPunishments(playerUuid: String?, mark: String?, operator: String,
+                               pause: Boolean = false): List<PunishmentData>? = try {
+        MarkedPunishmentStore(db, normalizedServerScope()).undo(playerUuid, mark, operator, pause)
+    } catch (error: Exception) {
+        logger.err("Failed to reverse marked punishments. ${error.message}")
+        null
+    }
+
+    fun resumeMark(mark: String): Boolean = try {
+        MarkedPunishmentStore(db, normalizedServerScope()).resume(mark)
+        true
+    } catch (error: Exception) {
+        logger.err("Failed to resume mark $mark. ${error.message}")
+        false
+    }
+
     fun removePunishment(uuidOrIp: String, punishmentType: String, removeAll: Boolean = false) {
         try {
             db.transaction {
@@ -273,7 +308,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                 execute(punishmentsSql, punishmentsParams)
                 val historyParams = mutableListOf<Any>(uuid)
                 val historySql = appendServerFilter("DELETE FROM punishmenthistory WHERE uuid = ?", historyParams, true)
-                for (table in listOf("punishment_templates", "punishment_undos")) {
+                for (table in listOf("punishment_templates", "punishment_undos", "punishment_marks")) {
                     val params = mutableListOf<Any>(uuid)
                     val historyIds = appendServerFilter("SELECT id FROM punishmenthistory WHERE uuid = ?", params, true)
                     execute("DELETE FROM $table WHERE historyId IN ($historyIds)", params)

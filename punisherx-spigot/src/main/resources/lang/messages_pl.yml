@@ -563,3 +563,13 @@ database-backup:
   import-started: "<yellow>Trwa import plugins/PunisherX/dump/backup.sql. Import dopisuje rekordy bez czyszczenia bazy i nadpisywania istniejących danych. Proszę czekać...</yellow>"
   import-success: "<green>Import bazy zakończony. Dopisano rekordy z kopii zapasowej.</green>"
   import-failed: "<red>Import bazy nie powiódł się. Żadne rekordy z tego importu nie zostały zatwierdzone. Sprawdź konsolę; ponowny import tej samej kopii może powodować konflikt klucza.</red>"
+
+unmark:
+  usage: '<red>Użycie: /unmark <gracz|all> [znacznik] [--silent] lub /unmark <pause|resume> <znacznik>'
+  invalid_mark: '<red>Użyj jednego znacznika: --mark lub --mark=check. Nazwa: 1-64 liter, cyfr, _, ., :, lub -, początek: litera lub cyfra.'
+  paused: '<yellow>Pominięto karę: check <gold>{mark}</gold> jest wstrzymany.'
+  db_error: '<red>Nie udało się przetworzyć oznaczonych kar. Sprawdź log serwera.'
+  success: '<green>Cofnięto {count} oznaczonych wpisów historii dla {player} (znacznik: {mark}).'
+  silent_success: '<gray>Cofnięto {count} oznaczonych wpisów historii dla {player} (znacznik: {mark}).'
+  pause_success: '<green>Wstrzymano check {mark} i cofnięto {count} oznaczonych wpisów historii. Po naprawie użyj /unmark resume {mark}.'
+  resumed: '<green>Check {mark} może ponownie nakładać oznaczone kary.'

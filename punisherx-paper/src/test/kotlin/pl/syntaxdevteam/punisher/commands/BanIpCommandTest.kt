@@ -95,7 +95,7 @@ class BanIpCommandTest {
         verify(plugin.messageHandler, never()).getSmartMessage(eq("banip"), eq("ban"), any())
         verify(plugin.messageHandler).getSmartMessage(eq("banip"), eq("silent_success"),
             argThat { get("player") == "target" && get("reason") == reason && get("time") == "999 dni" })
-        verify(plugin.actionExecutor).executeAction(eq("ip_banned"), eq("target"), any(), eq(true))
+        verify(plugin.actionExecutor).executeAction(eq("ip_banned"), eq("target"), any(), eq(true), isNull())
     }
 
     @Test
@@ -117,7 +117,7 @@ class BanIpCommandTest {
         }
         verify(plugin.proxyBridgeMessenger, times(2)).notifyIpBan(any(), eq(reason), any())
         verify(player).kick(any<Component>())
-        verify(plugin.actionExecutor).executeAction(eq("ip_banned"), eq("target"), any(), eq(false))
+        verify(plugin.actionExecutor).executeAction(eq("ip_banned"), eq("target"), any(), eq(false), isNull())
         verify(plugin.messageHandler, never()).stringMessageToComponent(eq("error"), eq("banip_db_error"), any<Map<String, String>>())
     }
 }

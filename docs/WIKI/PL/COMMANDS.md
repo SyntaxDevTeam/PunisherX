@@ -79,3 +79,17 @@ innych pluginów i własnych akcji podlegają ich ustawieniom.
 W `/punish` można łączyć obie flagi i podać je przed lub po opcjonalnym poziomie:
 `/punish Alex spam --force --silent` lub `/punish Alex spam 2 --silent --force`.
 `--force` omija odporność celu; samo `--silent` nie zmienia sprawdzania uprawnień.
+
+## Wsparcie antycheatów — oznaczone kary
+
+Dodaj `--mark` lub `--mark=grim.speed` do `/ban`, `/banip`, `/mute`, `/warn`, `/jail`, `/kick` lub `/punish`. Samo `--mark` oznacza znacznik `default`; nazwy checków nie rozróżniają wielkości liter.
+
+- `/unmark <gracz|all> [check] [--silent]` — cofa istniejące oznaczone kary; nie wstrzymuje przyszłych.
+- `/unmark pause <check>` — cofa oznaczone kary danego checku i blokuje kolejne aż do ręcznego wznowienia.
+- `/unmark resume <check>` — wznawia nakładanie kar przez ten check po naprawie antycheata.
+
+Przykład: `ban Steve 7d Cheating --mark=grim.speed --silent`, a po wykryciu false positive: `/unmark pause grim.speed`.
+
+Wymagane uprawnienie: `punisherx.cmd.unmark`. Blokady przetrwają restart. Ręczne kary pozostają aktywne, historia zachowuje audyt cofnięcia, a cofnięte kary z szablonów przestają zwiększać poziom eskalacji. Automatyczne kary PunisherX dziedziczą znacznik checku. Wyrzuconego gracza nie można automatycznie połączyć ponownie; cofnięcie kicka dotyczy wpisu historii. `--force` nie omija blokady checku. Wznowienie usuwa blokadę tylko w bieżącym zakresie serwera; blokadę `network` należy wznowić w zakresie `network`.
+
+[Szczegóły, zakresy serwerów i ograniczenia](../../ANTICHEAT-MARKS.md).

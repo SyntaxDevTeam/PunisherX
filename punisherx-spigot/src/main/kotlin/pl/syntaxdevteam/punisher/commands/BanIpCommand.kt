@@ -25,6 +25,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
             return
         }
+        if (!options.allowMark(plugin, stack)) return
         if (arguments.size < 2) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("banip", "usage"))
             return
@@ -71,8 +72,8 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
         val normalizedEnd = end ?: -1
         val punishmentIds = mutableListOf<Long>()
         playerIPs.distinct().forEach { ip ->
-            val punishmentId = plugin.databaseHandler.addPunishment(rawTarget, ip, reason, stack.sender.name,
-                "BANIP", start, normalizedEnd)
+            val punishmentId = options.persist(plugin, rawTarget, ip, reason, stack.sender.name,
+                "BANIP", start, normalizedEnd, playerUuid = targetUUID?.toString() ?: rawTarget)
             if (punishmentId == null) {
                 plugin.logger.err("IP ban not applied: failed to persist punishment for $ip")
                 failedIPs.add(ip)
@@ -80,7 +81,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
             }
             punishmentIds.add(punishmentId)
             bannedIPs.add(ip)
-            plugin.databaseHandler.addPunishmentHistory(rawTarget, ip, reason, stack.sender.name,
+            if (options.mark == null) plugin.databaseHandler.addPunishmentHistory(rawTarget, ip, reason, stack.sender.name,
                 "BANIP", start, normalizedEnd)
             plugin.proxyBridgeMessenger.notifyIpBan(ip, reason, normalizedEnd)
         }
@@ -120,15 +121,18 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         PunishmentCommandUtils.sendSenderMessages(plugin, stack, "banip", "ban", placeholders, silent = silent)
-        plugin.actionExecutor.executeAction("ip_banned", rawTarget, placeholders, silent = silent)
+        plugin.actionExecutor.executeAction("ip_banned", rawTarget, placeholders, silent = silent, mark = options.mark)
         PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_BANIP, "banip", "ban", placeholders, silent = silent)
 
         if (isForce) plugin.logger.warning("Force by ${stack.sender.name} on $rawTarget")
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
-        if (!PermissionChecker.hasWithLegacy(stack.sender as Player, PermissionChecker.PermissionKey.BANIP)) return emptyList()
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BANIP)) return emptyList()
         val input = args.lastOrNull().orEmpty()
+        if (input.startsWith("--")) return listOf("--force", "--silent", "--mark", "--mark=")
+            .filter { it.startsWith(input) && it !in args.dropLast(1) }
+
         return when (args.size) {
             0, 1 -> plugin.server.onlinePlayers.map { it.name }.filter { it.startsWith(input, ignoreCase = true) }
             2 -> TimeSuggestionProvider.generateTimeSuggestions().filter { it.startsWith(input, ignoreCase = true) }

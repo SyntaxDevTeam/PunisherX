@@ -19,7 +19,7 @@ import kotlin.test.*
 abstract class SyntaxDbCommandContract : SyntaxDbTestFixture() {
     protected val sender = mock<ConsoleCommandSender>()
     private val world = mock<World>()
-    private val commands = listOf("warn", "mute", "ban", "banip", "jail", "kick", "unwarn", "unmute", "unban", "clearall", "change-reason", "punish", "unpunish")
+    private val commands = listOf("warn", "mute", "ban", "banip", "jail", "kick", "unwarn", "unmute", "unban", "clearall", "change-reason", "punish", "unpunish", "unmark")
     protected abstract fun executeCommand(name: String, sender: CommandSender, args: Array<String>)
 
     @BeforeTest fun prepareCommands() {
@@ -46,9 +46,10 @@ abstract class SyntaxDbCommandContract : SyntaxDbTestFixture() {
         config.set("jail.location.world", "world")
     }
 
-    private fun execute(name: String, vararg args: String, actor: CommandSender = sender) {
+    private fun execute(name: String, vararg args: String, actor: CommandSender = sender, online: Player? = null) {
         mockStatic(Bukkit::class.java).use { bukkit ->
             bukkit.`when`<World?> { Bukkit.getWorld("world") }.thenReturn(world)
+            if (online != null) bukkit.`when`<Player?> { Bukkit.getPlayer(uuid) }.thenReturn(online)
             val offline = mock<OfflinePlayer>()
             whenever(offline.name).thenReturn("Target")
             bukkit.`when`<OfflinePlayer> { Bukkit.getOfflinePlayer(uuid) }.thenReturn(offline)
@@ -84,7 +85,7 @@ abstract class SyntaxDbCommandContract : SyntaxDbTestFixture() {
     @Test fun `mute persists temporary punishment and history`() {
         execute("mute", "Target", "10m", reason, "--silent")
         assertStored("MUTE")
-        verify(plugin.actionExecutor).executeAction(eq("muted"), eq("Target"), any(), eq(true))
+        verify(plugin.actionExecutor).executeAction(eq("muted"), eq("Target"), any(), eq(true), isNull())
     }
 
     @Test fun `mute without duration is permanent`() {
@@ -135,7 +136,7 @@ abstract class SyntaxDbCommandContract : SyntaxDbTestFixture() {
     @Test fun `kick with disabled history performs no database writes`() {
         execute("kick", "Target", reason, "--silent")
         assertEquals(0, count("punishments")); assertEquals(0, count("punishmenthistory"))
-        verify(plugin.actionExecutor).executeAction(eq("kicked"), eq("Target"), any(), eq(true))
+        verify(plugin.actionExecutor).executeAction(eq("kicked"), eq("Target"), any(), eq(true), isNull())
     }
 
     @Test fun `unwarn removes latest warning only and retains history and other types`() {
@@ -321,5 +322,104 @@ abstract class SyntaxDbCommandContract : SyntaxDbTestFixture() {
         verify(plugin.messageHandler).stringMessageToComponentNoPrefix(eq("banlist"), eq("ban_list"), argThat<Map<String, String>> {
             this["player"] == "Historical" && this["type"] == "BANIP" && this["reason"] == "Old ban"
         })
+    }
+
+    @Test fun `all direct penalty commands support marks and unmark all preserves manual punishment`() {
+        for (name in listOf("warn", "mute", "ban", "banip", "jail", "kick")) {
+            execute(name, "Target", "10m", reason, "--mark=grim.speed", "--silent")
+        }
+        assertEquals(7, count("punishment_marks")) // BANIP stores one entry per IP.
+        assertEquals(7, count("punishmenthistory"))
+        execute("mute", "Target", reason)
+        execute("unmark", "all", "grim.speed")
+        assertEquals(1, count("punishments"))
+        assertEquals("MUTE", handler.getPunishments(uuid.toString()).single().type)
+        assertEquals(7, count("punishment_undos"))
+        verify(plugin.cache).removePunishment(uuid, notify = false, removeDatabase = false)
+    }
+
+    @Test fun `pause blocks side effects of every direct command and resume restores punishments`() {
+        execute("ban", "Target", reason, "--mark=speed")
+        execute("unmark", "pause", "speed")
+        clearInvocations(plugin.proxyBridgeMessenger, plugin.actionExecutor, plugin.cache)
+        for (name in listOf("warn", "mute", "ban", "banip", "jail", "kick")) {
+            execute(name, "Target", reason, "--mark=speed", "--force")
+        }
+        assertEquals(0, count("punishments")); assertEquals(1, count("punishmenthistory"))
+        verifyNoInteractions(plugin.proxyBridgeMessenger, plugin.actionExecutor, plugin.cache)
+        execute("unmark", "resume", "speed")
+        execute("ban", "Target", reason, "--mark=speed")
+        assertEquals(1, count("punishments"))
+    }
+
+    @Test fun `unmark player reverses all their marked check types but does not pause future penalties`() {
+        execute("warn", "Target", reason, "--mark")
+        execute("mute", "Target", reason, "--mark=fly")
+        execute("unmark", "Target")
+        assertEquals(0, count("punishments"))
+        assertFalse(handler.isMarkPaused("default")); assertFalse(handler.isMarkPaused("fly"))
+        execute("warn", "Target", reason, "--mark")
+        assertEquals(1, count("punishments"))
+    }
+
+    @Test fun `unmark leaves another active jail in cache`() {
+        execute("jail", "Target", reason, "--mark")
+        execute("jail", "Target", reason)
+        clearInvocations(plugin.cache)
+        execute("unmark", "all")
+        assertEquals(1, count("punishments"))
+        verifyNoInteractions(plugin.cache)
+    }
+
+    @Test fun `marked template penalties retain check identity and undo escalation for all types`() {
+        for (type in listOf("BAN", "BANIP", "MUTE", "WARN", "KICK", "JAIL")) {
+            template(type)
+            execute("punish", "Target", "spam", "1", "--mark=template.check")
+        }
+        assertEquals(7, count("punishment_marks")); assertEquals(7, count("punishment_templates"))
+        execute("unmark", "all", "template.check")
+        assertEquals(0, count("punishments"))
+        assertEquals(0, handler.countEscalationHistory(uuid.toString(), "Target", reason, "spam"))
+    }
+
+    @Test fun `invalid or repeated marks never become plain penalties`() {
+        for (flags in listOf(arrayOf("--mark="), arrayOf("--mark=bad/check"), arrayOf("--mark=a", "--mark=b"))) {
+            execute("ban", "Target", reason, *flags)
+        }
+        assertEquals(0, count("punishments")); assertEquals(0, count("punishmenthistory"))
+        verifyNoInteractions(plugin.proxyBridgeMessenger)
+    }
+
+    @Test fun `failure storing a marked ban never invokes platform fallback or proxy disconnect`() {
+        sql("CREATE TRIGGER fail_mark BEFORE INSERT ON punishment_marks BEGIN SELECT RAISE(ABORT, 'injected'); END")
+        execute("ban", "Target", reason, "--mark")
+        template("BAN")
+        execute("punish", "Target", "spam", "--mark")
+        assertEquals(0, count("punishments")); assertEquals(0, count("punishmenthistory"))
+        verifyNoInteractions(plugin.proxyBridgeMessenger)
+    }
+
+    @Test fun `failed marked jail write restores online target location and gamemode`() {
+        sql("CREATE TRIGGER fail_mark BEFORE INSERT ON punishment_marks BEGIN SELECT RAISE(ABORT, 'injected'); END")
+        for (command in listOf("jail", "punish")) {
+            val target = mock<Player>()
+            val original = org.bukkit.Location(world, 20.0, 70.0, 20.0)
+            whenever(target.name).thenReturn("Target")
+            whenever(target.uniqueId).thenReturn(uuid)
+            whenever(target.location).thenReturn(original)
+            whenever(target.gameMode).thenReturn(org.bukkit.GameMode.SURVIVAL)
+            val teleport = mock<pl.syntaxdevteam.punisher.teleport.SafeTeleportService>()
+            whenever(plugin.safeTeleportService).thenReturn(teleport)
+            doAnswer { invocation -> invocation.getArgument<(Boolean) -> Unit>(2)(true); null }
+                .whenever(teleport).teleportSafely(any(), any(), any())
+            if (command == "punish") {
+                template("JAIL")
+                execute(command, "Target", "spam", "1", "--mark", online = target)
+            } else execute(command, "Target", reason, "--mark", online = target)
+            verify(teleport).teleportSafely(eq(target), eq(original), any())
+            verify(target).gameMode = org.bukkit.GameMode.SURVIVAL
+        }
+        assertEquals(0, count("punishments")); assertEquals(0, count("punishmenthistory"))
+        verifyNoInteractions(plugin.cache)
     }
 }

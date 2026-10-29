@@ -17,6 +17,7 @@ Recommended permissions plugin: [LuckPerms](https://luckperms.net/)
 | `punisherx.cmd.kick` | Enables kicking a player from the server with a specified reason. |
 | `punisherx.cmd.punish` | Uses `/punish` templates and quick template punishments in the player GUI. |
 | `punisherx.cmd.unpunish` | Allows reversing the last punishment and its escalation step in a template ladder. |
+| `punisherx.cmd.unmark` | Reverse marked penalties and pause/resume anti-cheat checks (operator by default). |
 | `punisherx.cmd.change_reason` | Allows changing the reason for a punishment. |
 | `punisherx.cmd.banlist` | Displays a list of all banned players. |
 | `punisherx.cmd.check` | Checks the punishments of a player. Not required for players checking themselves. |

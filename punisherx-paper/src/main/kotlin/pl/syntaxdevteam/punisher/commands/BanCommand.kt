@@ -18,6 +18,7 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
         val arguments = options.arguments
         val silent = options.silent
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.BAN)) {
+            if (!options.allowMark(plugin, stack)) return
             if (arguments.isNotEmpty()) {
                 if (arguments.size < 2) {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("ban", "usage"))
@@ -39,7 +40,11 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                     val end: Long? = if (gtime != null) (System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
                     val normalizedEnd = end ?: -1
 
-                    val punishmentId = plugin.databaseHandler.addPunishment(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, normalizedEnd)
+                    val punishmentId = options.persist(plugin, player, uuid.toString(), reason, stack.sender.name, punishmentType, start, normalizedEnd)
+                    if (punishmentId == null && options.mark != null) {
+                        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
+                        return
+                    }
                     if (punishmentId == null) {
                         plugin.logger.err("Failed to add ban to database for player $player. Using fallback method.")
                         stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
@@ -49,7 +54,7 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                         banList.addBan(playerProfile, reason, banEndDate, stack.sender.name)
                     }
                     clp.logCommand(stack.sender.name, punishmentType, player, reason)
-                    plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, normalizedEnd)
+                    if (options.mark == null) plugin.databaseHandler.addPunishmentHistory(player, uuid.toString(), reason, stack.sender.name, punishmentType, start, normalizedEnd)
                     plugin.proxyBridgeMessenger.notifyBan(uuid, reason, normalizedEnd)
 
                     val formattedTime = plugin.timeHandler.formatTime(gtime)
@@ -64,7 +69,7 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
 
                     PunishmentCommandUtils.sendKickMessage(plugin, targetPlayer, "ban", "kick_message", placeholders)
                     PunishmentCommandUtils.sendSenderMessages(plugin, stack, "ban", "ban", placeholders, silent = silent)
-                    plugin.actionExecutor.executeAction("banned", player, placeholders, silent = silent)
+                    plugin.actionExecutor.executeAction("banned", player, placeholders, silent = silent, mark = options.mark)
                     PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_BAN, "ban", "broadcast", placeholders, silent = silent)
                     if (isForce) {
                         plugin.logger.warning("Force-banned by ${stack.sender.name} on $player")
@@ -84,6 +89,9 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
             return emptyList()
         }
         val input = args.lastOrNull().orEmpty()
+        if (input.startsWith("--")) return listOf("--force", "--silent", "--mark", "--mark=")
+            .filter { it.startsWith(input) && it !in args.dropLast(1) }
+
         return when (args.size) {
             0, 1 -> plugin.server.onlinePlayers.map { it.name }.filter { it.startsWith(input, ignoreCase = true) }
             2 -> TimeSuggestionProvider.generateTimeSuggestions().filter { it.startsWith(input, ignoreCase = true) }

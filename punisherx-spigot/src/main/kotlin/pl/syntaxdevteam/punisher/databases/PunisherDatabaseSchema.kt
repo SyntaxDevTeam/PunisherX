@@ -8,6 +8,7 @@ import pl.syntaxdevteam.syntaxdb.schema.CreateTableBuilder
 /** Existing names and column order are retained, including PostgreSQL's unquoted lower-case names. */
 internal object PunisherDatabaseSchema {
     val tables = listOf("punishments", "punishmenthistory", "punishment_undos", "punishment_templates",
+        "punishment_marks", "punishment_mark_pauses",
         "playercache", "reports", "report_resolutions", "bridge_events",
         "punisherx_identity_migrations", "punisherx_identity_migration_items")
     val identityTables = setOf("punishments", "punishmenthistory", "playercache", "reports", "bridge_events")
@@ -36,6 +37,22 @@ internal object PunisherDatabaseSchema {
         }
         database.createTable("punishment_templates", ifNotExists = true) {
             integer(c("historyId")).primaryKey(); varchar(c("templateName"), 255).notNull(); varchar(c("playerUuid"), 36).notNull()
+        }
+        database.createTable("punishment_marks", ifNotExists = true) {
+            integer(c("historyId")).primaryKey(); bigInt(c("activeId")); varchar("mark", 64).notNull()
+            varchar(c("playerUuid"), 36).notNull()
+        }
+        database.createTable("punishment_mark_pauses", ifNotExists = true) {
+            varchar("mark", 64).notNull(); varchar("server", 64).notNull()
+            varchar(c("pausedBy"), 64).notNull(); bigInt(c("pausedAt")).notNull()
+            primaryKey("mark", "server")
+        }
+        database.createTable("punishment_mark_lock", ifNotExists = true) { integer("id").primaryKey() }
+        // Startup may run concurrently on several network servers.
+        try {
+            database.execute("INSERT INTO punishment_mark_lock (id) SELECT 1 WHERE NOT EXISTS (SELECT 1 FROM punishment_mark_lock WHERE id = 1)")
+        } catch (error: Exception) {
+            if (database.query("SELECT id FROM punishment_mark_lock WHERE id = 1").isEmpty()) throw error
         }
         database.createTable("playercache", ifNotExists = true) { id(); text("data") }
         database.createTable("reports", ifNotExists = true) {
