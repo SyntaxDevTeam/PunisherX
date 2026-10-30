@@ -1,3 +1,4 @@
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.gradle.api.file.DuplicatesStrategy
@@ -281,10 +282,31 @@ publishing {
             val snapshotsRepoUrl = uri("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/")
             url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
             credentials {
-                username = findProperty("nexusUser")?.toString()
-                    ?: throw GradleException("Właściwość 'nexusUser' nie jest ustawiona w gradle.properties")
-                password = findProperty("nexusPassword")?.toString()
-                    ?: throw GradleException("Właściwość 'nexusPassword' nie jest ustawiona w gradle.properties")
+                username = findProperty("nexusUser")
+                    ?.toString()
+                    ?.takeIf { it.isNotBlank() }
+                    ?: System.getenv("NEXUS_USER")
+                        ?.takeIf { it.isNotBlank() }
+
+                password = findProperty("nexusPassword")
+                    ?.toString()
+                    ?.takeIf { it.isNotBlank() }
+                    ?: System.getenv("NEXUS_PASSWORD")
+                        ?.takeIf { it.isNotBlank() }
+            }
+        }
+    }
+}
+
+tasks.withType<PublishToMavenRepository>().configureEach {
+    if (repository.name == "Nexus") {
+        doFirst {
+            val nexusCredentials = repository.credentials
+            if (nexusCredentials.username.isNullOrBlank() || nexusCredentials.password.isNullOrBlank()) {
+                throw GradleException(
+                    "Brak danych do publikacji w Nexus: ustaw 'nexusUser' i 'nexusPassword' " +
+                        "w gradle.properties lub zmienne srodowiskowe NEXUS_USER i NEXUS_PASSWORD"
+                )
             }
         }
     }
