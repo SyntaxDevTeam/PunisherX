@@ -1,5 +1,6 @@
-import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 @file:Suppress("AvoidDuplicateDependencies")
+
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.papermc.hangarpublishplugin.model.Platforms
