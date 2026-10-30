@@ -1,3 +1,4 @@
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 @file:Suppress("AvoidDuplicateDependencies")
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
@@ -258,20 +259,26 @@ publishing {
                     ?.takeIf { it.isNotBlank() }
                     ?: System.getenv("NEXUS_USER")
                         ?.takeIf { it.isNotBlank() }
-                            ?: throw GradleException(
-                        "Brak danych Nexus: ustaw 'nexusUser' w gradle.properties " +
-                                "lub zmienną środowiskową NEXUS_USER"
-                    )
 
                 password = findProperty("nexusPassword")
                     ?.toString()
                     ?.takeIf { it.isNotBlank() }
                     ?: System.getenv("NEXUS_PASSWORD")
                         ?.takeIf { it.isNotBlank() }
-                            ?: throw GradleException(
-                        "Brak danych Nexus: ustaw 'nexusPassword' w gradle.properties " +
-                                "lub zmienną środowiskową NEXUS_PASSWORD"
-                    )
+            }
+        }
+    }
+}
+
+tasks.withType<PublishToMavenRepository>().configureEach {
+    if (repository.name == "Nexus") {
+        doFirst {
+            val nexusCredentials = repository.credentials
+            if (nexusCredentials.username.isNullOrBlank() || nexusCredentials.password.isNullOrBlank()) {
+                throw GradleException(
+                    "Brak danych do publikacji w Nexus: ustaw 'nexusUser' i 'nexusPassword' " +
+                        "w gradle.properties lub zmienne srodowiskowe NEXUS_USER i NEXUS_PASSWORD"
+                )
             }
         }
     }
