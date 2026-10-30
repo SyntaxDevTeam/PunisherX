@@ -24,6 +24,8 @@ PunisherX brings punishments, player investigations and report handling together
 
 It works on standalone servers and networks, with a dedicated **Paper/Folia edition**, a **native Spigot edition**, and optional proxy bridges. This README describes the current `main` branch; check the [changelog](CHANGELOG.md) and download's version notes for the features included in a particular release.
 
+**PunisherX 2.0 planning:** the [architecture and implementation plan (Polish)](docs/PUNISHERX-2.0-ARCHITECTURE-PL.md) describes the proposed command contracts, full Paper Brigadier integration, punishment pipeline, cache, asynchronous execution and SyntaxDB storage. It is a design document; these changes are not implemented yet.
+
 ## ✨ Moderation tools
 
 | Tool | What your staff can do |
