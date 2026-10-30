@@ -253,8 +253,25 @@ publishing {
             val snapshotsRepoUrl = uri("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/")
             url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
             credentials {
-                username = findProperty("nexusUser")?.toString()
-                password = findProperty("nexusPassword")?.toString()
+                username = findProperty("nexusUser")
+                    ?.toString()
+                    ?.takeIf { it.isNotBlank() }
+                    ?: System.getenv("NEXUS_USER")
+                        ?.takeIf { it.isNotBlank() }
+                            ?: throw GradleException(
+                        "Brak danych Nexus: ustaw 'nexusUser' w gradle.properties " +
+                                "lub zmienną środowiskową NEXUS_USER"
+                    )
+
+                password = findProperty("nexusPassword")
+                    ?.toString()
+                    ?.takeIf { it.isNotBlank() }
+                    ?: System.getenv("NEXUS_PASSWORD")
+                        ?.takeIf { it.isNotBlank() }
+                            ?: throw GradleException(
+                        "Brak danych Nexus: ustaw 'nexusPassword' w gradle.properties " +
+                                "lub zmienną środowiskową NEXUS_PASSWORD"
+                    )
             }
         }
     }
