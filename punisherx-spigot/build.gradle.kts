@@ -12,6 +12,12 @@ plugins {
 description = "Advanced punishment system for Spigot servers with commands like warn, mute, jail, ban, kick and more."
 
 repositories {
+    // Opt-in for testing a locally published SyntaxCore before uploading its snapshot.
+    if (providers.gradleProperty("punisherx.syntaxcore.local").orNull == "true") {
+        mavenLocal {
+            content { includeModule("pl.syntaxdevteam", "syntaxcore") }
+        }
+    }
     // Opt-in for testing a locally published MessageHandler before uploading its snapshot.
     if (providers.gradleProperty("punisherx.messagehandler.local").orNull == "true") {
         mavenLocal {

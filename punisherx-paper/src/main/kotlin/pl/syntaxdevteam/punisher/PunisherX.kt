@@ -103,6 +103,7 @@ class PunisherX : JavaPlugin(), Listener {
             ModrinthSource("VCNRcwC2")
         )
         SyntaxCore.init(this, versionType = "paper")
+        localPlayerSkins.initialize(java.io.File(dataFolder, "skin-cache"))
 
         // Language YAML is deliberately excluded here: MessageHandler must be able to
         // preserve a broken translation and start on its bundled in-memory fallback.
@@ -153,6 +154,7 @@ class PunisherX : JavaPlugin(), Listener {
     }
 
     override fun onDisable() {
+        localPlayerSkins.close()
         HandlerList.unregisterAll(this as Plugin)
         cancelPluginTasks()
         server.servicesManager.unregisterAll(this)

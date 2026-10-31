@@ -52,4 +52,30 @@ class LocalPlayerSkinsTest {
         cache.apply(uuid, emptyMeta)
         verifyNoInteractions(emptyMeta)
     }
+    @Test fun `premium skins are delegated to SyntaxCore and applied with server UUID`() {
+        val uuid = UUID.randomUUID()
+        val manager = mock(pl.syntaxdevteam.core.tools.UUIDManager::class.java)
+        val resolver = mock(pl.syntaxdevteam.core.tools.PlayerSkinResolver::class.java)
+        val directory = java.io.File("unused-test-cache")
+        val skin = pl.syntaxdevteam.core.tools.PlayerSkin("https://textures.minecraft.net/texture/premium", true)
+        `when`(manager.createSkinResolver(directory)).thenReturn(resolver)
+        `when`(resolver.resolve(uuid, "OfflineName")).thenReturn(java.util.concurrent.CompletableFuture.completedFuture(skin))
+        val cache = LocalPlayerSkins()
+        cache.initialize(directory, manager)
+        kotlin.test.assertTrue(cache.resolve(uuid, "OfflineName").join())
+        val profile = mock(PlayerProfile::class.java)
+        val textures = mock(PlayerTextures::class.java)
+        val meta = mock(SkullMeta::class.java)
+        `when`(profile.textures).thenReturn(textures)
+        mockStatic(Bukkit::class.java).use { bukkit ->
+            bukkit.`when`<PlayerProfile> { Bukkit.createPlayerProfile(uuid) }.thenReturn(profile)
+            cache.apply(uuid, meta)
+            verify(textures).setSkin(java.net.URI(skin.url).toURL(), PlayerTextures.SkinModel.SLIM)
+            verify(meta).setOwnerProfile(profile)
+            verify(profile, never()).update()
+        }
+        cache.close()
+        verify(resolver).close()
+    }
+
 }

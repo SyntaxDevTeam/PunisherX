@@ -185,6 +185,19 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         })
 
         gui.open(player)
+        pageList.forEachIndexed { index, info ->
+            val uuid = UUID.fromString(info.playerUUID)
+            plugin.localPlayerSkins.resolve(uuid, info.playerName).thenAccept { available ->
+                if (available) plugin.schedulerAdapter.runForPlayer(player, Runnable {
+                    if (!player.isOnline || !gui.inventory.viewers.contains(player)) return@Runnable
+                    val item = gui.inventory.getItem(index) ?: return@Runnable
+                    val currentMeta = item.itemMeta as SkullMeta
+                    plugin.localPlayerSkins.apply(uuid, currentMeta)
+                    item.itemMeta = currentMeta
+                    gui.updateItem(index, item)
+                })
+            }
+        }
     }
 
     override fun getTitle(): Component {
