@@ -8,7 +8,6 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
-import com.destroystokyo.paper.profile.PlayerProfile
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.gui.PunisherMain
 import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
@@ -82,8 +81,8 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             val uuid = UUID.fromString(info.playerUUID)
             val head = ItemStack(Material.PLAYER_HEAD)
             val meta = head.itemMeta as SkullMeta
-            val profile: PlayerProfile = Bukkit.createProfile(uuid, info.playerName)
-            meta.playerProfile = profile
+
+            plugin.localPlayerSkins.apply(uuid, meta)
             meta.displayName(mH.formatMixedTextToMiniMessage("<yellow>${info.playerName}</yellow>", TagResolver.empty()))
             val loadMsg = mH.stringMessageToStringNoPrefix("GUI", "OfflineList.loading")
             meta.lore(

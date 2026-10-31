@@ -17,6 +17,7 @@ class PlayerJoinListener(
     @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerQuit(event: org.bukkit.event.player.PlayerQuitEvent) {
         val player = event.player
+        plugin.localPlayerSkins.capture(player)
         val save = pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService.captureLogoutLocation(player.uniqueId, player.location)
         plugin.schedulerAdapter.runAsync(save)
     }
@@ -24,6 +25,7 @@ class PlayerJoinListener(
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerJoin(event: PlayerJoinEvent) {
+        plugin.localPlayerSkins.capture(event.player)
         playerIPManager.handlePlayerJoin(event)
         punishmentChecker.handlePlayerJoin(event)
     }

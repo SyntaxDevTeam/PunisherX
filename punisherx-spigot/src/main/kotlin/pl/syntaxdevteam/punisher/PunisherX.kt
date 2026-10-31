@@ -170,9 +170,14 @@ class PunisherX : JavaPlugin(), Listener {
         }
     }
 
+    val localPlayerSkins = LocalPlayerSkins()
+
     fun resolvePlayerUuid(identifier: String): UUID {
         runCatching { UUID.fromString(identifier) }.getOrNull()?.let { return it }
         Bukkit.getPlayerExact(identifier)?.uniqueId?.let { return it }
+        Bukkit.getOfflinePlayers().firstOrNull { it.name?.equals(identifier, ignoreCase = true) == true }
+            ?.uniqueId?.let { return it }
+        if (!server.onlineMode) return UUID.nameUUIDFromBytes("OfflinePlayer:$identifier".toByteArray(Charsets.UTF_8))
         return uuidManager.getUUID(identifier)
     }
 
