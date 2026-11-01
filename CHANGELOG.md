@@ -52,6 +52,9 @@
 
 ### Bug fixes:
 
+* Fixed Mojang profile lookups from heads in the online player GUI on Paper/Folia and Spigot. Online and offline lists now use the same SyntaxCore skin cache and controlled asynchronous lookups, including default heads for missing textures and updates when skins become available.
+* Fixed `/punish` and `/punish <player>` showing Brigadier's unknown/incomplete command error on Paper/Folia. Both now display the configured, localized command usage for authorized senders.
+
 * **Fixed `/punish` suggestions on Paper and Spigot.** Template names match the entered prefix without case sensitivity, names requiring quotes are escaped correctly, and basic command entry points suggest configured levels and unused flags.
 * **Fixed failed `/banip` writes creating permanent vanilla IP bans.** Direct and template IP bans now record history and publish bridge events only for successfully persisted addresses; partial failures report both saved and failed IPs without an overall success message or follow-up action.
 * Fixed expired punishment cleanup removing a newer active punishment of the same type; cleanup now removes the expired record by ID.
