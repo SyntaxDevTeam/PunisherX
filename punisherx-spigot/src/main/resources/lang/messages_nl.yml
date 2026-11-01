@@ -342,6 +342,7 @@ GUI:
     title:         "<dark_gray>Hoofdmenu PunisherX</dark_gray>"
     serwerInfo:
       title:       "<gold>Serverinformatie</gold>"
+      name: "Mijn server" # Server name displayed in /panel; customize for your server.
       serverName:  "<gray>Servernaam: <green><servername></green></gray>"
       daily:       "<gray>Aantal straffen vandaag: <yellow><daily></yellow></gray>"
       tps:         "<gray>Server draaitijd: <green><time></green> (<green><tps></green>)</gray>"

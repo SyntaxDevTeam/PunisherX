@@ -391,6 +391,7 @@ GUI:
     title:         "<dark_gray>Головне меню PunisherX</dark_gray>"
     serwerInfo:
       title:       "<gold>Інформація про сервер</gold>"
+      name: "Мій сервер" # Server name displayed in /panel; customize for your server.
       serverName:  "<gray>Назва сервера: <green><servername></green></gray>"
       daily:       "<gray>Кількість покарань сьогодні: <yellow><daily></yellow></gray>"
       tps:         "<gray>Час роботи сервера: <green><time></green> (<green><tps></green>)</gray>"

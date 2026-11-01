@@ -391,6 +391,7 @@ GUI:
     title:         "<dark_gray>PunisherX Hauptmenü</dark_gray>"
     serwerInfo:
       title:       "<gold>Serverinformationen</gold>"
+      name: "Mein Server" # Server name displayed in /panel; customize for your server.
       serverName:  "<gray>Servername: <green><servername></green></gray>"
       daily:       "<gray>Strafen heute: <yellow><daily></yellow></gray>"
       tps:         "<gray>Serverlaufzeit: <green><time></green> (<green><tps></green>)</gray>"

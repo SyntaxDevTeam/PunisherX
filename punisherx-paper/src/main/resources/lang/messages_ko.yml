@@ -402,6 +402,7 @@ GUI:
     title:         "<dark_gray>PunisherX 메인 메뉴</dark_gray>"
     serwerInfo:
       title:       "<gold>서버 정보</gold>"
+      name: "내 서버" # Server name displayed in /panel; customize for your server.
       serverName:  "<gray>서버 이름: <green><servername></green></gray>"
       daily:       "<gray>오늘의 처벌: <yellow><daily></yellow></gray>"
       tps:         "<gray>서버 업타임(가동 시간): <green><time></green> (<green><tps></green>)</gray>"

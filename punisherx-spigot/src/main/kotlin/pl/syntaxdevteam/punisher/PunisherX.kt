@@ -42,8 +42,6 @@ import pl.syntaxdevteam.punisher.reports.ReportService
 import pl.syntaxdevteam.punisher.stats.FastStatsBridge
 import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
-import java.io.File
-import java.util.Properties
 import java.util.UUID
 import java.util.logging.Level
 
@@ -211,22 +209,8 @@ class PunisherX : JavaPlugin(), Listener {
         server.scheduler.cancelTasks(owner)
     }
 
-    fun getServerName(): String {
-        val properties = Properties()
-        val file = File("server.properties")
-        if (file.exists()) {
-            properties.load(file.inputStream())
-            val serverName = properties.getProperty("server-name")
-            if (serverName != null) {
-                return serverName
-            } else {
-                logger.debug("Property 'server-name' not found in server.properties file.")
-            }
-        } else {
-            logger.debug("The server.properties file does not exist.")
-        }
-        return "Unknown Server"
-    }
+    fun getServerName(): String =
+        messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.serwerInfo.name")
 
     fun reportError(throwable: Throwable) {
         runCatching { fastStatsBridge.trackError(throwable) }

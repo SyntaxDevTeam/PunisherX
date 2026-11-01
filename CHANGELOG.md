@@ -31,6 +31,7 @@
 
 ### Configuration and language safety:
 
+* Moved the server name shown in `/panel` to `GUI.PunisherMain.serwerInfo.name` in the language files on Paper/Folia and Spigot. Added translated defaults to all 12 bundled languages in both modules; administrators can customize this entry instead of `server.properties`. The name is read without the plugin message prefix.
 * Added separate, customizable `silent_success` messages for punishment and removal commands in all bundled languages. Silent confirmations include the relevant target, reason, duration and punishment ID where applicable.
 * Added configuration migration 168 and Polish/English messages for the report book interfaces.
 * Preserved existing `database.type`, `database.sql.*`, table names and SQLite file paths when switching the database layer to SyntaxDB. Added default database ports, a MariaDB alias and optional `database.sql.jdbc-url` configuration.

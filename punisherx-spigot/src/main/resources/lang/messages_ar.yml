@@ -394,6 +394,7 @@ GUI:
     title: "<dark_gray>القائمة الرئيسية لـ PunisherX</dark_gray>"
     serwerInfo:
       title: "<gold>معلومات الخادم</gold>"
+      name: "خادمي" # Server name displayed in /panel; customize for your server.
       serverName: "<gray>اسم الخادم: <green><servername></green></gray>"
       daily: "<gray>العقوبات اليوم: <yellow><daily></yellow></gray>"
       tps: "<gray>مدة تشغيل الخادم: <green><time></green> (<green><tps></green>)</gray>"
