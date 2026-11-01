@@ -287,6 +287,14 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
+    /** Removes the selected GUI event and its ladder contribution in one transaction. */
+    fun undoActivePunishment(punishment: PunishmentData, operator: String): Boolean = try {
+        PunishmentUndoStore(db, normalizedServerScope()).undoActive(punishment, operator)
+    } catch (error: Exception) {
+        logger.err("Failed to undo active punishment #${punishment.id}. ${error.message}")
+        false
+    }
+
     fun removePunishmentById(id: Int): Boolean {
         return try {
             val params = mutableListOf<Any>(id)

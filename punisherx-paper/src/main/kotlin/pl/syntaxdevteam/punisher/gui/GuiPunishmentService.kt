@@ -123,7 +123,7 @@ class GuiPunishmentService(private val plugin: PunisherX) {
             return
         }
         plugin.schedulerAdapter.runAsync(Runnable {
-            val removed = plugin.databaseHandler.removePunishmentById(punishment.id)
+            val removed = plugin.databaseHandler.undoActivePunishment(punishment, operator.name)
             val remainingJails = if (removed && punishment.type.equals("JAIL", true)) {
                 plugin.databaseHandler.getPunishments(punishment.uuid).any { it.type.equals("JAIL", true) }
             } else true

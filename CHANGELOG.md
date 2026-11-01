@@ -52,6 +52,8 @@
 
 ### Bug fixes:
 
+* Fixed the punishment panel's Undo action on Paper/Folia and Spigot leaving template escalation unchanged. It now reverses the selected active event and its escalation contribution atomically, preserves audited history, and rejects stale selections instead of undoing a newer punishment. Multi-IP template bans are reversed as one event.
+
 * Fixed Mojang profile lookups from heads in the online player GUI on Paper/Folia and Spigot. Online and offline lists now use the same SyntaxCore skin cache and controlled asynchronous lookups, including default heads for missing textures and updates when skins become available.
 * Fixed `/punish` and `/punish <player>` showing Brigadier's unknown/incomplete command error on Paper/Folia. Both now display the configured, localized command usage for authorized senders.
 

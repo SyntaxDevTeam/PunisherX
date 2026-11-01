@@ -54,23 +54,68 @@ internal class PunishmentUndoStore(private val database: Database, private val s
                 "AND operator = ? AND start = ? AND server = ?",
             eligibleParams(uuid, name, reason, template) + listOf(selected.name, selected.reason, selected.operator, selected.start, selected.server)
         ) else listOf(selected)
+        reverse(rows, operator)
+        rows
+    }
+
+    /** Undo the exact active event selected in a GUI, never the latest event in its template. */
+    fun undoActive(punishment: PunishmentData, operator: String): Boolean = database.transaction {
+        val active = rows("SELECT * FROM punishments WHERE id = ? AND $scopeFilter",
+            listOf(punishment.id) + scopeParams).singleOrNull() ?: return@transaction false
+        // Reject stale GUI entries, including an ID reused for a different event.
+        if (active != punishment.copy(undone = false)) return@transaction false
+        val history = rows("SELECT * FROM punishmenthistory WHERE uuid = ? AND punishmentType = ? " +
+            "AND start = ? AND server = ? AND operator = ? AND reason = ? AND endTime = ?",
+            eventParams(active))
+        check(history.size <= 1) { "Ambiguous history for active punishment #${active.id}" }
+        val selected = history.singleOrNull()
+        if (selected == null) {
+            // Older/imported active-only entries have no contribution to the ladder to reverse.
+            execute("DELETE FROM punishments WHERE id = ?", listOf(active.id))
+            cancelBridge(active)
+        } else {
+            val related = if (selected.type == "BANIP") {
+                val template = query("SELECT templateName, playerUuid FROM punishment_templates WHERE historyId = ?",
+                    listOf(selected.id)).singleOrNull()
+                val templateFilter = if (template == null)
+                    "NOT EXISTS (SELECT 1 FROM punishment_templates t WHERE t.historyId = punishmenthistory.id)"
+                else "EXISTS (SELECT 1 FROM punishment_templates t WHERE t.historyId = punishmenthistory.id " +
+                    "AND t.templateName = ? AND t.playerUuid = ?)"
+                val params = listOf(selected.name, selected.reason, selected.operator, selected.start, selected.server) +
+                    if (template == null) emptyList() else listOf(template.string("templateName").orEmpty(), template.string("playerUuid").orEmpty())
+                rows("SELECT * FROM punishmenthistory WHERE punishmentType = 'BANIP' AND name = ? " +
+                    "AND reason = ? AND operator = ? AND start = ? AND server = ? AND $templateFilter", params)
+            } else listOf(selected)
+            reverse(related, operator)
+        }
+        true
+    }
+
+    private fun eventParams(row: PunishmentData): List<Any> =
+        listOf(row.uuid, row.type, row.start, row.server, row.operator, row.reason, row.end)
+
+    private fun DatabaseClient.reverse(rows: List<PunishmentData>, operator: String) {
         val now = System.currentTimeMillis()
         for (row in rows) {
-            // The primary key also prevents concurrent or repeated reversals of the same entry.
-            execute("INSERT INTO punishment_undos (historyId, undoneBy, undoneAt) VALUES (?, ?, ?)",
-                listOf(row.id, operator, now))
-            // Active and history IDs are independent; match the original event, never the IDs.
-            execute("DELETE FROM punishments WHERE uuid = ? AND punishmentType = ? AND start = ? AND server = ? AND operator = ?",
-                listOf(row.uuid, row.type, row.start, row.server, row.operator))
-            if (row.type == "BAN" || row.type == "BANIP") {
-                // A queued disconnect must not fire later for a ban that no longer exists.
-                execute("DELETE FROM bridge_events WHERE action = ? AND target = ? AND reason = ? " +
-                    "AND endTime = ? AND processed = 0 AND NOT EXISTS " +
-                    "(SELECT 1 FROM punishments WHERE uuid = ? AND punishmentType = ?)",
-                    listOf(row.type, row.uuid, row.reason, row.end, row.uuid, row.type))
+            if (query("SELECT historyId FROM punishment_undos WHERE historyId = ?", listOf(row.id)).isEmpty()) {
+                // The primary key prevents concurrent reversals from committing twice.
+                execute("INSERT INTO punishment_undos (historyId, undoneBy, undoneAt) VALUES (?, ?, ?)",
+                    listOf(row.id, operator, now))
             }
+            // Active and history IDs are independent; match the full event, not those IDs.
+            execute("DELETE FROM punishments WHERE uuid = ? AND punishmentType = ? AND start = ? " +
+                "AND server = ? AND operator = ? AND reason = ? AND endTime = ?", eventParams(row))
+            cancelBridge(row)
         }
-        rows
+    }
+
+    private fun DatabaseClient.cancelBridge(row: PunishmentData) {
+        if (row.type == "BAN" || row.type == "BANIP") {
+            execute("DELETE FROM bridge_events WHERE action = ? AND target = ? AND reason = ? " +
+                "AND endTime = ? AND processed = 0 AND NOT EXISTS " +
+                "(SELECT 1 FROM punishments WHERE uuid = ? AND punishmentType = ?)",
+                listOf(row.type, row.uuid, row.reason, row.end, row.uuid, row.type))
+        }
     }
 
 

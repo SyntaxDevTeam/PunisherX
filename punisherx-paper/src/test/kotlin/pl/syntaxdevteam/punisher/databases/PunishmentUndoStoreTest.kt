@@ -163,4 +163,88 @@ class PunishmentUndoStoreTest {
         assertEquals(0, count("punishmenthistory"))
         assertEquals(0, count("punishment_templates"))
     }
+    private fun active(start: Long = 100): PunishmentData = database.query(
+        "SELECT * FROM punishments WHERE start = ? ORDER BY id", listOf(start)
+    ).first().let { row -> PunishmentData(row.int("id")!!, row.string("uuid")!!,
+        row.string("punishmentType")!!, row.string("reason")!!, row.long("start")!!,
+        row.long("endTime")!!, row.string("name")!!, row.string("operator")!!, row.string("server")!!) }
+
+    @Test fun `GUI undo restores first Spam step and preserves audited history`() {
+        event()
+        assertTrue(store().undoActive(active(), "Reviewer"))
+        assertEquals(1, ladder() + 1, "Next punishment must start at level one again")
+        assertEquals(0, count("punishments"))
+        assertEquals(1, count("punishmenthistory"))
+        assertEquals(1, count("punishment_undos"))
+    }
+
+    @Test fun `GUI reverses selected older event not a newer template punishment`() {
+        sql("INSERT INTO punishments (id) VALUES (50)")
+        event(100); event(200)
+        val selected = active(100)
+        assertTrue(store().undoActive(selected, "Reviewer"))
+        assertEquals(1, ladder())
+        assertEquals(200L, active(200).start)
+        assertEquals(2, count("punishments"), "Dummy row and newer penalty remain")
+        assertFalse(store().undoActive(selected, "Reviewer"))
+        assertEquals(1, count("punishment_undos"))
+    }
+
+    @Test fun `GUI refuses changed event and inaccessible server`() {
+        event(server = "survival")
+        val selected = active()
+        assertFalse(store("creative").undoActive(selected, "Reviewer"))
+        assertFalse(store().undoActive(selected.copy(reason = "Old reason"), "Reviewer"))
+        assertEquals(1, ladder())
+        assertEquals(0, count("punishment_undos"))
+    }
+
+    @Test fun `GUI audit failure rolls back active removal and escalation`() {
+        event()
+        sql("CREATE TRIGGER fail_gui_undo BEFORE INSERT ON punishment_undos BEGIN SELECT RAISE(ABORT, 'injected failure'); END")
+        assertFails { store().undoActive(active(), "Reviewer") }
+        assertEquals(1, count("punishments"))
+        assertEquals(1, ladder())
+    }
+
+    @Test fun `GUI multi IP template undo reverses whole event and cancels queued bans`() {
+        event(type = "BANIP", target = "192.0.2.1")
+        event(type = "BANIP", target = "192.0.2.2")
+        event(200, "BANIP", template = "other", target = "192.0.2.1")
+        sql("INSERT INTO bridge_events VALUES ('BANIP', '192.0.2.2', 'Spam', -1, 0)")
+        assertTrue(store().undoActive(active(), "Reviewer"))
+        assertEquals(0, ladder())
+        assertEquals(1, ladder("other"))
+        assertEquals(1, count("punishments"))
+        assertEquals(2, count("punishment_undos"))
+        assertEquals(0, count("bridge_events"))
+    }
+
+    @Test fun `GUI legacy history also stops contributing to template progression`() {
+        event()
+        sql("DELETE FROM punishment_templates")
+        assertEquals(1, ladder())
+        assertTrue(store().undoActive(active(), "Reviewer"))
+        assertEquals(0, ladder())
+    }
+
+    @Test fun `GUI active only imported entry is removable without inventing history`() {
+        event()
+        sql("DELETE FROM punishment_templates")
+        sql("DELETE FROM punishmenthistory")
+        assertTrue(store().undoActive(active(), "Reviewer"))
+        assertEquals(0, count("punishments"))
+        assertEquals(0, count("punishment_undos"))
+    }
+
+    @Test fun `GUI refuses ambiguous history rather than reversing an unrelated ladder step`() {
+        event()
+        store().record("Target", uuid, "Spam", "Admin", "MUTE", 100, -1, "network", "other", uuid)
+        assertFails { store().undoActive(active(), "Reviewer") }
+        assertEquals(1, ladder())
+        assertEquals(1, ladder("other"))
+        assertEquals(1, count("punishments"))
+        assertEquals(0, count("punishment_undos"))
+    }
+
 }
