@@ -51,7 +51,8 @@ class GuiPunishmentService(private val plugin: PunisherX) {
                         operator.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error")); return@Runnable
                     }
                     val placeholders = mapOf("player" to name, "operator" to operator.name, "reason" to reason,
-                        "time" to plugin.timeHandler.formatTime(time), "type" to type.uppercase(), "id" to id.toString())
+                        "time" to plugin.timeHandler.formatTime(time), "type" to type.uppercase(), "id" to id.toString(),
+                        "warn_no" to warnCount.toString())
                     plugin.commandLoggerPlugin.logCommand(operator.name, type.uppercase(), name, reason)
                     plugin.messageHandler.getSmartMessage(type.lowercase(), type.lowercase(), placeholders).forEach(operator::sendMessage)
                     val actionKey = mapOf("BAN" to "banned", "JAIL" to "jailed", "MUTE" to "muted", "WARN" to "warned")[type.uppercase()] ?: type.lowercase()

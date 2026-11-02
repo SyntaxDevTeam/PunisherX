@@ -27,12 +27,22 @@ class PlayerPunishmentsGUI(plugin: PunisherX) : BaseGUI(plugin) {
     private fun show(player: Player, target: OfflinePlayer, history: Boolean, page: Int, rows: List<PunishmentData>, hasNext: Boolean) {
         val gui = createGui(6, mH.miniMessageFormat(if (history) "<dark_gray>Punishment history</dark_gray>" else "<dark_gray>Active punishments</dark_gray>"))
         rows.forEachIndexed { index, punishment ->
-            val lore = listOf(
+            val lore = mutableListOf(
                 "<gray>Player: <white>${punishment.name}</white></gray>",
                 "<gray>Reason: <white>${punishment.reason}</white></gray>",
                 "<gray>Operator: <white>${punishment.operator}</white></gray>",
                 "<gray>Date: <white>${SimpleDateFormat("yy-MM-dd HH:mm:ss").format(Date(punishment.start))}</white></gray>"
             )
+            if (history && punishment.undone) {
+                lore += mH.stringMessageToStringNoPrefix("GUI", "PunishmentHistory.undone")
+                punishment.undoneBy?.let { actor ->
+                    lore += mH.stringMessageToStringNoPrefix("GUI", "PunishmentHistory.undoneBy", mapOf("operator" to actor))
+                }
+                punishment.undoneAt?.let { at ->
+                    lore += mH.stringMessageToStringNoPrefix("GUI", "PunishmentHistory.undoneAt",
+                        mapOf("date" to SimpleDateFormat("yy-MM-dd HH:mm:ss").format(Date(at))))
+                }
+            }
             gui.setItem(index, createGuiItem(Material.PAPER, "<yellow>${punishment.type} #${punishment.id}</yellow>", lore) { clicker ->
                 if (!history) PunishmentDetailsGUI(plugin).open(clicker, punishment) { open(clicker, target, false, page) }
             })

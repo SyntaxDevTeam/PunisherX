@@ -387,6 +387,14 @@ report-book:
 
 
 GUI:
+  UndoConfirmation:
+    title: "<yellow>Підтвердження скасування</yellow>"
+    confirm: "<green>Підтвердити скасування</green>"
+    cancel: "<red>Назад</red>"
+  PunishmentHistory:
+    undone: "<yellow>Скасовано</yellow>"
+    undoneBy: "<gray>Скасував: <white><operator></white></gray>"
+    undoneAt: "<gray>Дата скасування: <white><date></white></gray>"
   PunisherMain:
     title:         "<dark_gray>Головне меню PunisherX</dark_gray>"
     serwerInfo:

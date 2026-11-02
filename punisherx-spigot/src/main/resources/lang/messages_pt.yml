@@ -387,6 +387,14 @@ report-book:
 
 
 GUI:
+  UndoConfirmation:
+    title: "<yellow>Confirmar anulação</yellow>"
+    confirm: "<green>Confirmar anulação</green>"
+    cancel: "<red>Cancelar</red>"
+  PunishmentHistory:
+    undone: "<yellow>Anulada</yellow>"
+    undoneBy: "<gray>Anulada por: <white><operator></white></gray>"
+    undoneAt: "<gray>Data da anulação: <white><date></white></gray>"
   PunisherMain:
     title:         "<dark_gray>Menu principal do PunisherX</dark_gray>"
     serwerInfo:

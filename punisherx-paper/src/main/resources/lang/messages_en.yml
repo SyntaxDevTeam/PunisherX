@@ -391,6 +391,14 @@ clear:
 
 # GUI messages
 GUI:
+  UndoConfirmation:
+    title: "<yellow>Confirm punishment undo</yellow>"
+    confirm: "<green>Confirm undo</green>"
+    cancel: "<red>Cancel</red>"
+  PunishmentHistory:
+    undone: "<yellow>Undone</yellow>"
+    undoneBy: "<gray>Undone by: <white><operator></white></gray>"
+    undoneAt: "<gray>Undone at: <white><date></white></gray>"
   PunisherMain:
     title:         "<dark_gray>PunisherX Main Menu</dark_gray>"
     serwerInfo:

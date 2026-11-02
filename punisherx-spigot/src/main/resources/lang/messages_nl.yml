@@ -338,6 +338,14 @@ report-book:
 
 
 GUI:
+  UndoConfirmation:
+    title: "<yellow>Intrekking bevestigen</yellow>"
+    confirm: "<green>Intrekking bevestigen</green>"
+    cancel: "<red>Annuleren</red>"
+  PunishmentHistory:
+    undone: "<yellow>Ingetrokken</yellow>"
+    undoneBy: "<gray>Ingetrokken door: <white><operator></white></gray>"
+    undoneAt: "<gray>Ingetrokken op: <white><date></white></gray>"
   PunisherMain:
     title:         "<dark_gray>Hoofdmenu PunisherX</dark_gray>"
     serwerInfo:

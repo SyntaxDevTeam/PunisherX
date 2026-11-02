@@ -388,6 +388,14 @@ clear:
 
 # Obsługa wiadomości z GUI
 GUI:
+  UndoConfirmation:
+    title: "<yellow>Potwierdź cofnięcie kary</yellow>"
+    confirm: "<green>Potwierdź cofnięcie</green>"
+    cancel: "<red>Anuluj</red>"
+  PunishmentHistory:
+    undone: "<yellow>Cofnięta</yellow>"
+    undoneBy: "<gray>Cofnięta przez: <white><operator></white></gray>"
+    undoneAt: "<gray>Data cofnięcia: <white><date></white></gray>"
   PunisherMain:
     title:         "<dark_gray>Główne menu PunisherX</dark_gray>"
     serwerInfo:

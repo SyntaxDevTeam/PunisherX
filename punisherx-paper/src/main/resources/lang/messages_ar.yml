@@ -390,6 +390,14 @@ report-book:
 
 
 GUI:
+  UndoConfirmation:
+    title: "<yellow>تأكيد إلغاء العقوبة</yellow>"
+    confirm: "<green>تأكيد الإلغاء</green>"
+    cancel: "<red>رجوع</red>"
+  PunishmentHistory:
+    undone: "<yellow>تم الإلغاء</yellow>"
+    undoneBy: "<gray>ألغاها: <white><operator></white></gray>"
+    undoneAt: "<gray>وقت الإلغاء: <white><date></white></gray>"
   PunisherMain:
     title: "<dark_gray>القائمة الرئيسية لـ PunisherX</dark_gray>"
     serwerInfo:

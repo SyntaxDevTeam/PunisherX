@@ -16,8 +16,7 @@ class PunishmentDetailsGUI(plugin: PunisherX) : BaseGUI(plugin) {
             "<gray>Server: <white>${punishment.server}</white></gray>"
         )))
         gui.setItem(11, createGuiItem(Material.LIME_WOOL, "<green>Remove this punishment</green>") { clicker ->
-            clicker.closeInventory()
-            plugin.guiPunishmentService.revoke(clicker, punishment, back)
+            ConfirmUndoGUI(plugin).open(clicker, punishment, back)
         })
         gui.setItem(15, createNavGuiItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")) { back() })
         gui.open(player)

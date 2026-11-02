@@ -24,5 +24,7 @@ data class PunishmentData(
     val name: String,
     val operator: String,
     val server: String,
-    val undone: Boolean = false
+    val undone: Boolean = false,
+    val undoneBy: String? = null,
+    val undoneAt: Long? = null
 )

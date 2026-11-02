@@ -52,6 +52,10 @@
 
 ### Bug fixes:
 
+* Fixed the panel template preview counting undone history entries and unrelated templates with the same reason. Preview levels now use the same escalation counter as `/punish`; history remains intact and shows who reversed a punishment and when.
+* Fixed the missing `<warn_no>` value in warning messages, broadcasts and actions issued from the GUI on Paper/Folia and Spigot.
+* Replaced the panel’s bulk Undo action with a paginated active-punishment list. Administrators select one event and confirm before it is reversed; cancelling leaves all punishments unchanged. Added confirmation and history-audit translations to all bundled languages.
+
 * Fixed the punishment panel's Undo action on Paper/Folia and Spigot leaving template escalation unchanged. It now reverses the selected active event and its escalation contribution atomically, preserves audited history, and rejects stale selections instead of undoing a newer punishment. Multi-IP template bans are reversed as one event.
 
 * Fixed Mojang profile lookups from heads in the online player GUI on Paper/Folia and Spigot. Online and offline lists now use the same SyntaxCore skin cache and controlled asynchronous lookups, including default heads for missing textures and updates when skins become available.

@@ -582,7 +582,10 @@ class DatabaseHandler(private val plugin: PunisherX) {
     fun getPunishmentHistory(uuid: String, limit: Int? = null, offset: Int? = null): MutableList<PunishmentData> {
         val params = mutableListOf<Any>(uuid)
         var sql = appendServerFilter("SELECT *, CASE WHEN EXISTS (SELECT 1 FROM punishment_undos u " +
-            "WHERE u.historyId = punishmenthistory.id) THEN 1 ELSE 0 END AS undone FROM punishmenthistory WHERE uuid = ?", params, true)
+            "WHERE u.historyId = punishmenthistory.id) THEN 1 ELSE 0 END AS undone, " +
+            "(SELECT u.undoneBy FROM punishment_undos u WHERE u.historyId = punishmenthistory.id) AS undoneBy, " +
+            "(SELECT u.undoneAt FROM punishment_undos u WHERE u.historyId = punishmenthistory.id) AS undoneAt " +
+            "FROM punishmenthistory WHERE uuid = ?", params, true)
         if (limit != null && offset != null) {
             sql += " ORDER BY start DESC, id DESC LIMIT ? OFFSET ?"
             params.add(limit)
@@ -601,7 +604,9 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.string("name").orEmpty(),
                     rs.string("operator").orEmpty(),
                     rs.string("server").orEmpty(),
-                    (rs.boolean("undone") ?: false)
+                    (rs.boolean("undone") ?: false),
+                    rs.string("undoneBy"),
+                    rs.long("undoneAt")
                 )
             }.toMutableList()
         } catch (e: Exception) {

@@ -385,6 +385,14 @@ report-book:
 
 
 GUI:
+  UndoConfirmation:
+    title: "<yellow>Подтверждение отмены</yellow>"
+    confirm: "<green>Подтвердить отмену</green>"
+    cancel: "<red>Назад</red>"
+  PunishmentHistory:
+    undone: "<yellow>Отменено</yellow>"
+    undoneBy: "<gray>Отменил: <white><operator></white></gray>"
+    undoneAt: "<gray>Дата отмены: <white><date></white></gray>"
   PunisherMain:
     title:         "<dark_gray>Главное меню PunisherX</dark_gray>"
     serwerInfo:

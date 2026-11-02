@@ -387,6 +387,14 @@ report-book:
 
 
 GUI:
+  UndoConfirmation:
+    title: "<yellow>Aufhebung bestätigen</yellow>"
+    confirm: "<green>Aufhebung bestätigen</green>"
+    cancel: "<red>Abbrechen</red>"
+  PunishmentHistory:
+    undone: "<yellow>Aufgehoben</yellow>"
+    undoneBy: "<gray>Aufgehoben von: <white><operator></white></gray>"
+    undoneAt: "<gray>Aufgehoben am: <white><date></white></gray>"
   PunisherMain:
     title:         "<dark_gray>PunisherX Hauptmenü</dark_gray>"
     serwerInfo:

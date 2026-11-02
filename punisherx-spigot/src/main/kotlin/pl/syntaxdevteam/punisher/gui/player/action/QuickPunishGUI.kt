@@ -34,9 +34,14 @@ class QuickPunishGUI(plugin: PunisherX) : BaseGUI(plugin) {
             .sortedBy { it.name.lowercase(Locale.ROOT) }
 
         plugin.schedulerAdapter.runAsync(Runnable {
-            val history = plugin.databaseHandler.getPunishmentHistory(target.uniqueId.toString())
-            val nextLevels = templates.associate { template ->
-                template.name to (history.count { it.reason == template.reason } + 1)
+            val nextLevels = try {
+                nextLevels(target.uniqueId, targetName, templates)
+            } catch (error: Exception) {
+                plugin.logger.err("Failed to load template progression: ${error.message}")
+                plugin.schedulerAdapter.runForPlayer(player, Runnable {
+                    if (player.isOnline) player.sendMessage(mH.stringMessageToComponent("error", "db_error"))
+                })
+                return@Runnable
             }
 
             plugin.schedulerAdapter.runForPlayer(player, Runnable {
@@ -46,6 +51,11 @@ class QuickPunishGUI(plugin: PunisherX) : BaseGUI(plugin) {
             })
         })
     }
+
+    internal fun nextLevels(uuid: java.util.UUID, name: String, templates: List<PunishTemplate>): Map<String, Int> =
+        templates.associate { template ->
+            template.name to (plugin.databaseHandler.countEscalationHistory(uuid.toString(), name, template.reason, template.name) + 1)
+        }
 
     private fun show(
         player: Player,

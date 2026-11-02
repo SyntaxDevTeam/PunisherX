@@ -53,7 +53,8 @@ class GuiPunishmentService(private val plugin: PunisherX) {
                         return@Runnable
                     }
                     val placeholders = mapOf("player" to name, "operator" to operator.name, "reason" to reason,
-                        "time" to plugin.timeHandler.formatTime(time), "type" to type.uppercase(), "id" to id.toString())
+                        "time" to plugin.timeHandler.formatTime(time), "type" to type.uppercase(), "id" to id.toString(),
+                        "warn_no" to warnCount.toString())
                     plugin.commandLoggerPlugin.logCommand(operator.name, type.uppercase(), name, reason)
                     plugin.messageHandler.getSmartMessage(type.lowercase(), type.lowercase(), placeholders).forEach(operator::sendMessage)
                     val actionKey = when (type.uppercase()) {

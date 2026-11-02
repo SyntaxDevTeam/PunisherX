@@ -398,6 +398,14 @@ clear:
 
 # GUI messages
 GUI:
+  UndoConfirmation:
+    title: "<yellow>처벌 취소 확인</yellow>"
+    confirm: "<green>취소 확인</green>"
+    cancel: "<red>돌아가기</red>"
+  PunishmentHistory:
+    undone: "<yellow>취소됨</yellow>"
+    undoneBy: "<gray>취소한 관리자: <white><operator></white></gray>"
+    undoneAt: "<gray>취소 시간: <white><date></white></gray>"
   PunisherMain:
     title:         "<dark_gray>PunisherX 메인 메뉴</dark_gray>"
     serwerInfo:

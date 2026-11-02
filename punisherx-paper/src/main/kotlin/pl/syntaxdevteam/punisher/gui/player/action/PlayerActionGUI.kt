@@ -34,14 +34,7 @@ class PlayerActionGUI(plugin: PunisherX) : BaseGUI(plugin) {
         )
 
         gui.setItem(13, createGuiItem(Material.TOTEM_OF_UNDYING, mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.undo")) { clicker ->
-            clicker.closeInventory()
-            plugin.schedulerAdapter.runAsync(Runnable {
-                val punishments = plugin.databaseHandler.getPunishments(target.uniqueId.toString())
-                plugin.schedulerAdapter.runForPlayer(clicker, Runnable {
-                    if (punishments.isEmpty()) clicker.sendMessage(mH.stringMessageToComponent("error", "no_data"))
-                    else punishments.forEach { plugin.guiPunishmentService.revoke(clicker, it) }
-                })
-            })
+            PlayerPunishmentsGUI(plugin).open(clicker, target, history = false)
         })
         gui.setItem(15, createGuiItem(Material.BOOK, mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.history")) { clicker ->
             if (!PermissionChecker.hasWithLegacy(clicker, PermissionChecker.PermissionKey.HISTORY)) {
