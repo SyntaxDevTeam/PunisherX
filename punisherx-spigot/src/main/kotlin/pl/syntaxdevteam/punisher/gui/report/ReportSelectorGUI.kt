@@ -28,7 +28,7 @@ class ReportSelectorGUI(plugin: PunisherX) : BaseGUI(plugin) {
             clicker.closeInventory()
         })
 
-        gui.open(player)
+        openGui(gui, player)
     }
 
     override fun getTitle(): Component {

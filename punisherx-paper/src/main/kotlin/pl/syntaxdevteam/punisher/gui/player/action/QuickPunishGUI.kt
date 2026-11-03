@@ -143,7 +143,7 @@ class QuickPunishGUI(plugin: PunisherX) : BaseGUI(plugin) {
             )
         }
 
-        gui.open(player)
+        openGui(gui, player)
     }
 
     private fun materialFor(type: String): Material {

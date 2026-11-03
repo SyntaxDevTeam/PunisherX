@@ -77,7 +77,7 @@ class PlayerActionGUI(plugin: PunisherX) : BaseGUI(plugin) {
             if (target.isOnline) PlayerListGUI(plugin).open(clicker) else OfflinePlayerListGUI(plugin).open(clicker)
         })
 
-        gui.open(player)
+        openGui(gui, player)
     }
 
     override fun open(player: Player) {}

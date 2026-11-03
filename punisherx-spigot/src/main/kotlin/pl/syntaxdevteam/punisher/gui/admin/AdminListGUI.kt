@@ -42,7 +42,7 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         playersPage.forEachIndexed { index, target ->
             val head = ItemStack(Material.PLAYER_HEAD)
             val meta = head.itemMeta as SkullMeta
-            meta.owningPlayer = target
+
             meta.displayName(
                 mH.formatMixedTextToMiniMessage("<yellow>${target.name}</yellow>", TagResolver.empty())
             )
@@ -59,7 +59,7 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 )
             )
             head.itemMeta = meta
-            gui.setItem(index, createGuiItem(head))
+            setPlayerHead(gui, index, head, target.uniqueId, target.name)
 
             plugin.schedulerAdapter.runAsync(Runnable {
                 val uuid = target.uniqueId
@@ -107,7 +107,7 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             })
         }
 
-        gui.open(player)
+        openGui(gui, player)
     }
 
     override fun getTitle(): Component {

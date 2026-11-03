@@ -3,7 +3,6 @@ import pl.syntaxdevteam.punisher.compatibility.*
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -13,7 +12,6 @@ import pl.syntaxdevteam.punisher.databases.PunishmentData
 import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.UUID
 
 class PunishmentBrowserGUI(plugin: PunisherX) : BaseGUI(plugin) {
     private enum class Filter(val types: Set<String>) {
@@ -35,9 +33,10 @@ class PunishmentBrowserGUI(plugin: PunisherX) : BaseGUI(plugin) {
     }
     private fun show(player: Player, page: Int, filter: Filter, query: String, rows: List<PunishmentData>, hasNext: Boolean) {
         val gui = createGui(6)
-        rows.forEachIndexed { index, punishment -> gui.setItem(index, createGuiItem(createHead(punishment)) { clicker ->
+        rows.forEachIndexed { index, punishment -> setPlayerHead(gui, index, createHead(punishment),
+                runCatching { java.util.UUID.fromString(punishment.uuid) }.getOrNull(), punishment.name) { clicker ->
             PunishmentDetailsGUI(plugin).open(clicker, punishment) { load(clicker, page, filter, query) }
-        }) }
+        } }
         if (page > 0) gui.setItem(45, createNavGuiItem(Material.ARROW, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")) { load(it, page - 1, filter, query) })
         gui.setItem(47, createNavGuiItem(Material.HOPPER, "<yellow>Filter: ${filter.name.lowercase()}</yellow>") { load(it, 0, filter.next(), query) })
         gui.setItem(49, createNavGuiItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")) { PunishedListGUI(plugin).open(it) })
@@ -45,13 +44,12 @@ class PunishmentBrowserGUI(plugin: PunisherX) : BaseGUI(plugin) {
             plugin.guiSearchService.request(clicker, "<yellow>Enter player name in chat, or 'cancel'.</yellow>") { searcher, text -> load(searcher, 0, filter, text) }
         })
         if (hasNext) gui.setItem(53, createNavGuiItem(Material.ARROW, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")) { load(it, page + 1, filter, query) })
-        gui.open(player)
+        openGui(gui, player)
     }
     private fun createHead(p: PunishmentData): ItemStack {
         val head = ItemStack(Material.PLAYER_HEAD)
         val meta = head.itemMeta as SkullMeta
-        val uuid = runCatching { UUID.fromString(p.uuid) }.getOrNull()
-        meta.ownerProfile = Bukkit.createPlayerProfile(uuid, p.name)
+
         meta.displayName(mH.formatMixedTextToMiniMessage("<yellow>${p.name}</yellow> <gray>#${p.id}</gray>", TagResolver.empty()))
         val end = if (p.end == -1L) "permanent" else plugin.timeHandler.formatTime(((p.end - System.currentTimeMillis()).coerceAtLeast(0) / 1000).toString())
         meta.lore(listOf(mH.miniMessageFormat("<gray>Type: <yellow>${p.type}</yellow></gray>"),

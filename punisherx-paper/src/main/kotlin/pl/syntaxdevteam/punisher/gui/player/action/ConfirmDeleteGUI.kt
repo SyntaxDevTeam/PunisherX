@@ -25,7 +25,7 @@ class ConfirmDeleteGUI(plugin: PunisherX) : BaseGUI(plugin) {
             PlayerActionGUI(plugin).open(clicker, target)
         })
 
-        gui.open(player)
+        openGui(gui, player)
     }
 
     override fun open(player: Player) {}

@@ -127,6 +127,7 @@ dependencies {
 
     compileOnly(libs.faststats.bukkit)
 
+    testRuntimeOnly(libs.triumph.gui) { isTransitive = false }
     testImplementation(libs.kotlin.test)
     testImplementation(libs.syntaxdb)
     testImplementation(libs.syntaxcore) {

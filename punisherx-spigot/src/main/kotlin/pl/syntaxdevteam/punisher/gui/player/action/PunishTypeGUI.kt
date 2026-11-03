@@ -49,7 +49,7 @@ class PunishTypeGUI(plugin: PunisherX) : BaseGUI(plugin) {
             PunishTimeGUI(plugin).open(clicker, target, "warn")
         })
 
-        gui.open(player)
+        openGui(gui, player)
     }
 
     override fun open(player: Player) {}

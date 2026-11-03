@@ -19,7 +19,7 @@ class PunishmentDetailsGUI(plugin: PunisherX) : BaseGUI(plugin) {
             ConfirmUndoGUI(plugin).open(clicker, punishment, back)
         })
         gui.setItem(15, createNavGuiItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")) { back() })
-        gui.open(player)
+        openGui(gui, player)
     }
 
     override fun open(player: Player) = Unit

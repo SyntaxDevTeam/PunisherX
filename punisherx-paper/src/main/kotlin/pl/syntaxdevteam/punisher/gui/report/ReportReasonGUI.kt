@@ -75,7 +75,7 @@ class ReportReasonGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 openPaged(clicker, target, currentPage + 1, reasons)
             })
 
-        gui.open(player)
+        openGui(gui, player)
     }
 
     override fun open(player: Player) { /* not used */ }

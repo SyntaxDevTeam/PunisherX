@@ -43,6 +43,6 @@ class ReportInboxGUI(plugin: PunisherX) : BaseGUI(plugin) {
             mH.stringMessageToStringNoPrefix("GUI", "Nav.next")) { staff ->
             ReportsCommand(plugin).execute(staff, arrayOf("gui", (page + 1).toString()))
         })
-        gui.open(player)
+        openGui(gui, player)
     }
 }

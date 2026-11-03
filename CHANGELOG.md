@@ -52,6 +52,9 @@
 
 ### Bug fixes:
 
+* Fixed `/panel` losing click handling and inventory protection after plugin reload. Reload preserves Triumph GUI's one-time listeners and SyntaxCore lifecycle listeners, invalidates old menu callbacks, and closes previously open plugin menus without closing unrelated inventories.
+* Routed every player-head panel through shared cached skin binding: players online/offline, administrators, report targets, active punishments, bans and jailed players. Removed direct skull owners and name-based profile creation from GUI code; late skin updates preserve current item descriptions and ignore obsolete menus. Added an architecture regression check covering both Paper/Folia and Spigot GUI sources.
+
 * Fixed the panel template preview counting undone history entries and unrelated templates with the same reason. Preview levels now use the same escalation counter as `/punish`; history remains intact and shows who reversed a punishment and when.
 * Fixed the missing `<warn_no>` value in warning messages, broadcasts and actions issued from the GUI on Paper/Folia and Spigot.
 * Replaced the panel’s bulk Undo action with a paginated active-punishment list. Administrators select one event and confirm before it is reversed; cancelling leaves all punishments unchanged. Added confirmation and history-audit translations to all bundled languages.

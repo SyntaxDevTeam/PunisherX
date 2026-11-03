@@ -85,4 +85,28 @@ class PluginRegistrationsTest {
         verify(services).unregisterAll(previous)
         verify(services, never()).unregisterAll(current)
     }
+    @Test fun `repeated reload preserves both real Triumph handlers without duplicates`() {
+        val current = owner()
+        val handlers = HandlerList()
+        var guiCalls = 0
+        var appCalls = 0
+        val infrastructure = listOf("GuiListener", "InteractionModifierListener").map { name ->
+            Class.forName("dev.triumphteam.gui.guis.$name").getDeclaredConstructor().apply { isAccessible = true }
+                .newInstance() as Listener
+        }
+        infrastructure.forEach { listener ->
+            handlers.register(RegisteredListener(listener, { _, _ -> guiCalls++ }, EventPriority.NORMAL, current, false))
+        }
+        handlers.register(listener(current) { appCalls++ })
+        try {
+            repeat(3) {
+                PluginRegistrations.unregisterForReload(current)
+                handlers.registeredListeners.forEach { it.callEvent(ChatEvent(handlers)) }
+                assertEquals((it + 1) * 2, guiCalls)
+                assertEquals(0, appCalls)
+                assertEquals(2, handlers.registeredListeners.size)
+            }
+        } finally { handlers.unregister(current) }
+    }
+
 }

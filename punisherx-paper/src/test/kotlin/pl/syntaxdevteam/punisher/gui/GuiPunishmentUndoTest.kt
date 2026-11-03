@@ -25,6 +25,7 @@ class GuiPunishmentUndoTest {
         })
         whenever(plugin.dataFolder).thenReturn(folder)
         whenever(plugin.logger).thenReturn(mock())
+        whenever(plugin.guiRuntime).thenReturn(GuiRuntime(plugin))
         whenever(plugin.discordWebhook).thenReturn(mock())
         whenever(plugin.punishmentManager).thenReturn(pl.syntaxdevteam.punisher.basic.PunishmentManager())
         whenever(plugin.messageHandler).thenReturn(mock())

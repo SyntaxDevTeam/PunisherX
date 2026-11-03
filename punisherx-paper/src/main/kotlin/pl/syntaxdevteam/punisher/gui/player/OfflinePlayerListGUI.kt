@@ -82,7 +82,6 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             val head = ItemStack(Material.PLAYER_HEAD)
             val meta = head.itemMeta as SkullMeta
 
-            plugin.localPlayerSkins.apply(uuid, meta)
             meta.displayName(mH.formatMixedTextToMiniMessage("<yellow>${info.playerName}</yellow>", TagResolver.empty()))
             val loadMsg = mH.stringMessageToStringNoPrefix("GUI", "OfflineList.loading")
             meta.lore(
@@ -99,10 +98,10 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 )
             )
             head.itemMeta = meta
-            gui.setItem(index, createGuiItem(head) { clicker ->
+            setPlayerHead(gui, index, head, uuid, info.playerName) { clicker ->
                 val off = Bukkit.getOfflinePlayer(UUID.fromString(info.playerUUID))
                 PlayerActionGUI(plugin).open(clicker, off)
-            })
+            }
 
             plugin.schedulerAdapter.runAsync(Runnable {
                 val offlineTime = plugin.timeHandler.getOfflineDuration(info.lastUpdated)
@@ -184,20 +183,8 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             open(clicker, 0, sort.next(), query)
         })
 
-        gui.open(player)
-        pageList.forEachIndexed { index, info ->
-            val uuid = UUID.fromString(info.playerUUID)
-            plugin.localPlayerSkins.resolve(uuid, info.playerName).thenAccept { available ->
-                if (available) plugin.schedulerAdapter.runForPlayer(player, Runnable {
-                    if (!player.isOnline || !gui.inventory.viewers.contains(player)) return@Runnable
-                    val item = gui.inventory.getItem(index) ?: return@Runnable
-                    val currentMeta = item.itemMeta as SkullMeta
-                    plugin.localPlayerSkins.apply(uuid, currentMeta)
-                    item.itemMeta = currentMeta
-                    gui.updateItem(index, item)
-                })
-            }
-        }
+        openGui(gui, player)
+
     }
 
     override fun getTitle(): Component {

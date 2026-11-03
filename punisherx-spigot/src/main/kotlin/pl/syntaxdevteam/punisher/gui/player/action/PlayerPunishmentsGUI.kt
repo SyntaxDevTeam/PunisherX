@@ -51,7 +51,7 @@ class PlayerPunishmentsGUI(plugin: PunisherX) : BaseGUI(plugin) {
         if (page > 0) gui.setItem(45, createNavGuiItem(Material.ARROW, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")) { open(it, target, history, page - 1) })
         gui.setItem(49, createNavGuiItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")) { PlayerActionGUI(plugin).open(it, target) })
         if (hasNext) gui.setItem(53, createNavGuiItem(Material.ARROW, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")) { open(it, target, history, page + 1) })
-        gui.open(player)
+        openGui(gui, player)
     }
 
     override fun open(player: Player) = Unit

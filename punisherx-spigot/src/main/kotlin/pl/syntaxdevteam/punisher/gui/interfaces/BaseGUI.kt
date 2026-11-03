@@ -8,11 +8,48 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import pl.syntaxdevteam.punisher.PunisherX
 
 abstract class BaseGUI(protected val plugin: PunisherX) : GUI {
     protected val mH = plugin.messageHandler
+    private val generation = plugin.guiRuntime.generation
+    private data class HeadBinding(val slot: Int, val uuid: java.util.UUID, val name: String)
+    private val heads = java.util.IdentityHashMap<Gui, MutableList<HeadBinding>>()
+
+    /** The only player-head path for panels: never assign an incomplete owner/profile. */
+    protected fun setPlayerHead(gui: Gui, slot: Int, item: ItemStack, uuid: java.util.UUID?, name: String,
+                                onClick: ((Player) -> Unit)? = null) {
+        // IP bans have no player UUID. This key is for appearance only, never for punishment actions.
+        val skinKey = uuid ?: java.util.UUID.nameUUIDFromBytes("PunisherX:head:$name".toByteArray(Charsets.UTF_8))
+        val meta = item.itemMeta as org.bukkit.inventory.meta.SkullMeta
+        plugin.localPlayerSkins.apply(skinKey, meta)
+        item.itemMeta = meta
+        gui.setItem(slot, createGuiItem(item, onClick))
+        heads.getOrPut(gui) { mutableListOf() }.add(HeadBinding(slot, skinKey, name))
+    }
+
+    protected fun openGui(gui: Gui, player: Player) {
+        if (generation != plugin.guiRuntime.generation) return
+        plugin.guiRuntime.track(gui.inventory)
+        gui.open(player)
+        heads.remove(gui)?.forEach { head ->
+            plugin.localPlayerSkins.resolve(head.uuid, head.name).thenAccept { available ->
+                if (available && generation == plugin.guiRuntime.generation) {
+                    plugin.schedulerAdapter.runForPlayer(player, Runnable {
+                        if (generation != plugin.guiRuntime.generation || !player.isOnline ||
+                            player.openInventory.topInventory !== gui.inventory) return@Runnable
+                        val item = gui.inventory.getItem(head.slot) ?: return@Runnable
+                        val meta = item.itemMeta as? org.bukkit.inventory.meta.SkullMeta ?: return@Runnable
+                        plugin.localPlayerSkins.apply(head.uuid, meta)
+                        item.itemMeta = meta
+                        gui.updateItem(head.slot, item)
+                    })
+                }
+            }
+        }
+    }
 
     protected fun createGui(rows: Int, title: Component = getTitle()): Gui {
         return Gui.gui()
@@ -46,6 +83,7 @@ abstract class BaseGUI(protected val plugin: PunisherX) : GUI {
     ): GuiItem {
         return ItemBuilder.from(item).asGuiItem { event ->
             event.isCancelled = true
+            if (generation != plugin.guiRuntime.generation) return@asGuiItem
             val player = event.whoClicked as? Player ?: return@asGuiItem
             onClick?.invoke(player)
         }
@@ -81,5 +119,6 @@ abstract class BaseGUI(protected val plugin: PunisherX) : GUI {
         item.itemMeta = meta
         return item
     }
+
 
 }

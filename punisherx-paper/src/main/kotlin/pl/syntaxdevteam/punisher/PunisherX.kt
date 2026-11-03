@@ -165,6 +165,7 @@ class PunisherX : JavaPlugin(), Listener {
         }
     }
 
+    val guiRuntime = pl.syntaxdevteam.punisher.gui.GuiRuntime(this)
     val localPlayerSkins = LocalPlayerSkins()
 
     fun resolvePlayerUuid(identifier: String): UUID {
@@ -176,8 +177,9 @@ class PunisherX : JavaPlugin(), Listener {
     }
 
     private fun reloadMyConfig() {
-        HandlerList.unregisterAll(this as Plugin)
+        PluginRegistrations.unregisterForReload(this)
         cancelPluginTasks()
+        guiRuntime.reset()
         pluginInitializer.onDisable()
         runCatching { proxyBridgeMessenger.unregisterChannel() }
         reloadConfig()

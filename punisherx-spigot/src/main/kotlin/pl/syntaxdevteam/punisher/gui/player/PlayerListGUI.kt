@@ -42,8 +42,7 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         playersPage.forEachIndexed { index, target ->
             val head = ItemStack(Material.PLAYER_HEAD)
             val meta = head.itemMeta as SkullMeta
-            // Incomplete online profiles also trigger server-side skin lookups.
-            plugin.localPlayerSkins.apply(target.uniqueId, meta)
+
             meta.displayName(mH.formatMixedTextToMiniMessage("<yellow>${target.name}</yellow>", TagResolver.empty()))
             val loading = mH.stringMessageToStringNoPrefix("GUI", "PlayerList.loading")
             meta.lore(
@@ -58,9 +57,9 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 )
             )
             head.itemMeta = meta
-            gui.setItem(index, createGuiItem(head) { clicker ->
+            setPlayerHead(gui, index, head, target.uniqueId, target.name) { clicker ->
                 PlayerActionGUI(plugin).open(clicker, target)
-            })
+            }
 
             plugin.schedulerAdapter.runAsync(Runnable {
                 val uuid = target.uniqueId
@@ -109,20 +108,8 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 open(clicker, currentPage + 1, online, query)
             })
 
-        gui.open(player)
-        playersPage.forEachIndexed { index, target ->
-            val uuid = target.uniqueId
-            plugin.localPlayerSkins.resolve(uuid, target.name).thenAccept { available ->
-                if (available) plugin.schedulerAdapter.runForPlayer(player, Runnable {
-                    if (!player.isOnline || !gui.inventory.viewers.contains(player)) return@Runnable
-                    val item = gui.inventory.getItem(index) ?: return@Runnable
-                    val currentMeta = item.itemMeta as SkullMeta
-                    plugin.localPlayerSkins.apply(uuid, currentMeta)
-                    item.itemMeta = currentMeta
-                    gui.updateItem(index, item)
-                })
-            }
-        }
+        openGui(gui, player)
+
     }
 
     override fun getTitle(): Component {

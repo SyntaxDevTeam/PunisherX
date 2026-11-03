@@ -99,7 +99,7 @@ class PunisherMain(plugin: PunisherX) : BaseGUI(plugin) {
             )
         }
 
-        gui.open(player)
+        openGui(gui, player)
     }
 
     override fun getTitle(): Component {

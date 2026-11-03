@@ -25,7 +25,7 @@ class ConfirmUndoGUI(plugin: PunisherX) : BaseGUI(plugin) {
             mH.stringMessageToStringNoPrefix("GUI", "UndoConfirmation.cancel")) { clicker ->
             if (used.compareAndSet(false, true)) PunishmentDetailsGUI(plugin).open(clicker, punishment, back)
         })
-        gui.open(player)
+        openGui(gui, player)
     }
 
     override fun open(player: Player) = Unit

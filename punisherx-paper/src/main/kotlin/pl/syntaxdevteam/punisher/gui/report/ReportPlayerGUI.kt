@@ -44,20 +44,20 @@ class ReportPlayerGUI(plugin: PunisherX) : BaseGUI(plugin) {
             val slot = if (index < centerSlots.size) centerSlots[index] else index
             val head = ItemStack(Material.PLAYER_HEAD)
             val meta = head.itemMeta as SkullMeta
-            meta.owningPlayer = target
+
             meta.displayName(mH.formatMixedTextToMiniMessage("<gold><b>${target.name}</b></gold>", TagResolver.empty()))
             val loreText = mH.stringMessageToStringNoPrefix("GUI", "Report.lore.clickToReport")
             meta.lore(listOf(mH.formatMixedTextToMiniMessage(loreText, TagResolver.empty())))
             meta.addEnchant(Enchantment.UNBREAKING, 1, true)
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES)
             head.itemMeta = meta
-            gui.setItem(slot, createGuiItem(head) { clicker ->
+            setPlayerHead(gui, slot, head, target.uniqueId, target.name) { clicker ->
                 if (target.uniqueId == clicker.uniqueId) {
                     clicker.sendMessage(mH.stringMessageToComponent("reports", "cannot-report-self"))
-                    return@createGuiItem
+                    return@setPlayerHead
                 }
                 ReportReasonGUI(plugin).open(clicker, target)
-            })
+            }
         }
 
         if (currentPage > 0)
@@ -74,7 +74,7 @@ class ReportPlayerGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 open(clicker, currentPage + 1, list)
             })
 
-        gui.open(player)
+        openGui(gui, player)
     }
 
     override fun getTitle(): Component {

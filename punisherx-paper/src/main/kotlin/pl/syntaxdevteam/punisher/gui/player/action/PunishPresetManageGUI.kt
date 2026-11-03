@@ -213,7 +213,7 @@ class PunishPresetManageGUI(plugin: PunisherX) : BaseGUI(plugin) {
             )
         }
 
-        gui.open(player)
+        openGui(gui, player)
     }
 
     private fun requestValue(
@@ -323,7 +323,7 @@ private class PunishPresetEntryGUI(plugin: PunisherX) : BaseGUI(plugin) {
                 PunishPresetManageGUI(plugin).open(it, kind, page, onBack)
             }
         )
-        gui.open(player)
+        openGui(gui, player)
     }
 
     override fun open(player: Player) {}

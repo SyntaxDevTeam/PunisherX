@@ -35,7 +35,7 @@ class PunishedListGUI(plugin: PunisherX) : BaseGUI(plugin) {
         gui.setItem(40, createNavGuiItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")) { clicker ->
             PunisherMain(plugin).open(clicker)
         })
-        gui.open(player)
+        openGui(gui, player)
     }
 
     override fun getTitle(): Component {
