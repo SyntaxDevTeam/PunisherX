@@ -20,14 +20,14 @@ class PlatformParityTest {
     @Test
     fun `Paper and Spigot recognize exactly the same Minecraft versions`() {
         val root = repositoryRoot()
-        val regex = Regex("""SemanticVersion\\(\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*\\d+\\s*\\)""")
+        val regex = Regex("""SemanticVersion\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)""")
         fun versions(module: String): List<String> {
             val source = File(
                 root,
                 "punisherx-$module/src/main/kotlin/pl/syntaxdevteam/punisher/compatibility/VersionChecker.kt"
             ).readText()
             return regex.findAll(source).map { match ->
-                match.value.replace(Regex("""\\s+"""), "")
+                match.value.replace(Regex("""\s+"""), "")
             }.toList()
         }
         val paper = versions("paper")
