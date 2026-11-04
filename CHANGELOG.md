@@ -52,6 +52,9 @@
 
 ### Bug fixes:
 
+* Restored Spigot parity for Minecraft `26.3` / `26.3.0` recognition and the shared GUI base helpers without introducing Paper-only APIs. Added Spigot regression tests for supported versions, GUI reload protection, and cross-module version/template parity.
+* Aligned the bundled Spigot `AltAccountAbuse` third escalation step with Paper (`permanent` instead of `90d`). This only changes the bundled default template, not existing server-defined templates.
+
 * Fixed `/panel` losing click handling and inventory protection after plugin reload. Reload preserves Triumph GUI's one-time listeners and SyntaxCore lifecycle listeners, invalidates old menu callbacks, and closes previously open plugin menus without closing unrelated inventories.
 * Routed every player-head panel through shared cached skin binding: players online/offline, administrators, report targets, active punishments, bans and jailed players. Removed direct skull owners and name-based profile creation from GUI code; late skin updates preserve current item descriptions and ignore obsolete menus. Added an architecture regression check covering both Paper/Folia and Spigot GUI sources.
 

@@ -11,18 +11,19 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import pl.syntaxdevteam.punisher.PunisherX
+import java.util.UUID
 
 abstract class BaseGUI(protected val plugin: PunisherX) : GUI {
     protected val mH = plugin.messageHandler
     private val generation = plugin.guiRuntime.generation
-    private data class HeadBinding(val slot: Int, val uuid: java.util.UUID, val name: String)
+    private data class HeadBinding(val slot: Int, val uuid: UUID, val name: String)
     private val heads = java.util.IdentityHashMap<Gui, MutableList<HeadBinding>>()
 
     /** The only player-head path for panels: never assign an incomplete owner/profile. */
-    protected fun setPlayerHead(gui: Gui, slot: Int, item: ItemStack, uuid: java.util.UUID?, name: String,
+    protected fun setPlayerHead(gui: Gui, slot: Int, item: ItemStack, uuid: UUID?, name: String,
                                 onClick: ((Player) -> Unit)? = null) {
         // IP bans have no player UUID. This key is for appearance only, never for punishment actions.
-        val skinKey = uuid ?: java.util.UUID.nameUUIDFromBytes("PunisherX:head:$name".toByteArray(Charsets.UTF_8))
+        val skinKey = uuid ?: UUID.nameUUIDFromBytes("PunisherX:head:$name".toByteArray(Charsets.UTF_8))
         val meta = item.itemMeta as org.bukkit.inventory.meta.SkullMeta
         plugin.localPlayerSkins.apply(skinKey, meta)
         item.itemMeta = meta
@@ -120,5 +121,9 @@ abstract class BaseGUI(protected val plugin: PunisherX) : GUI {
         return item
     }
 
-
+    protected fun Inventory.fillWithFiller() {
+        for (slot in 0 until size) {
+            setItem(slot, createFillerItem())
+        }
+    }
 }

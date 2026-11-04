@@ -109,7 +109,7 @@ templates:
       time: "30d"
     3:
       punish: banip
-      time: "90d"
+      time: "permanent"
   InappropriateSkin:
     reason: "Inappropriate name or skin"
     1:
