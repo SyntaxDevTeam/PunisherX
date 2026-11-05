@@ -50,7 +50,7 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             meta.lore(
                 listOf(
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to loadMsg)),
-                    if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.VIEW_IP)) mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loadMsg)) else Component.empty(),
+                    if (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, player, target.uniqueId, target.name)) mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loadMsg)) else Component.empty(),
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to loadMsg)),
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to loadMsg)),
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to loadMsg)),
@@ -77,7 +77,7 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                     im.lore(
                         listOf(
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to target.uniqueId.toString())),
-                            if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.VIEW_IP)) mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to playerIP)) else Component.empty(),
+                            if (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, player, target.uniqueId, target.name)) mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to playerIP)) else Component.empty(),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to onlineStr)),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to totalStr)),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to lastActive)),

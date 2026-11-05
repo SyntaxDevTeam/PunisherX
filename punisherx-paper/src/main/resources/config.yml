@@ -1,4 +1,4 @@
-config-version: 168
+config-version: 169
 
 # /********************************************/
 #    Global settings
@@ -116,6 +116,12 @@ aliases:
 
 # Settings for the prison location and its radius.
 jail:
+  # JAIL itself confines the player and sets Adventure mode. No separate MUTE is created.
+  restrictions:
+    mute: true
+    commands: true
+  # Pause timed jail sentences on logout; persisted in the punishment database.
+  online_time_only: false
   location:
     world: "world"
     x: 100.0
@@ -320,3 +326,12 @@ name-formatting:
   # Example: "$suffix <gray>|</gray> $name $prefix". Use $$ for a literal dollar sign.
   operator-display: "$prefix$name$suffix"
   player-display: "$prefix$name$suffix"
+
+# Sensitive information shown by /check and player/admin GUI lists.
+privacy:
+  ip:
+    enabled: true
+    # Require explicitly assigned punisherx.view_ip for OP viewers as well.
+    restrict_operators: false
+    # UUIDs (recommended) or player names; applies even when the player is offline.
+    hidden_players: []

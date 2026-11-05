@@ -70,8 +70,8 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                         return@runSync
                     }
 
-                    if (isJailed && !plugin.cache.isPlayerInCache(uuid)) {
-                        plugin.cache.addOrUpdatePunishment(uuid, activeJail.end, player.location.clone())
+                    if (isJailed) {
+                        plugin.cache.addOrUpdatePunishment(uuid, activeJail.end, if (plugin.cache.isPlayerInCache(uuid)) null else player.location.clone())
                         plugin.logger.debug("Restore jail sentence from database for player ${player.name} (end=${activeJail.end})")
                     }
 
@@ -123,7 +123,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             }
 
             for (punishment in punishments) {
-                if (punishment.type != "MUTE" && punishment.type != "JAIL") {
+                if (punishment.type != "MUTE" && (punishment.type != "JAIL" || !plugin.config.getBoolean("jail.restrictions.mute", true))) {
                     continue
                 }
 
@@ -204,7 +204,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
                 }
             }
 
-            if (!activeJailFound) {
+            if (!activeJailFound || !plugin.config.getBoolean("jail.restrictions.commands", true)) {
                 return
             }
 

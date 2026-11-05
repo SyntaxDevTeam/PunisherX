@@ -157,6 +157,9 @@ class PunisherX : JavaPlugin(), Listener {
     }
 
     override fun onDisable() {
+        if (::databaseHandler.isInitialized) server.onlinePlayers.forEach {
+            databaseHandler.updateJailClock(it.uniqueId.toString(), pause = true)
+        }
         localPlayerSkins.close()
         HandlerList.unregisterAll(this as Plugin)
         cancelPluginTasks()

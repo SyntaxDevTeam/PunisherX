@@ -63,7 +63,7 @@ class ConfigManager(private val plugin: PunisherX) {
             }
         }
 
-        val shouldUpdate = !dataFile.exists() || sourceVersion < V_168
+        val shouldUpdate = !dataFile.exists() || sourceVersion < 169
 
         config = YamlDocument.create(
             dataFile,
@@ -82,7 +82,7 @@ class ConfigManager(private val plugin: PunisherX) {
             migrateFrom(sourceVersion)
             applyWarnCountOverrides()
 
-            config.set(VERSION_KEY, V_168)
+            config.set(VERSION_KEY, 169)
             config.save()
             plugin.logger.success("[Config] Done. Current version: ${config.getInt(VERSION_KEY)}")
         } else {

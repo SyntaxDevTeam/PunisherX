@@ -134,6 +134,27 @@ class DatabaseHandler(private val plugin: PunisherX) {
     // Data modification helpers
     // ---------------------------------------------------------------------
 
+    /** Paused jail deadlines encode remaining milliseconds as -(remaining + 2). */
+    @Synchronized
+    fun updateJailClock(uuid: String, pause: Boolean) {
+        val now = System.currentTimeMillis()
+        val params = mutableListOf<Any>(uuid)
+        val filter = appendServerFilter("SELECT id, endTime FROM punishments WHERE uuid = ? AND punishmentType = 'JAIL'", params, true)
+        query(filter, *params.toTypedArray()) { rs ->
+            (rs.int("id") ?: 0) to (rs.long("endTime") ?: -1L)
+        }.forEach { (id, end) ->
+            val next = when {
+                pause && plugin.config.getBoolean("jail.online_time_only", false) && end > now -> pl.syntaxdevteam.punisher.basic.JailClock.pause(end, now)
+                !pause && end < -1L -> pl.syntaxdevteam.punisher.basic.JailClock.resume(end, now)
+                else -> end
+            }
+            if (next != end) execute("UPDATE punishments SET endTime = ? WHERE id = ? AND endTime = ?", next, id, end)
+        }
+    }
+
+    private fun jailDisplayDeadline(end: Long): Long =
+        pl.syntaxdevteam.punisher.basic.JailClock.resume(end, System.currentTimeMillis())
+
     fun addPunishment(
         name: String,
         uuid: String,
@@ -147,7 +168,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return try {
             val values = linkedMapOf<String, Any?>(
                 "name" to name, "uuid" to uuid, "reason" to reason, "operator" to operator,
-                "punishmentType" to punishmentType, "start" to start, "endTime" to end, "server" to server
+                "punishmentType" to punishmentType, "start" to start, "endTime" to (if (punishmentType == "JAIL" && end > System.currentTimeMillis() && plugin.config.getBoolean("jail.online_time_only", false) && org.bukkit.Bukkit.getPlayer(java.util.UUID.fromString(uuid)) == null) -(end - System.currentTimeMillis() + 2) else end), "server" to server
             ).mapKeys { PunisherDatabaseSchema.column(db, it.key) }
             val punishmentId = (db.insert("punishments", values).generatedKey as? Number)?.toLong()
             if (punishmentId != null) {
@@ -534,7 +555,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.string("punishmentType").orEmpty(),
                     rs.string("reason").orEmpty(),
                     (rs.long("start") ?: 0L),
-                    (rs.long("endTime") ?: 0L),
+                    jailDisplayDeadline(rs.long("endTime") ?: 0L),
                     rs.string("name").orEmpty(),
                     rs.string("operator").orEmpty(),
                     rs.string("server").orEmpty()
@@ -566,7 +587,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.string("punishmentType").orEmpty(),
                     rs.string("reason").orEmpty(),
                     (rs.long("start") ?: 0L),
-                    (rs.long("endTime") ?: 0L),
+                    jailDisplayDeadline(rs.long("endTime") ?: 0L),
                     rs.string("name").orEmpty(),
                     rs.string("operator").orEmpty(),
                     rs.string("server").orEmpty()
@@ -600,7 +621,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.string("punishmentType").orEmpty(),
                     rs.string("reason").orEmpty(),
                     (rs.long("start") ?: 0L),
-                    (rs.long("endTime") ?: 0L),
+                    jailDisplayDeadline(rs.long("endTime") ?: 0L),
                     rs.string("name").orEmpty(),
                     rs.string("operator").orEmpty(),
                     rs.string("server").orEmpty(),
@@ -634,7 +655,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.string("punishmentType").orEmpty(),
                     rs.string("reason").orEmpty(),
                     (rs.long("start") ?: 0L),
-                    (rs.long("endTime") ?: 0L),
+                    jailDisplayDeadline(rs.long("endTime") ?: 0L),
                     rs.string("name").orEmpty(),
                     rs.string("operator").orEmpty(),
                     rs.string("server").orEmpty()
@@ -667,7 +688,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return try {
             query(sql, *params.toTypedArray()) { rs ->
                 PunishmentData((rs.int("id") ?: 0), rs.string("uuid").orEmpty(), rs.string("punishmentType").orEmpty(),
-                    rs.string("reason").orEmpty(), (rs.long("start") ?: 0L), (rs.long("endTime") ?: 0L),
+                    rs.string("reason").orEmpty(), (rs.long("start") ?: 0L), jailDisplayDeadline(rs.long("endTime") ?: 0L),
                     rs.string("name").orEmpty(), rs.string("operator").orEmpty(), rs.string("server").orEmpty())
             }.filter { plugin.punishmentManager.isPunishmentActive(it) }
         } catch (e: Exception) {
@@ -695,7 +716,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.string("punishmentType").orEmpty(),
                     rs.string("reason").orEmpty(),
                     (rs.long("start") ?: 0L),
-                    (rs.long("endTime") ?: 0L),
+                    jailDisplayDeadline(rs.long("endTime") ?: 0L),
                     rs.string("name").orEmpty(),
                     rs.string("operator").orEmpty(),
                     rs.string("server").orEmpty()
@@ -726,7 +747,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.string("punishmentType").orEmpty(),
                     rs.string("reason").orEmpty(),
                     (rs.long("start") ?: 0L),
-                    (rs.long("endTime") ?: 0L),
+                    jailDisplayDeadline(rs.long("endTime") ?: 0L),
                     rs.string("name").orEmpty(),
                     rs.string("operator").orEmpty(),
                     rs.string("server").orEmpty()
@@ -832,7 +853,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
                     rs.string("punishmentType").orEmpty(),
                     rs.string("reason").orEmpty(),
                     (rs.long("start") ?: 0L),
-                    (rs.long("endTime") ?: 0L),
+                    jailDisplayDeadline(rs.long("endTime") ?: 0L),
                     rs.string("name").orEmpty(),
                     rs.string("operator").orEmpty(),
                     rs.string("server").orEmpty()

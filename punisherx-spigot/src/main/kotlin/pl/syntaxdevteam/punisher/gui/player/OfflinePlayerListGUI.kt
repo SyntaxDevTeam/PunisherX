@@ -89,8 +89,8 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             meta.lore(
                 listOf(
                     mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.uuid", mapOf("uuid" to loadMsg)),
-                    if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.VIEW_IP)) mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.ip", mapOf("ip" to loadMsg)) else Component.empty(),
-                    if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.VIEW_IP)) mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.geo", mapOf("geo" to loadMsg)) else Component.empty(),
+                    if (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, player, uuid, info.playerName)) mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.ip", mapOf("ip" to loadMsg)) else Component.empty(),
+                    if (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, player, uuid, info.playerName)) mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.geo", mapOf("geo" to loadMsg)) else Component.empty(),
                     mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.lastSeen", mapOf("lastseen" to loadMsg)),
                     mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.lastLocation", mapOf("lastlocation" to loadMsg)),
                     mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.logout", mapOf("logout" to loadMsg)),
@@ -125,8 +125,8 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                     val im = item.itemMeta as SkullMeta
                     val loreLines = mutableListOf(
                         mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.uuid", mapOf("uuid" to info.playerUUID)),
-                        if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.VIEW_IP)) mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.ip", mapOf("ip" to ipLine)) else Component.empty(),
-                        if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.VIEW_IP)) mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.geo", mapOf("geo" to geo)) else Component.empty(),
+                        if (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, player, uuid, info.playerName)) mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.ip", mapOf("ip" to ipLine)) else Component.empty(),
+                        if (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, player, uuid, info.playerName)) mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.geo", mapOf("geo" to geo)) else Component.empty(),
                         mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.lastSeen", mapOf("lastseen" to lastSeenDate)),
                         mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.lastLocation", mapOf("lastlocation" to lastLocation)),
                         mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.logout", mapOf("logout" to lastSeenDate)),

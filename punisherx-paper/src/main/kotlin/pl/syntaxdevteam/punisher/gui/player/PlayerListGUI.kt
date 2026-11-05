@@ -47,7 +47,7 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             meta.lore(
                 listOf(
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to loading)),
-                    if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.VIEW_IP))
+                    if (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, player, target.uniqueId, target.name))
                         mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loading)) else Component.empty(),
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to loading)),
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to loading)),
@@ -77,7 +77,7 @@ class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                     im.lore(
                         listOf(
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to target.uniqueId.toString())),
-                            if (PermissionChecker.hasWithLegacy(player, PermissionChecker.PermissionKey.VIEW_IP))
+                            if (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, player, target.uniqueId, target.name))
                                 mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to playerIP)) else Component.empty(),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to onlineStr)),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to totalStr)),

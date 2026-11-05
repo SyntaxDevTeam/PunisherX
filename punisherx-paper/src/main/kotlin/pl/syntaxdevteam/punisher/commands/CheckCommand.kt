@@ -69,11 +69,11 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
                     val times = plugin.messageHandler.stringMessageToStringNoPrefix("check", "time")
                     val title = plugin.messageHandler.stringMessageToStringNoPrefix("check", "title")
                     val playerInfo = playerIPManager.getPlayerInfoByName(player)
-                    plugin.logger.debug("Player info: $playerInfo")
+
                     val playerIP = playerInfo?.playerIP
                     val geoLocation = playerInfo?.geoLocation?.takeIf { it.isNotBlank() } ?: "Unknown location"
                     plugin.logger.debug("GeoLocation: $geoLocation")
-                    val fullGeoLocation = when (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.VIEW_IP)) {
+                    val fullGeoLocation = when (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, stack.sender, uuid, player)) {
                         true -> playerIP?.let { "$it ($geoLocation)" } ?: geoLocation
                         else -> geoLocation
                     }
