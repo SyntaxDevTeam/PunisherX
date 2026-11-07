@@ -4,6 +4,9 @@
 
 ### Functional changes:
 
+* Added player-specific IP privacy on Paper/Folia and Spigot: `punisherx.privacy.hide_ip`, protected UUID/name lists, a global display switch and an option requiring explicitly assigned IP-view permission for operators. Protection applies to `/check` and online, offline and administrator GUI lists; permission preferences are saved on join/logout for offline display.
+* Added independent JAIL chat and command restrictions, plus optional online-only countdowns persisted across logout and graceful shutdown. JAIL chat blocking does not create a separate MUTE; independent MUTE penalties remain effective.
+
 * **Added anti-cheat marks on Paper/Folia and Spigot.** All punishment commands support `--mark` and `--mark=check`; `/unmark <player|all> [check]` reverses marked entries while retaining audit history. `/unmark pause <check>` also persistently suppresses future penalties, and `/unmark resume <check>` restores them. Automatic PunisherX penalties inherit their originating mark; manual punishments are preserved.
 
 * **Added `/unpunish <player> <template> [--silent]` on Paper and Spigot.** It reverses the latest punishment and its escalation step while preserving an audited history entry. It also works with expired or previously revoked punishments and treats a multi-IP ban as one escalation step.
@@ -30,6 +33,8 @@
 | `{time}` | The remaining punishment time when the webhook is sent, or the configured permanent-punishment label |
 
 ### Configuration and language safety:
+
+* Added configuration version 169 with `privacy.ip.enabled`, `privacy.ip.restrict_operators`, `privacy.ip.hidden_players`, `jail.restrictions.mute`, `jail.restrictions.commands` and `jail.online_time_only`. Defaults preserve existing behavior. Paused jail deadlines use a new negative encoding in the database; back up before downgrading. Unexpected process termination cannot save a logout checkpoint.
 
 * Moved the server name shown in `/panel` to `GUI.PunisherMain.serwerInfo.name` in the language files on Paper/Folia and Spigot. Added translated defaults to all 12 bundled languages in both modules; administrators can customize this entry instead of `server.properties`. The name is read without the plugin message prefix.
 * Added separate, customizable `silent_success` messages for punishment and removal commands in all bundled languages. Silent confirmations include the relevant target, reason, duration and punishment ID where applicable.

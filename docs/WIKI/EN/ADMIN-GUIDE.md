@@ -52,3 +52,7 @@ The [dedicated anti-cheat guide](ANTICHEAT-MARKS.md) explains server scopes, IP 
 - If book buttons stop working, reopen the menu. Dialogs require Paper 1.21.7+; use GUI or BOOK on Spigot.
 
 See [Configuration](CONFIGS.md) for settings. When requesting help on [Discord](https://discord.gg/Zk6mxv7eMh) or GitHub Issues, include the plugin version, server platform/version, Java version, relevant logs and reproduction steps.
+
+## Privacy and jail policy
+
+[IP privacy and JAIL configuration](CONFIGS.md#ip-address-privacy) covers protected UUIDs/names, OP restrictions and independent chat, command and online-only countdown settings. [Permissions](PERMISSIONS.md) describes `punisherx.view_ip` and `punisherx.privacy.hide_ip`.

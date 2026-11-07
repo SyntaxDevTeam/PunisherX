@@ -23,6 +23,7 @@ Recommended permissions plugin: [LuckPerms](https://luckperms.net/)
 | `punisherx.cmd.check` | Checks the punishments of a player. Not required for players checking themselves. |
 | `punisherx.cmd.history` | Enables checking the entire penalty history of a given player. Not required if the player checks themselves. |
 | `punisherx.view_ip` | Shows player IP information in investigation commands and player GUIs. |
+| `punisherx.privacy.hide_ip` | Explicit assignment hides the holder’s IP from every viewer; offline preference is saved on join/logout. |
 | `punisherx.cmd.clear_all` | Enables clearing all active penalties for a given player. |
 | `punisherx.cmd.prx` | Access to `/prx` / `/punisherx` administration, including validate, reload, diagnostics and database operations; also `/langfix`. |
 | `punisherx.cmd.panel` | Opens `/panel`. Management access can also allow entry; panel actions check their own permissions. |

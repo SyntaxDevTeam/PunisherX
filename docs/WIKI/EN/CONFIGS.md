@@ -91,3 +91,29 @@ H2 is unsupported. Back up the database and plugin folder before upgrading; expo
 ## LuckPerms names
 
 `name-formatting.operator-display` and `name-formatting.player-display` set name layouts (default `$prefix$name$suffix`). `name-formatting.name-color-meta` selects the nickname colour metadata key (default `name-color`). [Placeholders and example](PLACEHOLDERS.md).
+
+## IP address privacy
+
+These options apply to `/check` and online, offline and administrator GUI lists on Paper/Folia and Spigot:
+
+| Option | Default | Behavior |
+| --- | --- | --- |
+| `privacy.ip.enabled` | `true` | `false` hides IPs from everyone, including console and OP. |
+| `privacy.ip.restrict_operators` | `false` | `true` requires explicitly assigned `punisherx.view_ip` for OP viewers too. |
+| `privacy.ip.hidden_players` | `[]` | Protected UUIDs (recommended) or names, hidden from every viewer even while offline. |
+
+Explicitly assigned `punisherx.privacy.hide_ip` hides the holder's IP. Preferences are saved on join/logout in `ip-privacy.yml`. Use the UUID list to change protection for an offline player. This controls display; IP storage and IP bans remain independent. Owner/manage shortcuts do not bypass target protection or the OP restriction.
+
+## JAIL restrictions and countdown
+
+| Option | Default | Behavior |
+| --- | --- | --- |
+| `jail.restrictions.mute` | `true` | Blocks public chat during JAIL; `false` allows it. |
+| `jail.restrictions.commands` | `true` | Restricts commands to `jail.allowed_commands`, retaining the existing jail bypass. |
+| `jail.online_time_only` | `false` | `true` pauses on logout and resumes on join; `false` counts offline time too. |
+
+JAIL confines the player to the jail radius and sets Adventure mode. Release follows existing location rules and restores Survival. JAIL chat blocking does not create a separate MUTE; independently issued MUTE penalties remain effective when this restriction is disabled. Disabling jail command restrictions does not disable independent MUTE restrictions.
+
+Pauses are stored in the database and survive graceful server shutdown. Unexpected process termination cannot save a logout checkpoint. Permanent sentences stay permanent. Release existing paused sentences before changing countdown mode; paused sentences resume on their next login. Use consistent settings and server scopes across shared-database networks.
+
+Configuration updates to version 169. Paused deadlines use database values below `-1` (`-1` still means permanent). Back up the database before downgrading. History retains original deadlines.

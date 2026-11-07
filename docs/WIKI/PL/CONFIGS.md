@@ -91,3 +91,29 @@ H2 nie jest obsługiwane. Przed aktualizacją zachowaj kopię bazy i katalogu pl
 ## Nazwy LuckPerms
 
 `name-formatting.operator-display` i `name-formatting.player-display` definiują układ nazw (domyślnie `$prefix$name$suffix`). `name-formatting.name-color-meta` wskazuje klucz metadanych koloru nicku (domyślnie `name-color`). [Placeholdery i przykład](PLACEHOLDERS.md).
+
+## Prywatność adresów IP
+
+Opcje dotyczą `/check` oraz list graczy online, offline i administratorów w GUI (Paper/Folia i Spigot):
+
+| Opcja | Domyślnie | Działanie |
+| --- | --- | --- |
+| `privacy.ip.enabled` | `true` | `false` ukrywa IP przed wszystkimi, także konsolą i OP. |
+| `privacy.ip.restrict_operators` | `false` | `true` wymaga jawnie nadanego `punisherx.view_ip` również od OP. |
+| `privacy.ip.hidden_players` | `[]` | Lista UUID (zalecane) lub nicków chronionych przed każdym odbiorcą, również offline. |
+
+Jawnie nadane `punisherx.privacy.hide_ip` ukrywa IP posiadacza. Preferencja jest zapisywana przy wejściu/wyjściu w `ip-privacy.yml`. Zmieniając ochronę gracza offline, użyj listy UUID. Ochrona dotyczy wyświetlania; nie zmienia zapisu IP ani działania banów IP. Skróty owner/manage nie omijają ochrony gracza ani ograniczenia OP.
+
+## Ograniczenia i odliczanie JAIL
+
+| Opcja | Domyślnie | Działanie |
+| --- | --- | --- |
+| `jail.restrictions.mute` | `true` | Blokuje czat publiczny podczas JAIL; `false` pozwala pisać. |
+| `jail.restrictions.commands` | `true` | Ogranicza komendy do `jail.allowed_commands`, z dotychczasowym obejściem jail. |
+| `jail.online_time_only` | `false` | `true` wstrzymuje czas przy wyjściu i wznawia po wejściu. `false` odlicza także offline. |
+
+JAIL ogranicza gracza do promienia więzienia i ustawia tryb Adventure. Zwolnienie używa istniejących reguł lokalizacji i przywraca Survival. Blokada czatu JAIL nie tworzy osobnej kary MUTE; niezależna MUTE obowiązuje także po wyłączeniu tej blokady. Wyłączenie ograniczeń komend nie wyłącza ograniczeń niezależnej MUTE.
+
+Pauzy są zapisywane w bazie i przetrwają prawidłowe wyłączenie serwera. Awaria procesu nie zapisuje punktu wylogowania. Kary permanentne pozostają permanentne. Przed zmianą trybu odliczania zwolnij istniejące wstrzymane kary; wstrzymane kary wznawiają się przy następnym wejściu. W sieci używaj spójnych ustawień i zakresów serwera.
+
+Konfiguracja jest aktualizowana do wersji 169. Wstrzymane terminy używają wartości poniżej `-1` w bazie (`-1` nadal oznacza permanentną karę). Przed powrotem do starszej wersji wykonaj kopię bazy. Historia zachowuje pierwotne terminy.

@@ -23,6 +23,7 @@ Rekomendowany plugin do uprawnień: [LuckPerms](https://luckperms.net/)
 | `punisherx.cmd.check` | Sprawdza kary gracza. Nie jest wymagane, gdy gracz sprawdza samego siebie. |
 | `punisherx.cmd.history` | Pozwala sprawdzić pełną historię kar wybranego gracza. Nie jest wymagane przy sprawdzaniu własnej historii. |
 | `punisherx.view_ip` | Wyświetla IP graczy w komendach sprawdzających i GUI graczy. |
+| `punisherx.privacy.hide_ip` | Jawnie nadane ukrywa własne IP przed wszystkimi odbiorcami; preferencja offline jest zapisywana przy wejściu/wyjściu. |
 | `punisherx.cmd.clear_all` | Pozwala wyczyścić wszystkie aktywne kary wskazanego gracza. |
 | `punisherx.cmd.prx` | Dostęp do administracji przez `/prx` / `/punisherx`, w tym walidacji, reloadu, diagnostyki i operacji na bazie; także `/langfix`. |
 | `punisherx.cmd.panel` | Otwiera `/panel`. Dostęp mogą też zapewniać uprawnienia zarządzania; akcje panelu sprawdzają własne permisje. |

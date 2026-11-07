@@ -52,3 +52,7 @@ Gracz używa `/report`, `/report Steve` lub `/report Steve Powód zgłoszenia`. 
 - Jeśli stare przyciski książki nie reagują, otwórz menu ponownie. Dialogi wymagają Paper 1.21.7+; na Spigot użyj GUI lub BOOK.
 
 [Konfiguracja](CONFIGS.md) opisuje ustawienia. Zgłaszając problem na [Discordzie](https://discord.gg/Zk6mxv7eMh) lub GitHub Issues, podaj wersję pluginu, platformę i wersję serwera, Javę, fragment logu oraz kroki odtworzenia.
+
+## Prywatność i zasady więzienia
+
+[Konfiguracja prywatności IP i JAIL](CONFIGS.md#prywatność-adresów-ip) opisuje ochronę UUID/nicków, ograniczenie OP oraz osobne przełączniki blokady czatu, komend i odliczania tylko online. [Uprawnienia](PERMISSIONS.md) opisują `punisherx.view_ip` i `punisherx.privacy.hide_ip`.
