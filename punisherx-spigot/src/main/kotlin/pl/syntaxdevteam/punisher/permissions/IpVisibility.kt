@@ -19,6 +19,25 @@ object IpVisibility {
     private fun offlinePreference(plugin: PunisherX, uuid: UUID): Boolean =
         org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(java.io.File(plugin.dataFolder, "ip-privacy.yml")).getBoolean(uuid.toString(), false)
 
+    /** BANIP stores the address in the UUID column; never expose it as an identifier. */
+    fun displayField(plugin: PunisherX, viewer: CommandSender,
+                     data: pl.syntaxdevteam.punisher.databases.PunishmentData, value: String): String {
+        if (data.type != "BANIP" || value != data.uuid) return value
+        if (!canView(plugin, viewer, UUID.nameUUIDFromBytes(data.uuid.toByteArray()), data.name)) return "[hidden]"
+        return displayAddress(plugin, viewer, data.uuid)
+    }
+
+    fun displayAddress(plugin: PunisherX, viewer: CommandSender, value: String): String {
+        // Minecraft names cannot contain dots or colons. Do not parse hostnames or perform DNS.
+        if (!value.contains(':') && !value.matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+"))) return value
+        if (!canView(plugin, viewer, UUID.nameUUIDFromBytes(value.toByteArray()), value)) return "[hidden]"
+        val records = plugin.playerIPManager.getAllDecryptedRecords().filter { it.playerIP == value }
+        val visible = records.all { record ->
+            runCatching { canView(plugin, viewer, UUID.fromString(record.playerUUID), record.playerName) }.getOrDefault(false)
+        }
+        return if (visible) value else "[hidden]"
+    }
+
     fun canView(plugin: PunisherX, viewer: CommandSender, uuid: UUID, name: String): Boolean {
         if (!plugin.config.getBoolean("privacy.ip.enabled", true)) return false
         val protected = plugin.config.getStringList("privacy.ip.hidden_players").any {

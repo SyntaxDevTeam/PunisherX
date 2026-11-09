@@ -107,12 +107,8 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
     }
 
     private fun broadcastUnban(playerOrIp: String, commandSenderName: String) {
-        val messages = plugin.messageHandler.getSmartMessage("unban", "unban", mapOf("player" to playerOrIp, "operator" to commandSenderName))
-
-        plugin.server.onlinePlayers
-            .filterNot { it.name == commandSenderName }
-            .filter { PermissionChecker.hasWithSee(it, PermissionChecker.PermissionKey.SEE_UNBAN) }
-            .forEach { player -> messages.forEach { player.sendMessage(it) } }
+        PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_UNBAN,
+            "unban", "unban", mapOf("player" to playerOrIp, "operator" to commandSenderName))
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {

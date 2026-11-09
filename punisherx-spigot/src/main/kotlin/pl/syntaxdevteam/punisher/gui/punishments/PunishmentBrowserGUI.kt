@@ -33,8 +33,8 @@ class PunishmentBrowserGUI(plugin: PunisherX) : BaseGUI(plugin) {
     }
     private fun show(player: Player, page: Int, filter: Filter, query: String, rows: List<PunishmentData>, hasNext: Boolean) {
         val gui = createGui(6)
-        rows.forEachIndexed { index, punishment -> setPlayerHead(gui, index, createHead(punishment),
-                runCatching { java.util.UUID.fromString(punishment.uuid) }.getOrNull(), punishment.name) { clicker ->
+        rows.forEachIndexed { index, punishment -> setPlayerHead(gui, index, createHead(player, punishment),
+                runCatching { java.util.UUID.fromString(punishment.uuid) }.getOrNull(), pl.syntaxdevteam.punisher.permissions.IpVisibility.displayField(plugin, player, punishment, punishment.name)) { clicker ->
             PunishmentDetailsGUI(plugin).open(clicker, punishment) { load(clicker, page, filter, query) }
         } }
         if (page > 0) gui.setItem(45, createNavGuiItem(Material.ARROW, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")) { load(it, page - 1, filter, query) })
@@ -46,11 +46,11 @@ class PunishmentBrowserGUI(plugin: PunisherX) : BaseGUI(plugin) {
         if (hasNext) gui.setItem(53, createNavGuiItem(Material.ARROW, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")) { load(it, page + 1, filter, query) })
         openGui(gui, player)
     }
-    private fun createHead(p: PunishmentData): ItemStack {
+    private fun createHead(player: Player, p: PunishmentData): ItemStack {
         val head = ItemStack(Material.PLAYER_HEAD)
         val meta = head.itemMeta as SkullMeta
 
-        meta.displayName(mH.formatMixedTextToMiniMessage("<yellow>${p.name}</yellow> <gray>#${p.id}</gray>", TagResolver.empty()))
+        meta.displayName(mH.formatMixedTextToMiniMessage("<yellow>${pl.syntaxdevteam.punisher.permissions.IpVisibility.displayField(plugin, player, p, p.name)}</yellow> <gray>#${p.id}</gray>", TagResolver.empty()))
         val end = if (p.end == -1L) "permanent" else plugin.timeHandler.formatTime(((p.end - System.currentTimeMillis()).coerceAtLeast(0) / 1000).toString())
         meta.lore(listOf(mH.miniMessageFormat("<gray>Type: <yellow>${p.type}</yellow></gray>"),
             mH.miniMessageFormat("<gray>Reason: <white>${p.reason}</white></gray>"),

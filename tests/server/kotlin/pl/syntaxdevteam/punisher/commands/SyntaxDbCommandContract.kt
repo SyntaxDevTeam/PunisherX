@@ -291,6 +291,41 @@ abstract class SyntaxDbCommandContract : SyntaxDbTestFixture() {
         verifyNoInteractions(plugin.actionExecutor)
     }
 
+    @Test fun `history privacy overrides view permission and preserves permitted display`() {
+        handler.addPunishmentHistory("Target", uuid.toString(), reason, "Admin", "WARN", 0, -1)
+        whenever(sender.hasPermission("punisherx.view_ip")).thenReturn(true)
+        whenever(plugin.playerIPManager.getPlayerInfoByName("Target")).thenReturn(
+            pl.syntaxdevteam.punisher.players.PlayerIPManager.PlayerInfo("Target", uuid.toString(), "192.0.2.1", "Earth", "now"))
+        for (protected in listOf(false, true)) {
+            config.set("privacy.ip.enabled", !protected)
+            clearInvocations(plugin.messageHandler)
+            execute("history", "Target")
+            val output = argumentCaptor<String>()
+            verify(plugin.messageHandler, atLeastOnce()).miniMessageFormat(output.capture())
+            assertEquals(!protected, output.allValues.any { "192.0.2.1" in it })
+        }
+        config.set("privacy.ip.enabled", true)
+        config.set("privacy.ip.hidden_players", listOf(uuid.toString()))
+        clearInvocations(plugin.messageHandler)
+        execute("history", "Target")
+        val output = argumentCaptor<String>()
+        verify(plugin.messageHandler, atLeastOnce()).miniMessageFormat(output.capture())
+        assertFalse(output.allValues.any { "192.0.2.1" in it })
+    }
+
+    @Test fun `unban by name never reveals resolved IP when display is disabled`() {
+        add("BANIP", target = "192.0.2.1")
+        config.set("privacy.ip.enabled", false)
+        val viewer = mock<Player>()
+        whenever(viewer.name).thenReturn("Viewer")
+        whenever(viewer.isOp).thenReturn(true)
+        whenever(plugin.server.onlinePlayers).thenReturn(listOf(viewer))
+        execute("unban", "Target")
+        verify(plugin.messageHandler, atLeastOnce()).getSmartMessage(eq("unban"), eq("unban"), argThat<Map<String, String>> { get("player") == "[hidden]" })
+        verify(plugin.messageHandler, never()).getSmartMessage(any(), any(), argThat<Map<String, String>> { values.any { "192.0.2.1" in it } })
+        assertEquals(0, count("punishments"))
+    }
+
     @Test fun `history command renders the requested database page only`() {
         repeat(12) { handler.addPunishmentHistory("Target", uuid.toString(), "History-$it", "Admin", "WARN", it.toLong(), -1) }
         execute("history", "Target", "2")

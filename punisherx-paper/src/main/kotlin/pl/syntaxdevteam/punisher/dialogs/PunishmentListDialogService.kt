@@ -34,7 +34,7 @@ class PunishmentListDialogService(private val plugin: PunisherX) {
             button(
                 message("entry", mapOf(
                     "id" to punishment.id.toString(),
-                    "player" to punishment.name,
+                    "player" to pl.syntaxdevteam.punisher.permissions.IpVisibility.displayField(plugin, player, punishment, punishment.name),
                     "type" to displayedType(punishment)
                 )),
                 message("tooltip", mapOf("reason" to punishment.reason.take(120)))
@@ -59,8 +59,8 @@ class PunishmentListDialogService(private val plugin: PunisherX) {
     private fun openDetails(player: Player, title: Component, data: PunishmentData, back: () -> Unit) {
         val end = if (data.end == -1L) "∞" else dateFormat.format(Date(data.end))
         val details = message("details", mapOf(
-            "player" to data.name,
-            "uuid" to data.uuid,
+            "player" to pl.syntaxdevteam.punisher.permissions.IpVisibility.displayField(plugin, player, data, data.name),
+            "uuid" to pl.syntaxdevteam.punisher.permissions.IpVisibility.displayField(plugin, player, data, data.uuid),
             "id" to data.id.toString(),
             "type" to displayedType(data),
             "reason" to data.reason,
