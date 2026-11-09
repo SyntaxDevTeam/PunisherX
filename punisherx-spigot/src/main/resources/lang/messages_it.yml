@@ -387,6 +387,20 @@ report-book:
 
 
 GUI:
+  Config:
+    ipEnabled: "<yellow>Show IP addresses</yellow>"
+    restrictOperators: "<yellow>Require IP permission for operators</yellow>"
+    jailMute: "<yellow>Mute jailed players</yellow>"
+    jailCommands: "<yellow>Restrict jail commands</yellow>"
+    onlineTimeOnly: "<yellow>Count jail time only while online</yellow>"
+    enabled: "<yellow>Enabled - click to change</yellow>"
+    disabled: "<yellow>Disabled - click to change</yellow>"
+    hiddenPlayers: "<yellow>Protected players</yellow>"
+    hiddenCount: "<yellow>Protected entries: <count></yellow>"
+    hiddenPrompt: "<yellow>Enter UUIDs or names separated by spaces or commas. Use - to clear, or cancel.</yellow>"
+    activeJail: "<yellow>Release active jail sentences before changing the countdown mode.</yellow>"
+    invalidPlayers: "<yellow>Use valid UUIDs or Minecraft player names.</yellow>"
+    saved: "<yellow>Settings saved.</yellow>"
   UndoConfirmation:
     title: "<yellow>Conferma annullamento</yellow>"
     confirm: "<green>Conferma annullamento</green>"
