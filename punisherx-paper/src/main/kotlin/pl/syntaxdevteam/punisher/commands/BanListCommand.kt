@@ -70,9 +70,9 @@ class BanListCommand(private val plugin: PunisherX) : BasicCommand {
             val formattedDate = dateFormat.format(Date(punishment.start))
 
             val punishmentMessage = mh.stringMessageToComponentNoPrefix("banlist", "ban_list", mapOf(
-                "uuid" to punishment.uuid,
+                "uuid" to pl.syntaxdevteam.punisher.permissions.IpVisibility.displayField(plugin, stack.sender, punishment, punishment.uuid),
                 "id" to punishment.id.toString(),
-                "player" to punishment.name,
+                "player" to pl.syntaxdevteam.punisher.permissions.IpVisibility.displayField(plugin, stack.sender, punishment, punishment.name),
                 "type" to punishment.type,
                 "reason" to punishment.reason,
                 "time" to formattedDate,

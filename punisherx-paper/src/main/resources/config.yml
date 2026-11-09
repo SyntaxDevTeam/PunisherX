@@ -200,6 +200,24 @@ dialogs:
   list-page-size: 10
 
 # /********************************************/
+#    Name formatting settings
+# /********************************************/
+
+# Optional LuckPerms display placeholders in messages:
+# <operator_display>, <player_display>, <operator_prefix>, <player_prefix>,
+# <operator_suffix>, <player_suffix>. Original <operator>/<player> remain plain names.
+# Prefix/suffix accept legacy (&/section sign/hex) and MiniMessage formatting.
+# Set this LP meta key to a color such as &c, #ff5555 or <red>.
+# Offline users whose metadata is not cached, console and missing LP use plain names.
+name-formatting:
+  name-color-meta: name-color
+  # Layout tokens: $prefix, $name, $suffix. $player/$operator are aliases for $name.
+  # Spacing is literal. Defaults preserve the spacing stored in LP prefix/suffix.
+  # Example: "$suffix <gray>|</gray> $name $prefix". Use $$ for a literal dollar sign.
+  operator-display: "$prefix$name$suffix"
+  player-display: "$prefix$name$suffix"
+
+# /********************************************/
 #    GUI settings
 # /********************************************/
 
@@ -226,6 +244,15 @@ gui:
 # /********************************************/
 #    Internal settings
 # /********************************************/
+
+# Sensitive information shown by /check and player/admin GUI lists.
+privacy:
+  ip:
+    enabled: true
+    # Require explicitly assigned punisherx.view_ip for OP viewers as well.
+    restrict_operators: false
+    # UUIDs (recommended) or player names; applies even when the player is offline.
+    hidden_players: []
 
 geoDatabase:
   # To use GeoIP functionality, you need a MaxMind license key.
@@ -312,26 +339,3 @@ debug: off
 # Should StatsCollector be enabled? Recommended: true.
 stats:
   enabled: true
-
-# Optional LuckPerms display placeholders in messages:
-# <operator_display>, <player_display>, <operator_prefix>, <player_prefix>,
-# <operator_suffix>, <player_suffix>. Original <operator>/<player> remain plain names.
-# Prefix/suffix accept legacy (&/section sign/hex) and MiniMessage formatting.
-# Set this LP meta key to a color such as &c, #ff5555 or <red>.
-# Offline users whose metadata is not cached, console and missing LP use plain names.
-name-formatting:
-  name-color-meta: name-color
-  # Layout tokens: $prefix, $name, $suffix. $player/$operator are aliases for $name.
-  # Spacing is literal. Defaults preserve the spacing stored in LP prefix/suffix.
-  # Example: "$suffix <gray>|</gray> $name $prefix". Use $$ for a literal dollar sign.
-  operator-display: "$prefix$name$suffix"
-  player-display: "$prefix$name$suffix"
-
-# Sensitive information shown by /check and player/admin GUI lists.
-privacy:
-  ip:
-    enabled: true
-    # Require explicitly assigned punisherx.view_ip for OP viewers as well.
-    restrict_operators: false
-    # UUIDs (recommended) or player names; applies even when the player is offline.
-    hidden_players: []

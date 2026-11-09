@@ -200,8 +200,11 @@ permissions:
     description: Allows checking penalties for a player. Not required for self-check.
     default: true
   punisherx.view_ip:
-    description: Allows viewing a player's IP in the /check and /history command.
-    default: op
+    description: Allows viewing a player's IP subject to the configured privacy policy.
+    default: false
+  punisherx.privacy.hide_ip:
+    description: Hides the permission holder's IP from all viewers.
+    default: false
   punisherx.cmd.history:
     description: Allows viewing a player's penalty history. Not required for self-check.
     default: true

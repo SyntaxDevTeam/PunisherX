@@ -7,6 +7,12 @@ import pl.syntaxdevteam.punisher.compatibility.multilineComponent
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 internal object PunishmentCommandUtils {
+    private fun privatePlaceholders(plugin: PunisherX, viewer: org.bukkit.command.CommandSender,
+                                    placeholders: Map<String, String>): Map<String, String> =
+        placeholders.mapValues { (key, value) ->
+            if (key == "player") pl.syntaxdevteam.punisher.permissions.IpVisibility.displayAddress(plugin, viewer, value) else value
+        }
+
     fun parseTimeAndReason(
         plugin: PunisherX,
         args: Array<String>,
@@ -53,7 +59,7 @@ internal object PunishmentCommandUtils {
         silent: Boolean = false
     ) {
         val messageKey = if (silent) "silent_success" else key
-        plugin.messageHandler.getSmartMessage(section, messageKey, placeholders).forEach { stack.sender.sendMessage(it) }
+        plugin.messageHandler.getSmartMessage(section, messageKey, privatePlaceholders(plugin, stack.sender, placeholders)).forEach { stack.sender.sendMessage(it) }
     }
 
     fun sendTargetMessages(
@@ -90,10 +96,10 @@ internal object PunishmentCommandUtils {
         silent: Boolean = false
     ) {
         if (silent) return
-        val broadcastMessages = plugin.messageHandler.getSmartMessage(section, key, placeholders)
         val operator = placeholders["operator"]
         plugin.server.onlinePlayers.filterNot { it.name == operator }.forEach { onlinePlayer ->
             if (PermissionChecker.hasWithSee(onlinePlayer, permissionKey)) {
+                val broadcastMessages = plugin.messageHandler.getSmartMessage(section, key, privatePlaceholders(plugin, onlinePlayer, placeholders))
                 broadcastMessages.forEach { onlinePlayer.sendMessage(it) }
             }
         }

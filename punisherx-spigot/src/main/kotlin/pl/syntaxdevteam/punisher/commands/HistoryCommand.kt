@@ -53,7 +53,7 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
                 val playerIP = playerInfo?.playerIP
                 val geoLocation = playerInfo?.geoLocation?.takeIf { it.isNotBlank() } ?: "Unknown location"
                 plugin.logger.debug("GeoLocation: $geoLocation")
-                val fullGeoLocation = when (stack.sender.hasPermission("punisherx.view_ip")) {
+                val fullGeoLocation = when (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, stack.sender, uuid, player)) {
                     true -> playerIP?.let { "$it ($geoLocation)" } ?: geoLocation
                     else -> geoLocation
                 }
