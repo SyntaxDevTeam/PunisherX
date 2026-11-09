@@ -4,8 +4,9 @@
 
 ### Functional changes:
 
-* Added player-specific IP privacy on Paper/Folia and Spigot: `punisherx.privacy.hide_ip`, protected UUID/name lists, a global display switch and an option requiring explicitly assigned IP-view permission for operators. Protection applies to `/check` and online, offline and administrator GUI lists; permission preferences are saved on join/logout for offline display.
+* Added player-specific IP privacy on Paper/Folia and Spigot: `punisherx.privacy.hide_ip`, protected UUID/name lists, a global display switch and an option requiring explicitly assigned IP-view permission for operators. Protection applies to `/check`, `/history`, online/offline and administrator GUI lists, and structured BANIP identifiers in punishment lists and details; permission preferences are saved on join/logout for offline display.
 * Added independent JAIL chat and command restrictions, plus optional online-only countdowns persisted across logout and graceful shutdown. JAIL chat blocking does not create a separate MUTE; independent MUTE penalties remain effective.
+* Added configuration-panel controls on Paper/Folia and Spigot for IP visibility, operator restrictions, protected players, jail mute, jail command blocking and online-only countdowns. Protected-player input is validated, permissions are checked on clicks and chat submission, and countdown-mode changes are blocked while active jail sentences exist.
 
 * **Added anti-cheat marks on Paper/Folia and Spigot.** All punishment commands support `--mark` and `--mark=check`; `/unmark <player|all> [check]` reverses marked entries while retaining audit history. `/unmark pause <check>` also persistently suppresses future penalties, and `/unmark resume <check>` restores them. Automatic PunisherX penalties inherit their originating mark; manual punishments are preserved.
 
@@ -34,7 +35,7 @@
 
 ### Configuration and language safety:
 
-* Added configuration version 169 with `privacy.ip.enabled`, `privacy.ip.restrict_operators`, `privacy.ip.hidden_players`, `jail.restrictions.mute`, `jail.restrictions.commands` and `jail.online_time_only`. Defaults preserve existing behavior. Paused jail deadlines use a new negative encoding in the database; back up before downgrading. Unexpected process termination cannot save a logout checkpoint.
+* Added configuration version 169 with `privacy.ip.enabled`, `privacy.ip.restrict_operators`, `privacy.ip.hidden_players`, `jail.restrictions.mute`, `jail.restrictions.commands` and `jail.online_time_only`. Migration preserves administrator settings and creates a backup when upgrading configuration 168 to 169. Defaults preserve existing display and jail behavior; `punisherx.view_ip` and `punisherx.privacy.hide_ip` are declared with `default: false`, while unrestricted OP access is retained by the display policy. Paused jail deadlines use a new negative encoding in the database; back up before downgrading. Unexpected process termination cannot save a logout checkpoint.
 
 * Moved the server name shown in `/panel` to `GUI.PunisherMain.serwerInfo.name` in the language files on Paper/Folia and Spigot. Added translated defaults to all 12 bundled languages in both modules; administrators can customize this entry instead of `server.properties`. The name is read without the plugin message prefix.
 * Added separate, customizable `silent_success` messages for punishment and removal commands in all bundled languages. Silent confirmations include the relevant target, reason, duration and punishment ID where applicable.
@@ -56,6 +57,11 @@
 * Expanded automated coverage for database compatibility, backup/import, command behavior, transaction rollback, runtime dependencies, template flags, private silent confirmations and Velocity database operations. Added a Velocity runtime test harness and CI checks for the MessageHandler source version.
 
 ### Bug fixes:
+
+* Fixed `/history` bypassing global IP privacy, protected-player settings and operator restrictions on Paper/Folia and Spigot.
+* Fixed the default OP grant of `punisherx.view_ip` defeating the option requiring assigned permissions. Permission-provider and group grants remain supported.
+* Redacted IP addresses stored as BANIP identifiers in ban lists, punishment inventory panels and native Paper details, as well as sender/broadcast placeholders for IP unbans and IP-ban failure reports. Known protected players sharing an address also prevent its disclosure.
+* Configuration-panel saves now invalidate existing plugin inventory panels so IP lore allowed by the previous policy does not remain open. Setting a jail location from the panel preserves the configured radius instead of overwriting it with `5.0`.
 
 * Restored Spigot parity for Minecraft `26.3` / `26.3.0` recognition and the shared GUI base helpers without introducing Paper-only APIs. Added Spigot regression tests for supported versions, GUI reload protection, and cross-module version/template parity.
 * Aligned the bundled Spigot `AltAccountAbuse` third escalation step with Paper (`permanent` instead of `90d`). This only changes the bundled default template, not existing server-defined templates.
