@@ -15,7 +15,11 @@ repositories {
 dependencies {
     compileOnly(libs.bungeecord.api)
     implementation(libs.syntaxdb)
+    testImplementation(libs.kotlin.test)
+    testRuntimeOnly(libs.sqlite.jdbc)
 }
+
+tasks.test { useJUnitPlatform() }
 
 val brigadierCoordinates = libs.brigadier.get().toString()
 
