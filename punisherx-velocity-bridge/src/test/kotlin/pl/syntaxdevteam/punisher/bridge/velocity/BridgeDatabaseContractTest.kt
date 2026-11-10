@@ -61,10 +61,37 @@ class BridgeDatabaseContractTest {
         assertEquals(ActiveBan("Newer", 1000), bridge.findActiveBan(uuid, 500))
     }
 
-    @Test fun `closed pool returns no events and bans and closes idempotently`() {
+
+    @Test fun `current network BANIP is enforced for the connecting address`() {
+        db.execute("INSERT INTO punishments (uuid, reason, punishmentType, start, endTime, server) VALUES (?, ?, 'BANIP', ?, ?, 'network')",
+            listOf("192.0.2.8", text, 100, -1))
+        assertEquals(ActiveBan(text, -1, "BANIP"), bridge.findActiveBan(uuid, now = 500, ip = "192.0.2.8"))
+        assertNull(bridge.findActiveBan(uuid, now = 500, ip = "192.0.2.9"))
+    }
+
+    @Test fun `batch reconciliation excludes revoked local future and expired punishments`() {
+        val another = UUID.randomUUID()
+        ban(scope = "survival")
+        ban(start = 999, reason = "future")
+        ban(end = 200, reason = "expired")
+        db.execute("INSERT INTO punishments (uuid, reason, punishmentType, start, endTime, server) VALUES (?, ?, 'BAN', ?, ?, 'network')",
+            listOf(another.toString(), text, 100, -1))
+        val result = bridge.findActiveBans(
+            listOf(ConnectionIdentity(uuid, "192.0.2.8"), ConnectionIdentity(another, "192.0.2.9")),
+            now = 500
+        )
+        assertEquals(setOf(another), result.keys)
+    }
+
+    @Test fun `database errors are propagated rather than considered no ban`() {
+        db.execute("DROP TABLE punishments")
+        assertFails { bridge.findActiveBan(uuid, now = 500) }
+    }
+
+    @Test fun `closed pool returns no events and fails closed for bans and closes idempotently`() {
         bridge.close(); bridge.close()
         assertTrue(bridge.fetchPendingEvents().isEmpty())
-        assertNull(bridge.findActiveBan(uuid))
+        assertFails { bridge.findActiveBan(uuid) }
         bridge.markProcessed(1)
         assertFalse(db.isReady)
     }
