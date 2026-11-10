@@ -2,6 +2,15 @@
 
 ## [1.9.0] Unreleased
 
+### CRITICAL SECURITY FIXES — proxy bridges (2026-11-10)
+
+* **SECURITY / CRITICAL: Removed executable punishment commands from the client-accessible `punisherx:bridge` plugin messaging channel.** BungeeCord previously accepted unauthenticated `BAN`/`BANIP` payloads from connected players, allowing arbitrary player disconnections without moderation permissions. Both BungeeCord and Velocity now consume the legacy channel without executing any received payload; Paper/Folia and Spigot no longer emit commands on it.
+* **SECURITY / CRITICAL: Proxy punishment enforcement now requires an active, network-scoped SQL record.** Both bridges independently reconcile online UUID and IP bans and check active bans when players log in. Expired, revoked, backend-local, malformed and replayed events can no longer trigger a proxy ban. Active IP bans are also verified at login/transfer.
+* **SECURITY / HIGH: Changed login database verification from fail-open to fail-closed.** Unavailable or invalid SQL state denies new sessions (and Velocity transfers) with a generic retry message; BungeeCord no longer queries SQL synchronously in `ServerConnectEvent`. Existing online sessions are reconciled when SQL recovers.
+* **SECURITY / HIGH: Removed the global `bridge_events.processed` queue from proxy delivery.** Multiple proxy instances now read committed state independently with bounded, batched SQL queries, avoiding cross-proxy event loss and stale queue-triggered disconnects. Proxy bridge database users now need only `SELECT` access to `punishments` (no table creation or event acknowledgment writes).
+* **DEPLOYMENT / SECURITY:** Update the proxy bridge(s) and backend PunisherX JARs together. The legacy message/queue delivery scheme is no longer used; the new bridge detects changes through `poll-interval-ms` (default 1000 ms, minimum 200 ms). For existing installations, set a dedicated read-only SQL account and verify access to `punishments`. Added regression tests for forged messages, scope, expiry, BANIP, multi-proxy reconciliation and error handling.
+
+
 ### Functional changes:
 
 * Added player-specific IP privacy on Paper/Folia and Spigot: `punisherx.privacy.hide_ip`, protected UUID/name lists, a global display switch and an option requiring explicitly assigned IP-view permission for operators. Protection applies to `/check`, `/history`, online/offline and administrator GUI lists, and structured BANIP identifiers in punishment lists and details; permission preferences are saved on join/logout for offline display.
