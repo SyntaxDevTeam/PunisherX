@@ -21,6 +21,7 @@ import java.time.Duration
 import java.nio.file.Path
 import com.google.inject.Inject
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 // Plugin metadata and version come from the Gradle-expanded velocity-plugin.json.
 class PunisherXVelocityBridge @Inject constructor(
@@ -34,6 +35,7 @@ class PunisherXVelocityBridge @Inject constructor(
     private lateinit var bridgeDatabase: BridgeDatabase
     private var pollTask: ScheduledTask? = null
     private val polling = AtomicBoolean(false)
+    private val lastDbWarning = AtomicLong(0)
 
     @Subscribe
     fun onProxyInitialize(event: ProxyInitializeEvent) {
@@ -69,7 +71,7 @@ class PunisherXVelocityBridge @Inject constructor(
                 event.result = ComponentResult.denied(banMessage(ban.type, ban.reason, ban.endTime))
             }
         } catch (error: Exception) {
-            logger.error("Unable to verify network punishment during login", error)
+            logDbFailure("login", error)
             event.result = ComponentResult.denied(databaseUnavailable())
         }
     }
@@ -86,9 +88,17 @@ class PunisherXVelocityBridge @Inject constructor(
                 disconnect(player, ban.type, ban.reason, ban.endTime)
             }
         } catch (error: Exception) {
-            logger.error("Unable to verify network punishment before transfer", error)
+            logDbFailure("transfer", error)
             event.result = ServerPreConnectEvent.ServerResult.denied()
             event.player.disconnect(databaseUnavailable())
+        }
+    }
+
+    private fun logDbFailure(operation: String, error: Exception) {
+        val now = System.currentTimeMillis()
+        val previous = lastDbWarning.get()
+        if (now - previous > 30_000L && lastDbWarning.compareAndSet(previous, now)) {
+            logger.error("PunisherX database failure during {} (new accesses are fail-closed)", operation, error)
         }
     }
 
@@ -130,7 +140,7 @@ class PunisherXVelocityBridge @Inject constructor(
                 }
             }
         } catch (error: Exception) {
-            logger.error("PunisherX network ban reconciliation failed; new logins and transfers remain fail-closed", error)
+            logDbFailure("reconciliation", error)
         } finally {
             polling.set(false)
         }
