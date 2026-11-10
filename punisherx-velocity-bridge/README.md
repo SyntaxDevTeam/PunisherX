@@ -26,12 +26,12 @@ Install the bridge on the **proxy**, alongside the full PunisherX plugin on your
 | --- | --- |
 | **Cross-server bans** | Disconnects a player by UUID when a `BAN` event reaches the proxy. |
 | **IP ban events** | Disconnects connected players whose IP matches a `BANIP` event. |
-| **Persistent event queue** | Polls the shared `bridge_events` table, so events can arrive even from an empty backend. |
-| **Backend messages** | Also receives `BAN` and `BANIP` through the `punisherx:bridge` plugin messaging channel. |
+| **SQL reconciliation** | Independently polls active `punishments` records for currently connected players, including bans issued on an empty backend. |
+| **Hardened message handling** | Consumes the legacy `punisherx:bridge` channel without executing client- or backend-supplied payloads. |
 | **Login and transfer checks** | Checks active network-wide UUID bans at login and before connecting to a backend. |
 | **Clear disconnect messages** | Shows the punishment type, reason and remaining duration, including permanent bans. |
 
-The bridge handles **BAN and BANIP events**. Login and backend transfer checks currently query **UUID-based BAN records with `server = network`**; they do not query active IP bans. Other punishments, such as mute, warn and jail, are handled by PunisherX on the backend servers.
+The bridge enforces **active network-wide BAN and BANIP records** from SQL. Login, backend transfer and periodic connected-player checks include UUID and IP bans; backend-local, expired and revoked records never trigger a proxy disconnect. Other punishments, such as mute, warn and jail, are handled by PunisherX on the backend servers.
 
 ## 📦 Download
 
@@ -47,7 +47,7 @@ Looking for the backend plugin or the BungeeCord artifact? See the **[main Punis
 | Java | **25 or newer** on the proxy. |
 | Backend plugin | PunisherX for Paper/Folia or Spigot. |
 | Storage | A shared **MySQL database**, reachable from the proxy and backends. |
-| Database access | Read punishment records; read/write bridge events; create `bridge_events` if it is absent. |
+| Database access | **SELECT-only** on the `punishments` table; no table creation or write permission required. |
 
 ## 🚀 Quick start
 
@@ -60,44 +60,49 @@ Looking for the backend plugin or the BungeeCord artifact? See the **[main Punis
 
 ## 🔧 Configuration
 
-The bridge reads **`bridge.properties`**. Example:
+The bridge reads **`bridge.properties`**. Configure a dedicated read-only account. Example:
 
 ```properties
 host=localhost
 port=3306
 database=punisherx
-username=punisherx
-password=replace_with_your_database_password
+username=punisherx_proxy
+password=replace_with_your_read_only_password
 poll-interval-ms=1000
 ```
 
 | Setting | Meaning |
 | --- | --- |
 | `host` / `port` | Address of the shared MySQL server. `localhost` refers to the machine running the proxy. |
-| `database` | The database containing PunisherX's `punishments` and `bridge_events` tables. |
+| `database` | The database containing the PunisherX `punishments` table. |
 | `username` / `password` | Credentials with access to those tables. |
-| `poll-interval-ms` | Queue polling interval in milliseconds. Default: **1000**; values below **200** are clamped to 200. |
+| `poll-interval-ms` | Active-punishment reconciliation interval in milliseconds. Default: **1000**; values below **200** are clamped to 200. |
 
 Match the backend's `database.sql.*` connection settings. Credentials can differ if both database users have the required access to the same database. Restart the proxy after editing this file.
 
 ## 🔄 How it works
 
-1. PunisherX writes a `BAN` or `BANIP` event to the shared `bridge_events` table.
-2. The proxy bridge polls unprocessed events at the configured interval and disconnects matching connected players.
-3. Each handled event is marked as processed, so later polls skip it.
-4. Independently, login and backend transfer checks read active network-wide UUID bans from `punishments`. Processing a queue event does not remove the corresponding punishment.
+1. The Paper/Folia or Spigot plugin commits a punishment to the shared SQL `punishments` table.
+2. Each proxy independently reconciles the current active network-wide UUID/IP bans for its connected players, in bounded batches every `poll-interval-ms` (default 1000 ms).
+3. Login and backend-transfer checks read current SQL state directly. Active network bans are denied; a database error denies new access rather than treating it as no punishment.
+4. Removing or expiring a ban stops enforcement on the next check. No replayable plugin message or shared queue acknowledgment can cause an unrelated disconnection.
 
-For example, a moderator on **Survival** bans a player currently on **Lobby**. The bridge reads the event and disconnects that player from Velocity. If the UUID ban is stored with network scope and remains active, the login check disconnects the player when they try to return.
+**Security upgrade:** Install the updated proxy bridge and updated backend PunisherX editions together. Older BungeeCord bridges accepted forged plugin messages and must not remain exposed. The new proxy account needs only `SELECT` on `punishments`; do not use MySQL `root` or the same privileged credentials as the backend. A read-only example (run as a database administrator, replace the password and host):
+
+```sql
+CREATE USER 'punisherx_proxy'@'proxy-host' IDENTIFIED BY 'strong-private-password';
+GRANT SELECT ON punisherx.punishments TO 'punisherx_proxy'@'proxy-host';
+```
 
 ## 🛠️ Troubleshooting
 
 | Symptom | Check |
 | --- | --- |
 | Database connection fails | Host, port, credentials, database access and connectivity from the proxy. |
-| A ban does not reach the proxy | Both sides must use the same database; verify that the backend creates a `bridge_events` entry. |
+| A ban does not reach the proxy | Verify the backend committed an active network-scoped punishment and the proxy SELECT user can read it; check `poll-interval-ms`. |
 | A UUID ban does not block rejoining | The record must have `punishmentType = BAN`, `server = network` and an active expiry, or `endTime = -1` for a permanent ban. |
-| An IP-banned player can reconnect | Active IP bans are not checked by the bridge's login query; backend enforcement still needs to be configured. |
-| Changes to connection settings have no effect | Restart the proxy after editing `bridge.properties`. |
+| An IP-banned player can reconnect | Verify the IP is stored as an active network-scoped `BANIP` punishment and IP normalization matches the proxy's client address. |
+| SQL is unavailable | New logins/transfers are denied temporarily (fail-closed); restore SQL connectivity and restart the proxy if initialization failed. |\n| Changes to connection settings have no effect | Restart the proxy after editing `bridge.properties`. |
 
 ## 🧱 Build from source
 
