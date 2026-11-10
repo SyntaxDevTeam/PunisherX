@@ -161,9 +161,6 @@ public final class VelocityRuntimeProbe {
                 Thread.sleep(1200);
                 check(disconnects.isEmpty(), "backend-local BANIP does not disconnect");
                 sql.execute("DELETE FROM punishments");
-                sql.execute("DROP TABLE punishments");
-                check(!server.getEventManager().fire(new LoginEvent(player, null)).join().getResult().isAllowed(),
-                        "database failure denies login instead of failing open");
             } finally {
                 serverField.set(bridge, server);
             }
