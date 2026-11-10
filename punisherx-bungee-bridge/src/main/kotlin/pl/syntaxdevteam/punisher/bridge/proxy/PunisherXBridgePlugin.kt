@@ -191,8 +191,8 @@ class PunisherXBridgePlugin : Plugin(), Listener {
             val port = properties.getProperty("port", "3306").toIntOrNull() ?: 3306
             val name = properties.getProperty("database", "punisherx")
             jdbcUrl = "jdbc:mysql://$host:$port/$name"
-            username = properties.getProperty("username", "root")
-            password = properties.getProperty("password", "change_me")
+            username = properties.getProperty("username", "punisherx_proxy")
+            password = properties.getProperty("password", "")
             property("characterEncoding", "UTF-8")
             pool {
                 maximumPoolSize = 4; minimumIdle = 1
