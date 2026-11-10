@@ -134,35 +134,46 @@ public final class VelocityRuntimeProbe {
                 });
                 PluginMessageEvent ban = message(source, player, "BAN", uuid.toString());
                 server.getEventManager().fire(ban).join();
-                check(!ban.getResult().isAllowed() && disconnects.size() == 1, "backend BAN message handled and disconnects");
-                disconnects.clear();
-                server.getEventManager().fire(message(source, player, "BANIP", "127.0.0.2")).join();
-                check(disconnects.size() == 1, "backend BANIP message disconnects matching IP");
-                disconnects.clear();
+                check(!ban.getResult().isAllowed() && disconnects.isEmpty(),
+                        "backend plugin message is handled but cannot authorize BAN");
+                PluginMessageEvent banIp = message(source, player, "BANIP", "127.0.0.2");
+                server.getEventManager().fire(banIp).join();
+                check(!banIp.getResult().isAllowed() && disconnects.isEmpty(),
+                        "backend plugin message cannot authorize BANIP");
                 PluginMessageEvent forged = message(player, source, "BAN", uuid.toString());
                 server.getEventManager().fire(forged).join();
-                check(!forged.getResult().isAllowed() && disconnects.isEmpty(), "client message blocked without enforcing BAN");
+                check(!forged.getResult().isAllowed() && disconnects.isEmpty(),
+                        "client message blocked without enforcing BAN");
                 server.getEventManager().fire(new PluginMessageEvent(source, player,
                         MinecraftChannelIdentifier.from("punisherx:bridge"), new byte[]{0})).join();
                 check(disconnects.isEmpty(), "truncated message does not disconnect");
-                sql.execute("INSERT INTO bridge_events(action,target,reason,endTime) VALUES ('BAN','" + uuid + "','queue-ban',-1)");
-                long deadline = System.nanoTime() + Duration.ofSeconds(10).toNanos();
-                boolean processed = false;
-                while (System.nanoTime() < deadline) {
-                    try (ResultSet rows = sql.executeQuery("SELECT processed, processedAt FROM bridge_events")) {
-                        processed = rows.next() && rows.getInt(1) == 1 && rows.getLong(2) > 0;
-                    }
-                    if (processed && !disconnects.isEmpty()) break;
-                    Thread.sleep(50);
-                }
-                check(processed && !disconnects.isEmpty(), "real scheduler polls SQL queue and marks BAN processed");
+
+                sql.execute("INSERT INTO punishments VALUES ('" + uuid + "','runtime-poll',-1,'BAN','network',1)");
+                awaitDisconnects("live SQL BAN is independently reconciled by scheduler");
+                sql.execute("DELETE FROM punishments");
                 disconnects.clear();
-                Thread.sleep(600);
-                check(disconnects.isEmpty(), "processed queue event is not replayed");
+                sql.execute("INSERT INTO punishments VALUES ('127.0.0.2','runtime-ip',-1,'BANIP','network',1)");
+                awaitDisconnects("live network BANIP disconnects matching online IP");
+                disconnects.clear();
+                check(!server.getEventManager().fire(new LoginEvent(player, null)).join().getResult().isAllowed(),
+                        "network BANIP denies login");
+                sql.execute("UPDATE punishments SET server = 'survival'");
+                Thread.sleep(1200);
+                check(disconnects.isEmpty(), "backend-local BANIP does not disconnect");
+                sql.execute("DELETE FROM punishments");
+                sql.execute("DROP TABLE punishments");
+                check(!server.getEventManager().fire(new LoginEvent(player, null)).join().getResult().isAllowed(),
+                        "database failure denies login instead of failing open");
             } finally {
                 serverField.set(bridge, server);
             }
         }
+    }
+
+    private void awaitDisconnects(String name) throws InterruptedException {
+        long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
+        while (disconnects.isEmpty() && System.nanoTime() < deadline) Thread.sleep(50);
+        check(!disconnects.isEmpty(), name);
     }
 
     private PluginMessageEvent message(com.velocitypowered.api.proxy.messages.ChannelMessageSource source,
