@@ -12,10 +12,10 @@ plugins {
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.9.0-R0.1-SNAPSHOT"
+version = "1.9.0-R0.3-SNAPSHOT"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
-val bridgeVersion = "1.1.3-R0.1-SNAPSHOT"
+val bridgeVersion = "1.2.0-R0.1-SNAPSHOT"
 val databaseRuntimeDependencies = listOf(libs.syntaxdb.core, libs.hikari, libs.mysql.jdbc, libs.protobuf,
     libs.postgresql.jdbc, libs.mssql.jdbc, libs.sqlite.jdbc, libs.kotlin.stdlib)
 
