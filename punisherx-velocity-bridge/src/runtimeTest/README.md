@@ -29,19 +29,18 @@ offline mode so the wire test can authenticate without Mojang credentials.
 ## What runs
 
 The real proxy loads the bridge through its plugin descriptor and Guice injection,
-initializes HikariCP/MySQL Connector and creates `bridge_events`. Its real event
+initializes HikariCP/MySQL Connector using only read access to the existing `punishments` table. Its real event
 dispatcher runs checks for:
 
 - Permanent and temporary network BANs denying `LoginEvent`.
 - Active network BANs denying `ServerPreConnectEvent` and disconnecting the player.
 - Expired and backend-local BANs allowing proxy login.
-- Backend BAN and BANIP messages invoking disconnection.
+- Backend BAN and BANIP messages being consumed without executing unverified actions.
 - Client-originated bridge messages being handled without executing a BAN.
 - Truncated messages leaving players connected.
-- The real scheduler polling SQL events, disconnecting the target, marking events
-  processed and not replaying them.
+- The real scheduler reconciling current SQL UUID and IP bans, respecting scope and expiry,\n  without a shared processed-event flag.
 
-For these eleven checks, player discovery is temporarily replaced with a delegating
+For the security and compatibility checks, player discovery is temporarily replaced with a delegating
 `ProxyServer` and synthetic `Player`/`ServerConnection` objects. SQL, the production
 bridge instance, event dispatcher and scheduler remain real. Discovery is restored
 before the network checks.
@@ -56,7 +55,7 @@ This does not run a full Minecraft backend, online-mode authentication or a game
 client. Backend transfers and plugin messages are tested through real Velocity
 event dispatch, rather than a live backend network connection.
 
-## Verified 2026-10-25
+## Historical verification: 2026-10-25 (prior bridge architecture)
 
 Velocity **4.3.0 build 44**, Amazon Corretto **25**, local MariaDB:
 all eleven dispatcher/SQL checks, both TCP login denials, both session checks and

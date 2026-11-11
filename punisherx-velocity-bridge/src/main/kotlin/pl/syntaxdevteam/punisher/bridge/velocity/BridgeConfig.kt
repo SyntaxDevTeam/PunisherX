@@ -42,8 +42,8 @@ data class BridgeConfig(
                 host = props.getProperty("host", "localhost"),
                 port = props.getProperty("port")?.toIntOrNull() ?: 3306,
                 database = props.getProperty("database", "punisherx"),
-                username = props.getProperty("username", "root"),
-                password = props.getProperty("password", "change_me"),
+                username = props.getProperty("username", "punisherx_proxy"),
+                password = props.getProperty("password", ""),
                 pollInterval = Duration.ofMillis(pollMs.coerceAtLeast(200))
             )
         }

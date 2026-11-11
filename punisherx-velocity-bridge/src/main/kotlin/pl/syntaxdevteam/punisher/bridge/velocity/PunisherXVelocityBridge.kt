@@ -10,7 +10,6 @@ import com.velocitypowered.api.event.proxy.ProxyShutdownEvent
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
-import com.velocitypowered.api.proxy.ServerConnection
 import com.velocitypowered.api.proxy.messages.ChannelIdentifier
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier
 import com.velocitypowered.api.scheduler.ScheduledTask
@@ -18,13 +17,11 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.format.NamedTextColor
 import org.slf4j.Logger
-import java.io.ByteArrayInputStream
-import java.io.DataInputStream
 import java.time.Duration
-import java.util.Locale
-import java.util.UUID
 import java.nio.file.Path
 import com.google.inject.Inject
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 // Plugin metadata and version come from the Gradle-expanded velocity-plugin.json.
 class PunisherXVelocityBridge @Inject constructor(
@@ -37,6 +34,8 @@ class PunisherXVelocityBridge @Inject constructor(
     private lateinit var bridgeConfig: BridgeConfig
     private lateinit var bridgeDatabase: BridgeDatabase
     private var pollTask: ScheduledTask? = null
+    private val polling = AtomicBoolean(false)
+    private val lastDbWarning = AtomicLong(0)
 
     @Subscribe
     fun onProxyInitialize(event: ProxyInitializeEvent) {
@@ -45,46 +44,66 @@ class PunisherXVelocityBridge @Inject constructor(
 
         bridgeConfig = BridgeConfig.load(dataDirectory, logger)
         bridgeDatabase = BridgeDatabase(logger, bridgeConfig)
-        bridgeDatabase.ensureSchema()
+        runCatching { bridgeDatabase.ensureSchema() }.onFailure {
+            logger.error("PunisherX proxy access checks are fail-closed: database initialization failed", it)
+        }
         schedulePolling()
     }
 
+    /** Legacy clients/backends cannot submit punishment commands over plugin messaging.
+     * Consume the private channel without forwarding or executing any payload.
+     */
     @Subscribe
     fun onPluginMessage(event: PluginMessageEvent) {
-        if (event.identifier != channel) {
-            return
-        }
-
-        event.result = PluginMessageEvent.ForwardResult.handled()
-        if (event.source !is ServerConnection) {
-            return
-        }
-
-        val dataInput = DataInputStream(ByteArrayInputStream(event.data))
-        val action = runCatching { dataInput.readUTF() }.getOrNull()?.uppercase(Locale.ROOT) ?: return
-        val target = runCatching { dataInput.readUTF() }.getOrNull() ?: return
-        val reason = runCatching { dataInput.readUTF() }.getOrNull() ?: ""
-        val end = runCatching { dataInput.readLong() }.getOrNull() ?: -1L
-
-        when (action) {
-            "BAN" -> handleBan(target, reason, end)
-            "BANIP" -> handleBanIp(target, reason, end)
-            else -> logger.warn("Received unsupported PunisherX bridge action: $action")
+        if (event.identifier == channel) {
+            event.result = PluginMessageEvent.ForwardResult.handled()
         }
     }
 
     @Subscribe(async = true)
     fun onLogin(event: LoginEvent) {
-        val activeBan = bridgeDatabase.findActiveBan(event.player.uniqueId) ?: return
-        event.result = ComponentResult.denied(banMessage("BAN", activeBan.reason, activeBan.endTime))
+        try {
+            val player = event.player
+            val ban = bridgeDatabase.findActiveBan(
+                player.uniqueId, ip = player.remoteAddress.address.hostAddress
+            )
+            if (ban != null) {
+                event.result = ComponentResult.denied(banMessage(ban.type, ban.reason, ban.endTime))
+            }
+        } catch (error: Exception) {
+            logDbFailure("login", error)
+            event.result = ComponentResult.denied(databaseUnavailable())
+        }
     }
 
     @Subscribe(async = true)
     fun onServerPreConnect(event: ServerPreConnectEvent) {
-        val activeBan = bridgeDatabase.findActiveBan(event.player.uniqueId) ?: return
-        event.result = ServerPreConnectEvent.ServerResult.denied()
-        disconnect(event.player, "BAN", activeBan.reason, activeBan.endTime)
+        try {
+            val player = event.player
+            val ban = bridgeDatabase.findActiveBan(
+                player.uniqueId, ip = player.remoteAddress.address.hostAddress
+            )
+            if (ban != null) {
+                event.result = ServerPreConnectEvent.ServerResult.denied()
+                disconnect(player, ban.type, ban.reason, ban.endTime)
+            }
+        } catch (error: Exception) {
+            logDbFailure("transfer", error)
+            event.result = ServerPreConnectEvent.ServerResult.denied()
+            event.player.disconnect(databaseUnavailable())
+        }
     }
+
+    private fun logDbFailure(operation: String, error: Exception) {
+        val now = System.currentTimeMillis()
+        val previous = lastDbWarning.get()
+        if (now - previous > 30_000L && lastDbWarning.compareAndSet(previous, now)) {
+            logger.error("PunisherX database failure during {} (new accesses are fail-closed)", operation, error)
+        }
+    }
+
+    private fun databaseUnavailable(): Component =
+        Component.text("PunisherX: unable to verify access. Please retry shortly.", NamedTextColor.RED)
 
     @Subscribe
     fun onShutdown(event: ProxyShutdownEvent) {
@@ -97,41 +116,34 @@ class PunisherXVelocityBridge @Inject constructor(
     private fun schedulePolling() {
         pollTask?.cancel()
         pollTask = server.scheduler
-            .buildTask(this, Runnable { pollQueue() })
+            .buildTask(this, Runnable { pollOnlinePlayers() })
             .repeat(bridgeConfig.pollInterval)
             .schedule()
     }
 
-    private fun pollQueue() {
-        val events = bridgeDatabase.fetchPendingEvents()
-        if (events.isEmpty()) return
-
-        events.forEach { event ->
-            when (event.action.uppercase(Locale.ROOT)) {
-                "BAN" -> handleBan(event.target, event.reason, event.end)
-                "BANIP" -> handleBanIp(event.target, event.reason, event.end)
-                else -> logger.warn("Unknown bridge action ${event.action} for event ${event.id}")
+    /** Reconciliation uses current SQL state, not replayable queue messages or a global processed flag.
+     * Every proxy reads independently, so no competing proxy can consume another proxy's delivery.
+     */
+    private fun pollOnlinePlayers() {
+        if (!polling.compareAndSet(false, true)) return
+        try {
+            val snapshots = server.allPlayers.map {
+                ConnectionIdentity(it.uniqueId, it.remoteAddress.address.hostAddress)
             }
-
-            bridgeDatabase.markProcessed(event.id)
+            val bans = bridgeDatabase.findActiveBans(snapshots)
+            snapshots.forEach { snapshot ->
+                val ban = bans[snapshot.uuid] ?: return@forEach
+                server.getPlayer(snapshot.uuid).ifPresent { player ->
+                    if (player.remoteAddress.address.hostAddress == snapshot.ip) {
+                        disconnect(player, ban.type, ban.reason, ban.endTime)
+                    }
+                }
+            }
+        } catch (error: Exception) {
+            logDbFailure("reconciliation", error)
+        } finally {
+            polling.set(false)
         }
-    }
-
-    private fun handleBan(target: String, reason: String, end: Long) {
-        val uuid = runCatching { UUID.fromString(target) }.getOrNull()
-        if (uuid == null) {
-            logger.warn("PunisherX bridge received invalid UUID for BAN: $target")
-            return
-        }
-
-        server.getPlayer(uuid).ifPresent { player -> disconnect(player, "BAN", reason, end) }
-    }
-
-    private fun handleBanIp(targetIp: String, reason: String, end: Long) {
-        val normalizedIp = targetIp.trim()
-        server.allPlayers
-            .filter { player -> player.remoteAddress.address.hostAddress == normalizedIp }
-            .forEach { player -> disconnect(player, "BANIP", reason, end) }
     }
 
     private fun disconnect(player: Player, type: String, reason: String, end: Long) {

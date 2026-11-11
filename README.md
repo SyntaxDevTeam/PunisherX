@@ -45,7 +45,7 @@ It works on standalone servers and networks, with a dedicated **Paper/Folia edit
 * **Custom messages:** MiniMessage, legacy and plain-text formatting, bundled translations including Korean, and defaults for missing translation keys.
 * **Integrations:** Discord webhooks, PlaceholderAPI and asynchronous MaxMind GeoIP lookups when a license key is configured.
 * **Database choices:** SQLite, MySQL, MariaDB (MySQL driver), PostgreSQL and SQL Server through SyntaxDB, with export, import and migration tools.
-* **Network moderation:** server-scoped punishments and proxy bridges; the Velocity bridge also checks active network-wide bans at login.
+* **Network moderation:** server-scoped punishments and proxy bridges; both proxy bridges enforce active network-wide UUID/IP bans from SQL at login and reconcile online players without executing client-originated plugin messages.
 
 ### Safer configuration updates
 
