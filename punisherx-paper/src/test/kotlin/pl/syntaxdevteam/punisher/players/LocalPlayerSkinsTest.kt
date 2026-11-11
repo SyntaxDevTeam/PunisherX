@@ -3,7 +3,7 @@ package pl.syntaxdevteam.punisher.players
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.inventory.meta.SkullMeta
-import org.bukkit.profile.PlayerProfile
+import com.destroystokyo.paper.profile.PlayerProfile
 import org.bukkit.profile.PlayerTextures
 import org.mockito.Mockito.*
 import java.net.URI
@@ -24,7 +24,7 @@ class LocalPlayerSkinsTest {
         val uuid = UUID.randomUUID()
         val url = URI("https://textures.minecraft.net/texture/test").toURL()
         val player = mock(Player::class.java)
-        val loginProfile = mock(com.destroystokyo.paper.profile.PlayerProfile::class.java)
+        val loginProfile = mock(PlayerProfile::class.java)
         val loginTextures = mock(PlayerTextures::class.java)
         `when`(player.uniqueId).thenReturn(uuid)
         `when`(player.playerProfile).thenReturn(loginProfile)
@@ -38,11 +38,11 @@ class LocalPlayerSkinsTest {
         `when`(profile.textures).thenReturn(textures)
         val meta = mock(SkullMeta::class.java)
         mockStatic(Bukkit::class.java).use { bukkit ->
-            bukkit.`when`<PlayerProfile> { Bukkit.createPlayerProfile(uuid) }.thenReturn(profile)
+            bukkit.`when`<PlayerProfile> { Bukkit.createProfile(uuid) }.thenReturn(profile)
             cache.apply(uuid, meta)
             verify(textures).setSkin(url, PlayerTextures.SkinModel.SLIM)
             verify(profile).setTextures(textures)
-            verify(meta).setOwnerProfile(profile)
+            verify(meta).setPlayerProfile(profile)
             verify(profile, never()).update()
         }
         // A later login without textures must remove the previous skin.
@@ -68,10 +68,10 @@ class LocalPlayerSkinsTest {
         val meta = mock(SkullMeta::class.java)
         `when`(profile.textures).thenReturn(textures)
         mockStatic(Bukkit::class.java).use { bukkit ->
-            bukkit.`when`<PlayerProfile> { Bukkit.createPlayerProfile(uuid) }.thenReturn(profile)
+            bukkit.`when`<PlayerProfile> { Bukkit.createProfile(uuid) }.thenReturn(profile)
             cache.apply(uuid, meta)
             verify(textures).setSkin(java.net.URI(skin.url).toURL(), PlayerTextures.SkinModel.SLIM)
-            verify(meta).setOwnerProfile(profile)
+            verify(meta).setPlayerProfile(profile)
             verify(profile, never()).update()
         }
         cache.close()

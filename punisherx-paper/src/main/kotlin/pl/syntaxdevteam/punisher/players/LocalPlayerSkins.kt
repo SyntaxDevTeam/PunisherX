@@ -42,10 +42,10 @@ class LocalPlayerSkins : AutoCloseable {
 
     fun apply(uuid: UUID, meta: SkullMeta) {
         val skin = skins.getIfPresent(uuid) ?: return
-        val profile = Bukkit.createPlayerProfile(uuid)
+        val profile = Bukkit.createProfile(uuid)
         val textures = profile.textures
         textures.setSkin(skin.url, skin.model)
         profile.setTextures(textures)
-        meta.ownerProfile = profile
+        meta.playerProfile = profile
     }
 }

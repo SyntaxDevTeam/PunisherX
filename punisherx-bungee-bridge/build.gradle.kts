@@ -6,6 +6,9 @@ repositories {
     maven("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/")
     maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
     mavenCentral()
+    maven("https://central.sonatype.com/repository/maven-snapshots/") {
+        content { includeGroup("net.md-5") }
+    }
     maven("https://oss.sonatype.org/content/repositories/releases/")
     maven("https://oss.sonatype.org/content/repositories/snapshots/")
     maven("https://repo.md-5.net/content/groups/public/")

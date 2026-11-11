@@ -25,6 +25,11 @@ subprojects {
     apply(plugin = "maven-publish")
     apply(plugin = "org.jetbrains.dokka-javadoc")
 
+    // SQLite JDBC loads its native library from the test runtime classpath.
+    tasks.withType<Test>().configureEach {
+        jvmArgs("--enable-native-access=ALL-UNNAMED")
+    }
+
     group = rootProject.group
     version = if (name.endsWith("-bridge")) bridgeVersion else rootProject.version
 
