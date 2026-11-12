@@ -196,9 +196,12 @@ permissions:
   punisherx.cmd.kick:
     description: Allows kicking a player from the server.
     default: op
-  punisherx.check:
+  punisherx.cmd.check:
     description: Allows checking penalties for a player. Not required for self-check.
-    default: true
+    default: op
+  punisherx.check:
+    description: Deprecated alias for punisherx.cmd.check.
+    default: op
   punisherx.view_ip:
     description: Allows viewing a player's IP subject to the configured privacy policy.
     default: false
@@ -207,7 +210,7 @@ permissions:
     default: false
   punisherx.cmd.history:
     description: Allows viewing a player's penalty history. Not required for self-check.
-    default: true
+    default: op
   punisherx.cmd.banlist:
     description: Allows viewing the list of banned players.
     default: op
