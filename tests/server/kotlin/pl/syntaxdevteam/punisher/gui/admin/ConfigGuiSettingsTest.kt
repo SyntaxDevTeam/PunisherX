@@ -59,4 +59,9 @@ class ConfigGuiSettingsTest {
         assertEquals(ConfigGuiSettings.Result.SAVED, settings.hiddenPlayers(player, "-"))
         assertTrue(config.getStringList("privacy.ip.hidden_players").isEmpty())
     }
+    @Test fun `protected names containing s and whitespace separators are preserved`() {
+        whenever(player.isOp).thenReturn(true)
+        assertEquals(ConfigGuiSettings.Result.SAVED, settings.hiddenPlayers(player, "syntax Steve\tAlex, Test\nOther"))
+        assertEquals(listOf("syntax", "Steve", "Alex", "Test", "Other"), config.getStringList("privacy.ip.hidden_players"))
+    }
 }

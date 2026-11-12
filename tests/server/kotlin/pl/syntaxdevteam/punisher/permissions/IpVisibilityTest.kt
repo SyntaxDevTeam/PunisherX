@@ -81,4 +81,16 @@ class IpVisibilityTest {
         assertEquals(false, descriptor.get("permissions.punisherx.view_ip.default"))
         assertEquals(false, descriptor.get("permissions.punisherx.privacy.hide_ip.default"))
     }
+    @Test fun `shared address is hidden when another account is protected`() {
+        whenever(plugin.playerIPManager).thenReturn(mock())
+        val address = "192.0.2.10"
+        whenever(plugin.playerIPManager.getAllDecryptedRecords()).thenReturn(listOf(
+            pl.syntaxdevteam.punisher.players.PlayerIPManager.PlayerInfo("Target", uuid.toString(), address, "Earth", "now")))
+        assertEquals(address, IpVisibility.displayAddress(plugin, viewer, address))
+        config.set("privacy.ip.hidden_players", listOf("Target"))
+        assertEquals("[hidden]", IpVisibility.displayAddress(plugin, viewer, address))
+        config.set("privacy.ip.hidden_players", emptyList<String>())
+        config.set("privacy.ip.enabled", false)
+        assertEquals("[hidden]", IpVisibility.displayAddress(plugin, viewer, address))
+    }
 }

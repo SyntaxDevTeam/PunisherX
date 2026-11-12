@@ -112,7 +112,6 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                     .map { it.playerIP }
                     .distinct()
                     .take(3)
-                val ipLine = ipHistory.joinToString(", ").ifEmpty { noData }
                 val geo = info.geoLocation
                 val lastLocation = PlayerStatsService.getLastLocationString(uuid)
                     ?: mH.stringMessageToStringNoPrefix("error", "no_data")
@@ -126,7 +125,7 @@ class OfflinePlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                     val loreLines = mutableListOf(
                         mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.uuid", mapOf("uuid" to info.playerUUID)),
                         if (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, player, uuid, info.playerName))
-                            mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.ip", mapOf("ip" to ipLine)) else Component.empty(),
+                            mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.ip", mapOf("ip" to ipHistory.joinToString(", ") { pl.syntaxdevteam.punisher.permissions.IpVisibility.displayAddress(plugin, player, it) }.ifEmpty { noData })) else Component.empty(),
                         if (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, player, uuid, info.playerName))
                             mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.geo", mapOf("geo" to geo)) else Component.empty(),
                         mH.stringMessageToComponentNoPrefix("GUI", "OfflineList.hover.lastSeen", mapOf("lastseen" to lastSeenDate)),

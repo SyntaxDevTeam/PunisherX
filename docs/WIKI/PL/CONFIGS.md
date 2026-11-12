@@ -104,6 +104,20 @@ Opcje dotyczą `/check` oraz list graczy online, offline i administratorów w GU
 
 Jawnie nadane `punisherx.privacy.hide_ip` ukrywa IP posiadacza. Preferencja jest zapisywana przy wejściu/wyjściu w `ip-privacy.yml`. Zmieniając ochronę gracza offline, użyj listy UUID. Ochrona dotyczy wyświetlania; nie zmienia zapisu IP ani działania banów IP. Skróty owner/manage nie omijają ochrony gracza ani ograniczenia OP.
 
+`privacy.ip.enabled: true` zezwala na pokazywanie IP uprawnionym odbiorcom. Aby ukryć wszystkie adresy, ustaw `false`:
+
+```yaml
+privacy:
+  ip:
+    enabled: false
+    restrict_operators: true
+    hidden_players: []
+```
+
+Aby chronić wybrane osoby przy włączonym wyświetlaniu, dodaj ich nicki lub UUID do `hidden_players`. Edytor tej listy w GUI przyjmuje wpisy rozdzielone przecinkami lub białymi znakami. Wspólny adres chronionego konta jest ukrywany również na listach innych graczy korzystających z tego adresu. Ochrona obowiązuje także w potwierdzeniu cofnięcia bana IP.
+
+Po ręcznej edycji `config.yml` wykonaj `/prx reload` i otwórz panel ponownie. Zapis ustawień przez GUI zamyka dotychczasowe panele, żeby nie pozostały w nich wcześniej wyświetlone adresy.
+
 ## Ograniczenia i odliczanie JAIL
 
 | Opcja | Domyślnie | Działanie |
