@@ -132,6 +132,52 @@ class DatabaseHandler(private val plugin: PunisherX) {
         ready.set(true)
     }
 
+    /** Staff observations never affect punishments or escalation. */
+    fun addStaffNote(player: UUID, author: String, rawContent: String): Long? {
+        val content = rawContent.trim()
+        if (content.length !in 3..500 || content.any { Character.isISOControl(it) } || author.length !in 1..64) return null
+        return try {
+            val key = db.insert("staff_notes", mapOf(
+                "player_uuid" to player.toString(),
+                "author" to author,
+                "content" to content,
+                "created_at" to System.currentTimeMillis(),
+                "server" to normalizedServerScope()
+            )).generatedKey as? Number
+            key?.toLong()
+        } catch (e: Exception) {
+            reportDatabaseFailure("Could not save staff note", e)
+            null
+        }
+    }
+
+    fun getStaffNotes(player: UUID, limit: Int = 10, offset: Int = 0): List<StaffNoteData> {
+        require(limit in 1..50 && offset >= 0) { "Invalid staff note page" }
+        return query(
+            "SELECT id, player_uuid, author, content, created_at, server FROM staff_notes " +
+                "WHERE player_uuid = ? ORDER BY id DESC LIMIT ? OFFSET ?",
+            player.toString(), limit, offset
+        ) { row ->
+            StaffNoteData(
+                id = requireNotNull(row.long("id")),
+                player = UUID.fromString(requireNotNull(row.string("player_uuid"))),
+                author = row.string("author").orEmpty(),
+                content = row.string("content").orEmpty(),
+                createdAt = row.long("created_at") ?: 0,
+                server = row.string("server").orEmpty()
+            )
+        }
+    }
+
+    /** The target UUID must match, preventing cross-player deletes by ID. */
+    fun removeStaffNote(player: UUID, noteId: Long): Boolean {
+        if (noteId <= 0) return false
+        return db.execute(
+            "DELETE FROM staff_notes WHERE id = ? AND player_uuid = ?",
+            listOf(noteId, player.toString())
+        ) == 1
+    }
+
     // ---------------------------------------------------------------------
     // Data modification helpers
     // ---------------------------------------------------------------------

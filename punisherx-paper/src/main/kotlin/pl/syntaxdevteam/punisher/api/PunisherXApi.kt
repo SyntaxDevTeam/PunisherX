@@ -1,6 +1,7 @@
 package pl.syntaxdevteam.punisher.api
 
  import pl.syntaxdevteam.punisher.databases.PunishmentData
+ import pl.syntaxdevteam.punisher.databases.StaffNoteData
  import java.util.concurrent.CompletableFuture
 
  /**
@@ -84,4 +85,7 @@ package pl.syntaxdevteam.punisher.api
      * @return A CompletableFuture resolving to true when the player is jailed, false otherwise.
      */
     fun isJailed(uuid: String): CompletableFuture<Boolean>
+
+    /** Private, read-only staff notes available to trusted plugin integrations only. */
+    fun getStaffNotes(uuid: String, limit: Int = 10, offset: Int = 0): CompletableFuture<List<StaffNoteData>>
 }

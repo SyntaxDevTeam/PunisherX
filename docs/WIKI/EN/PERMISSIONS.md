@@ -93,3 +93,9 @@ Spigot also checks command permissions declared in `plugin.yml` before running h
 GUI preset editing uses `punisherx.manage` / `punisherx.manage.*`; there is no separate preset-edit permission. Quick template actions use `punisherx.cmd.punish`. `/cache` is console-only and cannot be enabled for players through a permission.
 
 `punisherx.manage.reports` alone grants reading and decisions; notifications additionally require `punisherx.see.reports` or parent visibility access. [Report workflow and interfaces](REPORTS.md).
+
+### Staff note permissions
+
+* `punisherx.see.notes` — read private staff notes (also inherited from `punisherx.see` / `punisherx.see.*`).
+* `punisherx.manage.notes` — create, remove and read staff notes (also inherited from `punisherx.manage` / `punisherx.manage.*`).
+* Both default to server operators; the console can use all note actions.

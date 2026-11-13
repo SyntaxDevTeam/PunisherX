@@ -145,3 +145,7 @@ Use these to create custom punishment dashboards or integrate PunisherX data int
 - `isJailed(uuid: String)` — `CompletableFuture<Boolean>`
 
 Replace `<version>` / `VERSION` with a published version matching the server. This page is for integration developers; plugin operation is covered by the [administrator guide](ADMIN-GUIDE.md).
+
+### Staff Notes — trusted plugin integrations
+
+`PunisherXApi.getStaffNotes(uuid: String, limit: Int = 10, offset: Int = 0)` returns `CompletableFuture<List<StaffNoteData>>`. The record includes note ID, player UUID, author, text, timestamp (epoch milliseconds) and server. This is an internal JVM API, not an HTTP endpoint. **Do not expose private notes to players or public services.**

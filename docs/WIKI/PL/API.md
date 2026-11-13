@@ -145,3 +145,7 @@ Możesz ich użyć do budowy własnych dashboardów kar lub integracji danych Pu
 - `isJailed(uuid: String)` — `CompletableFuture<Boolean>`
 
 Zastąp `<version>` / `VERSION` opublikowaną wersją zgodną z serwerem. To strona dla twórców integracji; obsługę pluginu opisuje [poradnik administratora](ADMIN-GUIDE.md).
+
+### Notatki administracyjne — integracja z zaufanymi pluginami
+
+`PunisherXApi.getStaffNotes(uuid: String, limit: Int = 10, offset: Int = 0)` zwraca `CompletableFuture<List<StaffNoteData>>`. Rekord zawiera ID notatki, UUID gracza, autora, treść, czas (milisekundy epoch) i serwer. Jest to lokalne API JVM, a nie endpoint HTTP. **Nie udostępniaj prywatnych notatek graczom ani usługom publicznym.**

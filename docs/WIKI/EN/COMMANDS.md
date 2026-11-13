@@ -16,6 +16,14 @@
 * `/history <player> (page)` — paginated history of all punishments for a player.
 * `/banlist (page) [--h]` — paginated list of currently banned players, with `--h` to show historical bans.
 
+## Staff notes — private moderator observations
+
+* `/note add <player|uuid> <text>` — records an observation of 3–500 characters, including author, timestamp, and server.
+* `/note list <player|uuid> [page]` — paginated staff-only history, newest first.
+* `/note remove <player|uuid> <id>` — deletes a note only if its ID belongs to that player.
+* Reading requires `punisherx.see.notes`. Adding and deleting requires `punisherx.manage.notes`. Management permission also allows reading.
+* A shortcut is available in the player-management panel. Notes are **not punishments**, never notify the player, and do not affect escalation. They are stored in SyntaxDB, included in backups, and accessible to trusted server plugins via `PunisherXApi.getStaffNotes`.
+
 ## Punishment templates and panel
 
 * `/punish <player> <template> (level) [--force] [--silent]` — applies a template from `punish-templates.yml`. Without a level, the plugin selects the next escalation level from punishment history. Requires `punisherx.cmd.punish`.

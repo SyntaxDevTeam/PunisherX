@@ -23,6 +23,7 @@ internal object DatabaseBackup {
         "playercache" to listOf("id", "data"),
         "reports" to listOf("id", "player", "suspect", "reason", "filedAt"),
         "report_resolutions" to listOf("reportId", "status", "handledBy", "note", "handledAt"),
+        "staff_notes" to listOf("id", "player_uuid", "author", "content", "created_at", "server"),
         "bridge_events" to listOf("id", "action", "target", "reason", "endTime", "processed", "processedAt"),
         "punisherx_identity_migrations" to listOf("migration_id", "source_uuid", "target_uuid", "state"),
         "punisherx_identity_migration_items" to listOf("migration_id", "entity_type", "entity_key")
@@ -71,7 +72,7 @@ internal object DatabaseBackup {
                             if (name.equals("filedAt", true) && value is String && database.dialect.type != DatabaseType.SQLITE)
                                 java.sql.Timestamp.valueOf(LocalDateTime.parse(value.replace(' ', 'T')))
                             else if (value is String && name.lowercase(Locale.ROOT) in setOf(
-                                "id", "historyid", "reportid", "start", "endtime", "processed", "processedat", "undoneat", "handledat", "activeid", "pausedat"
+                                "id", "historyid", "reportid", "start", "endtime", "processed", "processedat", "undoneat", "handledat", "activeid", "pausedat", "created_at"
                             )) value.toLong() // Compatibility with old exports that quoted every scalar.
                             else value
                         }

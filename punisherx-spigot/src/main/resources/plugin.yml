@@ -16,6 +16,9 @@ softdepend: [PlaceholderAPI, MiniPlaceholders, LuckPerms, Vault, VaultUnlocked, 
 
 
 commands:
+  note:
+    description: Add, list and remove private moderator notes.
+    usage: /note <add|list|remove> <player> [text|page|id]
   reports:
     description: Review and manage player reports.
     usage: /reports [gui|book|list|history|view|resolve|reject]
@@ -140,6 +143,12 @@ commands:
     permission: punisherx.cmd.prx
 
 permissions:
+  punisherx.manage.notes:
+    description: Allows adding and deleting private staff notes.
+    default: op
+  punisherx.see.notes:
+    description: Allows reading private staff notes.
+    default: op
   punisherx.cmd.unmark:
     description: Reverse marked penalties and manage check pauses.
     default: op

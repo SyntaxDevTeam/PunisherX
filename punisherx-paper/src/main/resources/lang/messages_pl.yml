@@ -601,3 +601,15 @@ unmark:
   silent_success: '<gray>Cofnięto {count} oznaczonych wpisów historii dla {player} (znacznik: {mark}).'
   pause_success: '<green>Wstrzymano check {mark} i cofnięto {count} oznaczonych wpisów historii. Po naprawie użyj /unmark resume {mark}.'
   resumed: '<green>Check {mark} może ponownie nakładać oznaczone kary.'
+
+staff-notes:
+  usage: "<yellow>Użycie: /note add <gracz> <treść> | /note list <gracz> [strona] | /note remove <gracz> <id></yellow>"
+  invalid-content: "<red>Notatka musi mieć 3–500 znaków i nie może zawierać znaków sterujących.</red>"
+  added: "<green>Dodano notatkę administracyjną #<id> dla <player>.</green>"
+  removed: "<green>Usunięto notatkę administracyjną #<id> gracza <player>.</green>"
+  not-found: "<yellow>Brak notatki o tym ID dla wskazanego gracza.</yellow>"
+  empty: "<gray>Brak notatek administracyjnych na tej stronie.</gray>"
+  list-title: "<gold>Notatki administracyjne gracza <player> — strona <page></gold>"
+  invalid-page: "<red>Nieprawidłowy numer strony.</red>"
+  db-error: "<red>Nie udało się odczytać lub zapisać notatek. Sprawdź log serwera.</red>"
+
