@@ -589,12 +589,12 @@ database-backup:
 unmark:
   usage: '<red>Użycie: /unmark <gracz|all> [znacznik] [--silent] lub /unmark <pause|resume> <znacznik>'
   invalid_mark: '<red>Użyj jednego znacznika: --mark lub --mark=check. Nazwa: 1-64 liter, cyfr, _, ., :, lub -, początek: litera lub cyfra.'
-  paused: '<yellow>Pominięto karę: check <gold>{mark}</gold> jest wstrzymany.'
+  paused: '<yellow>Pominięto karę: check <gold><mark></gold> jest wstrzymany.'
   db_error: '<red>Nie udało się przetworzyć oznaczonych kar. Sprawdź log serwera.'
-  success: '<green>Cofnięto {count} oznaczonych wpisów historii dla {player} (znacznik: {mark}).'
-  silent_success: '<gray>Cofnięto {count} oznaczonych wpisów historii dla {player} (znacznik: {mark}).'
-  pause_success: '<green>Wstrzymano check {mark} i cofnięto {count} oznaczonych wpisów historii. Po naprawie użyj /unmark resume {mark}.'
-  resumed: '<green>Check {mark} może ponownie nakładać oznaczone kary.'
+  success: '<green>Cofnięto <count> oznaczonych wpisów historii dla <player> (znacznik: <mark>).'
+  silent_success: '<gray>Cofnięto <count> oznaczonych wpisów historii dla <player> (znacznik: <mark>).'
+  pause_success: '<green>Wstrzymano check <mark> i cofnięto <count> oznaczonych wpisów historii. Po naprawie użyj /unmark resume <mark>.'
+  resumed: '<green>Check <mark> może ponownie nakładać oznaczone kary.'
 
 staff-notes:
   usage: "<yellow>Użycie: /note add <gracz> <treść> | /note list <gracz> [strona] | /note remove <gracz> <id></yellow>"
@@ -606,4 +606,3 @@ staff-notes:
   list-title: "<gold>Notatki administracyjne gracza <player> — strona <page></gold>"
   invalid-page: "<red>Nieprawidłowy numer strony.</red>"
   db-error: "<red>Nie udało się odczytać lub zapisać notatek. Sprawdź log serwera.</red>"
-
