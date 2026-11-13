@@ -16,6 +16,14 @@
 * `/history <gracz> (strona)` — stronicowana historia wszystkich kar danego gracza.
 * `/banlist (strona) [--h]` — stronicowana lista aktualnie zbanowanych graczy; `--h` pokazuje bany historyczne.
 
+## Staff Notes — prywatne notatki administracji
+
+* `/note add <gracz|uuid> <treść>` — zapisuje obserwację (3–500 znaków) wraz z autorem, datą i serwerem.
+* `/note list <gracz|uuid> [strona]` — stronicowana lista notatek, od najnowszych.
+* `/note remove <gracz|uuid> <id>` — usuwa wyłącznie notatkę wskazanego gracza.
+* Odczyt wymaga `punisherx.see.notes`, dodawanie i usuwanie — `punisherx.manage.notes`. Uprawnienie do zarządzania obejmuje również odczyt.
+* Skrót dostępny jest w panelu zarządzania graczem. Notatki **nie są karami**, nie są wysyłane graczowi i nie wpływają na eskalację. Są zapisywane w SyntaxDB, uwzględniane w kopiach bazy i udostępniane zaufanym pluginom przez `PunisherXApi.getStaffNotes`.
+
 ## Szablony kar i panel
 
 * `/punish <gracz> <szablon> (poziom) [--force] [--silent]` — nakłada karę z `punish-templates.yml`. Bez podania poziomu wybiera kolejny poziom eskalacji na podstawie historii kar. Wymaga `punisherx.cmd.punish`.

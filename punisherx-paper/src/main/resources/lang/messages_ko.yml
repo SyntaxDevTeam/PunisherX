@@ -604,3 +604,14 @@ unmark:
   silent_success: '<gray>Reversed <count> marked history entries for <player> (mark: <mark>).'
   pause_success: '<green>Paused check <mark> and reversed <count> marked history entries. Use /unmark resume <mark> after fixing the check.'
   resumed: '<green>Check <mark> can issue marked punishments again.'
+
+staff-notes:
+  usage: "<yellow>Usage: /note add <player> <text> | /note list <player> [page] | /note remove <player> <id></yellow>"
+  invalid-content: "<red>Note must contain 3–500 characters and no control characters.</red>"
+  added: "<green>Added staff note #<id> for <player>.</green>"
+  removed: "<green>Removed staff note #<id> for <player>.</green>"
+  not-found: "<yellow>No note with this ID exists for that player.</yellow>"
+  empty: "<gray>No staff notes on this page.</gray>"
+  list-title: "<gold>Staff notes for <player> — page <page></gold>"
+  invalid-page: "<red>Invalid page number.</red>"
+  db-error: "<red>Could not access staff notes. Check the server log.</red>"

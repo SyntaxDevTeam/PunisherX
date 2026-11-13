@@ -93,3 +93,9 @@ Spigot przed uruchomieniem komendy dodatkowo sprawdza permisję zadeklarowaną w
 Edycja presetów GUI używa `punisherx.manage` / `punisherx.manage.*`; nie ma osobnej permisji edycji presetów. Szybkie kary z szablonów używają `punisherx.cmd.punish`. `/cache` jest dostępne tylko z konsoli — permisja nie udostępni go graczom.
 
 Samo `punisherx.manage.reports` daje odczyt i decyzje; powiadomienia wymagają również `punisherx.see.reports` lub nadrzędnego dostępu widoczności. [Instrukcja zgłoszeń i interfejsów](REPORTS.md).
+
+### Uprawnienia notatek administracyjnych
+
+* `punisherx.see.notes` — podgląd prywatnych notatek (także przez `punisherx.see` / `punisherx.see.*`).
+* `punisherx.manage.notes` — tworzenie, usuwanie i odczyt notatek (także przez `punisherx.manage` / `punisherx.manage.*`).
+* Uprawnienia domyślnie dla operatorów; konsola ma dostęp do wszystkich akcji.

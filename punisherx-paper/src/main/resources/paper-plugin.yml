@@ -55,6 +55,9 @@ dependencies:
 
 
 commands:
+  note:
+    description: Add, list and remove private moderator notes.
+    usage: /note <add|list|remove> <player> [text|page|id]
   ban:
     description: Bans a player for a specified time with a reason.
     usage: /ban <player> (time) <reason>
@@ -152,6 +155,12 @@ commands:
     permission: punisherx.cmd.prx
 
 permissions:
+  punisherx.manage.notes:
+    description: Allows adding and deleting private staff notes.
+    default: op
+  punisherx.see.notes:
+    description: Allows reading private staff notes.
+    default: op
   punisherx.manage.reports:
     description: Allows resolving and rejecting player reports.
     default: op

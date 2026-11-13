@@ -50,6 +50,8 @@ object PermissionChecker {
         //Komunikaty
 
         MANAGE_REPORTS("punisherx.manage.reports"),
+        MANAGE_NOTES("punisherx.manage.notes"),
+        SEE_NOTES("punisherx.see.notes"),
         SEE_REPORTS("punisherx.see.reports"),
         SEE("punisherx.see"),
         SEE_BAN("punisherx.see.ban"),
@@ -106,6 +108,8 @@ object PermissionChecker {
         PermissionKey.MANAGE_SET_SPAWN -> "Allows you to set your respawn location after serving your prison sentence."
         PermissionKey.MANAGE_SET_JAIL -> "Allows setting the jail location."
 
+        PermissionKey.MANAGE_NOTES -> "Allows adding and deleting private staff notes."
+        PermissionKey.SEE_NOTES -> "Allows reading private staff notes."
         PermissionKey.MANAGE_REPORTS -> "Allows resolving and rejecting reports"
         PermissionKey.SEE_REPORTS -> "Allows viewing all reports"
         PermissionKey.SEE -> "Allows viewing all punishments."

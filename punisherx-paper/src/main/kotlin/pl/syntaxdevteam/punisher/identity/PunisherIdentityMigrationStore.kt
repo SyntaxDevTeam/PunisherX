@@ -50,6 +50,9 @@ internal object PunisherIdentityMigrationStore {
         }
     }
 
+    private fun hasStaffNotes(connection: Connection): Boolean =
+        connection.metaData.getTables(connection.catalog, connection.schema, "staff_notes", null).use { it.next() }
+
     fun inspect(connection: Connection, migrationId: UUID, source: UUID, target: UUID): PunisherIdentityMigrationBridgeResult {
         require(source != target)
         val existing = migration(connection, migrationId)
@@ -66,8 +69,9 @@ internal object PunisherIdentityMigrationStore {
         val bridge = count(connection, "SELECT COUNT(*) FROM bridge_events WHERE target = ?", source)
         val templates = count(connection, "SELECT COUNT(*) FROM punishment_templates WHERE playerUuid = ?", source)
         val marks = count(connection, "SELECT COUNT(*) FROM punishment_marks WHERE playerUuid = ?", source)
+        val notes = if (hasStaffNotes(connection)) count(connection, "SELECT COUNT(*) FROM staff_notes WHERE player_uuid = ?", source) else 0
         val journal = existing?.let { itemCount(connection, migrationId) } ?: 0
-        val evidence = active + history + reporter + suspect + bridge + templates + marks + journal > 0
+        val evidence = active + history + reporter + suspect + bridge + templates + marks + notes + journal > 0
         return PunisherIdentityMigrationBridgeResult(
             if (evidence) PunisherIdentityMigrationStatus.READY else PunisherIdentityMigrationStatus.NO_DATA,
             "PUNISHERX_ACTIVE_${active}_HISTORY_${history}_REPORTER_${reporter}_SUSPECT_${suspect}_BRIDGE_${bridge}",
@@ -122,6 +126,7 @@ internal object PunisherIdentityMigrationStore {
             journalIds(connection, migrationId, "REPORTER", "SELECT id FROM reports WHERE player = ?", source)
             journalIds(connection, migrationId, "SUSPECT", "SELECT id FROM reports WHERE suspect = ?", source)
             journalIds(connection, migrationId, "BRIDGE", "SELECT id FROM bridge_events WHERE target = ?", source)
+            if (hasStaffNotes(connection)) journalIds(connection, migrationId, "NOTE", "SELECT id FROM staff_notes WHERE player_uuid = ?", source)
 
             replaceUuid(connection, "punishments", "uuid", source, target)
             replaceUuid(connection, "punishment_marks", "playerUuid", source, target)
@@ -130,6 +135,7 @@ internal object PunisherIdentityMigrationStore {
             replaceUuid(connection, "reports", "player", source, target)
             replaceUuid(connection, "reports", "suspect", source, target)
             replaceUuid(connection, "bridge_events", "target", source, target)
+            if (hasStaffNotes(connection)) replaceUuid(connection, "staff_notes", "player_uuid", source, target)
 
             updateState(connection, migrationId, COMPLETED)
             PunisherIdentityMigrationBridgeResult(PunisherIdentityMigrationStatus.SUCCESS, inspection.reasonCode, true)
@@ -163,6 +169,7 @@ internal object PunisherIdentityMigrationStore {
                     "REPORTER" -> restore(connection, "reports", "id", item.key, "player", source, target)
                     "SUSPECT" -> restore(connection, "reports", "id", item.key, "suspect", source, target)
                     "BRIDGE" -> restore(connection, "bridge_events", "id", item.key, "target", source, target)
+                    "NOTE" -> restore(connection, "staff_notes", "id", item.key, "player_uuid", source, target)
                 }
             }
             updateState(connection, migrationId, ROLLED_BACK)

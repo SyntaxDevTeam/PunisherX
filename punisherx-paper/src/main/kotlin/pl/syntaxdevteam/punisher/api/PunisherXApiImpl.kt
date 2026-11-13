@@ -2,6 +2,8 @@ package pl.syntaxdevteam.punisher.api
 
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import pl.syntaxdevteam.punisher.databases.PunishmentData
+import pl.syntaxdevteam.punisher.databases.StaffNoteData
+import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
 class PunisherXApiImpl(private val databaseProvider: () -> DatabaseHandler) : PunisherXApi {
@@ -69,6 +71,14 @@ class PunisherXApiImpl(private val databaseProvider: () -> DatabaseHandler) : Pu
     override fun isMuted(uuid: String): CompletableFuture<Boolean> {
         return CompletableFuture.supplyAsync {
             databaseHandler.getPunishments(uuid).any { it.type.equals("MUTE", ignoreCase = true) }
+        }
+    }
+
+    override fun getStaffNotes(uuid: String, limit: Int, offset: Int): CompletableFuture<List<StaffNoteData>> {
+        require(limit in 1..50 && offset >= 0)
+        val playerId = UUID.fromString(uuid)
+        return CompletableFuture.supplyAsync {
+            databaseHandler.getStaffNotes(playerId, limit, offset)
         }
     }
 

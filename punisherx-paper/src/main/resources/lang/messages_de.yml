@@ -561,3 +561,14 @@ unmark:
   silent_success: '<gray>Reversed <count> marked history entries for <player> (mark: <mark>).'
   pause_success: '<green>Paused check <mark> and reversed <count> marked history entries. Use /unmark resume <mark> after fixing the check.'
   resumed: '<green>Check <mark> can issue marked punishments again.'
+
+staff-notes:
+  usage: "<yellow>Verwendung: /note add <player> <text> | /note list <player> [seite] | /note remove <player> <id></yellow>"
+  invalid-content: "<red>Notizen müssen 3–500 Zeichen lang sein und dürfen keine Steuerzeichen enthalten.</red>"
+  added: "<green>Teamnotiz #<id> für <player> hinzugefügt.</green>"
+  removed: "<green>Teamnotiz #<id> für <player> gelöscht.</green>"
+  not-found: "<yellow>Für diesen Spieler wurde keine Notiz mit dieser ID gefunden.</yellow>"
+  empty: "<gray>Keine Teamnotizen auf dieser Seite.</gray>"
+  list-title: "<gold>Teamnotizen für <player> — Seite <page></gold>"
+  invalid-page: "<red>Ungültige Seitenzahl.</red>"
+  db-error: "<red>Teamnotizen konnten nicht abgerufen werden. Serverprotokoll prüfen.</red>"

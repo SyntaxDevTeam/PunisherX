@@ -42,6 +42,16 @@ class PlayerActionGUI(plugin: PunisherX) : BaseGUI(plugin) {
             }
             PlayerPunishmentsGUI(plugin).open(clicker, target, history = true)
         })
+        // Staff-only observations, separate from punishment history.
+        gui.setItem(22, createGuiItem(Material.WRITABLE_BOOK, "<gold>Staff Notes</gold> <dark_gray>/note</dark_gray>") { clicker ->
+            if (!PermissionChecker.hasWithSee(clicker, PermissionChecker.PermissionKey.SEE_NOTES) &&
+                !PermissionChecker.hasWithManage(clicker, PermissionChecker.PermissionKey.MANAGE_NOTES)) {
+                clicker.sendMessage(mH.stringMessageToComponent("error", "no_permission"))
+                return@createGuiItem
+            }
+            clicker.closeInventory()
+            clicker.performCommand("note list " + target.uniqueId)
+        })
         gui.setItem(29, createGuiItem(Material.PAPER, mH.stringMessageToStringNoPrefix("GUI", "PlayerAction.active")) { clicker ->
             if (!PermissionChecker.hasWithLegacy(clicker, PermissionChecker.PermissionKey.CHECK)) {
                 clicker.sendMessage(mH.stringMessageToComponent("error", "no_permission")); return@createGuiItem

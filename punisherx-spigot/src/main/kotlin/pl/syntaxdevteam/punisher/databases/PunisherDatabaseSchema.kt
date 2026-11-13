@@ -9,9 +9,9 @@ import pl.syntaxdevteam.syntaxdb.schema.CreateTableBuilder
 internal object PunisherDatabaseSchema {
     val tables = listOf("punishments", "punishmenthistory", "punishment_undos", "punishment_templates",
         "punishment_marks", "punishment_mark_pauses",
-        "playercache", "reports", "report_resolutions", "bridge_events",
+        "playercache", "reports", "report_resolutions", "staff_notes", "bridge_events",
         "punisherx_identity_migrations", "punisherx_identity_migration_items")
-    val identityTables = setOf("punishments", "punishmenthistory", "playercache", "reports", "bridge_events")
+    val identityTables = setOf("punishments", "punishmenthistory", "playercache", "reports", "staff_notes", "bridge_events")
 
     fun column(database: Database, name: String): String =
         if (database.dialect.type == DatabaseType.POSTGRESQL) name.lowercase(Locale.ROOT) else name
@@ -58,6 +58,14 @@ internal object PunisherDatabaseSchema {
         database.createTable("reports", ifNotExists = true) {
             id(); varchar("player", 36); varchar("suspect", 36); text("reason")
             timestamp(c("filedAt")).defaultCurrentTimestamp()
+        }
+        database.createTable("staff_notes", ifNotExists = true) {
+            id()
+            varchar("player_uuid", 36).notNull()
+            varchar("author", 64).notNull()
+            text("content")
+            bigInt("created_at").notNull()
+            varchar("server", 64).notNull()
         }
         database.createTable("report_resolutions", ifNotExists = true) {
             integer(c("reportId")).primaryKey(); varchar("status", 16).notNull(); varchar(c("handledBy"), 64).notNull()

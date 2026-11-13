@@ -2,6 +2,13 @@
 
 ## [1.9.0] Unreleased
 
+### Staff Notes — private moderation observations
+
+* **Added private, non-punitive Staff Notes:** `/note add|list|remove` for Paper/Folia and Spigot, with author, creation time, server origin, separate read/manage permissions, pagination and audit logging.
+* Added staff notes access from the player management panel and a trusted read-only PunisherX JVM API.
+* Notes are stored in SyntaxDB, included in database exports/imports, and supported by the UUID migration/rollback journal. They are not part of punishment history or escalation.
+
+
 ### CRITICAL SECURITY FIXES — proxy bridges (2026-11-10)
 
 * **SECURITY / CRITICAL: Removed executable punishment commands from the client-accessible `punisherx:bridge` plugin messaging channel.** BungeeCord previously accepted unauthenticated `BAN`/`BANIP` payloads from connected players, allowing arbitrary player disconnections without moderation permissions. Both BungeeCord and Velocity now consume the legacy channel without executing any received payload; Paper/Folia and Spigot no longer emit commands on it.

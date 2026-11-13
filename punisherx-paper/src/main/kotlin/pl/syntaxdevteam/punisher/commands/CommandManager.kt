@@ -174,6 +174,7 @@ class CommandManager(private val plugin: PunisherX) {
                 "Review and manage player reports",
                 ReportsCommand(plugin)
             )
+            commands.register("note", "Manage private staff notes", NoteCommand(plugin))
 
             val aliases = plugin.config.getConfigurationSection("aliases")
             aliases?.getKeys(false)?.forEach { key ->
