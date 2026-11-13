@@ -13,7 +13,7 @@ object TestMessages {
 messages:
   literal: '<gray>Reason: <reason></gray>'
 """
-    fun create(): MessageHandler {
+    fun create(language: String = this.language): MessageHandler {
         val folder = kotlin.io.path.createTempDirectory("punisher-messages-test").toFile()
         folder.deleteOnExit()
         return MessageHandler(object : ResourceProvider {
