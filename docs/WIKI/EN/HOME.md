@@ -6,6 +6,7 @@ This Wiki describes the current `main` branch. Check the [changelog](../../../CH
 
 | Topic | Guide |
 | --- | --- |
+| Private moderator observations | [Staff notes](STAFF-NOTES.md) |
 | Installation and daily operations | [Administrator guide](ADMIN-GUIDE.md) |
 | Reporting a player and handling reports | [Player and staff report guide](REPORTS.md) |
 | Command syntax and flags | [Commands](COMMANDS.md) |

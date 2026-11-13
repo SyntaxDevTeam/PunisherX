@@ -24,6 +24,8 @@
 * Reading requires `punisherx.see.notes`. Adding and deleting requires `punisherx.manage.notes`. Management permission also allows reading.
 * A shortcut is available in the player-management panel. Notes are **not punishments**, never notify the player, and do not affect escalation. They are stored in SyntaxDB, included in backups, and accessible to trusted server plugins via `PunisherXApi.getStaffNotes`.
 
+Full guide and examples: [Staff notes](STAFF-NOTES.md).
+
 ## Punishment templates and panel
 
 * `/punish <player> <template> (level) [--force] [--silent]` — applies a template from `punish-templates.yml`. Without a level, the plugin selects the next escalation level from punishment history. Requires `punisherx.cmd.punish`.
@@ -101,3 +103,25 @@ Requires `punisherx.cmd.unmark`. Manual penalties remain active. Reversals retai
 [Examples, server scopes and limitations](ANTICHEAT-MARKS.md).
 
 For the full workflow, books and interface settings, see [Player reports](REPORTS.md).
+
+## Translating `/prx help`
+
+All help content is configurable in the `command-help` section of `lang/messages_<language>.yml`:
+
+- `border`, `header`, `spacer` — frame, heading and separator.
+- `commands` — displayed entries. Translate descriptions and argument labels, reorder, add or remove entries. Keep command names and flags consistent with the implementation.
+- `navigation` — page numbers and clickable previous/next buttons.
+
+Header and navigation placeholders: `<plugin>`, `<page>`, `<total_pages>`, `<previous_page>`, `<next_page>`. Pages are calculated automatically, with up to 12 entries from `commands` per page. An empty list still displays the heading and navigation for page 1/1. Editing help entries does not change command registration or permissions.
+
+Texts support the plugin's message formatting. Argument labels in `commands`, such as `<player>`, describe syntax and are not substituted. Header and navigation placeholders are substituted by the code. Apostrophes inside single-quoted YAML values must be doubled. For example:
+
+```yaml
+command-help:
+  header: '<gold>Commands for <plugin>'
+  navigation: '<gray><page>/<total_pages> <click:run_command:''/prx help <next_page>''><white>[Next]</white></click>'
+  commands:
+    - '<gold>/note list <player|uuid> (page) <gray>- <white>Private staff notes.'
+```
+
+In this example, `<player|uuid>` is a literal argument label in `commands`, whereas `<next_page>` in navigation is a substituted placeholder. Apply changes with `/prx reload`; the language resources bundled in the JAR contain the complete defaults.

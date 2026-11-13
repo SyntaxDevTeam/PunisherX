@@ -2,11 +2,15 @@
 
 ## [1.9.0] Unreleased
 
-### Staff Notes — private moderation observations
+### Staff Notes — private moderation observations ([PR #96](https://github.com/SyntaxDevTeam/PunisherX/pull/96))
 
 * **Added private, non-punitive Staff Notes:** `/note add|list|remove` for Paper/Folia and Spigot, with author, creation time, server origin, separate read/manage permissions, pagination and audit logging.
 * Added staff notes access from the player management panel and a trusted read-only PunisherX JVM API.
-* Notes are stored in SyntaxDB, included in database exports/imports, and supported by the UUID migration/rollback journal. They are not part of punishment history or escalation.
+* Notes are stored in SyntaxDB, included in database exports/imports, and supported by the Paper UUID migration/rollback journal. They are not part of punishment history or escalation.
+* Note text is rendered literally; notes accept 3–500 characters, reject control characters and can only be deleted for the specified player. Reading requires `punisherx.see.notes`; adding/removing requires `punisherx.manage.notes` (which also allows reading).
+* Updated `/prx help` on Paper/Folia and Spigot with staff notes, marked punishments, templates, reports and missing administration commands. Preserved `<...>` placeholders when resolving the PR translation conflicts.
+* Moved all `/prx help` text, command entries, layout and clickable page navigation to the `command-help` section of every bundled language file. Added Polish help text; pagination follows the translated list and safely handles an empty list.
+* Added Polish and English staff notes guides with examples, permissions, storage and API details.
 
 
 ### CRITICAL SECURITY FIXES — proxy bridges (2026-11-10)

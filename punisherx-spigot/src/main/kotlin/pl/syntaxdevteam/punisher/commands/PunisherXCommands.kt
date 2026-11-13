@@ -220,76 +220,33 @@ class PunishesXCommands(private val plugin: PunisherX) : BasicCommand {
     }
 
     private fun sendHelp(stack: CommandSourceStack, page: Int) {
-        val commands = listOf(
-            "  <gold>/prx help <gray>- <white>Displays this prompt.", // zmienione /punisherx → /prx
-            "  <gold>/prx version <gray>- <white>Shows plugin info.",
-            "  <gold>/prx reload <gray>- <white>Reloads the configuration file.",
-            "  <gold>/prx diag <gray>- <white>Runs diagnostics and prints results.",
-            "  <gold>/kick <player> <reason> <gray>- <white>Kicks a player from the server",
-            "  <gold>/warn <player> (time) <reason> <gray>- <white>Warns a player.",
-            "  <gold>/unpunish <player> <template> <gray>- <white>Reverses the last punishment and ladder step.",
-            "  <gold>/unwarn <player> <gray>- <white>Removes a player's warning.",
-            "  <gold>/mute <player> (time) <reason> <gray>- <white>Mutes a player.",
-            "  <gold>/unmute <player> <gray>- <white>Unmutes a player.",
-            "  <gold>/ban <player> (time) <reason> [--force]",
-            "         <gray>- <white>Bans a player, optionally ignoring bypass.",
-            "  <gold>/banip <player/ip> (time) <reason> [--force] ",
-            "         <gray>- <white>Bans a player's IP, optionally ignoring bypass.",
-            "  <gold>/unban <player/ip> <gray>- <white>Unbans a player.",
-            "  <gold>/check <player> <all/warn/mute/ban> ",
-            "    <gray>- <white>Checks and displays the punishments of a given player",
-            "  <gold>/clearall <player> <gray>- <white>Clears all active penalties.",
-            "  <gold>/jail <player> (time) <reason> <gray>- <white>Sends a player to jail.",
-            "  <gold>/unjail <player> <gray>- <white>Releases a player from jail.",
-            "  <gold>/setjail <radius> <gray>- <white>Setting up the jail location.",
-            "  <gold>/setunjail <gray>- <white>Sets the unjail respawn location",
-            "                             <white>after serving a prison sentence.",
-            "  <gold>/change-reason <penalty_id> <new_reason> <gray>",
-            "                - <white>Changes the reason for the penalty.",
-            "  ",
-            "  <gold>/history <player> (page) ",
-            "               <gray>- <white>Displays the player's punishment history.",
-            "  <gold>/banlist <page> --h <gray>- <white>Displays the list of banned players.",
-            "      <white>(Using the <gold>--h</gold> parameter will display the ban history)",
-            "  ",
-            "  <blue>Future:",
-            "  <gold>/panel <gray>- <white>Opens the PunisherX GUI with lots of useful",
-            "                                   <white> information and commands.",
-            "  ",
-            "  ",
-            "  ",
-            " "
-        )
-
+        val commands = mH.getMessageStringList("command-help", "commands")
         val itemsPerPage = 12
-        val totalPages = (commands.size + itemsPerPage - 1) / itemsPerPage
+        val totalPages = ((commands.size + itemsPerPage - 1) / itemsPerPage).coerceAtLeast(1)
         val currentPage = page.coerceIn(1, totalPages)
-
-        stack.sender.sendMessage(mH.miniMessageFormat(" <gray>+-------------------------------------------------"))
-        stack.sender.sendMessage(
-            mH.miniMessageFormat(" <gray>|    <gold>Available commands for ${plugin.description.name}:")
+        val placeholders = mapOf(
+            "plugin" to plugin.description.name,
+            "page" to currentPage.toString(),
+            "total_pages" to totalPages.toString(),
+            "previous_page" to (if (currentPage > 1) currentPage - 1 else totalPages).toString(),
+            "next_page" to (if (currentPage < totalPages) currentPage + 1 else 1).toString()
         )
-        stack.sender.sendMessage(mH.miniMessageFormat(" <gray>|"))
+        fun send(key: String) = stack.sender.sendMessage(
+            mH.stringMessageToComponentNoPrefix("command-help", key, placeholders)
+        )
 
+        send("border")
+        send("header")
+        send("spacer")
         val startIndex = (currentPage - 1) * itemsPerPage
         val endIndex = (currentPage * itemsPerPage).coerceAtMost(commands.size)
         for (i in startIndex until endIndex) {
-            stack.sender.sendMessage(mH.miniMessageFormat(" <gray>|  ${commands[i]}"))
+            stack.sender.sendMessage(mH.miniMessageFormat(commands[i]))
         }
-
-        val prevPage = if (currentPage > 1) currentPage - 1 else totalPages
-        val nextPage = if (currentPage < totalPages) currentPage + 1 else 1
-        stack.sender.sendMessage(mH.miniMessageFormat(" <gray>|"))
-        stack.sender.sendMessage(mH.miniMessageFormat(" <gray>|"))
-        stack.sender.sendMessage(
-            mH.miniMessageFormat(
-                " <gray>| (Page $currentPage/$totalPages) " +
-                        "<click:run_command:'/prx help $prevPage'><white>[Previous]</white></click>   " +
-                        "<click:run_command:'/prx help $nextPage'><white>[Next]</white></click>"
-            )
-        )
-        stack.sender.sendMessage(mH.miniMessageFormat(" <gray>|"))
-        stack.sender.sendMessage(mH.miniMessageFormat(" <gray>+-------------------------------------------------"))
+        send("spacer")
+        send("navigation")
+        send("spacer")
+        send("border")
     }
 
     override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {

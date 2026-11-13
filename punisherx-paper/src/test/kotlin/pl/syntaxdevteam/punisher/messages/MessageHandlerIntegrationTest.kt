@@ -12,6 +12,30 @@ import kotlin.test.assertTrue
 class MessageHandlerIntegrationTest {
     private val messages = TestMessages.create()
 
+    @Test fun `localized help renders literal arguments and clickable page navigation`() {
+        for (language in listOf("ar", "de", "en", "es", "fr", "it", "ko", "nl", "pl", "pt", "ru", "ua")) {
+            val text = assertNotNull(javaClass.getResourceAsStream("/lang/messages_$language.yml"))
+                .bufferedReader().use { it.readText() }
+            val handler = TestMessages.create(text)
+            val entries = handler.getMessageStringList("command-help", "commands")
+            assertTrue(entries.isNotEmpty(), language)
+            val argument = if (language == "pl") "<gracz|uuid>" else "<player|uuid>"
+            val addNote = entries.single { "/note add " in it }
+            assertTrue(argument in handler.getPlainText(handler.miniMessageFormat(addNote)), language)
+            val values = mapOf("plugin" to "PunisherX", "page" to "2", "total_pages" to "4",
+                "previous_page" to "1", "next_page" to "3")
+            val header = handler.stringMessageToComponentNoPrefix("command-help", "header", values)
+            assertTrue("PunisherX" in handler.getPlainText(header), language)
+            val navigation = handler.stringMessageToComponentNoPrefix("command-help", "navigation", values)
+            assertTrue("2/4" in handler.getPlainText(navigation), language)
+            fun clicks(component: Component): List<String> =
+                listOfNotNull(component.clickEvent()?.value()) + component.children().flatMap(::clicks)
+            val actions = clicks(navigation)
+            assertTrue("/prx help 1" in actions, "$language: $actions")
+            assertTrue("/prx help 3" in actions, "$language: $actions")
+        }
+    }
+
     @Test fun `unmark placeholders render in all bundled languages`() {
         for (language in listOf("ar", "de", "en", "es", "fr", "it", "ko", "nl", "pl", "pt", "ru", "ua")) {
             val text = assertNotNull(javaClass.getResourceAsStream("/lang/messages_$language.yml"))

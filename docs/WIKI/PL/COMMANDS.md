@@ -24,6 +24,8 @@
 * Odczyt wymaga `punisherx.see.notes`, dodawanie i usuwanie — `punisherx.manage.notes`. Uprawnienie do zarządzania obejmuje również odczyt.
 * Skrót dostępny jest w panelu zarządzania graczem. Notatki **nie są karami**, nie są wysyłane graczowi i nie wpływają na eskalację. Są zapisywane w SyntaxDB, uwzględniane w kopiach bazy i udostępniane zaufanym pluginom przez `PunisherXApi.getStaffNotes`.
 
+Pełna instrukcja i przykłady: [Notatki administracji](STAFF-NOTES.md).
+
 ## Szablony kar i panel
 
 * `/punish <gracz> <szablon> (poziom) [--force] [--silent]` — nakłada karę z `punish-templates.yml`. Bez podania poziomu wybiera kolejny poziom eskalacji na podstawie historii kar. Wymaga `punisherx.cmd.punish`.
@@ -104,3 +106,25 @@ Wymagane uprawnienie: `punisherx.cmd.unmark`. Blokady przetrwają restart. Ręcz
 [Szczegóły, zakresy serwerów i ograniczenia](ANTICHEAT-MARKS.md).
 
 Pełny przebieg, książki i ustawienia interfejsu: [Zgłoszenia graczy](REPORTS.md).
+
+## Tłumaczenie pomocy `/prx help`
+
+Całą treść pomocy zmienisz w sekcji `command-help` pliku `lang/messages_<język>.yml`:
+
+- `border`, `header`, `spacer` — ramka, nagłówek i separator.
+- `commands` — lista wyświetlanych wpisów. Możesz tłumaczyć opisy i argumenty, zmieniać kolejność, dodawać oraz usuwać wpisy. Nazwy komend i flag muszą pozostać zgodne z kodem.
+- `navigation` — numer strony oraz klikalne przyciski poprzedniej i następnej strony.
+
+Dostępne placeholdery nagłówka i nawigacji: `<plugin>`, `<page>`, `<total_pages>`, `<previous_page>`, `<next_page>`. Wartości stron są wyliczane automatycznie; każda strona mieści do 12 wpisów z `commands`. Pusta lista nadal pozwala wyświetlić nagłówek i nawigację strony 1/1. Edycja listy pomocy nie zmienia rejestracji komend ani uprawnień.
+
+Teksty obsługują formatowanie wiadomości pluginu. Argumenty w liście `commands`, np. `<gracz>`, są opisem składni i nie są podstawiane. Placeholdery nagłówka i nawigacji są podstawiane przez kod. Apostrof wewnątrz pojedynczo cytowanej wartości YAML zapisuje się podwójnie. Na przykład:
+
+```yaml
+command-help:
+  header: '<gold>Komendy <plugin>'
+  navigation: '<gray><page>/<total_pages> <click:run_command:''/prx help <next_page>''><white>[Dalej]</white></click>'
+  commands:
+    - '<gold>/note list <gracz|uuid> (strona) <gray>- <white>Prywatne notatki administracji.'
+```
+
+W przykładzie `<gracz|uuid>` jest dosłownym opisem argumentu w `commands`, a `<next_page>` w nawigacji jest podstawianym placeholderem. Zastosuj zmiany przez `/prx reload`; pełne wartości domyślne znajdziesz w pliku językowym dołączonym do JAR.

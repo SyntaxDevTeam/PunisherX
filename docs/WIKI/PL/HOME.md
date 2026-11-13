@@ -6,6 +6,7 @@ Dokumentacja bieżącej gałęzi `main`. Funkcje konkretnego wydania sprawdzisz 
 
 | Temat | Instrukcja |
 | --- | --- |
+| Prywatne obserwacje moderatorów | [Notatki administracji](STAFF-NOTES.md) |
 | Instalacja i administracja | [Poradnik administratora](ADMIN-GUIDE.md) |
 | Zgłoszenie naruszenia przez gracza | [Zgłoszenia — instrukcja gracza i administracji](REPORTS.md) |
 | Składnia komend i flagi | [Komendy](COMMANDS.md) |
