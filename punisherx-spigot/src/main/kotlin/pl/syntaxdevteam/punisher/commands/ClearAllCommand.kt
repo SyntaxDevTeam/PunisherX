@@ -1,4 +1,5 @@
 package pl.syntaxdevteam.punisher.commands
+import pl.syntaxdevteam.punisher.identity.resolvePlayerUuidOrNotify
 import pl.syntaxdevteam.punisher.compatibility.*
 
 import org.bukkit.Bukkit
@@ -15,7 +16,7 @@ class ClearAllCommand(private val plugin: PunisherX) : BasicCommand {
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.CLEAR_ALL)) {
             if (arguments.isNotEmpty()) {
                 val player = arguments[0]
-                val uuid = plugin.resolvePlayerUuid(player).toString()
+                val uuid = (plugin.resolvePlayerUuidOrNotify(player, stack.sender) ?: return).toString()
                 val punishments = plugin.databaseHandler.getPunishments(uuid)
                 if (punishments.isNotEmpty()) {
                     punishments.forEach { punishment ->
@@ -26,7 +27,7 @@ class ClearAllCommand(private val plugin: PunisherX) : BasicCommand {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent(
                         "clear", if (silent) "silent_success" else "clearall", mapOf("player" to player)))
                     if (!silent) {
-                        val targetPlayer = Bukkit.getPlayer(player)
+                        val targetPlayer = Bukkit.getPlayer(java.util.UUID.fromString(uuid))
                         val getMessage = plugin.messageHandler.stringMessageToComponent("clear", "clear_message")
                         targetPlayer?.sendMessage(getMessage)
                     }

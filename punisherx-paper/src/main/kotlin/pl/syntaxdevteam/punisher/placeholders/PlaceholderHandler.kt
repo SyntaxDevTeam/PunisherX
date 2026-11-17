@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.placeholders
 
+import pl.syntaxdevteam.punisher.identity.findConfirmedPlayerUuid
 import me.clip.placeholderapi.expansion.PlaceholderExpansion
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
@@ -49,7 +50,7 @@ class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion()
     }
 
     private fun getPunishmentEndTime(player: String, punishType: String): String? {
-        val uuid = plugin.resolvePlayerUuid(player)
+        val uuid = (plugin.findConfirmedPlayerUuid(player) ?: return null)
         val punishments = plugin.databaseHandler.getPunishments(uuid.toString())
         val punishData = punishments.find { it.type == punishType && it.end > System.currentTimeMillis() } ?: return null
         val punishment = when (punishType) {
@@ -83,7 +84,7 @@ class PlaceholderHandler(private val plugin: PunisherX) : PlaceholderExpansion()
             return ""
         }
 
-        val uuid = plugin.resolvePlayerUuid(playerName).toString()
+        val uuid = (plugin.findConfirmedPlayerUuid(playerName) ?: return null).toString()
         val limit = plugin.config.getInt("placeholders.punishment_list_limit").takeIf { it > 0 } ?: 5
 
         val punishments = if (includeHistory) {

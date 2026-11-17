@@ -1,3 +1,5 @@
+> Tożsamość gracza: nick wskazuje wyłącznie bieżącą lokalną sesję. Dla celów offline lub znanych tylko innemu serwerowi podaj pełny UUID. IP jest osobnym typem celu. Serwery offline/proxy muszą ustawić identity.realm; przed aktualizacją przeczytaj [opis wdrożenia](../../development/PLAYER-IDENTITY.md).
+
 ## Podstawowe komendy
 
 * `/ban <gracz> (czas) <powód> [--force] [--silent]` — banuje i natychmiast wyrzuca gracza, jeśli jest online; przy problemie z bazą używa listy banów Paper `PROFILE` jako fallback.

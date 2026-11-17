@@ -39,21 +39,21 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
 
         val playerName = event.name
 
-        val ip = event.address.hostAddress
+        val ip = pl.syntaxdevteam.punisher.identity.canonicalIp(event.address.hostAddress) ?: event.address.hostAddress
         if (ip.isNullOrBlank()) {
             plugin.logger.debug("ModernLogin(pre): brak adresu IP dla $playerName → leaving result ${event.loginResult}")
             return
         }
 
         try {
-            val uuid = plugin.resolvePlayerUuid(playerName)
+            val uuid = event.uniqueId
             when (val action = evaluatePunishments(uuid, playerName, ip)) {
                 is LoginAction.Allow -> {
-                    pendingDecisions.remove(playerName.lowercase(Locale.ROOT))
+                    pendingDecisions.remove(event.uniqueId.toString())
                 }
 
                 is LoginAction.Deny -> {
-                    val cacheKey = playerName.lowercase(Locale.ROOT)
+                    val cacheKey = event.uniqueId.toString()
                     pendingDecisions[cacheKey] = PendingDecision(action.message, System.currentTimeMillis() + decisionTtl)
                     event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, action.message)
                 }
@@ -75,14 +75,14 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
         }
 
 
-        val profile: PlayerProfile? = loginConn.unsafeProfile ?: loginConn.authenticatedProfile
+        val profile: PlayerProfile? = loginConn.authenticatedProfile ?: loginConn.unsafeProfile
         if (profile?.name.isNullOrBlank()) {
             plugin.logger.debug("ModernLogin: brak nazwy profilu → leaving existing decision")
             return
         }
 
         val playerName = profile.name!!
-        val cacheKey = playerName.lowercase(Locale.ROOT)
+        val cacheKey = profile.id?.toString() ?: return
         val decision = pendingDecisions.remove(cacheKey)?.takeUnless { it.isExpired(System.currentTimeMillis()) }
         if (decision != null) {
             event.kickMessage(decision.message)

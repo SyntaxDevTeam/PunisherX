@@ -9,6 +9,9 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 
 # Wiadomości obsługi błędów
 error:
+  identity_unconfirmed: "<red>Nie potwierdzono tożsamości gracza. Podaj jego pełny UUID.</red>"
+  identity_ambiguous: "<red>Niejednoznaczna tożsamość gracza. Podaj jego pełny UUID.</red>"
+  identity_unavailable: "<red>Usługa tożsamości graczy jest niedostępna. Spróbuj ponownie później.</red>"
   no_permission: "<red>Nie masz uprawnień do tej komendy.</red>"
   max_time: "<red>Możesz ukarać maksymalnie na <gold><time></gold>.</red>"
   player_not_found: "<gold>Nie znaleziono gracza o nicku <player>.</gold>"

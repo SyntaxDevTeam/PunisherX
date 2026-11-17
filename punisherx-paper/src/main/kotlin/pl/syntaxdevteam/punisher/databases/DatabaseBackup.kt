@@ -14,6 +14,8 @@ typealias DatabaseSnapshot = Map<String, List<Map<String, Any?>>>
 /** Complete, parameterized backup/restore. Import accepts INSERT dumps, never executes arbitrary SQL. */
 internal object DatabaseBackup {
     private val columns = linkedMapOf(
+        "player_identity_domain" to listOf("id", "domain"),
+        "player_identities" to listOf("realm_id", "player_uuid", "canonical_name", "normalized_name", "authority", "last_confirmed_at", "version"),
         "punishments" to listOf("id", "name", "uuid", "reason", "operator", "punishmentType", "start", "endTime", "server"),
         "punishmenthistory" to listOf("id", "name", "uuid", "reason", "operator", "punishmentType", "start", "endTime", "server"),
         "punishment_undos" to listOf("historyId", "undoneBy", "undoneAt"),
@@ -60,7 +62,18 @@ internal object DatabaseBackup {
     fun restore(database: Database, snapshot: DatabaseSnapshot) {
         snapshot.forEach { (table, rows) -> rows.forEach { validate(table, it.keys) } }
         database.transaction {
+            val bound = query("SELECT domain FROM player_identity_domain WHERE id = 1").firstOrNull()?.string("domain")
+            val incoming = snapshot["player_identity_domain"].orEmpty()
+            if (bound != null && snapshot.values.any { it.isNotEmpty() }) {
+                require(incoming.size == 1 && incoming.single()["domain"] == bound) {
+                    "Backup identity domain is missing or different; automatic cross-domain import is forbidden"
+                }
+            }
             for ((table, rows) in snapshot) {
+                if (table == "player_identity_domain" && bound != null) {
+                    require(rows.size <= 1 && rows.all { it["id"].toString() == "1" && it["domain"] == bound }) { "Invalid identity domain binding" }
+                    continue
+                }
                 if (rows.isEmpty()) continue
                 val identity = database.dialect.type == DatabaseType.SQL_SERVER && table in PunisherDatabaseSchema.identityTables
                 if (identity) execute("SET IDENTITY_INSERT $table ON")
@@ -69,10 +82,13 @@ internal object DatabaseBackup {
                     for (row in rows) {
                         val names = row.keys.toList()
                         val values = row.map { (name, value) ->
-                            if (name.equals("filedAt", true) && value is String && database.dialect.type != DatabaseType.SQLITE)
+                            if (table == "punishments" && name.equals("uuid", true) && value is String &&
+                                row.entries.any { it.key.equals("punishmentType", true) && it.value == "BANIP" })
+                                pl.syntaxdevteam.punisher.identity.canonicalIp(value) ?: value
+                            else if (name.equals("filedAt", true) && value is String && database.dialect.type != DatabaseType.SQLITE)
                                 java.sql.Timestamp.valueOf(LocalDateTime.parse(value.replace(' ', 'T')))
                             else if (value is String && name.lowercase(Locale.ROOT) in setOf(
-                                "id", "historyid", "reportid", "start", "endtime", "processed", "processedat", "undoneat", "handledat", "activeid", "pausedat", "created_at"
+                                "id", "historyid", "reportid", "start", "endtime", "processed", "processedat", "undoneat", "handledat", "activeid", "pausedat", "created_at", "last_confirmed_at", "version"
                             )) value.toLong() // Compatibility with old exports that quoted every scalar.
                             else value
                         }

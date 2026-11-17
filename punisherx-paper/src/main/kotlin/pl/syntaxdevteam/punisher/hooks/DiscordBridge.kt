@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.hooks
 
+import pl.syntaxdevteam.punisher.identity.findConfirmedPlayerUuid
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
@@ -314,7 +315,9 @@ class DiscordBridge(var plugin: PunisherX) {
     private fun nowMs(): Long = System.currentTimeMillis()
 
     private fun loadPlayerSnapshot(nick: String): PlayerSnapshot {
-        val uuid = plugin.resolvePlayerUuid(nick)
+        val uuid = plugin.findConfirmedPlayerUuid(nick) ?: return PlayerSnapshot(
+            location = "Unknown identity — use UUID", world = "N/A", health = "N/A", food = "N/A",
+            level = "N/A", ping = "N/A", uuid = "Unconfirmed", playTime = "N/A", lastSeen = "N/A")
         val online: Player? = Bukkit.getPlayer(uuid)
 
         if (online != null && online.isOnline) {

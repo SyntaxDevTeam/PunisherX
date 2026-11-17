@@ -1,4 +1,5 @@
 package pl.syntaxdevteam.punisher.commands
+import pl.syntaxdevteam.punisher.identity.resolvePlayerUuidOrNotify
 import pl.syntaxdevteam.punisher.compatibility.*
 
 import org.bukkit.Bukkit
@@ -84,7 +85,7 @@ class KickCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        val uuid = plugin.resolvePlayerUuid(targetArg)
+        val uuid = (plugin.resolvePlayerUuidOrNotify(targetArg, stack.sender) ?: return)
         val targetPlayer = Bukkit.getPlayer(uuid)
 
         if (targetPlayer != null) {

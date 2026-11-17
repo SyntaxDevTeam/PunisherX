@@ -1,5 +1,7 @@
 package pl.syntaxdevteam.punisher.commands
 
+import pl.syntaxdevteam.punisher.identity.canonicalIp
+import pl.syntaxdevteam.punisher.identity.resolvePlayerUuidOrNotify
 import io.papermc.paper.ban.BanListType
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
@@ -65,7 +67,7 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        val uuid = plugin.resolvePlayerUuid(targetName)
+        val uuid = (plugin.resolvePlayerUuidOrNotify(targetName, stack.sender) ?: return)
         val templateReason = template.reason
         val computedLevel = if (requestedLevel != null) {
             requestedLevel
@@ -234,10 +236,8 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         val reason = template.reason
         val parsedTemplateTime = parseTemplateTime(stack, "banip", templateLevel.time) ?: return
         val parsedSeconds = parsedTemplateTime.seconds
-        val playerIps = (
-            plugin.playerIPManager.getPlayerIPsByUUID(uuid.toString()) +
-                plugin.playerIPManager.getPlayerIPsByName(targetName.lowercase())
-            ).distinct()
+        val playerIps = plugin.playerIPManager.getPlayerIPsByUUID(uuid.toString())
+            .mapNotNull(::canonicalIp).distinct()
 
         if (playerIps.isEmpty()) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("banip", "not_found"))

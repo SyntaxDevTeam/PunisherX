@@ -10,6 +10,9 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 
 # Messages d’erreur
 error:
+  identity_unconfirmed: "<red>Player identity is not confirmed. Use the player's full UUID.</red>"
+  identity_ambiguous: "<red>Conflicting player identities. Use the player's full UUID.</red>"
+  identity_unavailable: "<red>Player identity service is unavailable. Try again later.</red>"
   banip_db_error: "<red>Échec de sauvegarde des bannissements IP. IP non bannies : <failed_ips>. IP bannies avec succès : <banned_ips>. Consultez la console.</red>"
   no_permission: "<red>Vous n’avez pas la permission d’utiliser cette commande.</red>"
   player_not_found: "<gold>Aucun joueur trouvé avec le pseudo <player>.</gold>"

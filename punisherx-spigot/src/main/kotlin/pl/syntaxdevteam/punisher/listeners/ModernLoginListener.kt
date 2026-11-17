@@ -22,7 +22,7 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
 
         val playerName = event.name
 
-        val ip = event.address.hostAddress
+        val ip = pl.syntaxdevteam.punisher.identity.canonicalIp(event.address.hostAddress) ?: event.address.hostAddress
         if (ip.isNullOrBlank()) {
             plugin.logger.debug("ModernLogin(pre): brak adresu IP dla $playerName → leaving result ${event.loginResult}")
             return

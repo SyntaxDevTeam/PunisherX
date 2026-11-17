@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 
+import pl.syntaxdevteam.punisher.identity.resolvePlayerUuidOrNotify
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.jetbrains.annotations.NotNull
@@ -15,7 +16,7 @@ class UnWarnCommand(private val plugin: PunisherX) : BasicCommand {
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNWARN)) {
             if (arguments.isNotEmpty()) {
                 val player = arguments[0]
-                val uuid = plugin.resolvePlayerUuid(player).toString()
+                val uuid = (plugin.resolvePlayerUuidOrNotify(player, stack.sender) ?: return).toString()
                 val punishments = plugin.databaseHandler.getPunishments(uuid)
                 val warnPunishments = punishments.filter { it.type == "WARN" }
                 if (warnPunishments.isNotEmpty()) {

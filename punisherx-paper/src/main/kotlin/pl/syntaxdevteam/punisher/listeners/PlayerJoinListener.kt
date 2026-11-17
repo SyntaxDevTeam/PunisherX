@@ -16,6 +16,7 @@ class PlayerJoinListener(
     @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerQuit(event: org.bukkit.event.player.PlayerQuitEvent) {
         val player = event.player
+        plugin.playerIdentities.left(player.uniqueId)
         pl.syntaxdevteam.punisher.permissions.IpVisibility.rememberPreference(plugin, player)
         plugin.databaseHandler.updateJailClock(player.uniqueId.toString(), pause = true)
         plugin.localPlayerSkins.capture(player)
@@ -26,6 +27,7 @@ class PlayerJoinListener(
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerJoin(event: PlayerJoinEvent) {
+        plugin.observePlayerIdentity(event.player.uniqueId, event.player.name)
         pl.syntaxdevteam.punisher.permissions.IpVisibility.rememberPreference(plugin, event.player)
         plugin.localPlayerSkins.capture(event.player)
         plugin.databaseHandler.updateJailClock(event.player.uniqueId.toString(), pause = false)

@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 
+import pl.syntaxdevteam.punisher.identity.resolvePlayerUuidOrNotify
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.Bukkit
@@ -33,7 +34,10 @@ class ReportCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
 
-        val target = args.firstOrNull()?.let(::resolveTarget)
+        val target = args.firstOrNull()?.let { identifier ->
+            val uuid = plugin.resolvePlayerUuidOrNotify(identifier, sender) ?: return
+            Bukkit.getOfflinePlayer(uuid)
+        }
         if (args.isNotEmpty() && target == null) {
             sender.sendMessage(
                 mH.stringMessageToComponent(
@@ -91,10 +95,4 @@ class ReportCommand(private val plugin: PunisherX) : BasicCommand {
             .toList()
     }
 
-    private fun resolveTarget(identifier: String): OfflinePlayer? {
-        Bukkit.getPlayerExact(identifier)?.let { return it }
-        Bukkit.getOfflinePlayerIfCached(identifier)?.let { return it }
-        val uuid = runCatching { UUID.fromString(identifier) }.getOrNull() ?: return null
-        return Bukkit.getOfflinePlayer(uuid)
-    }
 }

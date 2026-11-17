@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 
+import pl.syntaxdevteam.punisher.identity.resolvePlayerUuidOrNotify
 import pl.syntaxdevteam.punisher.compatibility.*
 
 import net.kyori.adventure.text.Component
@@ -39,8 +40,8 @@ class NoteCommand(private val plugin: PunisherX) : BasicCommand {
         if (action !in setOf("add", "list", "remove")) { message(sender, "usage"); return }
         val name = args.getOrNull(1)
         if (name == null) { message(sender, "usage"); return }
-        val uuid = resolveTarget(name)
-        if (uuid == null) { message(sender, "usage"); return }
+        val uuid = plugin.resolvePlayerUuidOrNotify(name, sender)
+        if (uuid == null) return
         if (!plugin.databaseHandler.isReady()) { message(sender, "db-error"); return }
         try {
             when (action) {
@@ -92,13 +93,6 @@ class NoteCommand(private val plugin: PunisherX) : BasicCommand {
             plugin.logger.err("Staff notes command failed: " + error.message)
             message(sender, "db-error")
         }
-    }
-
-    private fun resolveTarget(identifier: String): UUID? {
-        val parsed = runCatching { UUID.fromString(identifier) }.getOrNull()
-        if (parsed != null && parsed.toString().equals(identifier, ignoreCase = true)) return parsed
-        if (!Regex("[A-Za-z0-9_]{3,16}").matches(identifier)) return null
-        return plugin.resolvePlayerUuid(identifier)
     }
 
     override fun suggest(stack: CommandSourceStack, args: Array<String>): List<String> {

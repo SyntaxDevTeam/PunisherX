@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 
+import pl.syntaxdevteam.punisher.identity.resolvePlayerUuidOrNotify
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import net.kyori.adventure.text.Component
@@ -32,10 +33,10 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
             val limit = 10
             val offset = (page - 1) * limit
 
-            val uuid = plugin.resolvePlayerUuid(player)
-            val targetPlayer = when (Bukkit.getPlayer(player)?.name) {
+            val uuid = (plugin.resolvePlayerUuidOrNotify(player, stack.sender) ?: return)
+            val targetPlayer = when (Bukkit.getPlayer(uuid)?.name) {
                 null -> Bukkit.getOfflinePlayer(uuid).name
-                else -> Bukkit.getPlayer(player)?.name
+                else -> Bukkit.getPlayer(uuid)?.name
             }
 
             if (DialogSupport.canUseListDialogs(plugin, stack.sender)) {

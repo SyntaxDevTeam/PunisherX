@@ -112,7 +112,7 @@ class QuickPunishGUI(plugin: PunisherX) : BaseGUI(plugin) {
                             lore
                         ) { clicker ->
                             clicker.closeInventory()
-                            executePunish(clicker, targetName, template.name)
+                            executePunish(clicker, target.uniqueId.toString(), template.name)
                         }
                     )
                 }

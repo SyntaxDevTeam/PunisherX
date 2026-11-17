@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 
+import pl.syntaxdevteam.punisher.identity.resolvePlayerUuidOrNotify
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import pl.syntaxdevteam.punisher.PunisherX
@@ -26,7 +27,7 @@ class UnpunishCommand(private val plugin: PunisherX) : BasicCommand {
                 "punish", "template_not_found", mapOf("template" to templateName)))
             return
         }
-        val uuid = plugin.resolvePlayerUuid(arguments[0])
+        val uuid = (plugin.resolvePlayerUuidOrNotify(arguments[0], stack.sender) ?: return)
         val placeholders = mapOf("player" to arguments[0], "template" to template.name, "operator" to stack.sender.name)
         val undone = plugin.databaseHandler.undoPunishment(uuid.toString(), arguments[0], template.reason, template.name, stack.sender.name)
         if (undone == null) {

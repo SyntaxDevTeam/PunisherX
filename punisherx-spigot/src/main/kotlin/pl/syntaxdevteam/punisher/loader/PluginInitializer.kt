@@ -49,6 +49,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.logger.diag("[TIMING] after setUpLogger: ${System.currentTimeMillis() - t0}ms")
         setupConfig()
         plugin.logger.diag("[TIMING] after setupConfig: ${System.currentTimeMillis() - t0}ms")
+        plugin.resetPlayerIdentities()
         setupDatabase()
         plugin.logger.diag("[TIMING] after setupDatabase: ${System.currentTimeMillis() - t0}ms")
         setupHandlers()
@@ -101,6 +102,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         try {
             database.openConnection()
             database.createTables()
+            database.bindIdentityDomain()
         } catch (error: Exception) {
             runCatching { database.closeConnection() }.onFailure { error.addSuppressed(it) }
             throw IllegalStateException("Database initialization failed: ${error.message}", error)
@@ -176,6 +178,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService.initialize(plugin.dataFolder)
         plugin.playerJoinListener = PlayerJoinListener(plugin.playerIPManager, plugin.punishmentChecker, plugin)
         plugin.server.pluginManager.registerEvents(plugin.playerJoinListener, plugin)
+        plugin.server.onlinePlayers.forEach { plugin.observePlayerIdentity(it.uniqueId, it.name) }
         plugin.server.pluginManager.registerEvents(plugin.punishmentChecker, plugin)
         plugin.server.pluginManager.registerEvents(plugin.bookManager, plugin)
         plugin.server.pluginManager.registerEvents(ModernLoginListener(plugin), plugin)

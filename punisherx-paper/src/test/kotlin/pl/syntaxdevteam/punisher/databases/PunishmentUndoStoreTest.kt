@@ -247,4 +247,12 @@ class PunishmentUndoStoreTest {
         assertEquals(0, count("punishment_undos"))
     }
 
+    @Test fun `legacy IP history cannot attribute a nickname to an account`() {
+        event(100, "BANIP", target = "192.0.2.1")
+        sql("DELETE FROM punishment_templates")
+        assertEquals(0, ladder())
+        assertTrue(undo().isEmpty())
+        assertEquals(1, count("punishments"))
+    }
+
 }

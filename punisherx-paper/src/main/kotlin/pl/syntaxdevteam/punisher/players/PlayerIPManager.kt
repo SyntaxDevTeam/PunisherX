@@ -43,7 +43,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         val player = event.player
         val playerName = player.name
         val playerUUID = player.uniqueId.toString()
-        val playerIP = player.address?.address?.hostAddress
+        val playerIP = player.address?.address?.hostAddress?.let { pl.syntaxdevteam.punisher.identity.canonicalIp(it) }
 
         if (playerIP == null) return
 
@@ -208,7 +208,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
 
 
     fun getPlayersByIP(targetIP: String): List<PlayerInfo> {
-        return getAllDecryptedRecords().filter { it.playerIP.equals(targetIP, ignoreCase = true) }
+        return getAllDecryptedRecords().filter { it.playerIP == (pl.syntaxdevteam.punisher.identity.canonicalIp(targetIP) ?: targetIP) }
     }
 
     private fun parsePlayerInfo(decryptedLine: String): PlayerInfo? {
@@ -217,7 +217,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
             PlayerInfo(
                 playerName = parts[0],
                 playerUUID = parts[1],
-                playerIP = parts[2],
+                playerIP = pl.syntaxdevteam.punisher.identity.canonicalIp(parts[2]) ?: parts[2],
                 geoLocation = parts[3],
                 lastUpdated = parts[4]
             )

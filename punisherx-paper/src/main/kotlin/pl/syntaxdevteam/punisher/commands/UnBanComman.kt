@@ -1,5 +1,7 @@
 package pl.syntaxdevteam.punisher.commands
 
+import pl.syntaxdevteam.punisher.identity.*
+import pl.syntaxdevteam.punisher.identity.resolvePlayerUuidOrNotify
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.jetbrains.annotations.NotNull
@@ -24,14 +26,14 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
 
         val playerOrIpOrUUID = arguments[0]
 
-        if (playerOrIpOrUUID.matches(Regex("\\d+\\.\\d+\\.\\d+\\.\\d+"))) {
-            if (!unbanIP(stack, playerOrIpOrUUID, silent)) {
-                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "ip_not_found", mapOf("ip" to playerOrIpOrUUID)))
+        val target = plugin.resolveModerationTarget(playerOrIpOrUUID, stack.sender) ?: return
+        if (target is ModerationTarget.IpTarget) {
+            if (!unbanIP(stack, target.address, silent)) {
+                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "ip_not_found", mapOf("ip" to target.address)))
             }
             return
         }
-
-        val uuid = plugin.resolvePlayerUuid(playerOrIpOrUUID).toString()
+        val uuid = (target as ModerationTarget.PlayerTarget).uuid.toString()
 
         plugin.logger.debug("UUID for player $playerOrIpOrUUID: [$uuid]")
 

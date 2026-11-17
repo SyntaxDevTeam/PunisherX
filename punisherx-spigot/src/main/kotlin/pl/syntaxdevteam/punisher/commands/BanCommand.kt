@@ -1,4 +1,5 @@
 package pl.syntaxdevteam.punisher.commands
+import pl.syntaxdevteam.punisher.identity.resolvePlayerUuidOrNotify
 import pl.syntaxdevteam.punisher.compatibility.*
 
 import org.bukkit.Bukkit
@@ -23,7 +24,7 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("ban", "usage"))
                 } else {
                     val player = arguments[0]
-                    val uuid = plugin.resolvePlayerUuid(player)
+                    val uuid = (plugin.resolvePlayerUuidOrNotify(player, stack.sender) ?: return)
                     val targetPlayer = Bukkit.getPlayer(uuid)
                     val isForce = options.force
                     if (targetPlayer != null) {
