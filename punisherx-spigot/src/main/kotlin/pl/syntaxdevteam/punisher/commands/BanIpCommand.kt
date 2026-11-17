@@ -1,4 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
+import pl.syntaxdevteam.punisher.identity.*
+import pl.syntaxdevteam.punisher.identity.resolvePlayerUuidOrNotify
 import pl.syntaxdevteam.punisher.compatibility.*
 
 import net.kyori.adventure.text.Component
@@ -33,23 +35,18 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
 
         val rawTarget = arguments[0]
         val isForce = options.force
-        val playerIPs: List<String> = when {
-            IP_REGEX.matches(rawTarget) -> listOf(rawTarget)
-            UUID_REGEX.matches(rawTarget) -> plugin.playerIPManager.getPlayerIPsByUUID(rawTarget)
-            else -> plugin.playerIPManager.getPlayerIPsByName(rawTarget.lowercase())
+        val target = plugin.resolveModerationTarget(rawTarget, stack.sender) ?: return
+        val targetUUID = (target as? ModerationTarget.PlayerTarget)?.uuid
+        val playerIPs = when (target) {
+            is ModerationTarget.IpTarget -> listOf(target.address)
+            is ModerationTarget.PlayerTarget -> plugin.playerIPManager.getPlayerIPsByUUID(target.uuid.toString())
+                .mapNotNull(::canonicalIp).distinct()
         }
-
         if (playerIPs.isEmpty()) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("banip", "not_found"))
             return
         }
 
-        val targetUUID: UUID? = when {
-            IP_REGEX.matches(rawTarget) -> plugin.playerIPManager.getAllDecryptedRecords()
-                .find { it.playerIP == rawTarget }
-                ?.let { UUID.fromString(it.playerUUID) }
-            else -> plugin.resolvePlayerUuid(rawTarget)
-        }
         val targetPlayer: Player? = targetUUID?.let { Bukkit.getPlayer(it) }
 
         if (targetPlayer != null && !isForce && PermissionChecker.hasWithLegacy(targetPlayer, PermissionChecker.PermissionKey.BYPASS_BANIP)) {

@@ -7,7 +7,7 @@ import pl.syntaxdevteam.syntaxdb.schema.CreateTableBuilder
 
 /** Existing names and column order are retained, including PostgreSQL's unquoted lower-case names. */
 internal object PunisherDatabaseSchema {
-    val tables = listOf("punishments", "punishmenthistory", "punishment_undos", "punishment_templates",
+    val tables = listOf("player_identity_domain", "player_identities", "punishments", "punishmenthistory", "punishment_undos", "punishment_templates",
         "punishment_marks", "punishment_mark_pauses",
         "playercache", "reports", "report_resolutions", "staff_notes", "bridge_events",
         "punisherx_identity_migrations", "punisherx_identity_migration_items")
@@ -22,12 +22,12 @@ internal object PunisherDatabaseSchema {
             // MySQL needs explicit utf8mb4 even when the existing database defaults to latin1.
             if (database.dialect.type == DatabaseType.MYSQL) {
                 database.execute("""CREATE TABLE IF NOT EXISTS $table (
-                    id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(32), uuid VARCHAR(36),
+                    id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(64), uuid VARCHAR(36),
                     reason VARCHAR(255) CHARACTER SET utf8mb4, operator VARCHAR(16), punishmentType VARCHAR(16),
                     start BIGINT, endTime BIGINT, server VARCHAR(64) DEFAULT 'network'
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4""".trimIndent())
             } else database.createTable(table, ifNotExists = true) {
-                id(); varchar("name", 32); varchar("uuid", 36); varchar("reason", 255)
+                id(); varchar("name", 64); varchar("uuid", 36); varchar("reason", 255)
                 varchar("operator", 16); varchar(c("punishmentType"), 16)
                 bigInt("start"); bigInt(c("endTime")); varchar("server", 64).default("network")
             }
@@ -88,6 +88,16 @@ internal object PunisherDatabaseSchema {
             varchar("migration_id", 36).notNull(); varchar("entity_type", 32).notNull(); varchar("entity_key", 64).notNull()
             primaryKey("migration_id", "entity_type", "entity_key")
         }
+        database.createTable("player_identity_domain", ifNotExists = true) {
+            integer("id").primaryKey(); varchar("domain", 80).notNull()
+        }
+        database.createTable("player_identities", ifNotExists = true) {
+            varchar("realm_id", 64).notNull(); varchar("player_uuid", 36).notNull()
+            varchar("canonical_name", 16).notNull(); varchar("normalized_name", 16).notNull()
+            varchar("authority", 24).notNull(); bigInt("last_confirmed_at").notNull(); bigInt("version").notNull()
+            primaryKey("realm_id", "player_uuid")
+        }
+        ensureTargetNameCapacity(database)
         ensureScope(database)
     }
 
@@ -96,6 +106,26 @@ internal object PunisherDatabaseSchema {
         plan.statements.forEach { statement ->
             val sql = if (dialect.type == DatabaseType.MYSQL) statement.sql + " DEFAULT CHARSET=utf8mb4" else statement.sql
             execute(sql, statement.parameters)
+        }
+    }
+
+    /** Explicit UUID command targets are 36 characters, larger than the old nickname column. */
+    private fun ensureTargetNameCapacity(database: Database) {
+        if (database.dialect.type == DatabaseType.SQLITE) return
+        for (table in listOf("punishments", "punishmenthistory")) {
+            val size = database.withConnection { connection ->
+                connection.metaData.getColumns(connection.catalog, connection.schema, table, "name").use { rows ->
+                    if (rows.next()) rows.getInt("COLUMN_SIZE") else 0
+                }
+            }
+            if (size in 1..63) {
+                val sql = when (database.dialect.type) {
+                    DatabaseType.POSTGRESQL -> "ALTER TABLE $table ALTER COLUMN name TYPE VARCHAR(64)"
+                    DatabaseType.SQL_SERVER -> "ALTER TABLE $table ALTER COLUMN name VARCHAR(64)"
+                    else -> "ALTER TABLE $table MODIFY COLUMN name VARCHAR(64)"
+                }
+                database.execute(sql)
+            }
         }
     }
 

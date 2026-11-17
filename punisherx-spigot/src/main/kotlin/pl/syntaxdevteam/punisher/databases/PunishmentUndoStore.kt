@@ -14,11 +14,11 @@ internal class PunishmentUndoStore(private val database: Database, private val s
         "EXISTS (SELECT 1 FROM punishment_templates t WHERE t.historyId = punishmenthistory.id " +
         "AND t.playerUuid = ? AND t.templateName = ?) OR (" +
         "NOT EXISTS (SELECT 1 FROM punishment_templates t WHERE t.historyId = punishmenthistory.id) " +
-        "AND (uuid = ? OR (punishmentType = 'BANIP' AND LOWER(name) = ?)) AND reason = ?)) " +
+        "AND uuid = ? AND reason = ?)) " +
         "AND $scopeFilter AND NOT EXISTS (SELECT 1 FROM punishment_undos u WHERE u.historyId = punishmenthistory.id)"
 
     private fun eligibleParams(uuid: String, name: String, reason: String, template: String): List<Any> =
-        listOf(uuid, template.lowercase(Locale.ROOT), uuid, name.lowercase(Locale.ROOT), reason) + scopeParams
+        listOf(uuid, template.lowercase(Locale.ROOT), uuid, reason) + scopeParams
 
     /** Writes both the history event and its template identity, or neither. */
     fun record(name: String, uuid: String, reason: String, operator: String, type: String,
@@ -77,14 +77,13 @@ internal class PunishmentUndoStore(private val database: Database, private val s
             val related = if (selected.type == "BANIP") {
                 val template = query("SELECT templateName, playerUuid FROM punishment_templates WHERE historyId = ?",
                     listOf(selected.id)).singleOrNull()
-                val templateFilter = if (template == null)
-                    "NOT EXISTS (SELECT 1 FROM punishment_templates t WHERE t.historyId = punishmenthistory.id)"
-                else "EXISTS (SELECT 1 FROM punishment_templates t WHERE t.historyId = punishmenthistory.id " +
-                    "AND t.templateName = ? AND t.playerUuid = ?)"
-                val params = listOf(selected.name, selected.reason, selected.operator, selected.start, selected.server) +
-                    if (template == null) emptyList() else listOf(template.string("templateName").orEmpty(), template.string("playerUuid").orEmpty())
-                rows("SELECT * FROM punishmenthistory WHERE punishmentType = 'BANIP' AND name = ? " +
-                    "AND reason = ? AND operator = ? AND start = ? AND server = ? AND $templateFilter", params)
+                if (template == null) listOf(selected) else {
+                    rows("SELECT * FROM punishmenthistory WHERE punishmentType = 'BANIP' AND name = ? " +
+                        "AND reason = ? AND operator = ? AND start = ? AND server = ? AND EXISTS " +
+                        "(SELECT 1 FROM punishment_templates t WHERE t.historyId = punishmenthistory.id AND t.templateName = ? AND t.playerUuid = ?)",
+                        listOf(selected.name, selected.reason, selected.operator, selected.start, selected.server,
+                            template.string("templateName").orEmpty(), template.string("playerUuid").orEmpty()))
+                }
             } else listOf(selected)
             reverse(related, operator)
         }
@@ -92,7 +91,7 @@ internal class PunishmentUndoStore(private val database: Database, private val s
     }
 
     private fun eventParams(row: PunishmentData): List<Any> =
-        listOf(row.uuid, row.type, row.start, row.server, row.operator, row.reason, row.end)
+        listOf(if (row.type == "BANIP") pl.syntaxdevteam.punisher.identity.canonicalIp(row.uuid) ?: row.uuid else row.uuid, row.type, row.start, row.server, row.operator, row.reason, row.end)
 
     private fun DatabaseClient.reverse(rows: List<PunishmentData>, operator: String) {
         val now = System.currentTimeMillis()
@@ -114,7 +113,7 @@ internal class PunishmentUndoStore(private val database: Database, private val s
             execute("DELETE FROM bridge_events WHERE action = ? AND target = ? AND reason = ? " +
                 "AND endTime = ? AND processed = 0 AND NOT EXISTS " +
                 "(SELECT 1 FROM punishments WHERE uuid = ? AND punishmentType = ?)",
-                listOf(row.type, row.uuid, row.reason, row.end, row.uuid, row.type))
+                listOf(row.type, pl.syntaxdevteam.punisher.identity.canonicalIp(row.uuid) ?: row.uuid, row.reason, row.end, pl.syntaxdevteam.punisher.identity.canonicalIp(row.uuid) ?: row.uuid, row.type))
         }
     }
 

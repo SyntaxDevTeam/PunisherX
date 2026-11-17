@@ -1,4 +1,5 @@
 package pl.syntaxdevteam.punisher.commands
+import pl.syntaxdevteam.punisher.identity.resolvePlayerUuidOrNotify
 import pl.syntaxdevteam.punisher.compatibility.*
 
 import org.bukkit.Bukkit
@@ -19,7 +20,8 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("mute", "usage"))
                 } else {
                     val player = arguments[0]
-                    val targetPlayer = Bukkit.getPlayer(player)
+                    val uuid = (plugin.resolvePlayerUuidOrNotify(player, stack.sender) ?: return).toString()
+                    val targetPlayer = Bukkit.getPlayer(java.util.UUID.fromString(uuid))
                     val isForce = options.force
                     if (targetPlayer != null) {
                         if (!isForce && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_MUTE)) {
@@ -33,7 +35,6 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                             return
                         }
                     }
-                    val uuid = plugin.resolvePlayerUuid(player).toString()
 
                     val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, arguments, 1)
 

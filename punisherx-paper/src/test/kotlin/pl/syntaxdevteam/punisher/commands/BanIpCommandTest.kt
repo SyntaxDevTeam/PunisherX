@@ -39,7 +39,7 @@ class BanIpCommandTest {
         whenever(plugin.server.onlinePlayers).thenReturn(emptyList())
         whenever(source.sender).thenReturn(sender)
         whenever(sender.name).thenReturn("Admin")
-        whenever(plugin.playerIPManager.getPlayerIPsByName("target")).thenReturn(ips)
+        whenever(plugin.playerIPManager.getPlayerIPsByUUID(uuid.toString())).thenReturn(ips)
         whenever(plugin.resolvePlayerUuid("target")).thenReturn(uuid)
         whenever(plugin.timeHandler.parseTime("999d")).thenReturn(86_313_600L)
         whenever(plugin.timeHandler.formatTime("999d")).thenReturn("999 dni")

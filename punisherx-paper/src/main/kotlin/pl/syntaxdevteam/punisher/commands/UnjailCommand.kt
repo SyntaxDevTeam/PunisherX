@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 
+import pl.syntaxdevteam.punisher.identity.resolvePlayerUuidOrNotify
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import io.papermc.paper.command.brigadier.BasicCommand
@@ -25,7 +26,7 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         val playerName = arguments[0]
-        val uuid = plugin.resolvePlayerUuid(playerName)
+        val uuid = (plugin.resolvePlayerUuidOrNotify(playerName, stack.sender) ?: return)
 
         if (!plugin.cache.isPlayerInCache(uuid)) {
             stack.sender.sendMessage(

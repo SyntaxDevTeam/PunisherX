@@ -1,3 +1,5 @@
+> Player identity: nicknames resolve only for current local sessions. Use the full UUID for offline/cross-server targets. IP addresses are separate targets. Offline/proxy installations must configure identity.realm; read [the identity deployment guide](../../development/PLAYER-IDENTITY.md) before upgrading.
+
 ## Basic commands
 
 * `/ban <player> (time) <reason> [--force] [--silent]` — bans and immediately kicks the player if online, falling back to the Paper `PROFILE` ban list when the database is unavailable.

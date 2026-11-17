@@ -157,6 +157,7 @@ class PunisherX : JavaPlugin(), Listener {
     }
 
     override fun onDisable() {
+        identityDirectory = null
         if (::databaseHandler.isInitialized) server.onlinePlayers.forEach {
             databaseHandler.updateJailClock(it.uniqueId.toString(), pause = true)
         }
@@ -176,14 +177,46 @@ class PunisherX : JavaPlugin(), Listener {
     val guiRuntime = pl.syntaxdevteam.punisher.gui.GuiRuntime(this)
     val localPlayerSkins = LocalPlayerSkins()
 
-    fun resolvePlayerUuid(identifier: String): UUID {
-        runCatching { UUID.fromString(identifier) }.getOrNull()?.let { return it }
-        Bukkit.getPlayerExact(identifier)?.uniqueId?.let { return it }
-        Bukkit.getOfflinePlayers().firstOrNull { it.name?.equals(identifier, ignoreCase = true) == true }
-            ?.uniqueId?.let { return it }
-        if (!server.onlineMode) return UUID.nameUUIDFromBytes("OfflinePlayer:$identifier".toByteArray(Charsets.UTF_8))
-        return uuidManager.getUUID(identifier)
+    private var identityDirectory: pl.syntaxdevteam.punisher.identity.PlayerIdentityDirectory? = null
+
+    val playerIdentities: pl.syntaxdevteam.punisher.identity.PlayerIdentityDirectory
+        get() = requireNotNull(identityDirectory) { "Identity directory is not initialized" }
+
+    fun resetPlayerIdentities() {
+        identityDirectory = pl.syntaxdevteam.punisher.identity.PlayerIdentityDirectory(
+            pl.syntaxdevteam.punisher.identity.IdentitySettings.create(
+                config.getString("identity.realm"), config.getString("identity.authority"), server.onlineMode))
     }
+
+    fun observePlayerIdentity(uuid: UUID, name: String) {
+        val directory = playerIdentities
+        directory.joined(uuid, name)
+        val observedAt = System.currentTimeMillis()
+        // Offline sessions describe an offline namespace; they are not verified online accounts.
+        val identity = pl.syntaxdevteam.punisher.identity.PlayerIdentity(directory.settings.realm, uuid, name, directory.settings.authority)
+        schedulerAdapter.runAsync {
+            if (identityDirectory !== directory || !isEnabled) return@runAsync
+            runCatching { databaseHandler.recordIdentityObservation(identity, observedAt) }
+                .onFailure { logger.warning("Could not record player identity observation: ${it.message}") }
+        }
+    }
+
+    fun auditIdentityChoice(sender: org.bukkit.command.CommandSender, uuid: UUID, identifier: String) {
+        if (this::logger.isInitialized) {
+            val identity = (resolvePlayerIdentity(identifier) as? pl.syntaxdevteam.punisher.identity.IdentityResolution.Resolved)?.identity
+            logger.debug("Identity choice: operator=${sender.name}, input=$identifier, realm=${playerIdentities.settings.realm}, uuid=$uuid, source=${identity?.authority}")
+        }
+    }
+
+    fun resolvePlayerIdentity(identifier: String): pl.syntaxdevteam.punisher.identity.IdentityResolution =
+        identityDirectory?.resolve(identifier) ?: pl.syntaxdevteam.punisher.identity.IdentityResolution.Unavailable
+
+    /** Unknown names fail explicitly. No history, offline cache, synthetic UUID or blocking profile lookup. */
+    fun resolvePlayerUuid(identifier: String): UUID =
+        when (val result = resolvePlayerIdentity(identifier)) {
+            is pl.syntaxdevteam.punisher.identity.IdentityResolution.Resolved -> result.identity.uuid
+            else -> throw pl.syntaxdevteam.punisher.identity.IdentityNotResolvedException(result)
+        }
 
     private fun reloadMyConfig() {
         PluginRegistrations.unregisterForReload(this)

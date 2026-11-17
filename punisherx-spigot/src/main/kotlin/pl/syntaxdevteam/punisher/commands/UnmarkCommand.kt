@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 
+import pl.syntaxdevteam.punisher.identity.resolvePlayerUuidOrNotify
 import pl.syntaxdevteam.punisher.compatibility.*
 
 import pl.syntaxdevteam.punisher.PunisherX
@@ -33,7 +34,7 @@ class UnmarkCommand(private val plugin: PunisherX) : BasicCommand {
             reply(if (success) "resumed" else "db_error", mapOf("mark" to mark))
             return
         }
-        val playerUuid = if (control || operation == "all") null else plugin.resolvePlayerUuid(arguments[0]).toString()
+        val playerUuid = if (control || operation == "all") null else (plugin.resolvePlayerUuidOrNotify(arguments[0], stack.sender) ?: return).toString()
         val undone = plugin.databaseHandler.undoMarkedPunishments(playerUuid, mark, stack.sender.name, pause = control)
         if (undone == null) { reply("db_error"); return }
         for (target in undone.filter { it.type == "JAIL" }.map { it.uuid }.distinct()) {

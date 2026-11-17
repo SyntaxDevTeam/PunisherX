@@ -130,6 +130,20 @@ class DatabaseHandler(private val plugin: PunisherX) {
         ready.set(true)
     }
 
+    fun bindIdentityDomain() {
+        ready.set(false)
+        db.withConnection {
+            pl.syntaxdevteam.punisher.identity.IdentityRegistryStore.bind(it, plugin.playerIdentities.settings)
+            pl.syntaxdevteam.punisher.identity.IdentityRegistryStore.normalizeActiveAddresses(it)
+        }
+        ready.set(true)
+    }
+
+    fun recordIdentityObservation(identity: pl.syntaxdevteam.punisher.identity.PlayerIdentity, observedAt: Long) {
+        check(isReady()) { "Database is not ready" }
+        db.withConnection { pl.syntaxdevteam.punisher.identity.IdentityRegistryStore.record(it, identity, observedAt) }
+    }
+
     /** Staff observations never affect punishments or escalation. */
     fun addStaffNote(player: UUID, author: String, rawContent: String): Long? {
         val content = rawContent.trim()
@@ -624,8 +638,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun getPunishmentsByIP(ip: String): List<PunishmentData> {
         return try {
-            val params = mutableListOf<Any>(ip)
-            val sql = appendServerFilter("SELECT * FROM punishments WHERE uuid = ?", params, true)
+            val params = mutableListOf<Any>(pl.syntaxdevteam.punisher.identity.canonicalIp(ip) ?: return emptyList())
+            val sql = appendServerFilter("SELECT * FROM punishments WHERE uuid = ? AND punishmentType = 'BANIP'", params, true)
             val rows = query(sql, *params.toTypedArray()) { rs ->
                 PunishmentData(
                     (rs.int("id") ?: 0),

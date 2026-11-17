@@ -1,5 +1,6 @@
 package pl.syntaxdevteam.punisher.commands
 
+import pl.syntaxdevteam.punisher.identity.resolvePlayerUuidOrNotify
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.Bukkit
@@ -16,7 +17,7 @@ class UnMuteCommand(private val plugin: PunisherX) : BasicCommand {
         if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNMUTE)) {
             if (arguments.isNotEmpty()) {
                 val player = arguments[0]
-                val uuid = plugin.resolvePlayerUuid(player).toString()
+                val uuid = (plugin.resolvePlayerUuidOrNotify(player, stack.sender) ?: return).toString()
                 val punishments = plugin.databaseHandler.getPunishments(uuid)
                 if (punishments.isNotEmpty()) {
                     punishments.forEach { punishment ->
@@ -26,7 +27,7 @@ class UnMuteCommand(private val plugin: PunisherX) : BasicCommand {
                     }
                     val placeholders = mapOf("player" to player, "operator" to stack.sender.name)
                     PunishmentCommandUtils.sendSenderMessages(plugin, stack, "unmute", "unmute", placeholders, silent = silent)
-                    PunishmentCommandUtils.sendTargetMessages(plugin, Bukkit.getPlayer(player), "unmute", "unmute_message", placeholders, silent = silent)
+                    PunishmentCommandUtils.sendTargetMessages(plugin, Bukkit.getPlayer(java.util.UUID.fromString(uuid)), "unmute", "unmute_message", placeholders, silent = silent)
                     plugin.logger.info("Player $player ($uuid) has been unmuted")
                 } else {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_found", mapOf("player" to player, "operator" to stack.sender.name)))

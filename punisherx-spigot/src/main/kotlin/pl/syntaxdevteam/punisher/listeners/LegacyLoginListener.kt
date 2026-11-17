@@ -26,7 +26,7 @@ class LegacyLoginListener(private val plugin: PunisherX) : Listener {
             plugin.logger.debug("Checking punishment for player: ${player.name}")
 
             val uuid = player.uniqueId.toString()
-            val ip = event.address.hostAddress
+            val ip = pl.syntaxdevteam.punisher.identity.canonicalIp(event.address.hostAddress) ?: event.address.hostAddress
 
             val punishments = plugin.databaseHandler.getPunishments(uuid) + plugin.databaseHandler.getPunishmentsByIP(ip)
             if (punishments.isEmpty()) {

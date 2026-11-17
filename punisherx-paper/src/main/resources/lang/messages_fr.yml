@@ -10,6 +10,9 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 
 # Messages d’erreur
 error:
+  identity_unconfirmed: "<red>Player identity is not confirmed. Use the player's full UUID.</red>"
+  identity_ambiguous: "<red>Conflicting player identities. Use the player's full UUID.</red>"
+  identity_unavailable: "<red>Player identity service is unavailable. Try again later.</red>"
   no_permission: "<red>Vous n’avez pas la permission d’utiliser cette commande.</red>"
   max_time: "<red>Vous ne pouvez sanctionner que pour <gold><time></gold> maximum.</red>"
   player_not_found: "<gold>Aucun joueur trouvé avec le pseudo <player>.</gold>"

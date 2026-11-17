@@ -10,6 +10,9 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 
 # Foutmeldingen
 error:
+  identity_unconfirmed: "<red>Player identity is not confirmed. Use the player's full UUID.</red>"
+  identity_ambiguous: "<red>Conflicting player identities. Use the player's full UUID.</red>"
+  identity_unavailable: "<red>Player identity service is unavailable. Try again later.</red>"
   banip_db_error: "<red>IP-bans konden niet worden opgeslagen. Niet geblokkeerde IPs: <failed_ips>. Succesvol geblokkeerde IPs: <banned_ips>. Controleer de console.</red>"
   no_permission: "<red>Je hebt geen toestemming om dit commando te gebruiken.</red>"
   max_time: "<red>Je kunt maximaal voor <gold><time></gold> straffen.</red>"
