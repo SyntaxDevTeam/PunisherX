@@ -8,6 +8,8 @@ import org.bukkit.World
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
+import org.bukkit.permissions.PermissionAttachmentInfo
+import pl.syntaxdevteam.punisher.basic.TimeHandler
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.*
 import pl.syntaxdevteam.punisher.PunisherX
@@ -18,7 +20,7 @@ import java.util.UUID
 import kotlin.test.Test
 
 class PunishCommandFlagsTest {
-    private class Fixture(type: String) {
+    private class Fixture(type: String, time: String? = "10m", cap: String? = null) {
         val plugin = mock<PunisherX>()
         val source = mock<CommandSourceStack>()
         val sender = mock<ConsoleCommandSender>()
@@ -26,11 +28,16 @@ class PunishCommandFlagsTest {
         val observer = mock<Player>()
         val world = mock<World>()
         val uuid = UUID.randomUUID()
-        val template = PunishTemplate("spam", "Spam", mapOf(1 to PunishTemplateLevel(1, type, "10m")))
+        val template = PunishTemplate("spam", "Spam", mapOf(1 to PunishTemplateLevel(1, type, time)))
 
         init {
             whenever(source.sender).thenReturn(sender)
             whenever(sender.name).thenReturn("Admin")
+            val node = "punisherx.max.${type.lowercase()}.${cap}"
+            whenever(sender.effectivePermissions).thenReturn(if (cap == null) emptySet() else
+                setOf(PermissionAttachmentInfo(sender, node, null, true)))
+            whenever(sender.hasPermission(node)).thenReturn(cap != null)
+
             whenever(player.name).thenReturn("Steve")
             whenever(player.location).thenReturn(Location(world, 0.0, 64.0, 0.0))
             whenever(player.hasPermission("punisherx.bypass")).thenReturn(true)
@@ -50,9 +57,7 @@ class PunishCommandFlagsTest {
             whenever(plugin.messageHandler.getSmartMessage(any(), any(), any())).thenReturn(listOf(Component.text("Notice")))
             whenever(plugin.messageHandler.stringMessageToComponent(any(), any(), any<Map<String, String>>()))
                 .thenReturn(Component.text("Notice"))
-            whenever(plugin.timeHandler).thenReturn(mock())
-            whenever(plugin.timeHandler.parseTime("10m")).thenReturn(600)
-            whenever(plugin.timeHandler.formatTime(anyOrNull())).thenReturn("10 minutes")
+            whenever(plugin.timeHandler).thenReturn(TimeHandler({ _, key -> if (key == "undefined") "10 minutes" else "minutes" }))
             whenever(plugin.actionExecutor).thenReturn(mock())
             whenever(plugin.proxyBridgeMessenger).thenReturn(mock())
             whenever(plugin.playerIPManager).thenReturn(mock())
@@ -113,4 +118,34 @@ class PunishCommandFlagsTest {
         verify(f.player, atLeastOnce()).sendMessage(Component.text("Notice"))
         verify(f.observer).sendMessage(Component.text("Notice"))
     }
+    @Test fun `template caps reject every timed type before punishment side effects even with force silent and mark`() {
+        for (type in listOf("BAN", "BANIP", "MUTE", "WARN", "JAIL")) {
+            for (time in listOf("10m", null, "", " PeRmAnEnT ")) {
+                val f = Fixture(type, time, "5m")
+                f.execute("1", "--force", "--silent", "--mark=test")
+                verify(f.plugin.messageHandler).stringMessageToComponent("error", "max_time", mapOf("time" to "5 minutes"))
+                verify(f.plugin.databaseHandler, never()).addPunishment(any(), any(), any(), any(), any(), any(), any(), any())
+                verify(f.plugin.databaseHandler, never()).addMarkedPunishment(any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+                verifyNoInteractions(f.plugin.actionExecutor, f.plugin.proxyBridgeMessenger, f.plugin.safeTeleportService, f.plugin.cache)
+                verify(f.player, never()).kick(any<Component>())
+            }
+        }
+    }
+
+    @Test fun `template at cap is accepted and kick remains exempt`() {
+        for (type in listOf("BAN", "BANIP", "MUTE", "WARN", "JAIL", "KICK")) {
+            val f = Fixture(type, "10m", if (type == "KICK") "5m" else "10m")
+            f.execute("1", "--force", "--silent")
+            verify(f.plugin.databaseHandler).addTemplatePunishmentHistory(eq("Steve"), any(), eq("Spam"), eq("Admin"),
+                eq(type), any(), any(), eq("spam"), eq(f.uuid.toString()), any())
+        }
+    }
+
+    @Test fun `invalid template keeps invalid time message`() {
+        val f = Fixture("BAN", "wrong", "5m")
+        f.execute("1", "--force")
+        verify(f.plugin.messageHandler).stringMessageToComponent("punish", "invalid_time", mapOf("time" to "wrong"))
+        verifyNoInteractions(f.plugin.actionExecutor)
+    }
+
 }

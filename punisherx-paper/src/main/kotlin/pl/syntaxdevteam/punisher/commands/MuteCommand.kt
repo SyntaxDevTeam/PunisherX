@@ -37,6 +37,7 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                     val uuid = plugin.resolvePlayerUuid(player).toString()
 
                     val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, arguments, 1)
+                    if (PunishmentCommandUtils.exceedsMaxTime(plugin, stack, "mute", gtime)) return
 
                     val punishmentType = "MUTE"
                     val start = System.currentTimeMillis()

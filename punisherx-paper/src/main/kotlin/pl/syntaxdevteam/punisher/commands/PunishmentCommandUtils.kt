@@ -13,6 +13,24 @@ internal object PunishmentCommandUtils {
             if (key == "player") pl.syntaxdevteam.punisher.permissions.IpVisibility.displayAddress(plugin, viewer, value) else value
         }
 
+    // punisherx.max.<type>.<time>, e.g. punisherx.max.ban.7d, caps how long the sender may punish for and forbids permanent punishments.
+    fun exceedsMaxTime(plugin: PunisherX, stack: CommandSourceStack, type: String, time: String?): Boolean {
+        val prefix = "punisherx.max.$type."
+        val max = stack.sender.effectivePermissions
+            .asSequence()
+            .filter { it.value && it.permission.startsWith(prefix) && stack.sender.hasPermission(it.permission) }
+            .mapNotNull {
+                val raw = it.permission.removePrefix(prefix)
+                runCatching { raw to plugin.timeHandler.parseTime(raw) }.getOrNull()
+            }
+            .maxByOrNull { it.second } ?: return false
+        val seconds = time?.takeUnless { it.isBlank() || it.equals("permanent", ignoreCase = true) }
+            ?.let { plugin.timeHandler.parseTime(it) }
+        if (seconds != null && seconds <= max.second) return false
+        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "max_time", mapOf("time" to plugin.timeHandler.formatTime(max.first))))
+        return true
+    }
+
     fun parseTimeAndReason(
         plugin: PunisherX,
         args: Array<String>,

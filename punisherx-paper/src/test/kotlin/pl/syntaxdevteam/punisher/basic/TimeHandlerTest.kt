@@ -46,6 +46,8 @@ class TimeHandlerTest {
         assertEquals(172800L, handler.parseTime("2d"))
         assertEquals(300L, handler.parseTime("5M"))
         assertFailsWith<NumberFormatException> { handler.parseTime("3x") }
+        assertFailsWith<NumberFormatException> { handler.parseTime("9223372036854775807d") }
+        assertEquals(Long.MAX_VALUE, handler.parseTime("9223372036854775807s"))
     }
 
     @Test

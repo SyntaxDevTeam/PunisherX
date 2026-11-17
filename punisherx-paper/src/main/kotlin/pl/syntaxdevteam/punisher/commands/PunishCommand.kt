@@ -157,20 +157,15 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         }
     }
 
-    private fun parseTemplateTime(stack: CommandSourceStack, time: String?): TemplateTime? {
-        val trimmed = time?.trim()?.takeIf { it.isNotEmpty() } ?: return TemplateTime(null)
-        if (trimmed.equals("permanent", ignoreCase = true)) {
-            return TemplateTime(null)
-        }
-
+    private fun parseTemplateTime(stack: CommandSourceStack, type: String, time: String?): TemplateTime? {
+        val trimmed = time?.trim()?.takeUnless { it.isEmpty() || it.equals("permanent", ignoreCase = true) }
         return try {
-            TemplateTime(plugin.timeHandler.parseTime(trimmed))
+            val parsed = TemplateTime(trimmed?.let { plugin.timeHandler.parseTime(it) })
+            if (PunishmentCommandUtils.exceedsMaxTime(plugin, stack, type, trimmed)) null else parsed
         } catch (_: NumberFormatException) {
             stack.sender.sendMessage(
                 plugin.messageHandler.stringMessageToComponent(
-                    "punish",
-                    "invalid_time",
-                    mapOf("time" to trimmed)
+                    "punish", "invalid_time", mapOf("time" to trimmed.orEmpty())
                 )
             )
             null
@@ -187,7 +182,7 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         options: PunishmentCommandOptions
     ) {
         val reason = template.reason
-        val parsedTemplateTime = parseTemplateTime(stack, templateLevel.time) ?: return
+        val parsedTemplateTime = parseTemplateTime(stack, "ban", templateLevel.time) ?: return
         val parsedSeconds = parsedTemplateTime.seconds
         val start = System.currentTimeMillis()
         val end = parsedSeconds?.let { start + it * 1000 } ?: -1
@@ -237,7 +232,7 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         options: PunishmentCommandOptions
     ) {
         val reason = template.reason
-        val parsedTemplateTime = parseTemplateTime(stack, templateLevel.time) ?: return
+        val parsedTemplateTime = parseTemplateTime(stack, "banip", templateLevel.time) ?: return
         val parsedSeconds = parsedTemplateTime.seconds
         val playerIps = (
             plugin.playerIPManager.getPlayerIPsByUUID(uuid.toString()) +
@@ -311,7 +306,7 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         options: PunishmentCommandOptions
     ) {
         val reason = template.reason
-        val parsedTemplateTime = parseTemplateTime(stack, templateLevel.time) ?: return
+        val parsedTemplateTime = parseTemplateTime(stack, "mute", templateLevel.time) ?: return
         val parsedSeconds = parsedTemplateTime.seconds
         val start = System.currentTimeMillis()
         val end = parsedSeconds?.let { start + it * 1000 } ?: -1
@@ -350,7 +345,7 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         options: PunishmentCommandOptions
     ) {
         val reason = template.reason
-        val parsedTemplateTime = parseTemplateTime(stack, templateLevel.time) ?: return
+        val parsedTemplateTime = parseTemplateTime(stack, "warn", templateLevel.time) ?: return
         val parsedSeconds = parsedTemplateTime.seconds
         val start = System.currentTimeMillis()
         val end = parsedSeconds?.let { start + it * 1000 } ?: -1
@@ -439,7 +434,7 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         options: PunishmentCommandOptions
     ) {
         val reason = template.reason
-        val parsedTemplateTime = parseTemplateTime(stack, templateLevel.time) ?: return
+        val parsedTemplateTime = parseTemplateTime(stack, "jail", templateLevel.time) ?: return
         val parsedSeconds = parsedTemplateTime.seconds
         val start = System.currentTimeMillis()
         val end = parsedSeconds?.let { start + it * 1000 } ?: -1

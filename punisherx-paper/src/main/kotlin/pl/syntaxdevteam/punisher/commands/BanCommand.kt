@@ -34,6 +34,7 @@ class BanCommand(private var plugin: PunisherX) : BasicCommand {
                         }
                     }
                     val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, arguments, 1)
+                    if (PunishmentCommandUtils.exceedsMaxTime(plugin, stack, "ban", gtime)) return
 
                     val punishmentType = "BAN"
                     val start = System.currentTimeMillis()

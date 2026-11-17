@@ -28,6 +28,7 @@ class WarnCommand(private val plugin: PunisherX) : BasicCommand {
                         return
                     }
                     val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, arguments, 1)
+                    if (PunishmentCommandUtils.exceedsMaxTime(plugin, stack, "warn", gtime)) return
 
                     val punishmentType = "WARN"
                     val start = System.currentTimeMillis()

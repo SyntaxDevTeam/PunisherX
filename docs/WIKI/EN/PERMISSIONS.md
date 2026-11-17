@@ -1,6 +1,20 @@
 The plugin offers a comprehensive set of permissions to manage access to its various features. Below is a categorized list of available permissions along with their descriptions.
 Recommended permissions plugin: [LuckPerms](https://luckperms.net/)
 
+### Punishment duration limits (Paper)
+
+`punisherx.max.<type>.<time>` caps a moderator's punishment duration, e.g. `punisherx.max.ban.7d`.
+Types: `ban`, `banip`, `mute`, `warn`, `jail`. Time: a number followed by `s`, `m`, `h` or `d`.
+The longest active valid cap for that type wins. Durations equal to the cap are allowed;
+longer and permanent punishments are rejected. No valid cap means no duration restriction.
+A cap does not grant command access. It covers direct commands, `/punish` and GUI template punishments;
+`--force`, `--silent` and `--mark` do not bypass it. `KICK` has no duration cap.
+
+Grant concrete nodes, e.g. `punisherx.max.mute.1h`; `punisherx.max.ban.*` does not specify a duration.
+Nodes are enumerated through Bukkit `effectivePermissions` and checked with `hasPermission`.
+Verify visibility with your permission provider and contexts; this is not a LuckPerms API integration.
+This feature is not currently implemented in the Spigot module.
+
 ### Command permissions
 
 | Permission | Description |

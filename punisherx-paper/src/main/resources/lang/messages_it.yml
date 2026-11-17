@@ -11,6 +11,7 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 # Messaggi di errore
 error:
   no_permission: "<red>Non hai il permesso per usare questo comando.</red>"
+  max_time: "<red>Puoi punire al massimo per <gold><time></gold>.</red>"
   player_not_found: "<gold>Nessun giocatore trovato con il nome <player>.</gold>"
   player_not_punished: "<gold>Il giocatore <player> non ha questa punizione.</gold>"
   ip_not_found: "<gold>Nessun giocatore trovato con l’IP <ip>.</gold>"

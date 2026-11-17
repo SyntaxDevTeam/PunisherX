@@ -38,6 +38,7 @@ class JailCommand(private val plugin: PunisherX) : BasicCommand {
             return
         }
         val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, arguments, 1)
+        if (PunishmentCommandUtils.exceedsMaxTime(plugin, stack, "jail", gtime)) return
 
         val punishmentType = "JAIL"
         val start = System.currentTimeMillis()
