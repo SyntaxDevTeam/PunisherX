@@ -12,6 +12,7 @@ prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>
 error:
   banip_db_error: "<red>IP-bans konden niet worden opgeslagen. Niet geblokkeerde IPs: <failed_ips>. Succesvol geblokkeerde IPs: <banned_ips>. Controleer de console.</red>"
   no_permission: "<red>Je hebt geen toestemming om dit commando te gebruiken.</red>"
+  max_time: "<red>Je kunt maximaal voor <gold><time></gold> straffen.</red>"
   player_not_found: "<gold>Speler met bijnaam <player> niet gevonden.</gold>"
   ip_not_found: "<gold>Speler met IP <ip> niet gevonden.</gold>"
   player_not_punished: "<gold>Speler <player> heeft geen dergelijke straf.</gold>"

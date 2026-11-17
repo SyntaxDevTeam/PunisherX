@@ -63,6 +63,7 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
         val durationSec = timeArg?.let {
             try { plugin.timeHandler.parseTime(it) } catch (_: Exception) { null }
         }
+        if (PunishmentCommandUtils.exceedsMaxTime(plugin, stack, "banip", timeArg.takeIf { durationSec != null })) return
         val reason = if (durationSec != null) filtered.drop(2).joinToString(" ") else filtered.drop(1).joinToString(" ")
 
         val start = System.currentTimeMillis()
