@@ -175,6 +175,8 @@ class PunisherX : JavaPlugin(), Listener {
         runCatching { UUID.fromString(identifier) }.getOrNull()?.let { return it }
         Bukkit.getPlayerExact(identifier)?.uniqueId?.let { return it }
         Bukkit.getOfflinePlayerIfCached(identifier)?.uniqueId?.let { return it }
+        // Player may have never joined this server but was punished on another one in the network
+        databaseHandler.uuidByName(identifier)?.let { return it }
         if (!server.onlineMode) return UUID.nameUUIDFromBytes("OfflinePlayer:$identifier".toByteArray(Charsets.UTF_8))
         return Bukkit.getOfflinePlayer(identifier).uniqueId
     }

@@ -539,6 +539,15 @@ class DatabaseHandler(private val plugin: PunisherX) {
         }
     }
 
+    fun uuidByName(name: String): UUID? = try {
+        query("SELECT uuid FROM punishmenthistory WHERE LOWER(name) = LOWER(?) ORDER BY start DESC, id DESC LIMIT 1", name) {
+            it.string("uuid")
+        }.firstOrNull()?.let { runCatching { UUID.fromString(it) }.getOrNull() }
+    } catch (e: Exception) {
+        logger.err("Failed to find the UUID of $name. ${e.message}")
+        null
+    }
+
     fun updatePunishmentReason(id: Int, newReason: String): Boolean {
         return try {
             val params = mutableListOf<Any>(newReason, id)
