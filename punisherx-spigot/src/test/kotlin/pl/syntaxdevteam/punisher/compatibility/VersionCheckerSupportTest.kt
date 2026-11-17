@@ -1,0 +1,37 @@
+package pl.syntaxdevteam.punisher.compatibility
+
+import pl.syntaxdevteam.punisher.compatibility.VersionChecker
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
+class VersionCheckerSupportTest {
+
+    @Test
+    fun `supports approved legacy versions`() {
+        assertTrue(VersionChecker.isVersionSupported("1.20.6"))
+        assertTrue(VersionChecker.isVersionSupported("1.21"))
+        assertTrue(VersionChecker.isVersionSupported("1.21.0"))
+        assertTrue(VersionChecker.isVersionSupported("1.21.11"))
+    }
+
+    @Test
+    fun `supports approved year-based versions`() {
+        assertTrue(VersionChecker.isVersionSupported("26.1"))
+        assertTrue(VersionChecker.isVersionSupported("26.1.0"))
+        assertTrue(VersionChecker.isVersionSupported("26.2"))
+        assertTrue(VersionChecker.isVersionSupported("26.2.0"))
+        assertTrue(VersionChecker.isVersionSupported("26.3"))
+        assertTrue(VersionChecker.isVersionSupported("26.3.0"))
+    }
+
+    @Test
+    fun `rejects versions that are not explicitly approved`() {
+        assertFalse(VersionChecker.isVersionSupported("1.20.5"))
+        assertFalse(VersionChecker.isVersionSupported("1.22"))
+        assertFalse(VersionChecker.isVersionSupported("26.0"))
+        assertFalse(VersionChecker.isVersionSupported("26.3.1"))
+        assertFalse(VersionChecker.isVersionSupported("26.4"))
+        assertFalse(VersionChecker.isVersionSupported("27.1"))
+    }
+}

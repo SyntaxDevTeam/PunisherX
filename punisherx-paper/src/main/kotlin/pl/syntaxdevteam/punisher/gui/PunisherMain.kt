@@ -1,0 +1,117 @@
+package pl.syntaxdevteam.punisher.gui
+
+import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
+import org.bukkit.Material
+import org.bukkit.entity.Player
+import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.gui.admin.AdminListGUI
+import pl.syntaxdevteam.punisher.gui.admin.ConfigGUI
+import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
+import pl.syntaxdevteam.punisher.gui.player.OfflinePlayerListGUI
+import pl.syntaxdevteam.punisher.gui.player.PlayerListGUI
+import pl.syntaxdevteam.punisher.gui.punishments.PunishedListGUI
+import java.lang.management.ManagementFactory
+
+/**
+ * Main menu of PunisherX.
+ */
+class PunisherMain(plugin: PunisherX) : BaseGUI(plugin) {
+
+    /**
+     * Representation of a clickable menu entry.
+     */
+    private data class MenuEntry(
+        val title: String,
+        val material: Material,
+        val slot: Int,
+        val onClick: (Player) -> Unit
+    )
+
+    /**
+     * Buttons displayed in the main menu.
+     */
+    private val menuEntries = listOf(
+        MenuEntry(plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.serwerInfo.title"), Material.PAPER, 4) { _ -> },
+        MenuEntry(plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.playerOnline.title"), Material.PLAYER_HEAD, 10) { player ->
+            PlayerListGUI(plugin).open(player)
+        },
+        MenuEntry(plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.playerOffline.title"), Material.SKELETON_SKULL, 16) { player ->
+            OfflinePlayerListGUI(plugin).open(player)
+        },
+        MenuEntry(plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.adminOnline.title"), Material.COMMAND_BLOCK, 22) { player ->
+            AdminListGUI(plugin).open(player)
+        },
+        MenuEntry(
+            plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PlayerAction.list"),
+            plugin.guiMaterialResolver.resolveMaterial("IRON_CHAIN", "IRON_BARS", "CHAIN"),
+            29
+        ) { player ->
+            PunishedListGUI(plugin).open(player)
+        },
+        MenuEntry(plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PlayerAction.config"), Material.COMPARATOR, 33) { player ->
+            ConfigGUI(plugin).open(player)
+        },
+    )
+
+    override fun open(player: Player) {
+        val serverName = plugin.getServerName()
+        val onlinePlayers = Bukkit.getOnlinePlayers().size.toString()
+        val uptimeSeconds = ManagementFactory.getRuntimeMXBean().uptime / 1000
+        val time = plugin.timeHandler.formatTime(uptimeSeconds.toString())
+        val tps = getServerTPS()
+        player.sendActionBar(mH.miniMessageFormat("<gray>Loading panel...</gray>"))
+        plugin.schedulerAdapter.runAsync(Runnable {
+            val totalPlayers = plugin.playerIPManager.getAllDecryptedRecords().size.toString()
+            val daily = plugin.databaseHandler.countTodayPunishments().toString()
+            plugin.schedulerAdapter.runForPlayer(player, Runnable {
+                if (player.isOnline) show(player, serverName, onlinePlayers, totalPlayers, daily, time, tps)
+            })
+        })
+    }
+
+    private fun show(player: Player, serverName: String, onlinePlayers: String, totalPlayers: String, daily: String, time: String, tps: String) {
+        val gui = createGui(5)
+
+        menuEntries.forEach { entry ->
+            val lore = when (entry.slot) {
+                4 -> listOf(
+                    plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.serwerInfo.serverName", mapOf("servername" to serverName)),
+                    plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.serwerInfo.daily", mapOf("daily" to daily)),
+                    plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.serwerInfo.tps", mapOf("time" to time, "tps" to tps)),
+                )
+                10 -> listOf(
+                    plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.playerOnline.online", mapOf("onlineplayers" to onlinePlayers)),
+                    plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.playerOnline.clickToView")
+                )
+                16 -> listOf(
+                    plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.playerOffline.total", mapOf("totalplayers" to totalPlayers)),
+                    plugin.messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.playerOffline.clickToView")
+                )
+                else -> emptyList()
+            }
+            gui.setItem(
+                entry.slot,
+                createGuiItem(entry.material, entry.title, lore) { clicker ->
+                    entry.onClick(clicker)
+                }
+            )
+        }
+
+        openGui(gui, player)
+    }
+
+    override fun getTitle(): Component {
+        return plugin.messageHandler.stringMessageToComponentNoPrefix("GUI", "PunisherMain.title")
+    }
+
+    private fun getServerTPS(): String {
+        return try {
+            val method = Bukkit.getServer()::class.java.getMethod("getTPS")
+            val tps = method.invoke(Bukkit.getServer()) as? DoubleArray
+            if (tps != null && tps.isNotEmpty()) String.format("%.2f", tps[0]) else "N/A"
+        } catch (_: Exception) {
+            "N/A"
+        }
+    }
+}

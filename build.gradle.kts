@@ -1,186 +1,121 @@
-import io.papermc.hangarpublishplugin.model.Platforms
-import org.gradle.api.publish.maven.MavenPublication
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import java.util.zip.ZipFile
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
 plugins {
-    kotlin("jvm") version "2.3.0"
-    id("com.gradleup.shadow") version "9.3.0"
-    `maven-publish`
-    id("io.papermc.hangar-publish-plugin") version "0.1.3"
-    id("xyz.jpenilla.run-paper") version "3.0.2"
-    id("pl.syntaxdevteam.plugindeployer") version "1.0.4"
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.shadow) apply false
+    alias(libs.plugins.dokka.javadoc) apply false
+    alias(libs.plugins.hangar) apply false
+    alias(libs.plugins.run.paper) apply false
+    alias(libs.plugins.plugindeployer) apply false
 }
 
 group = "pl.syntaxdevteam.punisher"
-version = "1.7.0-Experimental"
+version = "1.9.0-R0.3-SNAPSHOT"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
-val targetJavaVersion = 21
-kotlin {
-    jvmToolchain(targetJavaVersion)
-}
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor(0, "seconds")
-}
+val bridgeVersion = "1.2.0-R0.1-SNAPSHOT"
+val databaseRuntimeDependencies = listOf(libs.syntaxdb.core, libs.hikari, libs.mysql.jdbc, libs.protobuf,
+    libs.postgresql.jdbc, libs.mssql.jdbc, libs.sqlite.jdbc, libs.kotlin.stdlib)
 
-repositories {
-    maven("https://nexus.syntaxdevteam.pl/repository/maven-snapshots/") //SyntaxDevTeam
-    maven("https://nexus.syntaxdevteam.pl/repository/maven-releases/") //SyntaxDevTeam
-    gradlePluginPortal()
-    mavenCentral()
-    maven("https://repo.papermc.io/repository/maven-public/") {
-        name = "papermc"
-    }
-    maven("https://oss.sonatype.org/content/groups/public/") {
-        name = "sonatype"
-    }
-    maven("https://repo.menthamc.org/repository/maven-public/")
-    maven("https://repo.extendedclip.com/releases/") // PlaceholderAPI
-    maven("https://repo.codemc.org/repository/maven-public/") // VaultUnlockedAPI
-    maven("https://jitpack.io") // VaultAPI
-    maven("https://repo.essentialsx.net/releases/") // EssentialsX
-    maven("https://repo.leavesmc.org/snapshots/") {
-        name = "leavesmc-repo"
-    }
-}
+subprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "com.gradleup.shadow")
+    apply(plugin = "maven-publish")
+    apply(plugin = "org.jetbrains.dokka-javadoc")
 
-val mockitoAgent: Configuration by configurations.creating
-
-dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    //compileOnly("org.leavesmc.leaves:leaves-api:1.21.10-R0.1-SNAPSHOT")
-    //compileOnly("dev.folia:folia-api:1.21.8-R0.1-SNAPSHOT")
-    //compileOnly("me.earthme.luminol:luminol-api:1.21.8-R0.1-SNAPSHOT")
-    //implementation(files("libs/SyntaxCore-1.2.6n-SNAPSHOT-all.jar"))
-    compileOnly("pl.syntaxdevteam:core:1.2.8-R0.1-SNAPSHOT")
-    compileOnly("pl.syntaxdevteam:messageHandler-paper:1.1.0-R0.1-SNAPSHOT")
-    compileOnly("org.eclipse.aether:aether-api:1.1.0")
-    compileOnly("org.yaml:snakeyaml:2.5")
-    compileOnly("com.google.code.gson:gson:2.13.2")
-    compileOnly("net.kyori:adventure-text-serializer-legacy:4.26.1")
-    compileOnly("net.kyori:adventure-text-minimessage:4.26.1")
-    compileOnly("net.kyori:adventure-text-serializer-gson:4.26.1")
-    compileOnly("net.kyori:adventure-text-serializer-plain:4.26.1")
-    compileOnly("net.kyori:adventure-text-serializer-ansi:4.26.1")
-    compileOnly("net.kyori:adventure-nbt:4.26.1")
-    compileOnly("com.maxmind.geoip2:geoip2:5.0.2")
-    compileOnly("org.apache.ant:ant:1.10.15")
-    compileOnly("com.zaxxer:HikariCP:7.0.2")
-    compileOnly("net.luckperms:api:5.5")
-    compileOnly("me.clip:placeholderapi:2.11.7")
-    compileOnly("io.github.miniplaceholders:miniplaceholders-kotlin-ext:3.1.0")
-    compileOnly("com.github.milkbowl:VaultAPI:1.7.1")
-    compileOnly("net.milkbowl.vault:VaultUnlockedAPI:2.15")
-    compileOnly("net.essentialsx:EssentialsXSpawn:2.21.2"){
-        isTransitive = false
+    // SQLite JDBC loads its native library from the test runtime classpath.
+    tasks.withType<Test>().configureEach {
+        jvmArgs("--enable-native-access=ALL-UNNAMED")
     }
-    compileOnly("com.github.ben-manes.caffeine:caffeine:3.2.3")
-    compileOnly("dev.dejvokep:boosted-yaml:1.3.7")
 
-    testImplementation(kotlin("test"))
-    testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    testImplementation("org.mockito:mockito-core:5.20.0")
-    testImplementation("org.mockito:mockito-inline:5.2.0")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:6.1.0")
-    mockitoAgent("net.bytebuddy:byte-buddy-agent:1.18.2") {
-        isTransitive = false
-    }
-}
+    group = rootProject.group
+    version = if (name.endsWith("-bridge")) bridgeVersion else rootProject.version
 
-tasks {
-    build {
-        dependsOn(shadowJar)
-    }
-    test {
-        useJUnitPlatform()
-        jvmArgs("-javaagent:${mockitoAgent.singleFile}")
-    }
-    runServer {
-        minecraftVersion("1.21.11")
-        runDirectory(file("run/paper"))
-    }
-    runPaper.folia.registerTask()
-}
-
-tasks.processResources {
-    val props = mapOf(
-        "version" to version,
-        "description" to description
-    )
-    inputs.properties(props)
-    filteringCharset = "UTF-8"
-    filesMatching(listOf("paper-plugin.yml")) {
-        expand(props)
-    }
-}
-
-tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
-    archiveBaseName.set("PunisherX")
-    archiveClassifier.set("")
-    archiveVersion.set(project.version.toString())
-    mergeServiceFiles()
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("PunisherX") {
-            artifact(tasks.named("shadowJar").get()) {
-                classifier = null
+    if (name in setOf("punisherx-paper", "punisherx-spigot")) {
+        extensions.configure<KotlinJvmProjectExtension> {
+            sourceSets.named("test") {
+                kotlin.srcDir(rootProject.file("tests/server/kotlin"))
             }
-            pom {
-                name.set("PunisherX")
-                description.set(project.description)
-                url.set("https://github.com/SyntaxDevTeam/PunisherX")
-                licenses {
-                    license {
-                        name.set("MIT License")
-                        url.set("https://opensource.org/licenses/MIT")
+        }
+        // Mirrors the explicit runtime manifests, without optional mapping/coroutine modules.
+        val databaseRuntimeLibraries = configurations.create("databaseRuntimeLibraries")
+        databaseRuntimeDependencies.forEach {
+            dependencies.add(databaseRuntimeLibraries.name, it)
+        }
+        tasks.withType<Test>().configureEach {
+            inputs.files(databaseRuntimeLibraries)
+            inputs.property("mysqlTestUrl", providers.environmentVariable("PUNISHERX_TEST_MYSQL_URL").orElse(""))
+            doFirst {
+                systemProperty("punisherx.database.runtimeClasspath", databaseRuntimeLibraries.asPath)
+            }
+        }
+    }
+}
+
+tasks.register("buildAll") {
+    group = "build"
+    description = "Builds all enabled PunisherX server and proxy modules"
+    val enabledBuilds = listOf(
+        ":punisherx-paper",
+        ":punisherx-spigot",
+        ":punisherx-velocity-bridge",
+        ":punisherx-bungee-bridge",
+    ).filter { findProject(it) != null }
+        .map { "$it:build" }
+    dependsOn(enabledBuilds)
+}
+
+tasks.register("deploySpigotOnly") {
+    group = "deployment"
+    description = "Deploys only the Spigot module artifact"
+    dependsOn(":punisherx-spigot:deployPluginToSpigot")
+}
+
+// Server plugins download their DB runtime; proxies currently bundle it (no runtime loader).
+subprojects {
+    val verifyDatabaseBundle = tasks.register("verifyDatabaseBundle") {
+        group = "verification"
+        description = "Checks the database runtime packaging contract for server and proxy JARs"
+        val bundle = tasks.named<ShadowJar>("shadowJar")
+        dependsOn(bundle)
+        doLast {
+            val required = listOf(
+                "pl/syntaxdevteam/syntaxdb/Database.class",
+                "com/zaxxer/hikari/HikariDataSource.class",
+                "com/mysql/cj/jdbc/Driver.class",
+                "org/postgresql/Driver.class",
+                "org/sqlite/JDBC.class",
+                "com/microsoft/sqlserver/jdbc/SQLServerDriver.class",
+                "META-INF/services/java.sql.Driver",
+            )
+            ZipFile(bundle.get().archiveFile.get().asFile).use { jar ->
+                if (project.name in setOf("punisherx-paper", "punisherx-spigot")) {
+                    val forbidden = listOf("pl/syntaxdevteam/syntaxdb/", "com/zaxxer/hikari/", "org/sqlite/",
+                        "com/mysql/", "org/postgresql/", "com/microsoft/sqlserver/", "kotlin/", "kotlinx/coroutines/")
+                    check(jar.entries().asSequence().none { entry -> forbidden.any { entry.name.startsWith(it) } }) {
+                        "Downloaded libraries must not be bundled in ${project.name}"
                     }
-                }
-                developers {
-                    developer {
-                        id.set("WieszczY85")
-                        name.set("WieszczY")
+                    val platform = project.name.removePrefix("punisherx-")
+                    val manifest = requireNotNull(jar.getEntry("$platform-libraries.yml"))
+                    val text = jar.getInputStream(manifest).bufferedReader().use { it.readText() }
+                    check(!text.contains("\${")) { "Unexpanded runtime library versions in ${project.name}" }
+                    listOf("pl.syntaxdevteam:syntaxdb-core:", "com.zaxxer:HikariCP:",
+                        "com.mysql:mysql-connector-j:", "com.google.protobuf:protobuf-java:",
+                        "org.postgresql:postgresql:", "com.microsoft.sqlserver:mssql-jdbc:", "org.xerial:sqlite-jdbc:")
+                        .forEach { check(text.contains(it)) { "Missing runtime library $it in ${project.name}" } }
+                    if (platform == "spigot") {
+                        val descriptor = jar.getInputStream(jar.getEntry("plugin.yml")).bufferedReader().use { it.readText() }
+                        check(descriptor.contains("org.jetbrains.kotlin:kotlin-stdlib:")) { "Spigot must bootstrap Kotlin before Libby" }
+                    }
+                } else {
+                    required.forEach { entry ->
+                        check(jar.getEntry(entry) != null) { "Database runtime is incomplete: missing $entry in ${project.name}" }
                     }
                 }
             }
         }
     }
-    repositories {
-        maven {
-            name = "Nexus"
-            url = uri("https://nexus.syntaxdevteam.pl/repository/maven-releases/")
-            credentials {
-                username = findProperty("nexusUser")?.toString()
-                    ?: throw GradleException("Właściwość 'nexusUser' nie jest ustawiona w gradle.properties")
-                password = findProperty("nexusPassword")?.toString()
-                    ?: throw GradleException("Właściwość 'nexusPassword' nie jest ustawiona w gradle.properties")
-            }
-        }
-    }
-}
-
-hangarPublish {
-    publications.register("plugin") {
-        version.set(project.version as String)
-        channel.set("Release")
-        id.set("PunisherX")
-        apiKey.set(System.getenv("HANGAR_API_TOKEN"))
-
-        platforms {
-            register(Platforms.PAPER) {
-                jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-
-                val versions: List<String> = (property("paperVersion") as String)
-                    .split(",")
-                    .map { it.trim() }
-                platformVersions.set(versions)
-            }
-        }
-        changelog.set(file("CHANGELOG.md").readText())
-    }
-}
-
-plugindeployer {
-    paper { dir = "/home/debian/poligon/Paper/1.21.11/plugins" } //ostatnia wersja dla Paper
-    folia { dir = "/home/debian/poligon/Folia/1.21.11/plugins" } //ostatnia wersja dla Folia
+    tasks.named("check") { dependsOn(verifyDatabaseBundle) }
 }

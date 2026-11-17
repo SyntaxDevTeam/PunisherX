@@ -1,0 +1,45 @@
+package pl.syntaxdevteam.punisher.commands
+import pl.syntaxdevteam.punisher.compatibility.*
+
+import org.jetbrains.annotations.NotNull
+import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+
+class UnWarnCommand(private val plugin: PunisherX) : BasicCommand {
+
+    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+        val options = PunishmentCommandOptions.parse(args)
+        val arguments = options.arguments
+        val silent = options.silent
+        if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNWARN)) {
+            if (arguments.isNotEmpty()) {
+                val player = arguments[0]
+                val uuid = plugin.resolvePlayerUuid(player).toString()
+                val punishments = plugin.databaseHandler.getPunishments(uuid)
+                val warnPunishments = punishments.filter { it.type == "WARN" }
+                if (warnPunishments.isNotEmpty()) {
+                    plugin.databaseHandler.removePunishment(uuid, "WARN")
+                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unwarn", if (silent) "silent_success" else "unwarn", mapOf("player" to player, "operator" to stack.sender.name)))
+                    plugin.logger.info("Player $player ($uuid) has been unwarned")
+                } else {
+                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_found", mapOf("player" to player, "operator" to stack.sender.name)))
+                }
+            } else {
+                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unwarn", "usage"))
+            }
+        } else {
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
+        }
+    }
+
+    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNWARN)) {
+            return emptyList()
+        }
+        val input = args.lastOrNull().orEmpty()
+        return when (args.size) {
+            1 -> plugin.server.onlinePlayers.map { it.name }.filter { it.startsWith(input, ignoreCase = true) }
+            else -> emptyList()
+        }
+    }
+}

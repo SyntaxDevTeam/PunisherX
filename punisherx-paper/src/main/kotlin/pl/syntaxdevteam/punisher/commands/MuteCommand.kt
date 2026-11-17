@@ -1,0 +1,130 @@
+package pl.syntaxdevteam.punisher.commands
+
+import com.destroystokyo.paper.profile.PlayerProfile
+import com.mojang.brigadier.tree.LiteralCommandNode
+import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes
+import pl.syntaxdevteam.punisher.commands.arguments.PunishmentDuration
+import pl.syntaxdevteam.punisher.commands.arguments.PunishmentDurationArgumentType
+import pl.syntaxdevteam.punisher.commands.arguments.ReasonArgumentType
+import io.papermc.paper.command.brigadier.BasicCommand
+import io.papermc.paper.command.brigadier.CommandSourceStack
+import org.bukkit.Bukkit
+import org.jetbrains.annotations.NotNull
+import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+
+class MuteCommand(private val plugin: PunisherX) : BasicCommand, BrigadierCommand {
+
+    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+        val options = PunishmentCommandOptions.parse(args)
+        val arguments = options.arguments
+        val silent = options.silent
+        if(PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.MUTE)) {
+            if (!options.allowMark(plugin, stack)) return
+            if (arguments.isNotEmpty()) {
+                if (arguments.size < 2) {
+                    stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("mute", "usage"))
+                } else {
+                    val player = arguments[0]
+                    val targetPlayer = Bukkit.getPlayer(player)
+                    val isForce = options.force
+                    if (targetPlayer != null) {
+                        if (!isForce && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_MUTE)) {
+                            stack.sender.sendMessage(
+                                plugin.messageHandler.stringMessageToComponent(
+                                    "error",
+                                    "bypass",
+                                    mapOf("player" to player)
+                                )
+                            )
+                            return
+                        }
+                    }
+                    val uuid = plugin.resolvePlayerUuid(player).toString()
+
+                    val (gtime, reason) = PunishmentCommandUtils.parseTimeAndReason(plugin, arguments, 1)
+
+                    val punishmentType = "MUTE"
+                    val start = System.currentTimeMillis()
+                    val end: Long? = if (gtime != null) (System.currentTimeMillis() + plugin.timeHandler.parseTime(gtime) * 1000) else null
+
+                    val punishmentId = options.persist(plugin, player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
+                    if (punishmentId == null) {
+                        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "db_error"))
+                        return
+                    }
+                    if (options.mark == null) plugin.databaseHandler.addPunishmentHistory(player, uuid, reason, stack.sender.name, punishmentType, start, end ?: -1)
+
+                    val formattedTime = plugin.timeHandler.formatTime(gtime)
+                    val placeholders = PunishmentCommandUtils.buildPlaceholders(
+                        player = player,
+                        operator = stack.sender.name,
+                        reason = reason,
+                        time = formattedTime,
+                        type = punishmentType,
+                        extra = mapOf("id" to punishmentId.toString())
+                    )
+                    PunishmentCommandUtils.sendSenderMessages(plugin, stack, "mute", "mute", placeholders, silent = silent)
+                    plugin.actionExecutor.executeAction("muted", player, placeholders, silent = silent, mark = options.mark)
+                    PunishmentCommandUtils.sendTargetMessages(plugin, targetPlayer, "mute", "mute_message", placeholders, silent = silent)
+                    PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_MUTE, "mute", "broadcast", placeholders, silent = silent)
+                }
+            } else {
+                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("mute", "usage"))
+            }
+        } else {
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
+        }
+    }
+
+    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.MUTE)) {
+            return emptyList()
+        }
+        val input = args.lastOrNull().orEmpty()
+        if (input.startsWith("--")) return listOf("--force", "--silent", "--mark", "--mark=")
+            .filter { it.startsWith(input) && it !in args.dropLast(1) }
+
+        return when (args.size) {
+            0, 1 -> plugin.server.onlinePlayers.map { it.name }.filter { it.startsWith(input, ignoreCase = true) }
+            2 -> TimeSuggestionProvider.generateTimeSuggestions().filter { it.startsWith(input, ignoreCase = true) }
+            3 -> plugin.messageHandler.getMessageStringList("mute", "reasons").filter { it.startsWith(input, ignoreCase = true) }
+            else -> emptyList()
+        }
+    }
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val targetArg = Commands.argument("target", ArgumentTypes.playerProfiles())
+            .executes(BrigadierCommandUtils.executor(this))
+            .then(
+                Commands.argument("time", PunishmentDurationArgumentType.duration())
+                    .suggests(BrigadierCommandUtils.suggestions { _, remaining ->
+                        TimeSuggestionProvider.generateTimeSuggestions()
+                            .filter { it.startsWith(remaining, ignoreCase = true) }
+                    })
+                    .executes(BrigadierCommandUtils.executor(this))
+                    .then(
+                        Commands.argument("reason", ReasonArgumentType.reason())
+                            .suggests(BrigadierCommandUtils.suggestions { _, remaining ->
+                                plugin.messageHandler.getMessageStringList("mute", "reasons")
+                                    .filter { it.startsWith(remaining, ignoreCase = true) }
+                            })
+                            .executes(BrigadierCommandUtils.executor(this))
+                    )
+            )
+            .then(
+                Commands.argument("reason", ReasonArgumentType.reason())
+                    .suggests(BrigadierCommandUtils.suggestions { _, remaining ->
+                        plugin.messageHandler.getMessageStringList("mute", "reasons")
+                            .filter { it.startsWith(remaining, ignoreCase = true) }
+                    })
+                    .executes(BrigadierCommandUtils.executor(this))
+            )
+
+        return Commands.literal(name)
+            .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.MUTE))
+            .executes(BrigadierCommandUtils.executor(this))
+            .then(targetArg)
+            .build()
+    }
+}

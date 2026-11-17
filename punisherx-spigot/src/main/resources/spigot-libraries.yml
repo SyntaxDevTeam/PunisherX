@@ -1,0 +1,57 @@
+repositories:
+  syntaxdevteam-snapshots: "https://nexus.syntaxdevteam.pl/repository/maven-snapshots/"
+  syntaxdevteam-releases: "https://nexus.syntaxdevteam.pl/repository/maven-releases/"
+  jitpack: "https://jitpack.io/"
+  codemc-snapshots: "https://repo.codemc.io/repository/maven-snapshots/"
+  faststatsReleases: "https://repo.faststats.dev/releases"
+
+libraries:
+  # Basic libraries
+  - org.eclipse.aether:aether-api:${aetherVersion}
+  - org.yaml:snakeyaml:${snakeyamlVersion}
+  - com.google.code.gson:gson:${gsonVersion}
+  # MessageHandler libraries
+  - com.github.ben-manes.caffeine:caffeine:${caffeineVersion}
+  - net.kyori:adventure-nbt:${adventureVersion}
+  - net.kyori:adventure-api:${adventureVersion}
+  - net.kyori:adventure-key:${adventureVersion}
+  - net.kyori:adventure-platform-api:${adventurePlatformVersion}
+  - net.kyori:adventure-platform-bukkit:${adventurePlatformVersion}
+  - net.kyori:adventure-platform-facet:${adventurePlatformVersion}
+  - net.kyori:adventure-text-minimessage:${adventureVersion}
+  - net.kyori:adventure-text-serializer-json:${adventureVersion}
+  - net.kyori:adventure-text-serializer-gson:${adventureVersion}
+  - net.kyori:adventure-text-serializer-legacy:${adventureVersion}
+  - net.kyori:adventure-text-serializer-plain:${adventureVersion}
+  - net.kyori:adventure-text-serializer-ansi:${adventureVersion}
+  - net.kyori:examination-api:${examinationVersion}
+  - net.kyori:examination-string:${examinationVersion}
+  - net.kyori:option:${optionVersion}
+  # GUI libraries
+  - dev.triumphteam:triumph-gui:${triumphGuiVersion}
+  # Additional libraries
+  - com.maxmind.geoip2:geoip2:${geoipVersion}
+  - org.apache.ant:ant:${antVersion}
+  # Database libraries
+  # Explicit dependencies also work with Libby, which does not resolve transitive POMs.
+  - coordinate: pl.syntaxdevteam:syntaxdb-core:${syntaxdbVersion}
+    repository: syntaxdevteam-snapshots
+  - com.zaxxer:HikariCP:${hikariVersion}
+  - com.mysql:mysql-connector-j:${mysqlVersion}
+  - com.google.protobuf:protobuf-java:${protobufVersion}
+  - org.postgresql:postgresql:${postgresqlVersion}
+  - com.microsoft.sqlserver:mssql-jdbc:${mssqlVersion}
+  - org.xerial:sqlite-jdbc:${sqliteVersion}
+
+  # FastStats dependencies
+  - coordinate: dev.faststats.metrics:core:${faststatsVersion}
+    repository: faststatsReleases
+  - coordinate: dev.faststats.metrics:config:${faststatsVersion}
+    repository: faststatsReleases
+  - coordinate: dev.faststats.metrics:bukkit:${faststatsVersion}
+    repository: faststatsReleases
+  # SyntaxDevTeam libraries
+  - coordinate: pl.syntaxdevteam:syntaxcore:${syntaxcoreVersion}
+    repository: syntaxdevteam-snapshots
+  - coordinate: pl.syntaxdevteam:messageHandler-spigot:${messagehandlerVersion}
+    repository: syntaxdevteam-snapshots

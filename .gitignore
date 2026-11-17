@@ -1,6 +1,9 @@
 .gradle/
+.kotlin/
 .idea/
 .vscode/
 bin/
 build/
 gradle.properties
+.idea
+/run/

@@ -1,0 +1,572 @@
+# Author: LegacyHeaven (Julian Van Den Hogen)
+# Ver. 1.0.0
+# Berichtformaat:
+# Je kunt MiniMessage en Legacy (Minecraft) opmaak gebruiken.
+# Voorbeelden van hoe je MiniMessage gebruikt: https://docs.advntr.dev/minimessage/format.html
+# Meng geen formaten in één bericht. Als je Legacy gebruikt, voeg dan geen MiniMessage-opmaak toe, anders wordt alleen de laatste gebruikt.
+# TODO: Uzupełnić braki wpisów dla setunjail
+prefix: "<gradient:#2400ff:#5555ff:#55adff:#000caa>[<b>PunisherX</b>]</gradient>"
+
+
+# Foutmeldingen
+error:
+  banip_db_error: "<red>IP-bans konden niet worden opgeslagen. Niet geblokkeerde IPs: <failed_ips>. Succesvol geblokkeerde IPs: <banned_ips>. Controleer de console.</red>"
+  no_permission: "<red>Je hebt geen toestemming om dit commando te gebruiken.</red>"
+  player_not_found: "<gold>Speler met bijnaam <player> niet gevonden.</gold>"
+  ip_not_found: "<gold>Speler met IP <ip> niet gevonden.</gold>"
+  player_not_punished: "<gold>Speler <player> heeft geen dergelijke straf.</gold>"
+  db_not_ready: "<red>De database wordt nog opgestart, probeer het over een paar seconden opnieuw.</red>"
+  reload: "<red>Er is een fout opgetreden tijdens het herladen van de configuratie:</red> "
+  bypass: "<red><b>WAARSCHUWING!</b> Speler <gold><player><gold/> <red>kan niet worden gestraft vanwege hun rechten (OP of bypass).</red><dark_gray>Dit kan misschien worden omzeild...</dark_gray>"
+
+
+# /setunjail commando berichten
+setunjail:
+  usage: "Correct gebruik is: <gold>/setunjail</gold>"
+  set: "<green>Respawnlocatie is ingesteld: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>]</green>"
+  set_error: "<red>Kan respawnlocatie niet instellen.</red>"
+
+
+# /setjail commando berichten
+setjail:
+  usage: "Correct gebruik is: <gold>/setjail radius <radius>"
+  set: "<green>De gevangenislocatie is ingesteld: <gold><world></gold> [<gold><locationx></gold>, <gold><locationy></gold>, <gold><locationz></gold>] met een straal van <gold><radius></gold>"
+  set_error: "<red>Fout bij het instellen van de gevangenislocatie</red>"
+  invalid_radius: "<red>Geef een geldige straal op (nummer groter dan 0)</red>"
+
+
+# /jail commando berichten
+jail:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt speler <gold><player></gold> opgesloten voor <gold><reason></gold> voor <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
+  jail: "<green>Je hebt speler <gold><player></gold> opgesloten voor <gold><reason></gold> voor <gold><time></gold></green> <dark_gray>(ID: <id>)</dark_gray>"
+  usage: "Correct gebruik is: <gold>/jail <speler_naam> (tijd) <reden>"
+  jail_message: "<red>Je bent opgesloten voor <b><reason></b> voor <b><time></b></red>"
+  teleport_failed: "<red>Teleportation cancelled: the configured jail location is unsafe.</red>"
+  jail_info_message: "<red>Je probeert te spreken, maar niemand kan je horen vanuit de gevangenis</red>"
+  command_blocked_message: "<red>Je kunt geen commando's gebruiken terwijl je in de gevangenis zit.</red>"
+  jail_restrict_message: "Het verlaten van het gevangenisgebied is verboden. Je bent teruggeteleporteerd naar de aangewezen locatie."
+  broadcast: "<dark_gray>Speler <gray><player></gray> is opgesloten voor <gray><reason></gray> voor <gray><time></gray></dark_gray>"
+  log: "<dark_gray>Opgesloten speler <gray><player></gray> <dark_gray>roept vanuit hun cel: <gray><message></gray>"
+  no_reasons: "geen reden"
+  reasons:
+    - "Adverteren"
+    - "Spam"
+    - "Speler beledigen"
+    - "Vloeken"
+
+
+# /unjail commando berichten
+unjail:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Speler <gold><player></gold> is succesvol uit de gevangenis vrijgelaten.</green>"
+  unjail: "<green>Je hebt speler <gold><player></gold> uit de gevangenis vrijgelaten</green>"
+  usage: "Correct gebruik is: <gold>/unjail <speler_naam>"
+  unjail_message: "<green>Je gevangenisstraf is beëindigd! Verspil deze kans niet!</green>"
+  teleport_failed: "<red>Teleportation cancelled: the configured spawn location is unsafe.</red>"
+  success: "<green>Speler <gold><player></gold> is succesvol uit de gevangenis vrijgelaten.</green>"
+  broadcast: "Speler <gold><player></gold> is uit de gevangenis vrijgelaten. Kijk uit..."
+
+
+# /ban commando berichten
+ban:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt <gold><player></gold> verbannen voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
+  ban: "<green>Je hebt <gold><player></gold> verbannen voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
+  usage: "Correct gebruik is: <gold>/ban <speler> (tijd) <reden>"
+  kick_message:
+    - 'Server Naam'
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Je bent verbannen</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Reden </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - "<red>Voor </red><dark_gray>» </dark_gray><gray><time></gray>"
+    - '<gray></gray>'
+    - '<dark_gray>Je kunt in beroep gaan op:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://servername.pl/discord</underlined></red>"
+  broadcast: "<dark_gray>Speler <gray><player></gray> is verbannen voor <gray><reason></gray> voor <gray><time></gray></dark_gray>"
+  no_reasons: "geen reden"
+  reasons:
+    - "Cheaten"
+    - "Griefen"
+    - "Spammen"
+    - "Beledigende taal"
+
+
+# /banip commando berichten
+banip:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt het IP van de speler verbannen voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray> <dark_gray>(<player>)</dark_gray>"
+  ban: "<green>Je hebt het IP van de speler verbannen voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
+  usage: "Correct gebruik is: <gold>/banip <speler|ip> (tijd) <reden>"
+  kick_message:
+    - 'Server Naam'
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Je IP is verbannen!</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Reden </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - "<red>Voor </red><dark_gray>» </dark_gray><gray><time></gray>"
+    - '<gray></gray>'
+    - '<dark_gray>Je kunt in beroep gaan op:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://SyntaxDevTeam.pl/discord</underlined></red>"
+  broadcast: "<dark_gray>Speler <gray><player></gray> is verbannen voor <gray><reason></gray> voor <gray><time></gray></dark_gray>"
+  no_reasons: "geen reden"
+  reasons:
+    - "Meerdere accounts"
+    - "Griefen"
+    - "Spammen"
+    - "Beledigende taal"
+
+
+# /unban commando berichten
+unban:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Speler <gold><player></gold> is uit de ban gehaald</green>"
+  unban: "<green>Speler <gold><player></gold> is uit de ban gehaald</green>"
+  usage: "Correct gebruik is: <gold>/unban <speler>"
+  broadcast: "<dark_gray>Speler <gray><player></gray> is uit de ban gehaald</dark_gray>"
+
+
+# /mute commando berichten
+mute:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt speler <gold><player></gold> gemute voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
+  mute: "<green>Je hebt speler <gold><player></gold> gemute voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
+  usage: "Correct gebruik is: <gold>/mute <speler> (tijd) <reden>"
+  mute_message: "<red>Je bent gemute voor <b><reason></b> voor <b><time></b></red>"
+  mute_info_message: "<red>Je probeert te spreken maar je bent gemute</red>"
+  broadcast: "<dark_gray>Speler <gray><player></gray> is gemute voor <gray><reason></gray> voor <gray><time></gray></dark_gray>"
+  log: "<dark_gray>Gemute speler <gray><player></gray> <dark_gray>stuurde een bericht: <gray><message></gray>"
+  no_reasons: "geen reden"
+  reasons:
+    - "Adverteren"
+    - "Spam"
+    - "Speler beledigen"
+    - "Beledigende taal"
+
+
+# /unmute commando berichten
+unmute:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt speler <gold><player></gold> gedemute</green>"
+  unmute: "<green>Je hebt speler <gold><player></gold> gedemute</green>"
+  usage: "Correct gebruik is: <gold>/unmute <speler>"
+  unmute_message: "<green>Je bent gedemute!</green>"
+
+
+# /warn commando berichten
+warn:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt speler <gold><player></gold> gewaarschuwd (<warn_no> keer) voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
+  warn: "<green>Je hebt speler <gold><player></gold> gewaarschuwd (<warn_no> keer) voor <gold><reason></gold> voor <gold><time></green> <dark_gray>(ID: <id>)</dark_gray>"
+  usage: "Correct gebruik is: <gold>/warn <speler> (tijd) <reden>"
+  warn_message: "<red>Je hebt <b><warn_no></b> waarschuwing(en) ontvangen!</red>"
+  broadcast: "<dark_gray>Speler <gray><player></gray> heeft een waarschuwing ontvangen voor <gray><reason></gray> voor <gray><time></gray></dark_gray>"
+  no_reasons: "geen reden"
+  reasons:
+    - "Adverteren"
+    - "Spam"
+    - "Speler beledigen"
+    - "Beledigende taal"
+
+
+# /punish commando berichten
+punish:
+  history_error: "<red>De escalatiegeschiedenis kon niet worden gelezen. Er is geen straf opgelegd. Controleer de console.</red>"
+  usage: "Correct gebruik is: <gold>/punish <speler> <sjabloon> (lvl)"
+  template_not_found: "<red>Sjabloon <gold><template></gold> niet gevonden.</red>"
+  invalid_level: "<red>Ongeldig sjabloonniveau: <gold><level></gold>.</red>"
+  invalid_time: "<red>Ongeldige sjabloontijd: <gold><time></gold>.</red>"
+  invalid_type: "<red>Niet-ondersteund straftype in sjabloon: <gold><type></gold>.</red>"
+
+
+# Reverse the latest punishment from a template ladder.
+unpunish:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Straf #<id> voor <player> uit <template> en de bijdrage aan de escalatie zijn teruggedraaid.</green>"
+  usage: "Gebruik: <gold>/unpunish <player> <template></gold>"
+  success: "<green>Straf #<id> voor <player> uit <template> en de bijdrage aan de escalatie zijn teruggedraaid.</green>"
+  not_found: "<red>Geen resterende straf voor <player> uit <template> binnen dit serverbereik.</red>"
+  history_marker: "<gray>[teruggedraaid]</gray>"
+  db_error: "<red>De straf kon door een databasefout niet worden teruggedraaid. Controleer de console.</red>"
+
+
+# /unwarn commando berichten
+unwarn:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt de waarschuwing voor speler <gold><player></gold> verwijderd</green>"
+  unwarn: "<green>Je hebt de waarschuwing voor speler <gold><player></gold> verwijderd</green>"
+  usage: "Correct gebruik is: <gold>/unwarn <speler>"
+
+
+# /kick commando berichten
+kick:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Je hebt speler <gold><player></gold> gekicked voor <gold><reason></gold></green>"
+  kick: "<green>Je hebt speler <gold><player></gold> gekicked voor <gold><reason></gold></green>"
+  usage: "Correct gebruik is: <gold>/kick <speler> <reden>"
+  kick_message:
+    - 'Server Naam'
+    - 'PunisherX <dark_gray>» </dark_gray><gray>Je bent gekicked</gray>'
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - "<red>Reden </red><dark_gray>» </dark_gray><gray><reason></gray>"
+    - '<gray></gray>'
+    - '<gray></gray>'
+    - '<dark_gray>Je kunt in beroep gaan op:</dark_gray>'
+    - "<yellow>Discord </yellow><dark_gray>» </dark_gray><red><underlined>https://servername.pl/discord</underlined></red>"
+  broadcast: "<dark_gray>Speler <gray><player></gray> is gekicked voor <gray><reason></gray></dark_gray>"
+  no_reasons: "geen reden"
+  reasons:
+    - "Overstroming"
+    - "Spammen"
+    - "Beledigende taal"
+
+
+# /check commando berichten
+check:
+  usage: "Correct gebruik is: <gold>/check <speler_naam> <alles|ban|jail|mute|warn>"
+  invalid_type: "<red>Ongeldig strafftype. Gebruik: alles, ban, jail, mute, warn.</red>"
+  no_punishments: "<dark_green>Speler <gold><player></gold> heeft geen straffen.</dark_green>"
+  title: "<dark_gray>Actieve straffen voor</dark_gray>"
+  id: "<dark_gray>ID</dark_gray>"
+  type: "<dark_gray>Type</dark_gray>"
+  reason: "<dark_gray>Reden</dark_gray>"
+  time: "<dark_gray>Overgebleven tijd</dark_gray>"
+
+
+# /history commando berichten
+history:
+  usage: "Correct gebruik is: <gold>/history <speler_naam>"
+  no_punishments: "<dark_green>Speler <gold><player></gold> heeft geen straffen.</dark_green>"
+  title: "<dark_gray>Actieve straffen voor</dark_gray>"
+  id: "<dark_gray>ID</dark_gray>"
+  type: "<dark_gray>Type</dark_gray>"
+  reason: "<dark_gray>Reden</dark_gray>"
+  time: "<dark_gray>Tijd</dark_gray>"
+
+
+# Berichten voor het /banlist commando
+banlist:
+  usage: "Correct gebruik: <gold>/banlist"
+  no_punishments: "<dark_green>De banlijst is leeg.</dark_green>"
+  title: "<blue>|   <gray>Verbannen spelerslijst:</gray>"
+  top_header: "<blue>--------------------------------------------------</blue>"
+  table_header: "<blue>|    Naam          |          Type          |          Wanneer</blue>"
+  ban_list: "<blue>|   <hover:show_text:'<white>UUID:</white> <gold><uuid></gold>'><white><player></white></hover>   |   <hover:show_text:'<white>ID:</white> <gold>#<id><newline><white>Operator:</white> <gold><operator></gold><newline><white>Reden:</white> <gold><reason></gold>'><white><type></white></hover>   |   <white><time></white></blue>"
+
+
+# /change-reason commando berichten
+change-reason:
+  usage: "Correct gebruik is: <gold>/change-reason <straff_ID> <nieuwe_reden>"
+  invalid_id: "<red>Ongeldig straff-ID</red>"
+  success: "<green>De huidige reden voor straff-ID: <gold><id></gold> is veranderd naar \"<gold><reason></gold>\"</green>"
+  failure: "<red>Fout bij het bijwerken van de reden voor straff-ID: <gold><id></gold></red>"
+
+
+# Berichten voor het /clearall commando
+clear:
+  silent_success: "<dark_gray>[Stille modus]</dark_gray> <green>Alle actieve straffen voor speler </green><gold><player></gold><green> zijn gewist</green>"
+  usage: "Correct gebruik is: <gold>/clearall <speler>"
+  clearall: "<green>Alle actieve straffen voor speler </green><gold><player></gold><green> zijn gewist</green>"
+  clear_message: "<green>Alle actieve straffen zijn geannuleerd! </green><dark_gray>Pssst! Heb je misschien wat connecties met de beheerders of zo?</dark_gray>"
+
+
+# GUI-berichten
+punishment-dialog:
+  close: "<red>Sluiten</red>"
+  entry: "<gold>#<id></gold> <dark_gray>•</dark_gray> <yellow><player></yellow> <dark_gray>•</dark_gray> <aqua><type></aqua>"
+  tooltip: "<gray><reason></gray>"
+  details: "<gold><player></gold> <dark_gray>(<uuid>)</dark_gray><newline><yellow>#<id></yellow> <dark_gray>•</dark_gray> <aqua><type></aqua><newline><newline><white><reason></white><newline><newline><gray><start></gray> <dark_gray>→</dark_gray> <gray><end></gray><newline><gold><operator></gold> <dark_gray>•</dark_gray> <gray><server></gray>"
+
+
+reports:
+  dialog-list-entry: "<gold>#<id></gold> <dark_gray>•</dark_gray> <yellow><target></yellow> <dark_gray>•</dark_gray> <white><reason></white>"
+  dialog-details-body: "<gold><reporter></gold> <dark_gray>(<reporter_uuid>)</dark_gray> <gray>→</gray> <yellow><target></yellow> <dark_gray>(<target_uuid>)</dark_gray><newline><gray><filed_at></gray><newline><newline><white><reason></white>"
+  dialog-resolution-body: "<gold><handled_by></gold> <dark_gray>•</dark_gray> <gray><handled_at></gray><newline><white><note></white>"
+  gui-title: "Spelersmeldingen"
+  gui-details: "Klik om details en acties te bekijken."
+  gui-history: "Meldingsgeschiedenis"
+  admin-usage: "<gold>/reports book | list [page] | history [page] | view <id> | resolve <id> <note> | reject <id> <note></gold><newline><gray>The note must contain between 3 and 255 characters. Click a report to view details.</gray>"
+  inbox-title: "<gold>Open reports — page <page></gold>"
+  history-title: "<gold>Report history — page <page></gold>"
+  empty: "<gray>No reports on this page.</gray>"
+  details-title: "<gold>Report #<id></gold>"
+  not-found: "<red>Report not found.</red>"
+  already-closed: "<yellow>This report is already closed.</yellow>"
+  handled: "<green>Report #<id> closed. The decision and note were saved.</green>"
+  status-open: "<yellow>Status: open</yellow>"
+  status-resolved: "<green>Status: resolved</green>"
+  status-rejected: "<red>Status: rejected</red>"
+  usage: "Correct usage: <gold>/report [player] [reason]"
+  cannot-report-self: "<red>You cannot report yourself!</red>"
+  already-submitted: "<red>You already have an open report. Staff must close it before you submit another one.</red>"
+  already-reported-target: "<red>Je hebt al een open melding tegen deze speler. Wacht tot de staf deze sluit.</red>"
+  report-limit-reached: "<red>Je hebt de limiet van <limit> open meldingen bereikt. Wacht tot de staf er een sluit.</red>"
+  invalid-reason: "<red>The report reason must contain between 3 and 255 characters.</red>"
+  no-targets: "<yellow>There are no players available to report.</yellow>"
+  invalid-form: "<red>The form contains invalid data. Open it again.</red>"
+  report-sent: "<green>Your report against <gold><target></gold> for <gray><reason></gray> was submitted. This player now has <gold><count></gold> reports.</green>"
+  admin-notify: "<red>[Report]</red> <gold><reporter></gold> reported <yellow><target></yellow> for <gray><reason></gray> <dark_gray>(reports: <count>)</dark_gray> <click:run_command:/reports><yellow>[Open reports]</yellow></click>"
+  dialog-title: "<red>Report a player</red>"
+  dialog-body: "<gray>Select the player and report reason.</gray>"
+  dialog-body-target: "<gray>Select the reason for reporting <gold><target></gold>.</gray>"
+  dialog-target-label: "<yellow>Player</yellow>"
+  dialog-reason-label: "<yellow>Reason</yellow>"
+  dialog-submit: "<green>Submit report</green>"
+  dialog-cancel: "<red>Cancel</red>"
+
+
+# Book report interface. Edit headings, entries and navigation labels here.
+report-book:
+  title: "Reports"
+  author: "PunisherX"
+  players-heading: "<dark_red><bold>Report a player</bold></dark_red><newline>"
+  player-entry: "<blue>• <target></blue>"
+  reasons-heading: "<dark_red><bold>Report: <target></bold></dark_red><newline>"
+  reason-entry: "<blue>• <reason></blue>"
+  confirmation: "<dark_red><bold>Report: <target></bold></dark_red><newline><newline><reason>"
+  confirm-heading: "<dark_red><bold>Send this report?</bold></dark_red><newline>"
+  submit: "<dark_green>[Send report]</dark_green>"
+  previous: "<blue>[Previous]</blue>"
+  next: "<blue>[Next]</blue>"
+  back: "<blue>[Back]</blue>"
+  empty: "No entries."
+  inbox-heading: "<dark_red><bold>Open reports — <page></bold></dark_red><newline>"
+  history-heading: "<dark_red><bold>Report history — <page></bold></dark_red><newline>"
+  report-entry: "<blue>#<id>: <target></blue>"
+  inbox: "<blue>[Open reports]</blue>"
+  history: "<blue>[History]</blue>"
+  details: "<dark_red><bold>Report #<id></bold></dark_red><newline><newline>Reporter: <reporter><newline>Player: <target><newline>Status: <status>"
+  reason-page: "<dark_red><bold>Reason</bold></dark_red><newline><newline><reason>"
+  resolution: "<dark_red><bold>Resolution</bold></dark_red><newline><newline>By: <handled_by><newline>Date: <handled_at>"
+  note-page: "<dark_red><bold>Note</bold></dark_red><newline><newline><note>"
+  actions-heading: "<dark_red><bold>Actions</bold></dark_red><newline>"
+  resolve: "<dark_green>[Resolve]</dark_green>"
+  reject: "<dark_red>[Reject]</dark_red>"
+  decision-prompt: "<gray>Click here and enter the reason in chat: </gray>"
+  filed-at: "<dark_red><bold>Filed at</bold></dark_red><newline><newline><filed_at>"
+
+
+GUI:
+  Config:
+    ipEnabled: "<yellow>Show IP addresses</yellow>"
+    restrictOperators: "<yellow>Require IP permission for operators</yellow>"
+    jailMute: "<yellow>Mute jailed players</yellow>"
+    jailCommands: "<yellow>Restrict jail commands</yellow>"
+    onlineTimeOnly: "<yellow>Count jail time only while online</yellow>"
+    enabled: "<yellow>Enabled - click to change</yellow>"
+    disabled: "<yellow>Disabled - click to change</yellow>"
+    hiddenPlayers: "<yellow>Protected players</yellow>"
+    hiddenCount: "<yellow>Protected entries: <count></yellow>"
+    hiddenPrompt: "<yellow>Enter UUIDs or names separated by spaces or commas. Use - to clear, or cancel.</yellow>"
+    activeJail: "<yellow>Release active jail sentences before changing the countdown mode.</yellow>"
+    invalidPlayers: "<yellow>Use valid UUIDs or Minecraft player names.</yellow>"
+    saved: "<yellow>Settings saved.</yellow>"
+  UndoConfirmation:
+    title: "<yellow>Intrekking bevestigen</yellow>"
+    confirm: "<green>Intrekking bevestigen</green>"
+    cancel: "<red>Annuleren</red>"
+  PunishmentHistory:
+    undone: "<yellow>Ingetrokken</yellow>"
+    undoneBy: "<gray>Ingetrokken door: <white><operator></white></gray>"
+    undoneAt: "<gray>Ingetrokken op: <white><date></white></gray>"
+  PunisherMain:
+    title:         "<dark_gray>Hoofdmenu PunisherX</dark_gray>"
+    serwerInfo:
+      title:       "<gold>Serverinformatie</gold>"
+      name: "Mijn server" # Server name displayed in /panel; customize for your server.
+      serverName:  "<gray>Servernaam: <green><servername></green></gray>"
+      daily:       "<gray>Aantal straffen vandaag: <yellow><daily></yellow></gray>"
+      tps:         "<gray>Server draaitijd: <green><time></green> (<green><tps></green>)</gray>"
+    playerOnline:
+      title:       "<green>Online spelerslijst</green>"
+      online:      "<gray>Aantal online spelers: <green><onlineplayers></green></gray>"
+      clickToView: "<gray><b>Klik om de spelerslijst te bekijken</b></gray>"
+    playerOffline:
+      title:       "<gray>Offline spelerslijst</gray>"
+      total:       "<gray>Totaal aantal spelers: <green><totalplayers></green></gray>"
+      clickToView: "<gray><b>Klik om offline spelers te bekijken</b></gray>"
+    adminOnline:
+      title:       "<red>Online staflijst</red>"
+    compare:
+      title:       "<blue>Vergelijk spelers</blue>"
+  PlayerList:
+    loading: "<gray>Bezig met laden...</gray>"
+    hover:
+      uuid:         "<gray>UUID: <yellow><uuid></yellow></gray>"
+      playerIP:     "<gray>Huidig IP: <yellow><playerip></yellow></gray>"
+      onlineStr:    "<gray>Online tijd: <green><onlinestr></green></gray>"
+      totalStr:     "<gray>Totaal tijd: <green><totalstr></green></gray>"
+      lastActive:   "<gray>Laatst gezien: <yellow><lastactive></yellow></gray>"
+      punishments:  "<gray>Huidige straf: <yellow><punishments></yellow></gray>"
+      punishStr:    "<gray>Totaal straffen: <yellow><punishstr></yellow></gray>"
+  OfflineList:
+    loading: "<gray>Bezig met laden...</gray>"
+    sort:
+      nameAsc: "<gray>Sorteer: <green>Naam A-Z</green></gray>"
+      nameDesc: "<gray>Sorteer: <green>Naam Z-A</green></gray>"
+      lastSeenDesc: "<gray>Sorteer: <green>Laatst gezien ↓</green></gray>"
+      lastSeenAsc: "<gray>Sorteer: <green>Laatst gezien ↑</green></gray>"
+    hover:
+      uuid: "<gray>UUID: <yellow><uuid></yellow></gray>"
+      ip: "<gray>IP: <yellow><ip></yellow></gray>"
+      geo: "<gray>Locatie: <yellow><geo></yellow></gray>"
+      lastSeen: "<gray>Laatst gezien: <yellow><lastseen></yellow></gray>"
+      lastLocation: "<gray>Laatste locatie: <yellow><lastlocation></yellow></gray>"
+      logout: "<gray>Uitgelogd: <yellow><logout></yellow></gray>"
+      offlineTime: "<gray>Offline sinds: <yellow><offlinetime></yellow></gray>"
+      punishment: "<gray>Straf: <yellow><punishment></yellow></gray>"
+      noPunishments: "<gray>Geen strafgeschiedenis</gray>"
+  PlayerAction:
+    title: "<yellow>Spelermenu</yellow>"
+    punish: "<yellow>Straffen</yellow>"
+    kick: "<yellow>Kick</yellow>"
+    banip: "<yellow>IP ban</yellow>"
+    teleport: "<yellow>Teleporteer</yellow>"
+    delete: "<yellow>Account verwijderen</yellow>"
+    deleteMessage: "<red>Je account is verwijderd</red>"
+    confirmDelete:
+      title: "<red>Bevestig accountverwijdering</red>"
+      confirm: "<green>Bevestigen</green>"
+      cancel: "<red>Annuleren</red>"
+  PunishType:
+    title: "<yellow>Kies straf type</yellow>"
+    ban: "<yellow>Ban</yellow>"
+    jail: "<yellow>Gevangenis</yellow>"
+    mute: "<yellow>Mute</yellow>"
+    warn: "<yellow>Waarschuwing</yellow>"
+  PunishTime:
+    title: "<yellow>Kies duur</yellow>"
+  PunishReason:
+    title: "<yellow>Kies reden</yellow>"
+  Report:
+    menu:
+      title: "<yellow>Kies een speler om te rapporteren</yellow>"
+      online: "<green>Online spelers</green>"
+      offline: "<red>Offline spelers (afgelopen uur)</red>"
+    player:
+      title: "<yellow>Kies een speler om te rapporteren</yellow>"
+    offline:
+      title: "<yellow>Offline spelers (afgelopen uur)</yellow>"
+    reason:
+      title: "<yellow>Kies de reden van de melding</yellow>"
+    lore:
+      clickToReport: "<gray>Klik om te rapporteren</gray>"
+      clickToChoose: "<gray>Klik om te kiezen</gray>"
+  Nav:
+    next: "<gray>Volgende pagina</gray>"
+    previous: "<gray>Vorige pagina</gray>"
+    back: "<gray>Terug naar vorig menu</gray>"
+
+
+# Berichten voor de webhook
+webhook:
+  title: "Nieuwe straf op de server"
+  player: "Speler"
+  operator: "Beheerder"
+  reason: "Reden"
+  type: "Type straf"
+  time: "Eindtijd"
+  app_name: "PunisherX • "
+
+
+# Berichten voor placeholders
+placeholders:
+  mute_remaining_time: "<gray>Stilte tot: <gold>"
+  warn_remaining_time: "<gray>Waarschuwing geldig tot: <gold>"
+  total_punishments: "<gray>Totaal aantal straffen: <gold>"
+  total_active_punishments: "<gray>Totaal actieve straffen: <gold>"
+  active_punishments_list: "<gray>Actieve straffen (laatste <gold><limit></gold>):</gray><newline><list>"
+  punishment_history_list: "<gray>Strafgeschiedenis (laatste <gold><limit></gold>):</gray><newline><list>"
+  punishment_list_entry: "<gray>- <gold><type></gold> <dark_gray>|</dark_gray> <gray><reason></gray> <dark_gray>|</dark_gray> <yellow><start></yellow> → <yellow><end></yellow> <dark_gray>|</dark_gray> <gray><operator></gray></gray>"
+  punishment_list_empty: "<gray>Geen straffen gevonden.</gray>"
+  punishment_list_permanent: "onbepaald"
+
+# Tijd formatering
+formatTime:
+  undefined: "onbepaald"
+  minute:
+    one: "minuut"
+    few: "minuten"
+    many: "minuten"
+  second:
+    one: "seconde"
+    few: "seconden"
+    many: "seconden"
+  hour:
+    one: "uur"
+    few: "uren"
+    many: "uren"
+  day:
+    one: "dag"
+    few: "dagen"
+    many: "dagen"
+
+# Database backup commands (/prx export and /prx import).
+database-backup:
+  busy: "<yellow>A database export or import is already running. Please wait.</yellow>"
+  export-started: "<yellow>Exporting the database. Please wait...</yellow>"
+  export-success: "<green>Database exported to plugins/PunisherX/dump/backup.sql.</green>"
+  export-failed: "<red>Database export failed. The previous backup has been preserved. Check the console for details.</red>"
+  import-started: "<yellow>Importing plugins/PunisherX/dump/backup.sql. This adds records without clearing or overwriting existing data. Please wait...</yellow>"
+  import-success: "<green>Database import completed. Records from the backup have been added.</green>"
+  import-failed: "<red>Database import failed. No records from this import were committed. Check the console for details; importing the same backup again can cause a key conflict.</red>"
+
+unmark:
+  usage: '<red>Usage: /unmark <player|all> [mark] [--silent] or /unmark <pause|resume> <mark>'
+  invalid_mark: '<red>Use one mark: --mark or --mark=check. Check names must contain 1-64 letters, digits, _, ., :, or - and start with a letter or digit.'
+  paused: '<yellow>Marked punishment skipped: check <gold><mark></gold> is paused.'
+  db_error: '<red>Could not process marked punishments. Check the server log.'
+  success: '<green>Reversed <count> marked history entries for <player> (mark: <mark>).'
+  silent_success: '<gray>Reversed <count> marked history entries for <player> (mark: <mark>).'
+  pause_success: '<green>Paused check <mark> and reversed <count> marked history entries. Use /unmark resume <mark> after fixing the check.'
+  resumed: '<green>Check <mark> can issue marked punishments again.'
+
+staff-notes:
+  usage: "<yellow>Usage: /note add <player> <text> | /note list <player> [page] | /note remove <player> <id></yellow>"
+  invalid-content: "<red>Note must contain 3–500 characters and no control characters.</red>"
+  added: "<green>Added staff note #<id> for <player>.</green>"
+  removed: "<green>Removed staff note #<id> for <player>.</green>"
+  not-found: "<yellow>No note with this ID exists for that player.</yellow>"
+  empty: "<gray>No staff notes on this page.</gray>"
+  list-title: "<gold>Staff notes for <player> — page <page></gold>"
+  invalid-page: "<red>Invalid page number.</red>"
+  db-error: "<red>Could not access staff notes. Check the server log.</red>"
+
+# /prx help: translate text and arguments; keep command names and navigation placeholders.
+command-help:
+  border: ' <gray>+-------------------------------------------------'
+  header: ' <gray>|    <gold>Available commands for <plugin>:'
+  spacer: ' <gray>|'
+  navigation: ' <gray>| (Page <page>/<total_pages>) <click:run_command:''/prx help <previous_page>''><white>[Previous]</white></click>   <click:run_command:''/prx help <next_page>''><white>[Next]</white></click>'
+  commands:
+    - ' <gray>|    <gold>/prx help (page) <gray>- <white>Lists commands; /punisherx is an alias for /prx.'
+    - ' <gray>|    <gold>/prx version <gray>- <white>Shows plugin information.'
+    - ' <gray>|    <gold>/prx validate <gray>- <white>Validates configuration and language YAML files.'
+    - ' <gray>|    <gold>/prx reload <gray>- <white>Validates YAML and reloads the plugin.'
+    - ' <gray>|    <gold>/prx diag | diagnostics <gray>- <white>Prints environment diagnostics.'
+    - ' <gray>|    <gold>/prx export <gray>- <white>Exports the database to dump/backup.sql.'
+    - ' <gray>|    <gold>/prx import <gray>- <white>Imports dump/backup.sql without clearing existing data.'
+    - ' <gray>|    <gold>/prx migrate <from> <to> [--force] <gray>- <white>Migrates databases; --force skips confirmation.'
+    - ' <gray>|    <gold>/kick <player|all> <reason> [--force] [--silent] [--mark=check] <gray>- <white>Kicks players.'
+    - ' <gray>|    <gold>/warn <player> (time) <reason> [--force] [--silent] [--mark=check] <gray>- <white>Warns a player.'
+    - ' <gray>|    <gold>/unwarn <player> [--silent] <gray>- <white>Removes warnings.'
+    - ' <gray>|    <gold>/mute <player> (time) <reason> [--force] [--silent] [--mark=check] <gray>- <white>Mutes a player.'
+    - ' <gray>|    <gold>/unmute <player> [--silent] <gray>- <white>Removes a mute.'
+    - ' <gray>|    <gold>/ban <player> (time) <reason> [--force] [--silent] [--mark=check] <gray>- <white>Bans a player.'
+    - ' <gray>|    <gold>/banip <ip|player|uuid> (time) <reason> [--force] [--silent] [--mark=check] <gray>- <white>Bans associated IPs.'
+    - ' <gray>|    <gold>/unban <ip|player|uuid> [--silent] <gray>- <white>Removes bans.'
+    - ' <gray>|    <gold>/jail <player> (time) <reason> [--force] [--silent] [--mark=check] <gray>- <white>Sends a player to jail.'
+    - ' <gray>|    <gold>/unjail <player> [--silent] <gray>- <white>Releases a player from jail.'
+    - ' <gray>|    <gold>/setjail <radius> <gray>- <white>Sets the jail location and radius.'
+    - ' <gray>|    <gold>/setunjail <gray>- <white>Sets the release location.'
+    - ' <gray>|    <gold>/punish <player> <template> (level) [--force] [--silent] [--mark=check] <gray>- <white>Applies a punishment template.'
+    - ' <gray>|    <gold>/unpunish <player> <template> [--silent] <gray>- <white>Reverses the latest punishment and escalation step.'
+    - ' <gray>|    <gold>/unmark <player|all> [mark] [--silent] <gray>- <white>Reverses marked history entries.'
+    - ' <gray>|    <gold>/unmark pause <mark> <gray>- <white>Reverses marked entries and pauses further marked punishments.'
+    - ' <gray>|    <gold>/unmark resume <mark> <gray>- <white>Resumes punishments for a paused mark.'
+    - ' <gray>|    <gold>/check <player> <all|warn|mute|ban|jail> <gray>- <white>Displays active punishments.'
+    - ' <gray>|    <gold>/clearall <player> [--silent] <gray>- <white>Clears active punishments.'
+    - ' <gray>|    <gold>/change-reason <penalty_id> <new_reason> <gray>- <white>Changes a punishment reason.'
+    - ' <gray>|    <gold>/history <player> (page) <gray>- <white>Displays punishment history.'
+    - ' <gray>|    <gold>/banlist (page) [--h] <gray>- <white>Lists bans; --h includes historical bans.'
+    - ' <gray>|    <gold>/panel <gray>- <white>Opens the moderation panel.'
+    - ' <gray>|    <gold>/report [player] [reason] <gray>- <white>Reports a player or opens the report interface.'
+    - ' <gray>|    <gold>/reports [gui|book|list|history] (page) <gray>- <white>Browses staff reports.'
+    - ' <gray>|    <gold>/reports view <id> <gray>- <white>Displays report details.'
+    - ' <gray>|    <gold>/reports resolve|reject <id> <note> <gray>- <white>Closes a report with an explanation.'
+    - ' <gray>|    <gold>/note add <player|uuid> <text> <gray>- <white>Adds a private staff note (3-500 characters).'
+    - ' <gray>|    <gold>/note list <player|uuid> (page) <gray>- <white>Lists private staff notes, newest first.'
+    - ' <gray>|    <gold>/note remove <player|uuid> <id> <gray>- <white>Deletes a note belonging to that player.'
+    - ' <gray>|    <gold>/langfix <gray>- <white>Converts legacy language placeholders to angle brackets.'
+    - ' <gray>|    <gold>/cache <gray>- <white>Displays player IP cache entries; console only.'

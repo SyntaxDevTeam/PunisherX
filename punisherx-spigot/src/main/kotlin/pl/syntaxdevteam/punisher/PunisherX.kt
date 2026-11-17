@@ -1,0 +1,224 @@
+package pl.syntaxdevteam.punisher
+
+import org.bukkit.Bukkit
+import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.event.HandlerList
+import org.bukkit.event.Listener
+import org.bukkit.plugin.Plugin
+import org.bukkit.plugin.java.JavaPlugin
+import pl.syntaxdevteam.core.SyntaxCore
+import pl.syntaxdevteam.core.logging.Logger
+import pl.syntaxdevteam.core.manager.PluginManagerX
+import pl.syntaxdevteam.core.stats.StatsCollector
+import pl.syntaxdevteam.core.tools.UUIDManager
+import pl.syntaxdevteam.core.update.GitHubSource
+import pl.syntaxdevteam.core.update.ModrinthSource
+import pl.syntaxdevteam.punisher.api.PunisherXApi
+import pl.syntaxdevteam.punisher.basic.*
+import pl.syntaxdevteam.punisher.bridge.OnlinePunishmentWatcher
+import pl.syntaxdevteam.punisher.bridge.ProxyBridgeMessenger
+import pl.syntaxdevteam.punisher.commands.CommandManager
+import pl.syntaxdevteam.punisher.common.CommandLoggerPlugin
+import pl.syntaxdevteam.punisher.common.ConfigManager
+import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
+import pl.syntaxdevteam.punisher.compatibility.VersionChecker
+import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
+import pl.syntaxdevteam.punisher.compatibility.platform.SchedulerAdapter
+import pl.syntaxdevteam.punisher.config.ConfigurationPreflight
+import pl.syntaxdevteam.punisher.config.ConfigurationValidationReport
+import pl.syntaxdevteam.punisher.databases.*
+import pl.syntaxdevteam.punisher.gui.GuiPunishmentService
+import pl.syntaxdevteam.punisher.gui.GuiSearchService
+import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
+import pl.syntaxdevteam.punisher.hooks.DiscordBridge
+import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
+import pl.syntaxdevteam.punisher.hooks.HookHandler
+import pl.syntaxdevteam.punisher.inits.loader.LibraryLoader
+import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
+import pl.syntaxdevteam.punisher.loader.PluginRegistrations
+import pl.syntaxdevteam.punisher.loader.PluginInitializer
+import pl.syntaxdevteam.punisher.players.*
+import pl.syntaxdevteam.punisher.reports.ReportService
+import pl.syntaxdevteam.punisher.stats.FastStatsBridge
+import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
+import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
+import java.util.UUID
+import java.util.logging.Level
+
+class PunisherX : JavaPlugin(), Listener {
+    private lateinit var libraryLoader: LibraryLoader
+
+    private val fastStatsBridge: FastStatsBridge by lazy {
+        FastStatsBridge(this, "face5edae5524c9d98184b87d9f48aeb")
+    }
+
+    @Volatile
+    var commandsRegistered: Boolean = false
+    private lateinit var pluginInitializer: PluginInitializer
+
+    lateinit var logger: Logger
+    val bookManager = pl.syntaxdevteam.punisher.books.BookManager(plainText = { messageHandler.getPlainText(it) })
+
+    fun nameMetadata(name: String, colorKey: String) = if (::hookHandler.isInitialized) hookHandler.nameMetadata(name, colorKey) else null
+
+    lateinit var messageHandler: pl.syntaxdevteam.punisher.messages.PunisherMessages
+    lateinit var pluginsManager: PluginManagerX
+
+    lateinit var pluginConfig: FileConfiguration
+    lateinit var statsCollector: StatsCollector
+
+    lateinit var punishmentChecker: PunishmentChecker
+    lateinit var playerJoinListener: PlayerJoinListener
+
+    @Volatile
+    lateinit var databaseHandler: DatabaseHandler
+    lateinit var timeHandler: TimeHandler
+    lateinit var geoIPHandler: GeoIPHandler
+    lateinit var punishmentManager: PunishmentManager
+    lateinit var cache: PunishmentCache
+    lateinit var punishmentActionBarNotifier: PunishmentActionBarNotifier
+    lateinit var punisherXApi: PunisherXApi
+    lateinit var hookHandler: HookHandler
+    lateinit var discordWebhook: DiscordWebhook
+    lateinit var commandLoggerPlugin: CommandLoggerPlugin
+    lateinit var commandManager: CommandManager
+    lateinit var playerIPManager: PlayerIPManager
+    lateinit var versionChecker: VersionChecker
+    lateinit var versionCompatibility: VersionCompatibility
+    lateinit var guiMaterialResolver: GuiMaterialResolver
+    lateinit var guiPunishmentService: GuiPunishmentService
+    lateinit var guiSearchService: GuiSearchService
+    lateinit var actionExecutor: PunishmentActionExecutor
+    lateinit var schedulerAdapter: SchedulerAdapter
+    lateinit var safeTeleportService: SafeTeleportService
+    lateinit var cfg: ConfigManager
+    lateinit var proxyBridgeMessenger: ProxyBridgeMessenger
+    lateinit var onlinePunishmentWatcher: OnlinePunishmentWatcher
+    lateinit var punishTemplateManager: PunishTemplateManager
+    lateinit var discordBridge: DiscordBridge
+    val reportService: ReportService by lazy(LazyThreadSafetyMode.NONE) { ReportService(this) }
+    lateinit var uuidManager: UUIDManager
+
+    override fun onLoad() {
+        libraryLoader = LibraryLoader(this)
+        try {
+            libraryLoader.loadRuntimeLibraries()
+        } catch (exception: Exception) {
+            reportError(exception)
+            throw exception
+        }
+    }
+
+    override fun onEnable() {
+        SyntaxCore.registerUpdateSources(
+            GitHubSource("SyntaxDevTeam/PunisherX"),
+            ModrinthSource("VCNRcwC2")
+        )
+        SyntaxCore.init(this, versionType = "spigot")
+        localPlayerSkins.initialize(java.io.File(dataFolder, "skin-cache"))
+
+        // Language YAML is deliberately excluded here: MessageHandler must be able to
+        // preserve a broken translation and start on its bundled in-memory fallback.
+        val startupValidation = validateConfiguration(includeLanguageFiles = false)
+        if (!startupValidation.valid) {
+            startupValidation.issues.forEach { issue ->
+                super.getLogger().severe(
+                    "[Config validation] ${startupValidation.relativePath(issue.file)}: ${issue.error}"
+                )
+            }
+            throw IllegalStateException(
+                "PunisherX startup aborted because YAML validation failed: ${startupValidation.compactMessage()}"
+            )
+        }
+
+        initializePlugin()
+        versionChecker.checkAndLog()
+        fastStatsBridge.ready()
+    }
+
+    fun validateConfiguration(includeLanguageFiles: Boolean = true): ConfigurationValidationReport =
+        ConfigurationPreflight(this).validate(includeLanguageFiles)
+
+    /**
+     * Reloads PunisherX only after a successful read-only YAML preflight.
+     * If validation fails, the currently running plugin instance remains untouched.
+     */
+    fun onReload() {
+        val validation = validateConfiguration()
+        if (!validation.valid) {
+            validation.issues.forEach { issue ->
+                logger.err("[Config validation] ${validation.relativePath(issue.file)}: ${issue.error}")
+            }
+            throw IllegalStateException(
+                "Reload aborted because YAML validation failed: ${validation.compactMessage()}"
+            )
+        }
+        reloadMyConfig()
+    }
+
+    override fun onDisable() {
+        if (::databaseHandler.isInitialized) server.onlinePlayers.forEach {
+            databaseHandler.updateJailClock(it.uniqueId.toString(), pause = true)
+        }
+        localPlayerSkins.close()
+        HandlerList.unregisterAll(this as Plugin)
+        cancelPluginTasks()
+        server.servicesManager.unregisterAll(this)
+        runCatching { fastStatsBridge.shutdown() }
+        if (::pluginInitializer.isInitialized) {
+            pluginInitializer.onDisable()
+        }
+        if (this::proxyBridgeMessenger.isInitialized) {
+            runCatching { proxyBridgeMessenger.unregisterChannel() }
+        }
+    }
+
+    val guiRuntime = pl.syntaxdevteam.punisher.gui.GuiRuntime(this)
+    val localPlayerSkins = LocalPlayerSkins()
+
+    fun resolvePlayerUuid(identifier: String): UUID {
+        runCatching { UUID.fromString(identifier) }.getOrNull()?.let { return it }
+        Bukkit.getPlayerExact(identifier)?.uniqueId?.let { return it }
+        Bukkit.getOfflinePlayers().firstOrNull { it.name?.equals(identifier, ignoreCase = true) == true }
+            ?.uniqueId?.let { return it }
+        if (!server.onlineMode) return UUID.nameUUIDFromBytes("OfflinePlayer:$identifier".toByteArray(Charsets.UTF_8))
+        return uuidManager.getUUID(identifier)
+    }
+
+    private fun reloadMyConfig() {
+        PluginRegistrations.unregisterForReload(this)
+        cancelPluginTasks()
+        guiRuntime.reset()
+        pluginInitializer.onDisable()
+        runCatching { proxyBridgeMessenger.unregisterChannel() }
+        reloadConfig()
+        initializePlugin()
+    }
+
+    private fun initializePlugin() {
+        val removed = PluginRegistrations.clearStale(this) { owner -> cancelPluginTasks(owner) }
+        if (removed > 0) {
+            super.getLogger().warning("Removed stale registrations from $removed previous PunisherX instance(s).")
+        }
+        pluginInitializer = PluginInitializer(this)
+        try {
+            pluginInitializer.onEnable()
+        } catch (error: Exception) {
+            // A plugin with no database must not keep accepting punishment commands.
+            server.pluginManager.disablePlugin(this)
+            throw error
+        }
+    }
+
+    private fun cancelPluginTasks(owner: Plugin = this) {
+        server.scheduler.cancelTasks(owner)
+    }
+
+    fun getServerName(): String =
+        messageHandler.stringMessageToStringNoPrefix("GUI", "PunisherMain.serwerInfo.name")
+
+    fun reportError(throwable: Throwable) {
+        runCatching { fastStatsBridge.trackError(throwable) }
+        super.getLogger().log(Level.SEVERE, throwable.message, throwable)
+    }
+}

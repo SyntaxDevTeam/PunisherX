@@ -1,0 +1,124 @@
+<div align="center">
+  <img src="../assets/PunisherX_Velocity_Bridge_mini.png" alt="PunisherX Velocity Bridge" width="240">
+  <h1>PunisherX Velocity Bridge</h1>
+  <p><strong>One network. Shared bans. Moderation that follows the player.</strong></p>
+  <p>
+    <a href="#-requirements"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3.2.0/assets/cozy/supported/velocity_vector.svg" alt="Supports Velocity" height="56"></a>
+  </p>
+
+[![Build](https://github.com/SyntaxDevTeam/PunisherX/actions/workflows/buildexplorer.yml/badge.svg?branch=main)](https://github.com/SyntaxDevTeam/PunisherX/actions/workflows/buildexplorer.yml)
+[![Velocity](https://img.shields.io/badge/Velocity-4-3982CE?style=flat)](#-requirements)
+[![Java](https://img.shields.io/badge/Java-25%2B-orange?style=flat)](#-requirements)
+[![Database](https://img.shields.io/badge/Database-MySQL-4479A1?style=flat)](#-configuration)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](../LICENSE)
+
+**[Download](#-download)** · **[Quick start](#-quick-start)** · **[Configuration](#-configuration)** · **[Documentation](../docs/WIKI/EN/ADMIN-GUIDE.md)** · **[Discord](https://discord.gg/Zk6mxv7eMh)**
+
+</div>
+
+PunisherX Velocity Bridge connects your Velocity proxy to the PunisherX installation on your backend servers. A ban issued from one backend can disconnect its target elsewhere on the network, even when the command runs from the console on an empty server.
+
+Install the bridge on the **proxy**, alongside the full PunisherX plugin on your **Paper/Folia or Spigot backends**. Both use the same MySQL database.
+
+## ✨ Network moderation
+
+| Feature | What it does |
+| --- | --- |
+| **Cross-server bans** | Disconnects a player by UUID when a `BAN` event reaches the proxy. |
+| **IP ban events** | Disconnects connected players whose IP matches a `BANIP` event. |
+| **SQL reconciliation** | Independently polls active `punishments` records for currently connected players, including bans issued on an empty backend. |
+| **Hardened message handling** | Consumes the legacy `punisherx:bridge` channel without executing client- or backend-supplied payloads. |
+| **Login and transfer checks** | Checks active network-wide UUID bans at login and before connecting to a backend. |
+| **Clear disconnect messages** | Shows the punishment type, reason and remaining duration, including permanent bans. |
+
+The bridge enforces **active network-wide BAN and BANIP records** from SQL. Login, backend transfer and periodic connected-player checks include UUID and IP bans; backend-local, expired and revoked records never trigger a proxy disconnect. Other punishments, such as mute, warn and jail, are handled by PunisherX on the backend servers.
+
+## 📦 Download
+
+Download `PunisherX-Velocity-Bridge-<version>.jar` from **[GitHub Releases](https://github.com/SyntaxDevTeam/PunisherX/releases)** when available. Development artifacts are available from successful **[build workflow runs](https://github.com/SyntaxDevTeam/PunisherX/actions/workflows/buildexplorer.yml)**.
+
+Looking for the backend plugin or the BungeeCord artifact? See the **[main PunisherX README](../README.md#-download)**.
+
+## ⚙️ Requirements
+
+| Component | Requirement |
+| --- | --- |
+| Proxy | **Velocity 4.3.0** (stable API). |
+| Java | **25 or newer** on the proxy. |
+| Backend plugin | PunisherX for Paper/Folia or Spigot. |
+| Storage | A shared **MySQL database**, reachable from the proxy and backends. |
+| Database access | **SELECT-only** on the `punishments` table; no table creation or write permission required. |
+
+## 🚀 Quick start
+
+1. Install PunisherX on your backend servers and configure them to use the shared MySQL database.
+2. Place `PunisherX-Velocity-Bridge-<version>.jar` in the proxy's `plugins/` directory.
+3. Start the proxy once to generate `bridge.properties` in the bridge's plugin data directory.
+4. Set the database connection in that file to the same database used by PunisherX on the backends.
+5. Restart the proxy to load the connection settings.
+6. Configure network-wide punishment scope on the backends, following the **[administrator guide](../docs/WIKI/EN/ADMIN-GUIDE.md)**.
+
+## 🔧 Configuration
+
+The bridge reads **`bridge.properties`**. Configure a dedicated read-only account. Example:
+
+```properties
+host=localhost
+port=3306
+database=punisherx
+username=punisherx_proxy
+password=replace_with_your_read_only_password
+poll-interval-ms=1000
+```
+
+| Setting | Meaning |
+| --- | --- |
+| `host` / `port` | Address of the shared MySQL server. `localhost` refers to the machine running the proxy. |
+| `database` | The database containing the PunisherX `punishments` table. |
+| `username` / `password` | Credentials with access to those tables. |
+| `poll-interval-ms` | Active-punishment reconciliation interval in milliseconds. Default: **1000**; values below **200** are clamped to 200. |
+
+Match the backend's `database.sql.*` connection settings. Credentials can differ if both database users have the required access to the same database. Restart the proxy after editing this file.
+
+## 🔄 How it works
+
+1. The Paper/Folia or Spigot plugin commits a punishment to the shared SQL `punishments` table.
+2. Each proxy independently reconciles the current active network-wide UUID/IP bans for its connected players, in bounded batches every `poll-interval-ms` (default 1000 ms).
+3. Login and backend-transfer checks read current SQL state directly. Active network bans are denied; a database error denies new access rather than treating it as no punishment.
+4. Removing or expiring a ban stops enforcement on the next check. No replayable plugin message or shared queue acknowledgment can cause an unrelated disconnection.
+
+**Security upgrade:** Install the updated proxy bridge and updated backend PunisherX editions together. Older BungeeCord bridges accepted forged plugin messages and must not remain exposed. The new proxy account needs only `SELECT` on `punishments`; do not use MySQL `root` or the same privileged credentials as the backend. A read-only example (run as a database administrator, replace the password and host):
+
+```sql
+CREATE USER 'punisherx_proxy'@'proxy-host' IDENTIFIED BY 'strong-private-password';
+GRANT SELECT ON punisherx.punishments TO 'punisherx_proxy'@'proxy-host';
+```
+
+## 🛠️ Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| Database connection fails | Host, port, credentials, database access and connectivity from the proxy. |
+| A ban does not reach the proxy | Verify the backend committed an active network-scoped punishment and the proxy SELECT user can read it; check `poll-interval-ms`. |
+| A UUID ban does not block rejoining | The record must have `punishmentType = BAN`, `server = network` and an active expiry, or `endTime = -1` for a permanent ban. |
+| An IP-banned player can reconnect | Verify the IP is stored as an active network-scoped `BANIP` punishment and IP normalization matches the proxy's client address. |
+| SQL is unavailable | New logins/transfers are denied temporarily (fail-closed); restore SQL connectivity and restart the proxy if initialization failed. |\n| Changes to connection settings have no effect | Restart the proxy after editing `bridge.properties`. |
+
+## 🧱 Build from source
+
+From the repository root:
+
+```bash
+./gradlew :punisherx-velocity-bridge:build
+```
+
+Use a **Java 25 toolchain**. The resulting plugin JAR is written to `punisherx-velocity-bridge/build/libs/`.
+
+For the isolated Velocity 4.3.0 and MariaDB runtime test, including TCP login denial
+and player session API checks, see [runtime compatibility tests](src/runtimeTest/README.md).
+
+## 📚 Links
+
+**[PunisherX](../README.md)** · **[Admin guide (EN)](../docs/WIKI/EN/ADMIN-GUIDE.md)** · **[Admin guide (PL)](../docs/WIKI/PL/ADMIN-GUIDE.md)** · **[Changelog](../CHANGELOG.md)** · **[Report an issue](https://github.com/SyntaxDevTeam/PunisherX/issues)**
+
+Licensed under the **[MIT License](../LICENSE)**. Created by **SyntaxDevTeam**.

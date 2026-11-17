@@ -1,0 +1,42 @@
+repositories:
+  syntaxdevteam-snapshots: "https://nexus.syntaxdevteam.pl/repository/maven-snapshots/"
+  syntaxdevteam-releases: "https://nexus.syntaxdevteam.pl/repository/maven-releases/"
+  paper: "https://repo.papermc.io/repository/maven-public/"
+  central-mirror: "https://repo.papermc.io/repository/maven-central/"
+  jitpack: "https://jitpack.io/"
+  codemc-snapshots: "https://repo.codemc.io/repository/maven-snapshots/"
+  faststatsReleases: "https://repo.faststats.dev/releases"
+
+libraries:
+  # Basic libraries
+  - org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}
+  - org.eclipse.aether:aether-api:${aetherVersion}
+  - org.yaml:snakeyaml:${snakeyamlVersion}
+  - com.google.code.gson:gson:${gsonVersion}
+  # MessageHandler libraries
+  - com.github.ben-manes.caffeine:caffeine:${caffeineVersion}
+  - net.kyori:adventure-nbt:${adventureVersion}
+  # GUI libraries
+  - dev.triumphteam:triumph-gui:${triumphGuiVersion}
+  # Additional libraries
+  - com.maxmind.geoip2:geoip2:${geoipVersion}
+  - org.apache.ant:ant:${antVersion}
+  # Database libraries
+  # Explicit dependencies also work with Libby, which does not resolve transitive POMs.
+  - coordinate: pl.syntaxdevteam:syntaxdb-core:${syntaxdbVersion}
+    repository: syntaxdevteam-snapshots
+  - com.zaxxer:HikariCP:${hikariVersion}
+  - com.mysql:mysql-connector-j:${mysqlVersion}
+  - com.google.protobuf:protobuf-java:${protobufVersion}
+  - org.postgresql:postgresql:${postgresqlVersion}
+  - com.microsoft.sqlserver:mssql-jdbc:${mssqlVersion}
+  - org.xerial:sqlite-jdbc:${sqliteVersion}
+
+  # FastStats dependencies
+  - coordinate: dev.faststats.metrics:bukkit:${faststatsVersion}
+    repository: faststatsReleases
+  # SyntaxDevTeam libraries
+  - coordinate: pl.syntaxdevteam:syntaxcore:${syntaxcoreVersion}
+    repository: syntaxdevteam-snapshots
+  - coordinate: pl.syntaxdevteam:messageHandler-paper:${messagehandlerVersion}
+    repository: syntaxdevteam-snapshots

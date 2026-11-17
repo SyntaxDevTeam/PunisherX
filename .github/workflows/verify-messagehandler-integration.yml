@@ -1,0 +1,72 @@
+name: Verify MessageHandler integration
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/verify-messagehandler-integration.yml
+      - punisherx-paper/src/**
+      - punisherx-spigot/src/**
+      - punisherx-paper/build.gradle.kts
+      - punisherx-spigot/build.gradle.kts
+      - gradle/libs.versions.toml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PunisherX
+        uses: actions/checkout@v7
+        with:
+          path: PunisherX
+
+      - name: Checkout MessageHandler
+        uses: actions/checkout@v7
+        with:
+          repository: SyntaxDevTeam/MessageHandler
+          ref: main
+          path: MessageHandler
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Check required MessageHandler version
+        working-directory: PunisherX
+        run: |
+          python3 - <<'PYCODE'
+          import re
+          import tomllib
+          from pathlib import Path
+          required = tomllib.loads(Path("gradle/libs.versions.toml").read_text())["versions"]["messagehandler"]
+          source = Path("../MessageHandler/build.gradle.kts").read_text()
+          match = re.search(r'^version\s*=\s*"([^"]+)"', source, re.MULTILINE)
+          actual = match.group(1) if match else "unknown"
+          if actual != required:
+              raise SystemExit(f"MessageHandler checkout has version {actual}, but PunisherX requires {required}. Push the matching MessageHandler API/version changes before building PunisherX.")
+          print(f"MessageHandler source version matches: {actual}")
+          PYCODE
+
+      - name: Publish required MessageHandler modules to runner Maven local
+        working-directory: MessageHandler
+        run: |
+          chmod +x ./gradlew
+          ./gradlew \
+            :MessageHandler-Paper:publishToMavenLocal \
+            :MessageHandler-Spigot:publishToMavenLocal \
+            --console=plain --no-daemon
+
+      - name: Test and build PunisherX against MessageHandler R0.3
+        working-directory: PunisherX
+        run: |
+          chmod +x ./gradlew
+          ./gradlew test build -Ppunisherx.messagehandler.local=true --console=plain --no-daemon

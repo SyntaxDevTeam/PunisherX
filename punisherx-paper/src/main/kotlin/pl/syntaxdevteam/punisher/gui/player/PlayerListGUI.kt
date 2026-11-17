@@ -1,0 +1,121 @@
+package pl.syntaxdevteam.punisher.gui.player
+
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import org.bukkit.Bukkit
+import org.bukkit.Material
+import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.SkullMeta
+import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.gui.PunisherMain
+import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
+import pl.syntaxdevteam.punisher.gui.player.action.PlayerActionGUI
+import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+
+/**
+ * GUI displaying currently online players.
+ */
+class PlayerListGUI(plugin: PunisherX) : BaseGUI(plugin) {
+    override fun open(player: Player) {
+        val online = ArrayList(plugin.server.onlinePlayers)
+        online.sortBy { it.name.lowercase() }
+        open(player, 0, online, "")
+    }
+
+    /**
+     * Opens the player list GUI for the given page.
+     */
+    private fun open(player: Player, page: Int, online: List<Player>, query: String) {
+        val filtered = online.filter { it.name.contains(query, ignoreCase = true) }
+        val playersPerPage = 27
+        val totalPages = if (filtered.isEmpty()) 1 else (filtered.size - 1) / playersPerPage + 1
+        val currentPage = page.coerceIn(0, totalPages - 1)
+
+        val startIndex = currentPage * playersPerPage
+        val playersPage = filtered.drop(startIndex).take(playersPerPage)
+
+        val gui = createGui(5)
+
+        playersPage.forEachIndexed { index, target ->
+            val head = ItemStack(Material.PLAYER_HEAD)
+            val meta = head.itemMeta as SkullMeta
+
+            meta.displayName(mH.formatMixedTextToMiniMessage("<yellow>${target.name}</yellow>", TagResolver.empty()))
+            val loading = mH.stringMessageToStringNoPrefix("GUI", "PlayerList.loading")
+            meta.lore(
+                listOf(
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to loading)),
+                    if (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, player, target.uniqueId, target.name))
+                        mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loading)) else Component.empty(),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to loading)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to loading)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to loading)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishments", mapOf("punishments" to loading)),
+                    mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to loading))
+                )
+            )
+            head.itemMeta = meta
+            setPlayerHead(gui, index, head, target.uniqueId, target.name) { clicker ->
+                PlayerActionGUI(plugin).open(clicker, target)
+            }
+
+            plugin.schedulerAdapter.runAsync(Runnable {
+                val uuid = target.uniqueId
+                val onlineStr = PlayerStatsService.getCurrentOnlineString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
+                val totalStr = PlayerStatsService.getTotalPlaytimeString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
+                val punishStr = plugin.databaseHandler.countPlayerAllPunishmentHistory(uuid).toString()
+                val playerIP = plugin.playerIPManager.getPlayerIPByName(target.name) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
+                val punishments = plugin.databaseHandler.getActivePunishmentsString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
+                val lastActive = PlayerStatsService.getLastActiveString(uuid) ?: mH.stringMessageToStringNoPrefix("error", "no_data")
+
+                plugin.schedulerAdapter.runForPlayer(player, Runnable {
+                    if (!gui.inventory.viewers.contains(player)) return@Runnable
+                    val item = gui.inventory.getItem(index) ?: return@Runnable
+                    val im = item.itemMeta as SkullMeta
+                    im.lore(
+                        listOf(
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to target.uniqueId.toString())),
+                            if (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, player, target.uniqueId, target.name))
+                                mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to pl.syntaxdevteam.punisher.permissions.IpVisibility.displayAddress(plugin, player, playerIP))) else Component.empty(),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to onlineStr)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to totalStr)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to lastActive)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishments", mapOf("punishments" to punishments)),
+                            mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.punishStr", mapOf("punishstr" to punishStr))
+                        )
+                    )
+                    item.itemMeta = im
+                    gui.updateItem(index, item)
+                })
+            })
+        }
+
+        if (currentPage > 0)
+            gui.setItem(36, createNavGuiItem(Material.PAPER, mH.stringMessageToStringNoPrefix("GUI", "Nav.previous")) { clicker ->
+                open(clicker, currentPage - 1, online, query)
+            })
+
+        gui.setItem(40, createNavGuiItem(Material.BARRIER, mH.stringMessageToStringNoPrefix("GUI", "Nav.back")) { clicker ->
+            PunisherMain(plugin).open(clicker)
+        })
+        gui.setItem(39, createNavGuiItem(Material.NAME_TAG, "<yellow>Search players</yellow>") { clicker ->
+            plugin.guiSearchService.request(clicker, "<yellow>Enter player name in chat, or 'cancel'.</yellow>") { searcher, text ->
+                open(searcher, 0, online, text)
+            }
+        })
+
+        if (currentPage < totalPages - 1)
+            gui.setItem(44, createNavGuiItem(Material.BOOK, mH.stringMessageToStringNoPrefix("GUI", "Nav.next")) { clicker ->
+                open(clicker, currentPage + 1, online, query)
+            })
+
+        openGui(gui, player)
+
+    }
+
+    override fun getTitle(): Component {
+        return mH.stringMessageToComponentNoPrefix("GUI", "PunisherMain.playerOnline.title")
+    }
+}

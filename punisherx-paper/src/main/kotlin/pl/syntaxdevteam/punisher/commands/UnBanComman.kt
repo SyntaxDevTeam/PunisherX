@@ -1,0 +1,134 @@
+package pl.syntaxdevteam.punisher.commands
+
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.tree.LiteralCommandNode
+import io.papermc.paper.command.brigadier.Commands
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes
+import pl.syntaxdevteam.punisher.commands.arguments.IpAddressArgumentType
+import io.papermc.paper.command.brigadier.BasicCommand
+import io.papermc.paper.command.brigadier.CommandSourceStack
+import org.jetbrains.annotations.NotNull
+import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+
+class UnBanCommand(private val plugin: PunisherX) : BasicCommand, BrigadierCommand {
+
+    override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
+        val options = PunishmentCommandOptions.parse(args)
+        val arguments = options.arguments
+        val silent = options.silent
+        if (!PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNBAN)) {
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "no_permission"))
+            return
+        }
+
+        if (arguments.isEmpty()) {
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unban", "usage"))
+            return
+        }
+
+        val playerOrIpOrUUID = arguments[0]
+
+        if (com.google.common.net.InetAddresses.isInetAddress(playerOrIpOrUUID)) {
+            if (!unbanIP(stack, playerOrIpOrUUID, silent)) {
+                stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "ip_not_found", mapOf("ip" to playerOrIpOrUUID)))
+            }
+            return
+        }
+
+        val uuid = plugin.resolvePlayerUuid(playerOrIpOrUUID).toString()
+
+        plugin.logger.debug("UUID for player $playerOrIpOrUUID: [$uuid]")
+
+        if (unbanPlayer(stack, playerOrIpOrUUID, uuid, silent)) {
+            return
+        }
+
+        val ips = plugin.playerIPManager.getPlayerIPsByName(playerOrIpOrUUID)
+        plugin.logger.debug("Assigned IPs for player $playerOrIpOrUUID: $ips")
+
+        val anyUnbanned = ips.map { ip -> unbanIP(stack, ip, silent) }.any { it }
+        if (!anyUnbanned) {
+            stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_punished", mapOf("player" to playerOrIpOrUUID, "operator" to stack.sender.name)))
+        }
+    }
+
+    private fun unbanPlayer(stack: CommandSourceStack, playerName: String, uuid: String, silent: Boolean): Boolean {
+        val punishments = plugin.databaseHandler.getPunishments(uuid)
+
+        if (punishments.isEmpty()) {
+            plugin.logger.debug("Player $playerName ($uuid) has no ban")
+            return false
+        }
+
+        var unbanned = false
+        punishments.forEach { punishment ->
+            if (punishment.type == "BAN") {
+                plugin.commandLoggerPlugin.logCommand(stack.sender.name, "UNBAN", playerName, "")
+                plugin.databaseHandler.removePunishment(uuid, punishment.type, removeAll = false)
+                plugin.logger.info("Player $playerName ($uuid) has been unbanned")
+                unbanned = true
+            }
+        }
+
+        if (unbanned) {
+            PunishmentCommandUtils.sendSenderMessages(
+                plugin, stack, "unban", "unban",
+                mapOf("player" to playerName, "operator" to stack.sender.name), silent = silent
+            )
+            if (!silent) broadcastUnban(playerName, stack.sender.name)
+        }
+
+        return unbanned
+    }
+
+    private fun unbanIP(stack: CommandSourceStack, ip: String, silent: Boolean): Boolean {
+        val punishments = plugin.databaseHandler.getPunishmentsByIP(ip)
+
+        if (punishments.isEmpty()) {
+            plugin.logger.debug("No punishments found for IP $ip")
+            return false
+        }
+
+        var unbanned = false
+        punishments.forEach { punishment ->
+            if (punishment.type == "BANIP") {
+                plugin.commandLoggerPlugin.logCommand(stack.sender.name, "UNBAN (IP)", ip, "")
+                plugin.databaseHandler.removePunishment(ip, punishment.type)
+                plugin.logger.info("IP $ip has been unbanned")
+                unbanned = true
+            }
+        }
+
+        if (unbanned) {
+            PunishmentCommandUtils.sendSenderMessages(
+                plugin, stack, "unban", "unban",
+                mapOf("player" to ip, "operator" to stack.sender.name), silent = silent
+            )
+            if (!silent) broadcastUnban(ip, stack.sender.name)
+        }
+
+        return unbanned
+    }
+
+    private fun broadcastUnban(playerOrIp: String, commandSenderName: String) {
+        PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_UNBAN,
+            "unban", "unban", mapOf("player" to playerOrIp, "operator" to commandSenderName))
+    }
+
+    override fun suggest(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>): List<String> {
+        val input = args.lastOrNull().orEmpty()
+        return if (PermissionChecker.hasWithLegacy(stack.sender, PermissionChecker.PermissionKey.UNBAN) && args.size == 1) {
+            plugin.server.onlinePlayers.map { it.name }.filter { it.startsWith(input, ignoreCase = true) }
+        } else {
+            emptyList()
+        }
+    }
+    override fun build(name: String): LiteralCommandNode<CommandSourceStack> {
+        val target = Commands.argument("target", pl.syntaxdevteam.punisher.commands.arguments.TargetArgumentType())
+            .executes(BrigadierCommandUtils.executor(this))
+        return Commands.literal(name)
+            .requires(BrigadierCommandUtils.requiresPermission(PermissionChecker.PermissionKey.UNBAN))
+            .executes(BrigadierCommandUtils.executor(this)).then(target).build()
+    }
+}
