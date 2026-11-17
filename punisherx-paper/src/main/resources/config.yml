@@ -114,6 +114,27 @@ aliases:
   setunjail: "sunjail"
   panel:    "px"
 
+# Tab completion of all commands.
+# arguments: names shown while typing, e.g. /ban <player> <time> <reason>. Changes need a restart.
+# times: durations offered for <time>. Reasons come from "reasons" of each command in the language file.
+command-completion:
+  arguments:
+    player: "player"
+    target: "player|ip"
+    time: "time"
+    reason: "reason"
+    flags: "flags"
+    page: "page"
+    type: "type"
+    id: "id"
+    mark: "mark"
+    radius: "radius"
+    note: "note"
+    text: "text"
+    from: "from"
+    to: "to"
+  times: ["30m", "1h", "6h", "12h", "1d", "3d", "7d", "14d", "30d"]
+
 # Settings for the prison location and its radius.
 jail:
   # JAIL itself confines the player and sets Adventure mode. No separate MUTE is created.

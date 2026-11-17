@@ -1,11 +1,19 @@
 package pl.syntaxdevteam.punisher.commands
 
 import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.tree.LiteralCommandNode
+import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
+import org.bukkit.command.CommandSender
 import org.bukkit.plugin.Plugin
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.commands.CommandTree.Argument
+import pl.syntaxdevteam.punisher.commands.CommandTree.Kind
+import pl.syntaxdevteam.punisher.commands.CommandTree.Literal
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker.PermissionKey
 
 class CommandManager(private val plugin: PunisherX) {
 
@@ -13,42 +21,8 @@ class CommandManager(private val plugin: PunisherX) {
         val manager: LifecycleEventManager<Plugin> = plugin.lifecycleManager
         manager.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
             val commands: Commands = event.registrar()
-            commands.register(
-                "punisherx",
-                "PunisherX plugin command. Type /punisherx help to check available commands",
-                PunisherRootCommand(plugin)
-            )
-            commands.register(
-                "prx",
-                "PunisherX plugin command. Type /prx help to check available commands",
-                PunisherRootCommand(plugin)
-            )
-            commands.register(
-                "check",
-                "Checking player penalties" + plugin.messageHandler.stringMessageToString("check", "usage"),
-                CheckCommand(plugin, plugin.playerIPManager)
-            )
-            commands.register(
-                "history",
-                "Checking player all penalties history" + plugin.messageHandler.stringMessageToString("history", "usage"),
-                HistoryCommand(plugin, plugin.playerIPManager)
-            )
-            commands.register(
-                "banlist",
-                "Checking player all penalties history" + plugin.messageHandler.stringMessageToString("banlist", "usage"),
-                BanListCommand(plugin)
-            )
-            commands.register(
-                "kick",
-                plugin.messageHandler.stringMessageToString("kick", "usage"),
-                KickCommand(plugin)
-            )
-            commands.register(
-                "warn",
-                plugin.messageHandler.stringMessageToString("warn", "usage"),
-                WarnCommand(plugin)
-            )
-            commands.register("unmark", "/unmark <player|all> [mark] | pause/resume <mark>", UnmarkCommand(plugin))
+            val tree = CommandTree(plugin)
+            commandKeys.forEach { key -> commands.register(node(tree, key, key)!!, description(key), emptyList()) }
             val unpunishCmd = UnpunishCommand(plugin)
             val unpunishNode = Commands.literal("unpunish")
                 .requires { src -> pl.syntaxdevteam.punisher.permissions.PermissionChecker
@@ -90,206 +64,138 @@ class CommandManager(private val plugin: PunisherX) {
             commands.register(unpunishNode, "/unpunish <player> <template>", emptyList())
             val punishNode = createPunishNode()
             commands.register(punishNode, plugin.messageHandler.stringMessageToString("punish", "usage"), emptyList())
-            commands.register(
-                "unwarn",
-                plugin.messageHandler.stringMessageToString("unwarn", "usage"),
-                UnWarnCommand(plugin)
-            )
-            commands.register(
-                "mute",
-                plugin.messageHandler.stringMessageToString("mute", "usage"),
-                MuteCommand(plugin)
-            )
-            commands.register(
-                "unmute", plugin.messageHandler.stringMessageToString("unmute", "usage"),
-                UnMuteCommand(plugin)
-            )
-            commands.register(
-                "setjail",
-                plugin.messageHandler.stringMessageToString("setjail", "usage"),
-                SetjailCommand(plugin)
-            )
-            commands.register(
-                "setunjail",
-                plugin.messageHandler.stringMessageToString("setunjail", "usage"),
-                SetSpawnCommand(plugin)
-            )
-            commands.register(
-                "jail",
-                plugin.messageHandler.stringMessageToString("jail", "usage"),
-                JailCommand(plugin)
-            )
-            commands.register(
-                "unjail",
-                plugin.messageHandler.stringMessageToString("unjail", "usage"),
-                UnjailCommand(plugin)
-            )
-            commands.register(
-                "ban",
-                plugin.messageHandler.stringMessageToString("ban", "usage"),
-                BanCommand(plugin)
-            )
-            commands.register(
-                "banip",
-                plugin.messageHandler.stringMessageToString("banip", "usage"),
-                BanIpCommand(plugin)
-            )
-            commands.register(
-                "unban",
-                plugin.messageHandler.stringMessageToString("unban", "usage"),
-                UnBanCommand(plugin)
-            )
-            commands.register(
-                "cache",
-                "debugging command",
-                CacheCommand(plugin)
-            )
-            commands.register(
-                "change-reason",
-                plugin.messageHandler.stringMessageToString("change-reason", "usage"),
-                ChangeReasonCommand(plugin)
-            )
-            commands.register(
-                "clearall",
-                plugin.messageHandler.stringMessageToString("clear", "usage"),
-                ClearAllCommand(plugin)
-            )
-            commands.register(
-                "panel",
-                "Opens the PunisherX GUI with lots of useful information and commands.",
-                PanelCommand(plugin)
-            )
-            commands.register(
-                "langfix",
-                "Converts legacy translation placeholders from {} to <>",
-                PlaceholderFixCommand(plugin)
-            )
-            commands.register(
-                "report",
-                "Report a player for breaking rules",
-                ReportCommand(plugin)
-            )
-            commands.register(
-                "reports",
-                "Review and manage player reports",
-                ReportsCommand(plugin)
-            )
-            commands.register("note", "Manage private staff notes", NoteCommand(plugin))
 
             val aliases = plugin.config.getConfigurationSection("aliases")
             aliases?.getKeys(false)?.forEach { key ->
                 val commandName = aliases.getString(key) ?: key
-                when (key) {
-                    "check" -> commands.register(
-                        commandName,
-                        "Checking player penalties" + plugin.messageHandler.stringMessageToString("check", "usage"),
-                        CheckCommand(plugin, plugin.playerIPManager)
-                    )
-
-                    "history" -> commands.register(
-                        commandName,
-                        "Checking player all penalties history" + plugin.messageHandler.stringMessageToString("history", "usage"),
-                        HistoryCommand(plugin, plugin.playerIPManager)
-                    )
-
-                    "kick" -> commands.register(
-                        commandName,
-                        plugin.messageHandler.stringMessageToString("kick", "usage"),
-                        KickCommand(plugin)
-                    )
-
-                    "warn" -> commands.register(
-                        commandName,
-                        plugin.messageHandler.stringMessageToString("warn", "usage"),
-                        WarnCommand(plugin)
-                    )
-/*
-                    "unpunish" -> commands.register(
-                        commandName, "/unpunish <player> <template>", UnpunishCommand(plugin)
-                    )
-                    "punish" -> commands.register(
-                        commandName,
-                        plugin.messageHandler.stringMessageToString("punish", "usage"),
-                        PunishCommand(plugin)
-                    )*/
-
-                    "unwarn" -> commands.register(
-                        commandName,
-                        plugin.messageHandler.stringMessageToString("unwarn", "usage"),
-                        UnWarnCommand(plugin)
-                    )
-
-                    "mute" -> commands.register(
-                        commandName,
-                        plugin.messageHandler.stringMessageToString("mute", "usage"),
-                        MuteCommand(plugin)
-                    )
-
-                    "unmute" -> commands.register(
-                        commandName, plugin.messageHandler.stringMessageToString("unmute", "usage"),
-                        UnMuteCommand(plugin)
-                    )
-
-                    "setjail" -> commands.register(
-                        commandName,
-                        plugin.messageHandler.stringMessageToString("setjail", "usage"),
-                        SetjailCommand(plugin)
-                    )
-
-                    "setunjail" -> commands.register(
-                        commandName,
-                        plugin.messageHandler.stringMessageToString("setunjail", "usage"),
-                        SetSpawnCommand(plugin)
-                    )
-
-                    "jail" -> commands.register(
-                        commandName,
-                        plugin.messageHandler.stringMessageToString("jail", "usage"),
-                        JailCommand(plugin)
-                    )
-
-                    "unjail" -> commands.register(
-                        commandName,
-                        plugin.messageHandler.stringMessageToString("unjail", "usage"),
-                        UnjailCommand(plugin)
-                    )
-
-                    "ban" -> commands.register(
-                        commandName,
-                        plugin.messageHandler.stringMessageToString("ban", "usage"),
-                        BanCommand(plugin)
-                    )
-
-                    "banip" -> commands.register(
-                        commandName,
-                        plugin.messageHandler.stringMessageToString("banip", "usage"),
-                        BanIpCommand(plugin)
-                    )
-
-                    "unban" -> commands.register(
-                        commandName,
-                        plugin.messageHandler.stringMessageToString("unban", "usage"),
-                        UnBanCommand(plugin)
-                    )
-
-                    "change-reason" -> commands.register(
-                        commandName,
-                        plugin.messageHandler.stringMessageToString("change-reason", "usage"),
-                        ChangeReasonCommand(plugin)
-                    )
-
-                    "clearall" -> commands.register(
-                        commandName,
-                        plugin.messageHandler.stringMessageToString("clear", "usage"),
-                        ClearAllCommand(plugin)
-                    )
-                    "panel" -> commands.register(
-                        commandName,
-                        "Opens the PunisherX GUI with lots of useful information and commands.",
-                        PanelCommand(plugin)
-                    )
-                }
+                node(tree, key, commandName)?.let { commands.register(it, description(key), emptyList()) }
             }
+        }
+    }
+
+    private val commandKeys = listOf(
+        "punisherx", "prx", "check", "history", "banlist", "kick", "warn", "unmark", "unwarn", "mute", "unmute",
+        "setjail", "setunjail", "jail", "unjail", "ban", "banip", "unban", "cache", "change-reason", "clearall",
+        "panel", "langfix", "report", "reports", "note"
+    )
+
+    private fun usage(key: String) = plugin.messageHandler.stringMessageToString(key, "usage")
+
+    private fun description(key: String): String = when (key) {
+        "punisherx", "prx" -> "PunisherX plugin command. Type /$key help to check available commands"
+        "check" -> "Checking player penalties" + usage("check")
+        "history" -> "Checking player all penalties history" + usage("history")
+        "banlist" -> "Checking player all penalties history" + usage("banlist")
+        "unmark" -> "/unmark <player|all> [mark] | pause/resume <mark>"
+        "cache" -> "debugging command"
+        "clearall" -> usage("clear")
+        "panel" -> "Opens the PunisherX GUI with lots of useful information and commands."
+        "langfix" -> "Converts legacy translation placeholders from {} to <>"
+        "report" -> "Report a player for breaking rules"
+        "reports" -> "Review and manage player reports"
+        "note" -> "Manage private staff notes"
+        else -> usage(key)
+    }
+
+    // The forms each command accepts. Null for keys that are not commands, e.g. an unknown alias.
+    private fun node(tree: CommandTree, key: String, name: String): LiteralCommandNode<CommandSourceStack>? {
+        fun legacy(permission: PermissionKey): (CommandSender) -> Boolean = { PermissionChecker.hasWithLegacy(it, permission) }
+        fun manage(permission: PermissionKey): (CommandSender) -> Boolean = { PermissionChecker.hasWithManage(it, permission) }
+        val anyone: (CommandSender) -> Boolean = { true }
+        val player = Argument("player", values = tree::players)
+        val silent = Argument("flags", Kind.GREEDY, listOf("--silent"))
+        val page = Argument("page")
+
+        return when (key) {
+            "ban" -> tree.punishment(name, "ban", PermissionKey.BAN, BanCommand(plugin))
+            "banip" -> tree.punishment(name, "banip", PermissionKey.BANIP, BanIpCommand(plugin), targetArgument = "target")
+            "mute" -> tree.punishment(name, "mute", PermissionKey.MUTE, MuteCommand(plugin))
+            "warn" -> tree.punishment(name, "warn", PermissionKey.WARN, WarnCommand(plugin))
+            "jail" -> tree.punishment(name, "jail", PermissionKey.JAIL, JailCommand(plugin))
+            "kick" -> tree.punishment(name, "kick", PermissionKey.KICK, KickCommand(plugin), timed = false)
+
+            "unban" -> {
+                val target = Argument("target", values = tree::players)
+                tree.create(name, legacy(PermissionKey.UNBAN), UnBanCommand(plugin), listOf(target), listOf(target, silent))
+            }
+            "unmute" -> tree.create(name, legacy(PermissionKey.UNMUTE), UnMuteCommand(plugin), listOf(player), listOf(player, silent))
+            "unwarn" -> tree.create(name, legacy(PermissionKey.UNWARN), UnWarnCommand(plugin), listOf(player), listOf(player, silent))
+            "unjail" -> tree.create(name, legacy(PermissionKey.UNJAIL), UnjailCommand(plugin), listOf(player), listOf(player, silent))
+            "clearall" -> tree.create(name, legacy(PermissionKey.CLEAR_ALL), ClearAllCommand(plugin), listOf(player), listOf(player, silent))
+
+            // A player may look at their own record without the permission.
+            "check" -> {
+                val type = Argument("type", values = { listOf("all", "ban", "jail", "mute", "warn") })
+                tree.create(name, anyone, CheckCommand(plugin, plugin.playerIPManager), listOf(player), listOf(player, type))
+            }
+            "history" -> tree.create(name, anyone, HistoryCommand(plugin, plugin.playerIPManager), listOf(player), listOf(player, page))
+            "banlist" -> {
+                val history = Literal("--h")
+                tree.create(name, legacy(PermissionKey.BAN_LIST), BanListCommand(plugin), listOf(page), listOf(history), listOf(history, page))
+            }
+            "change-reason" -> {
+                val id = Argument("id")
+                tree.create(name, legacy(PermissionKey.CHANGE_REASON), ChangeReasonCommand(plugin), listOf(id), listOf(id, Argument("reason", Kind.GREEDY)))
+            }
+            "unmark" -> {
+                val who = Argument("player", values = { listOf("all") + tree.players() })
+                val mark = Argument("mark")
+                tree.create(
+                    name, legacy(PermissionKey.UNMARK), UnmarkCommand(plugin),
+                    listOf(Literal("pause"), mark), listOf(Literal("resume"), mark),
+                    listOf(who), listOf(who, mark), listOf(who, mark, silent)
+                )
+            }
+
+            "setjail" -> {
+                val radius = Argument("radius", values = { listOf("5", "10", "20", "50") })
+                tree.create(name, manage(PermissionKey.MANAGE_SET_JAIL), SetjailCommand(plugin), listOf(radius))
+            }
+            "setunjail" -> tree.create(name, legacy(PermissionKey.MANAGE_SET_SPAWN), SetSpawnCommand(plugin))
+            "panel" -> tree.create(name, manage(PermissionKey.PANELS_COMMAND), PanelCommand(plugin))
+            "langfix" -> tree.create(name, legacy(PermissionKey.PUNISHERX_COMMAND), PlaceholderFixCommand(plugin))
+            "cache" -> tree.create(name, anyone, CacheCommand(plugin))
+
+            "report" -> tree.create(name, anyone, ReportCommand(plugin), listOf(player), listOf(player, Argument("reason", Kind.GREEDY)))
+            "reports" -> {
+                val canManage = manage(PermissionKey.MANAGE_REPORTS)
+                val canRead: (CommandSender) -> Boolean = { PermissionChecker.hasWithSee(it, PermissionKey.SEE_REPORTS) || canManage(it) }
+                val id = Argument("id")
+                val note = Argument("note", Kind.GREEDY)
+                val forms = listOf("gui", "book", "list", "history").flatMap { listOf(listOf(Literal(it)), listOf(Literal(it), page)) } +
+                    listOf(listOf(Literal("view"), id)) +
+                    listOf("resolve", "reject").map { listOf(Literal(it, canManage), id, note) }
+                tree.create(name, canRead, ReportsCommand(plugin), *forms.toTypedArray())
+            }
+            "note" -> {
+                val canManage = manage(PermissionKey.MANAGE_NOTES)
+                val canRead: (CommandSender) -> Boolean = { canManage(it) || PermissionChecker.hasWithSee(it, PermissionKey.SEE_NOTES) }
+                tree.create(
+                    name, canRead, NoteCommand(plugin),
+                    listOf(Literal("list"), player), listOf(Literal("list"), player, page),
+                    listOf(Literal("add", canManage), player, Argument("text", Kind.GREEDY)),
+                    listOf(Literal("remove", canManage), player, Argument("id"))
+                )
+            }
+
+            // help is open to everyone, the rest is checked again inside the command.
+            "punisherx", "prx" -> {
+                val admin = legacy(PermissionKey.PUNISHERX_COMMAND)
+                val types = { listOf("mysql", "mariadb", "postgresql", "mssql", "sqlite") }
+                val from = Argument("from", values = types)
+                val to = Argument("to", values = types)
+                val force = Literal("--force", admin)
+                val migrate = Literal("migrate", admin)
+                val simple = listOf("version", "reload", "export", "import", "diag", "diagnostics", "panel", "validate")
+                    .map { listOf(Literal(it, admin)) }
+                tree.create(
+                    name, anyone, PunisherRootCommand(plugin),
+                    listOf(Literal("help")), listOf(Literal("help"), page), *simple.toTypedArray(),
+                    listOf(migrate, from), listOf(migrate, from, to), listOf(migrate, from, to, force),
+                    listOf(migrate, from, force), listOf(migrate, from, force, to)
+                )
+            }
+            else -> null
         }
     }
 
