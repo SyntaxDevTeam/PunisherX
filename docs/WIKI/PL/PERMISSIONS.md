@@ -1,6 +1,20 @@
 Plugin oferuje rozbudowany zestaw permisji do zarządzania dostępem do różnych funkcji. Poniżej znajdziesz pogrupowaną listę dostępnych permisji wraz z opisami.
 Rekomendowany plugin do uprawnień: [LuckPerms](https://luckperms.net/)
 
+### Limity czasu kar (Paper)
+
+`punisherx.max.<typ>.<czas>` ogranicza czas kar moderatora, np. `punisherx.max.ban.7d`.
+Typy: `ban`, `banip`, `mute`, `warn`, `jail`. Czas: liczba z jednostką `s`, `m`, `h` lub `d`.
+Najdłuższy aktywny, poprawny limit dla danego typu wygrywa. Kary równe limitowi są dozwolone;
+dłuższe i permanentne są blokowane. Brak poprawnego limitu oznacza brak ograniczenia.
+Limit nie nadaje dostępu do komendy. Obejmuje zwykłe komendy, `/punish` i szybkie kary z szablonów w GUI;
+`--force`, `--silent` i `--mark` go nie omijają. `KICK` nie ma limitu czasu.
+
+Nadaj konkretne węzły, np. `punisherx.max.mute.1h`; wildcard `punisherx.max.ban.*` nie określa czasu.
+Węzły są odczytywane z Bukkit `effectivePermissions` i sprawdzane przez `hasPermission`.
+Sprawdź ich widoczność z używanym systemem rang i kontekstami; nie jest to integracja z API LuckPerms.
+Funkcja nie jest obecnie zaimplementowana w module Spigot.
+
 ### Permisje komend
 
 | Permisja | Opis |

@@ -17,12 +17,17 @@ internal object PunishmentCommandUtils {
     fun exceedsMaxTime(plugin: PunisherX, stack: CommandSourceStack, type: String, time: String?): Boolean {
         val prefix = "punisherx.max.$type."
         val max = stack.sender.effectivePermissions
-            .filter { it.value && it.permission.startsWith(prefix) }
-            .map { it.permission.removePrefix(prefix) }
-            .filter { runCatching { plugin.timeHandler.parseTime(it) }.isSuccess }
-            .maxByOrNull { plugin.timeHandler.parseTime(it) } ?: return false
-        if (time != null && plugin.timeHandler.parseTime(time) <= plugin.timeHandler.parseTime(max)) return false
-        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "max_time", mapOf("time" to plugin.timeHandler.formatTime(max))))
+            .asSequence()
+            .filter { it.value && it.permission.startsWith(prefix) && stack.sender.hasPermission(it.permission) }
+            .mapNotNull {
+                val raw = it.permission.removePrefix(prefix)
+                runCatching { raw to plugin.timeHandler.parseTime(raw) }.getOrNull()
+            }
+            .maxByOrNull { it.second } ?: return false
+        val seconds = time?.takeUnless { it.isBlank() || it.equals("permanent", ignoreCase = true) }
+            ?.let { plugin.timeHandler.parseTime(it) }
+        if (seconds != null && seconds <= max.second) return false
+        stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "max_time", mapOf("time" to plugin.timeHandler.formatTime(max.first))))
         return true
     }
 

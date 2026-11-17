@@ -26,12 +26,17 @@ class TimeHandler internal constructor(
         val amount = normalized.dropLast(1).toLong()
         val unit = normalized.last()
 
-        return when (unit) {
-            's' -> amount
-            'm' -> amount * 60
-            'h' -> amount * 60 * 60
-            'd' -> amount * 60 * 60 * 24
+        val multiplier = when (unit) {
+            's' -> 1L
+            'm' -> 60L
+            'h' -> 3600L
+            'd' -> 86400L
             else -> throw NumberFormatException("Invalid time unit: $unit")
+        }
+        return try {
+            Math.multiplyExact(amount, multiplier)
+        } catch (_: ArithmeticException) {
+            throw NumberFormatException("Time is too large: $time")
         }
     }
 
