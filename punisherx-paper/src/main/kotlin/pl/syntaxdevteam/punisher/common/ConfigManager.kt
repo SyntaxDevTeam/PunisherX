@@ -9,6 +9,7 @@ import pl.syntaxdevteam.punisher.PunisherX
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import pl.syntaxdevteam.punisher.messages.NameFormatting
 
 class ConfigManager(private val plugin: PunisherX) {
 
@@ -153,7 +154,7 @@ class ConfigManager(private val plugin: PunisherX) {
             plugin.logger.debug("[Config] Migrating $sourceVersion -> $V_168 …")
             for (role in listOf("player", "operator")) {
                 val key = "name-formatting.$role-display"
-                config.set(key, rawUserDoc?.getString(key) ?: pl.syntaxdevteam.punisher.messages.NameFormatting.DEFAULT_LAYOUT)
+                config.set(key, rawUserDoc?.getString(key) ?: NameFormatting.DEFAULT_LAYOUT)
             }
         }
         // Experimental DscBridgeAPI migration stays disabled until full release.

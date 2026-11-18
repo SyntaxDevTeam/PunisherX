@@ -8,6 +8,9 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.time.LocalDateTime
 import java.util.Locale
+import java.nio.file.AtomicMoveNotSupportedException
+import java.sql.Timestamp
+import pl.syntaxdevteam.punisher.identity.canonicalIp
 
 typealias DatabaseSnapshot = Map<String, List<Map<String, Any?>>>
 
@@ -53,7 +56,7 @@ internal object DatabaseBackup {
                 }
             }
             try { Files.move(temporary, file.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING) }
-            catch (_: java.nio.file.AtomicMoveNotSupportedException) {
+            catch (_: AtomicMoveNotSupportedException) {
                 Files.move(temporary, file.toPath(), StandardCopyOption.REPLACE_EXISTING)
             }
         } finally { Files.deleteIfExists(temporary) }
@@ -84,9 +87,9 @@ internal object DatabaseBackup {
                         val values = row.map { (name, value) ->
                             if (table == "punishments" && name.equals("uuid", true) && value is String &&
                                 row.entries.any { it.key.equals("punishmentType", true) && it.value == "BANIP" })
-                                pl.syntaxdevteam.punisher.identity.canonicalIp(value) ?: value
+                                canonicalIp(value) ?: value
                             else if (name.equals("filedAt", true) && value is String && database.dialect.type != DatabaseType.SQLITE)
-                                java.sql.Timestamp.valueOf(LocalDateTime.parse(value.replace(' ', 'T')))
+                                Timestamp.valueOf(LocalDateTime.parse(value.replace(' ', 'T')))
                             else if (value is String && name.lowercase(Locale.ROOT) in setOf(
                                 "id", "historyid", "reportid", "start", "endtime", "processed", "processedat", "undoneat", "handledat", "activeid", "pausedat", "created_at", "last_confirmed_at", "version"
                             )) value.toLong() // Compatibility with old exports that quoted every scalar.

@@ -7,6 +7,7 @@ import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.databases.MarkedPunishmentStore
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.UUID
+import java.util.Locale
 
 class UnmarkCommand(private val plugin: PunisherX) : BasicCommand {
     override fun execute(stack: CommandSourceStack, args: Array<String>) {
@@ -22,7 +23,7 @@ class UnmarkCommand(private val plugin: PunisherX) : BasicCommand {
             reply("usage")
             return
         }
-        val operation = arguments[0].lowercase(java.util.Locale.ROOT)
+        val operation = arguments[0].lowercase(Locale.ROOT)
         val control = operation == "pause" || operation == "resume"
         if (control && arguments.size != 2) { reply("usage"); return }
         val mark = arguments.getOrNull(1)?.let { value ->

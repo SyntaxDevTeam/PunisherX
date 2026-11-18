@@ -17,6 +17,7 @@ import pl.syntaxdevteam.punisher.templates.PunishTemplateLevel
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import org.bukkit.entity.Player
 
 class PunishCommand(private val plugin: PunisherX) : BasicCommand {
     private data class TemplateTime(val seconds: Long?)
@@ -147,7 +148,7 @@ class PunishCommand(private val plugin: PunisherX) : BasicCommand {
         }
     }
 
-    private fun isBypassed(targetPlayer: org.bukkit.entity.Player, type: String): Boolean {
+    private fun isBypassed(targetPlayer: Player, type: String): Boolean {
         return when (type) {
             "BAN" -> PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_BAN)
             "BANIP" -> PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_BANIP)

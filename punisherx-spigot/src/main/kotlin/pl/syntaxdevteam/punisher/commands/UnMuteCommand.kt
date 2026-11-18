@@ -6,6 +6,7 @@ import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+import java.util.UUID
 
 class UnMuteCommand(private val plugin: PunisherX) : BasicCommand {
 
@@ -26,7 +27,7 @@ class UnMuteCommand(private val plugin: PunisherX) : BasicCommand {
                     }
                     val placeholders = mapOf("player" to player, "operator" to stack.sender.name)
                     PunishmentCommandUtils.sendSenderMessages(plugin, stack, "unmute", "unmute", placeholders, silent = silent)
-                    PunishmentCommandUtils.sendTargetMessages(plugin, Bukkit.getPlayer(java.util.UUID.fromString(uuid)), "unmute", "unmute_message", placeholders, silent = silent)
+                    PunishmentCommandUtils.sendTargetMessages(plugin, Bukkit.getPlayer(UUID.fromString(uuid)), "unmute", "unmute_message", placeholders, silent = silent)
                     plugin.logger.info("Player $player ($uuid) has been unmuted")
                 } else {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_found", mapOf("player" to player, "operator" to stack.sender.name)))

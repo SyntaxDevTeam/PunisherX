@@ -14,12 +14,13 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import org.mockito.stubbing.Answer
 
 class SilentConfirmationTest {
     private val plugin = mock<PunisherX>()
     private val sender = mock<CommandSender>()
     private val delivered = mutableListOf<String>()
-    private val senderBridge = mock<CommandSender.Spigot>(defaultAnswer = org.mockito.stubbing.Answer { invocation ->
+    private val senderBridge = mock<CommandSender.Spigot>(defaultAnswer = Answer { invocation ->
         if (invocation.method.name == "sendMessage") {
             val components = invocation.arguments.filterIsInstance<BaseComponent>().toTypedArray()
             delivered += BaseComponent.toPlainText(*components)

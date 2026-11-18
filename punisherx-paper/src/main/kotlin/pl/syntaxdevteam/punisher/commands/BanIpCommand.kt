@@ -11,6 +11,7 @@ import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.compatibility.multilineComponent
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.UUID
+import pl.syntaxdevteam.punisher.permissions.IpVisibility
 
 class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
     companion object {
@@ -87,8 +88,8 @@ class BanIpCommand(private val plugin: PunisherX) : BasicCommand {
         if (failedIPs.isNotEmpty()) {
             stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent(
                 "error", "banip_db_error", mapOf(
-                    "failed_ips" to failedIPs.joinToString(", ") { pl.syntaxdevteam.punisher.permissions.IpVisibility.displayAddress(plugin, stack.sender, it) },
-                    "banned_ips" to bannedIPs.joinToString(", ") { pl.syntaxdevteam.punisher.permissions.IpVisibility.displayAddress(plugin, stack.sender, it) }.ifEmpty { "-" }
+                    "failed_ips" to failedIPs.joinToString(", ") { IpVisibility.displayAddress(plugin, stack.sender, it) },
+                    "banned_ips" to bannedIPs.joinToString(", ") { IpVisibility.displayAddress(plugin, stack.sender, it) }.ifEmpty { "-" }
                 )
             ))
             // Some addresses may already have been persisted. Do not report full success.

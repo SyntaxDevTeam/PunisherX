@@ -14,6 +14,7 @@ import pl.syntaxdevteam.core.SyntaxCore
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.*
+import org.bukkit.entity.Player
 
 class PunishmentChecker(private val plugin: PunisherX) : Listener {
 
@@ -47,7 +48,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
     }
 
     private fun processPlayerJoinLocation(
-        player: org.bukkit.entity.Player,
+        player: Player,
         name: String,
         uuid: UUID,
         radius: Double,

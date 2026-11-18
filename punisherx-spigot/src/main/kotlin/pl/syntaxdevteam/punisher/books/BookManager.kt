@@ -9,6 +9,12 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer
+import org.bukkit.Material
+import org.bukkit.event.EventPriority
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.BookMeta
 
 /** Shared transport for book menus. Every opened menu replaces the player's previous actions. */
 class BookManager(private val plainText: (Component) -> String, private val clock: () -> Long = System::currentTimeMillis) : Listener {
@@ -27,19 +33,19 @@ class BookManager(private val plainText: (Component) -> String, private val cloc
     fun open(player: Player, title: Component, author: Component, build: (Menu) -> List<Component>) {
         val menu = Menu()
         val pages = build(menu).ifEmpty { listOf(Component.empty()) }.take(100).map {
-            Component.empty().color(net.kyori.adventure.text.format.NamedTextColor.BLACK).append(it)
+            Component.empty().color(NamedTextColor.BLACK).append(it)
         }
         sessions[player.uniqueId] = Session(clock() + 300_000, menu.actions.toMap())
-        val book = org.bukkit.inventory.ItemStack(org.bukkit.Material.WRITTEN_BOOK)
-        val meta = book.itemMeta as org.bukkit.inventory.meta.BookMeta
+        val book = ItemStack(Material.WRITTEN_BOOK)
+        val meta = book.itemMeta as BookMeta
         meta.title = plainText(title).take(32)
         meta.author = plainText(author)
-        meta.spigot().setPages(*pages.map { net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer.get().serialize(it) }.toTypedArray())
+        meta.spigot().setPages(*pages.map { BungeeComponentSerializer.get().serialize(it) }.toTypedArray())
         book.itemMeta = meta
         player.openBook(book)
     }
 
-    @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onCommand(event: PlayerCommandPreprocessEvent) {
         if (!event.message.startsWith("/report __prx:book ", true)) return
         event.isCancelled = true

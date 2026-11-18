@@ -9,6 +9,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent
 import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.identity.canonicalIp
 
 class LegacyLoginListener(private val plugin: PunisherX) : Listener {
 
@@ -26,7 +27,7 @@ class LegacyLoginListener(private val plugin: PunisherX) : Listener {
             plugin.logger.debug("Checking punishment for player: ${player.name}")
 
             val uuid = player.uniqueId.toString()
-            val ip = pl.syntaxdevteam.punisher.identity.canonicalIp(event.address.hostAddress) ?: event.address.hostAddress
+            val ip = canonicalIp(event.address.hostAddress) ?: event.address.hostAddress
 
             val punishments = plugin.databaseHandler.getPunishments(uuid) + plugin.databaseHandler.getPunishmentsByIP(ip)
             if (punishments.isEmpty()) {

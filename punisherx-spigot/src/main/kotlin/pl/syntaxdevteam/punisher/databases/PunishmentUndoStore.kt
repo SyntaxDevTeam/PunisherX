@@ -4,6 +4,7 @@ import pl.syntaxdevteam.syntaxdb.Database
 import pl.syntaxdevteam.syntaxdb.DatabaseClient
 import pl.syntaxdevteam.syntaxdb.row.Row
 import java.util.Locale
+import pl.syntaxdevteam.punisher.identity.canonicalIp
 
 /** Keeps the original history and records each reversal once, in the same transaction as removal. */
 internal class PunishmentUndoStore(private val database: Database, private val scope: String) {
@@ -91,7 +92,7 @@ internal class PunishmentUndoStore(private val database: Database, private val s
     }
 
     private fun eventParams(row: PunishmentData): List<Any> =
-        listOf(if (row.type == "BANIP") pl.syntaxdevteam.punisher.identity.canonicalIp(row.uuid) ?: row.uuid else row.uuid, row.type, row.start, row.server, row.operator, row.reason, row.end)
+        listOf(if (row.type == "BANIP") canonicalIp(row.uuid) ?: row.uuid else row.uuid, row.type, row.start, row.server, row.operator, row.reason, row.end)
 
     private fun DatabaseClient.reverse(rows: List<PunishmentData>, operator: String) {
         val now = System.currentTimeMillis()
@@ -113,7 +114,7 @@ internal class PunishmentUndoStore(private val database: Database, private val s
             execute("DELETE FROM bridge_events WHERE action = ? AND target = ? AND reason = ? " +
                 "AND endTime = ? AND processed = 0 AND NOT EXISTS " +
                 "(SELECT 1 FROM punishments WHERE uuid = ? AND punishmentType = ?)",
-                listOf(row.type, pl.syntaxdevteam.punisher.identity.canonicalIp(row.uuid) ?: row.uuid, row.reason, row.end, pl.syntaxdevteam.punisher.identity.canonicalIp(row.uuid) ?: row.uuid, row.type))
+                listOf(row.type, canonicalIp(row.uuid) ?: row.uuid, row.reason, row.end, canonicalIp(row.uuid) ?: row.uuid, row.type))
         }
     }
 

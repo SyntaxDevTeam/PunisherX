@@ -9,6 +9,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.util.UUID
 import kotlin.test.AfterTest
+import java.util.logging.Logger
 
 /** Each test owns a real file and SyntaxDB pool; JDBC assertions do not reuse production queries. */
 abstract class SyntaxDbTestFixture {
@@ -26,7 +27,7 @@ abstract class SyntaxDbTestFixture {
         whenever(it.discordWebhook).thenReturn(mock())
         whenever(it.punishmentManager).thenReturn(PunishmentManager())
         whenever(it.server).thenReturn(mock())
-        whenever(it.server.logger).thenReturn(java.util.logging.Logger.getAnonymousLogger())
+        whenever(it.server.logger).thenReturn(Logger.getAnonymousLogger())
     }
     protected val handler = DatabaseHandler(plugin)
     protected val uuid = UUID.randomUUID()

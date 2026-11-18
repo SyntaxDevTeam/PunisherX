@@ -5,12 +5,14 @@ import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+import org.bukkit.command.CommandSender
+import pl.syntaxdevteam.punisher.permissions.IpVisibility
 
 internal object PunishmentCommandUtils {
-    private fun privatePlaceholders(plugin: PunisherX, viewer: org.bukkit.command.CommandSender,
+    private fun privatePlaceholders(plugin: PunisherX, viewer: CommandSender,
                                     placeholders: Map<String, String>): Map<String, String> =
         placeholders.mapValues { (key, value) ->
-            if (key == "player") pl.syntaxdevteam.punisher.permissions.IpVisibility.displayAddress(plugin, viewer, value) else value
+            if (key == "player") IpVisibility.displayAddress(plugin, viewer, value) else value
         }
 
     fun parseTimeAndReason(

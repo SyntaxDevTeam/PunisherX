@@ -44,6 +44,16 @@ import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
 import java.util.UUID
 import java.util.logging.Level
+import java.io.File
+import org.bukkit.command.CommandSender
+import pl.syntaxdevteam.punisher.books.BookManager
+import pl.syntaxdevteam.punisher.gui.GuiRuntime
+import pl.syntaxdevteam.punisher.identity.IdentityNotResolvedException
+import pl.syntaxdevteam.punisher.identity.IdentityResolution
+import pl.syntaxdevteam.punisher.identity.IdentitySettings
+import pl.syntaxdevteam.punisher.identity.PlayerIdentity
+import pl.syntaxdevteam.punisher.identity.PlayerIdentityDirectory
+import pl.syntaxdevteam.punisher.messages.PunisherMessages
 
 class PunisherX : JavaPlugin(), Listener {
     private lateinit var libraryLoader: LibraryLoader
@@ -57,11 +67,11 @@ class PunisherX : JavaPlugin(), Listener {
     private lateinit var pluginInitializer: PluginInitializer
 
     lateinit var logger: Logger
-    val bookManager = pl.syntaxdevteam.punisher.books.BookManager(plainText = { messageHandler.getPlainText(it) })
+    val bookManager = BookManager(plainText = { messageHandler.getPlainText(it) })
 
     fun nameMetadata(name: String, colorKey: String) = if (::hookHandler.isInitialized) hookHandler.nameMetadata(name, colorKey) else null
 
-    lateinit var messageHandler: pl.syntaxdevteam.punisher.messages.PunisherMessages
+    lateinit var messageHandler: PunisherMessages
     lateinit var pluginsManager: PluginManagerX
 
     lateinit var pluginConfig: FileConfiguration
@@ -115,7 +125,7 @@ class PunisherX : JavaPlugin(), Listener {
             ModrinthSource("VCNRcwC2")
         )
         SyntaxCore.init(this, versionType = "spigot")
-        localPlayerSkins.initialize(java.io.File(dataFolder, "skin-cache"))
+        localPlayerSkins.initialize(File(dataFolder, "skin-cache"))
 
         // Language YAML is deliberately excluded here: MessageHandler must be able to
         // preserve a broken translation and start on its bundled in-memory fallback.
@@ -174,17 +184,17 @@ class PunisherX : JavaPlugin(), Listener {
         }
     }
 
-    val guiRuntime = pl.syntaxdevteam.punisher.gui.GuiRuntime(this)
+    val guiRuntime = GuiRuntime(this)
     val localPlayerSkins = LocalPlayerSkins()
 
-    private var identityDirectory: pl.syntaxdevteam.punisher.identity.PlayerIdentityDirectory? = null
+    private var identityDirectory: PlayerIdentityDirectory? = null
 
-    val playerIdentities: pl.syntaxdevteam.punisher.identity.PlayerIdentityDirectory
+    val playerIdentities: PlayerIdentityDirectory
         get() = requireNotNull(identityDirectory) { "Identity directory is not initialized" }
 
     fun resetPlayerIdentities() {
-        identityDirectory = pl.syntaxdevteam.punisher.identity.PlayerIdentityDirectory(
-            pl.syntaxdevteam.punisher.identity.IdentitySettings.create(
+        identityDirectory = PlayerIdentityDirectory(
+            IdentitySettings.create(
                 config.getString("identity.realm"), config.getString("identity.authority"), server.onlineMode))
     }
 
@@ -193,7 +203,7 @@ class PunisherX : JavaPlugin(), Listener {
         directory.joined(uuid, name)
         val observedAt = System.currentTimeMillis()
         // Offline sessions describe an offline namespace; they are not verified online accounts.
-        val identity = pl.syntaxdevteam.punisher.identity.PlayerIdentity(directory.settings.realm, uuid, name, directory.settings.authority)
+        val identity = PlayerIdentity(directory.settings.realm, uuid, name, directory.settings.authority)
         schedulerAdapter.runAsync {
             if (identityDirectory !== directory || !isEnabled) return@runAsync
             runCatching { databaseHandler.recordIdentityObservation(identity, observedAt) }
@@ -201,21 +211,21 @@ class PunisherX : JavaPlugin(), Listener {
         }
     }
 
-    fun auditIdentityChoice(sender: org.bukkit.command.CommandSender, uuid: UUID, identifier: String) {
+    fun auditIdentityChoice(sender: CommandSender, uuid: UUID, identifier: String) {
         if (this::logger.isInitialized) {
-            val identity = (resolvePlayerIdentity(identifier) as? pl.syntaxdevteam.punisher.identity.IdentityResolution.Resolved)?.identity
+            val identity = (resolvePlayerIdentity(identifier) as? IdentityResolution.Resolved)?.identity
             logger.debug("Identity choice: operator=${sender.name}, input=$identifier, realm=${playerIdentities.settings.realm}, uuid=$uuid, source=${identity?.authority}")
         }
     }
 
-    fun resolvePlayerIdentity(identifier: String): pl.syntaxdevteam.punisher.identity.IdentityResolution =
-        identityDirectory?.resolve(identifier) ?: pl.syntaxdevteam.punisher.identity.IdentityResolution.Unavailable
+    fun resolvePlayerIdentity(identifier: String): IdentityResolution =
+        identityDirectory?.resolve(identifier) ?: IdentityResolution.Unavailable
 
     /** Unknown names fail explicitly. No history, offline cache, synthetic UUID or blocking profile lookup. */
     fun resolvePlayerUuid(identifier: String): UUID =
         when (val result = resolvePlayerIdentity(identifier)) {
-            is pl.syntaxdevteam.punisher.identity.IdentityResolution.Resolved -> result.identity.uuid
-            else -> throw pl.syntaxdevteam.punisher.identity.IdentityNotResolvedException(result)
+            is IdentityResolution.Resolved -> result.identity.uuid
+            else -> throw IdentityNotResolvedException(result)
         }
 
     private fun reloadMyConfig() {

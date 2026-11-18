@@ -7,6 +7,7 @@ import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+import java.util.UUID
 
 class ClearAllCommand(private val plugin: PunisherX) : BasicCommand {
 
@@ -28,7 +29,7 @@ class ClearAllCommand(private val plugin: PunisherX) : BasicCommand {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent(
                         "clear", if (silent) "silent_success" else "clearall", mapOf("player" to player)))
                     if (!silent) {
-                        val targetPlayer = Bukkit.getPlayer(java.util.UUID.fromString(uuid))
+                        val targetPlayer = Bukkit.getPlayer(UUID.fromString(uuid))
                         val getMessage = plugin.messageHandler.stringMessageToComponent("clear", "clear_message")
                         targetPlayer?.sendMessage(getMessage)
                     }

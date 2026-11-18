@@ -6,21 +6,25 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import pl.syntaxdevteam.punisher.basic.PunishmentChecker
 import pl.syntaxdevteam.punisher.players.PlayerIPManager
+import org.bukkit.event.player.PlayerQuitEvent
+import pl.syntaxdevteam.punisher.PunisherX
+import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
+import pl.syntaxdevteam.punisher.permissions.IpVisibility
 
 class PlayerJoinListener(
     private val playerIPManager: PlayerIPManager,
     private val punishmentChecker: PunishmentChecker,
-    private val plugin: pl.syntaxdevteam.punisher.PunisherX
+    private val plugin: PunisherX
 ) : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
-    fun onPlayerQuit(event: org.bukkit.event.player.PlayerQuitEvent) {
+    fun onPlayerQuit(event: PlayerQuitEvent) {
         val player = event.player
         plugin.playerIdentities.left(player.uniqueId)
-        pl.syntaxdevteam.punisher.permissions.IpVisibility.rememberPreference(plugin, player)
+        IpVisibility.rememberPreference(plugin, player)
         plugin.databaseHandler.updateJailClock(player.uniqueId.toString(), pause = true)
         plugin.localPlayerSkins.capture(player)
-        val save = pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService.captureLogoutLocation(player.uniqueId, player.location)
+        val save = PlayerStatsService.captureLogoutLocation(player.uniqueId, player.location)
         plugin.schedulerAdapter.runAsync(save)
     }
 
@@ -28,7 +32,7 @@ class PlayerJoinListener(
     @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerJoin(event: PlayerJoinEvent) {
         plugin.observePlayerIdentity(event.player.uniqueId, event.player.name)
-        pl.syntaxdevteam.punisher.permissions.IpVisibility.rememberPreference(plugin, event.player)
+        IpVisibility.rememberPreference(plugin, event.player)
         plugin.localPlayerSkins.capture(event.player)
         plugin.databaseHandler.updateJailClock(event.player.uniqueId.toString(), pause = false)
         plugin.databaseHandler.getPunishments(event.player.uniqueId.toString()).firstOrNull { it.type == "JAIL" }?.let {

@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import pl.syntaxdevteam.message.MessageHandler
 import pl.syntaxdevteam.punisher.PunisherX
+import net.kyori.adventure.text.TextReplacementConfig
 
 /** Enriches the message boundary without changing plain names or the delegate's language selection. */
 class PunisherMessages(private val plugin: PunisherX, private val delegate: MessageHandler) {
@@ -38,7 +39,7 @@ class PunisherMessages(private val plugin: PunisherX, private val delegate: Mess
 
     private fun replace(component: Component, prepared: Prepared): Component =
         prepared.replacements.entries.fold(component) { result, (marker, replacement) ->
-            result.replaceText(net.kyori.adventure.text.TextReplacementConfig.builder().matchLiteral(marker).replacement(replacement).build())
+            result.replaceText(TextReplacementConfig.builder().matchLiteral(marker).replacement(replacement).build())
         }
 
     private fun replace(text: String, prepared: Prepared, format: MessageHandler.MessageFormat): String {

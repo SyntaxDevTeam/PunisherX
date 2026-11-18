@@ -16,6 +16,7 @@ import java.time.Duration
 import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import pl.syntaxdevteam.punisher.identity.canonicalIp
 
 class ModernLoginListener(private val plugin: PunisherX) : Listener {
 
@@ -39,7 +40,7 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
 
         val playerName = event.name
 
-        val ip = pl.syntaxdevteam.punisher.identity.canonicalIp(event.address.hostAddress) ?: event.address.hostAddress
+        val ip = canonicalIp(event.address.hostAddress) ?: event.address.hostAddress
         if (ip.isNullOrBlank()) {
             plugin.logger.debug("ModernLogin(pre): brak adresu IP dla $playerName → leaving result ${event.loginResult}")
             return

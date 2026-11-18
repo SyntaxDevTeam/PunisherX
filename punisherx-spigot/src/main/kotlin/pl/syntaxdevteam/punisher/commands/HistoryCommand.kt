@@ -9,6 +9,7 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.players.PlayerIPManager
 import java.text.SimpleDateFormat
 import java.util.*
+import pl.syntaxdevteam.punisher.permissions.IpVisibility
 
 class HistoryCommand(private val plugin: PunisherX, private val playerIPManager: PlayerIPManager) : BasicCommand {
 
@@ -54,7 +55,7 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
                 val playerIP = playerInfo?.playerIP
                 val geoLocation = playerInfo?.geoLocation?.takeIf { it.isNotBlank() } ?: "Unknown location"
                 plugin.logger.debug("GeoLocation: $geoLocation")
-                val fullGeoLocation = when (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, stack.sender, uuid, player)) {
+                val fullGeoLocation = when (IpVisibility.canView(plugin, stack.sender, uuid, player)) {
                     true -> playerIP?.let { "$it ($geoLocation)" } ?: geoLocation
                     else -> geoLocation
                 }

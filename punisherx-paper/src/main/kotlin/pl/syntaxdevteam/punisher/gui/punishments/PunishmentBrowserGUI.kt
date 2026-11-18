@@ -11,6 +11,8 @@ import pl.syntaxdevteam.punisher.databases.PunishmentData
 import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.UUID
+import pl.syntaxdevteam.punisher.permissions.IpVisibility
 
 class PunishmentBrowserGUI(plugin: PunisherX) : BaseGUI(plugin) {
     private enum class Filter(val types: Set<String>) {
@@ -40,7 +42,7 @@ class PunishmentBrowserGUI(plugin: PunisherX) : BaseGUI(plugin) {
         val gui = createGui(6)
         rows.forEachIndexed { index, punishment ->
             setPlayerHead(gui, index, createHead(player, punishment),
-                runCatching { java.util.UUID.fromString(punishment.uuid) }.getOrNull(), pl.syntaxdevteam.punisher.permissions.IpVisibility.displayField(plugin, player, punishment, punishment.name)) { clicker ->
+                runCatching { UUID.fromString(punishment.uuid) }.getOrNull(), IpVisibility.displayField(plugin, player, punishment, punishment.name)) { clicker ->
                 PunishmentDetailsGUI(plugin).open(clicker, punishment) { load(clicker, page, filter, query) }
             }
         }
@@ -58,7 +60,7 @@ class PunishmentBrowserGUI(plugin: PunisherX) : BaseGUI(plugin) {
         val head = ItemStack(Material.PLAYER_HEAD)
         val meta = head.itemMeta as SkullMeta
 
-        meta.displayName(mH.formatMixedTextToMiniMessage("<yellow>${pl.syntaxdevteam.punisher.permissions.IpVisibility.displayField(plugin, player, punishment, punishment.name)}</yellow> <gray>#${punishment.id}</gray>", TagResolver.empty()))
+        meta.displayName(mH.formatMixedTextToMiniMessage("<yellow>${IpVisibility.displayField(plugin, player, punishment, punishment.name)}</yellow> <gray>#${punishment.id}</gray>", TagResolver.empty()))
         val end = if (punishment.end == -1L) "permanent" else plugin.timeHandler.formatTime(((punishment.end - System.currentTimeMillis()).coerceAtLeast(0) / 1000).toString())
         meta.lore(listOf(
             mH.miniMessageFormat("<gray>Type: <yellow>${punishment.type}</yellow></gray>"),

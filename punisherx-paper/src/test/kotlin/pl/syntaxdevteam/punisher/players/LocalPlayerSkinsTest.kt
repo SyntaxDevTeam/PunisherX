@@ -9,6 +9,12 @@ import org.mockito.Mockito.*
 import java.net.URI
 import java.util.UUID
 import kotlin.test.Test
+import java.io.File
+import java.util.concurrent.CompletableFuture
+import kotlin.test.assertTrue
+import pl.syntaxdevteam.core.tools.PlayerSkin
+import pl.syntaxdevteam.core.tools.PlayerSkinResolver
+import pl.syntaxdevteam.core.tools.UUIDManager
 
 class LocalPlayerSkinsTest {
     @Test fun `unknown skin never creates a profile`() {
@@ -54,15 +60,15 @@ class LocalPlayerSkinsTest {
     }
     @Test fun `premium skins are delegated to SyntaxCore and applied with server UUID`() {
         val uuid = UUID.randomUUID()
-        val manager = mock(pl.syntaxdevteam.core.tools.UUIDManager::class.java)
-        val resolver = mock(pl.syntaxdevteam.core.tools.PlayerSkinResolver::class.java)
-        val directory = java.io.File("unused-test-cache")
-        val skin = pl.syntaxdevteam.core.tools.PlayerSkin("https://textures.minecraft.net/texture/premium", true)
+        val manager = mock(UUIDManager::class.java)
+        val resolver = mock(PlayerSkinResolver::class.java)
+        val directory = File("unused-test-cache")
+        val skin = PlayerSkin("https://textures.minecraft.net/texture/premium", true)
         `when`(manager.createSkinResolver(directory)).thenReturn(resolver)
-        `when`(resolver.resolve(uuid, "OfflineName")).thenReturn(java.util.concurrent.CompletableFuture.completedFuture(skin))
+        `when`(resolver.resolve(uuid, "OfflineName")).thenReturn(CompletableFuture.completedFuture(skin))
         val cache = LocalPlayerSkins()
         cache.initialize(directory, manager)
-        kotlin.test.assertTrue(cache.resolve(uuid, "OfflineName").join())
+        assertTrue(cache.resolve(uuid, "OfflineName").join())
         val profile = mock(PlayerProfile::class.java)
         val textures = mock(PlayerTextures::class.java)
         val meta = mock(SkullMeta::class.java)
@@ -70,7 +76,7 @@ class LocalPlayerSkinsTest {
         mockStatic(Bukkit::class.java).use { bukkit ->
             bukkit.`when`<PlayerProfile> { Bukkit.createProfile(uuid) }.thenReturn(profile)
             cache.apply(uuid, meta)
-            verify(textures).setSkin(java.net.URI(skin.url).toURL(), PlayerTextures.SkinModel.SLIM)
+            verify(textures).setSkin(URI(skin.url).toURL(), PlayerTextures.SkinModel.SLIM)
             verify(meta).setPlayerProfile(profile)
             verify(profile, never()).update()
         }

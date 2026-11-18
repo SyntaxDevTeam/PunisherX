@@ -9,6 +9,9 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import net.kyori.adventure.inventory.Book
+import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.event.EventPriority
 
 /** Shared transport for book menus. Every opened menu replaces the player's previous actions. */
 class BookManager(private val clock: () -> Long = System::currentTimeMillis) : Listener {
@@ -27,13 +30,13 @@ class BookManager(private val clock: () -> Long = System::currentTimeMillis) : L
     fun open(player: Player, title: Component, author: Component, build: (Menu) -> List<Component>) {
         val menu = Menu()
         val pages = build(menu).ifEmpty { listOf(Component.empty()) }.take(100).map {
-            Component.empty().color(net.kyori.adventure.text.format.NamedTextColor.BLACK).append(it)
+            Component.empty().color(NamedTextColor.BLACK).append(it)
         }
         sessions[player.uniqueId] = Session(clock() + 300_000, menu.actions.toMap())
-        player.openBook(net.kyori.adventure.inventory.Book.book(title, author, pages))
+        player.openBook(Book.book(title, author, pages))
     }
 
-    @EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onCommand(event: PlayerCommandPreprocessEvent) {
         if (!event.message.startsWith("/report __prx:book ", true)) return
         event.isCancelled = true

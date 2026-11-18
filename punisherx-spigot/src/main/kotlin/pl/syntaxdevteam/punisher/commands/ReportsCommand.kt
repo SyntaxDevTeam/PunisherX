@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.UUID
+import pl.syntaxdevteam.punisher.books.ReportBookService
 
 /** Staff inbox; all actions also work from the server console. */
 class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
@@ -42,7 +43,7 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
                         return
                     }
                     if (args.firstOrNull().equals("book", true) || useBooks()) {
-                        pl.syntaxdevteam.punisher.books.ReportBookService(plugin).openInbox(sender, page)
+                        ReportBookService(plugin).openInbox(sender, page)
                     } else ReportInboxGUI(plugin).open(sender, page)
                 }
                 "list", "history" -> {
@@ -54,7 +55,7 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
                     }
                     val closed = args.firstOrNull()?.equals("history", true) == true
                     if (sender is Player && useBooks()) {
-                        pl.syntaxdevteam.punisher.books.ReportBookService(plugin).openInbox(sender, page, closed)
+                        ReportBookService(plugin).openInbox(sender, page, closed)
                         return
                     }
                     val reports = plugin.databaseHandler.getReports(pageSize + 1, (page - 1) * pageSize, closed)
@@ -92,7 +93,7 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
                     }
                     if (action == "view") {
                         if (sender is Player && useBooks()) {
-                            pl.syntaxdevteam.punisher.books.ReportBookService(plugin).openDetails(sender, id)
+                            ReportBookService(plugin).openDetails(sender, id)
                             return
                         }
                         message(sender, "details-title", mapOf("id" to "$id"))

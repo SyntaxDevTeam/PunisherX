@@ -8,6 +8,8 @@ import pl.syntaxdevteam.punisher.PunisherX
 import java.nio.file.Files
 import java.util.UUID
 import kotlin.test.*
+import pl.syntaxdevteam.punisher.databases.PunishmentData
+import pl.syntaxdevteam.punisher.players.PlayerIPManager
 
 class IpVisibilityTest {
     private val folder = Files.createTempDirectory("ip-policy-").toFile()
@@ -60,7 +62,7 @@ class IpVisibilityTest {
         assertTrue(visible())
     }
     @Test fun `BANIP address masquerading as uuid or player name respects policy`() {
-        val data = pl.syntaxdevteam.punisher.databases.PunishmentData(1, "192.0.2.1", "BANIP", "reason", 0, -1, "192.0.2.1", "Admin", "survival")
+        val data = PunishmentData(1, "192.0.2.1", "BANIP", "reason", 0, -1, "192.0.2.1", "Admin", "survival")
         config.set("privacy.ip.enabled", false)
         assertEquals("[hidden]", IpVisibility.displayField(plugin, viewer, data, data.uuid))
         assertEquals("[hidden]", IpVisibility.displayField(plugin, viewer, data, data.name))
@@ -70,7 +72,7 @@ class IpVisibilityTest {
         whenever(plugin.playerIPManager.getAllDecryptedRecords()).thenReturn(emptyList())
         assertEquals(data.uuid, IpVisibility.displayField(plugin, viewer, data, data.uuid))
         whenever(plugin.playerIPManager.getAllDecryptedRecords()).thenReturn(listOf(
-            pl.syntaxdevteam.punisher.players.PlayerIPManager.PlayerInfo("Target", uuid.toString(), data.uuid, "Earth", "now")))
+            PlayerIPManager.PlayerInfo("Target", uuid.toString(), data.uuid, "Earth", "now")))
         config.set("privacy.ip.hidden_players", listOf(uuid.toString()))
         assertEquals("[hidden]", IpVisibility.displayField(plugin, viewer, data, data.uuid))
     }
@@ -85,7 +87,7 @@ class IpVisibilityTest {
         whenever(plugin.playerIPManager).thenReturn(mock())
         val address = "192.0.2.10"
         whenever(plugin.playerIPManager.getAllDecryptedRecords()).thenReturn(listOf(
-            pl.syntaxdevteam.punisher.players.PlayerIPManager.PlayerInfo("Target", uuid.toString(), address, "Earth", "now")))
+            PlayerIPManager.PlayerInfo("Target", uuid.toString(), address, "Earth", "now")))
         assertEquals(address, IpVisibility.displayAddress(plugin, viewer, address))
         config.set("privacy.ip.hidden_players", listOf("Target"))
         assertEquals("[hidden]", IpVisibility.displayAddress(plugin, viewer, address))

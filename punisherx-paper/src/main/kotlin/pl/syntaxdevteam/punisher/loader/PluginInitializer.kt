@@ -40,6 +40,8 @@ import pl.syntaxdevteam.punisher.hooks.DiscordBridge
 import pl.syntaxdevteam.punisher.templates.PunishTemplateManager
 import java.io.File
 import java.util.Locale
+import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
+import pl.syntaxdevteam.punisher.messages.PunisherMessages
 
 class PluginInitializer(private val plugin: PunisherX) {
     private var databaseHandler: DatabaseHandler? = null
@@ -122,7 +124,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         t("before SyntaxMessages.initialize")
         SyntaxMessages.initialize(plugin)
         t("after SyntaxMessages.initialize")
-        plugin.messageHandler = pl.syntaxdevteam.punisher.messages.PunisherMessages(plugin, SyntaxMessages.messages)
+        plugin.messageHandler = PunisherMessages(plugin, SyntaxMessages.messages)
         t("after SyntaxMessages.messages")
         plugin.pluginsManager = SyntaxCore.pluginManagerx
         t("after pluginsManager")
@@ -179,7 +181,7 @@ class PluginInitializer(private val plugin: PunisherX) {
             .getOrElse {
                 VersionChecker(plugin).also { plugin.versionChecker = it }
             }
-        pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService.initialize(plugin.dataFolder)
+        PlayerStatsService.initialize(plugin.dataFolder)
         plugin.playerJoinListener = PlayerJoinListener(plugin.playerIPManager, plugin.punishmentChecker, plugin)
         plugin.server.pluginManager.registerEvents(plugin.playerJoinListener, plugin)
         plugin.server.onlinePlayers.forEach { plugin.observePlayerIdentity(it.uniqueId, it.name) }

@@ -20,6 +20,7 @@ import java.time.Duration
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.UUID
+import io.papermc.paper.dialog.DialogResponseView
 
 /** Native staff report browser available through the Paper API on 1.21.7+. */
 @Suppress("UnstableApiUsage")
@@ -144,7 +145,7 @@ class ReportManagementDialogService(private val plugin: PunisherX) {
             }
         }
 
-    private fun button(label: Component, callback: (io.papermc.paper.dialog.DialogResponseView) -> Unit): ActionButton =
+    private fun button(label: Component, callback: (DialogResponseView) -> Unit): ActionButton =
         ActionButton.create(label, null, 180, DialogAction.customClick(
             { response, _ -> callback(response) },
             ClickCallback.Options.builder().uses(1).lifetime(Duration.ofMinutes(10)).build()

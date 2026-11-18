@@ -1,9 +1,8 @@
 package pl.syntaxdevteam.punisher.api
 import pl.syntaxdevteam.punisher.compatibility.*
-
- import pl.syntaxdevteam.punisher.databases.PunishmentData
- import pl.syntaxdevteam.punisher.databases.StaffNoteData
- import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CompletableFuture
+import pl.syntaxdevteam.punisher.databases.PunishmentData
+import pl.syntaxdevteam.punisher.databases.StaffNoteData
 
  /**
   * API interface for PunisherX plugin.

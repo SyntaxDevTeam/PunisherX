@@ -11,6 +11,10 @@ import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 import kotlin.text.Charsets.UTF_8
+import java.nio.file.AtomicMoveNotSupportedException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import pl.syntaxdevteam.punisher.identity.canonicalIp
 
 class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHandler) {
 
@@ -43,7 +47,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         val player = event.player
         val playerName = player.name
         val playerUUID = player.uniqueId.toString()
-        val playerIP = player.address?.address?.hostAddress?.let { pl.syntaxdevteam.punisher.identity.canonicalIp(it) }
+        val playerIP = player.address?.address?.hostAddress?.let { canonicalIp(it) }
 
         if (playerIP == null) return
 
@@ -208,7 +212,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
 
 
     fun getPlayersByIP(targetIP: String): List<PlayerInfo> {
-        return getAllDecryptedRecords().filter { it.playerIP == (pl.syntaxdevteam.punisher.identity.canonicalIp(targetIP) ?: targetIP) }
+        return getAllDecryptedRecords().filter { it.playerIP == (canonicalIp(targetIP) ?: targetIP) }
     }
 
     private fun parsePlayerInfo(decryptedLine: String): PlayerInfo? {
@@ -217,7 +221,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
             PlayerInfo(
                 playerName = parts[0],
                 playerUUID = parts[1],
-                playerIP = pl.syntaxdevteam.punisher.identity.canonicalIp(parts[2]) ?: parts[2],
+                playerIP = canonicalIp(parts[2]) ?: parts[2],
                 geoLocation = parts[3],
                 lastUpdated = parts[4]
             )
@@ -294,17 +298,17 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
             val temp = File(cacheFile.parentFile, ".${cacheFile.name}.identity-migration.tmp")
             temp.writeText(lines.joinToString(separator = "\n", postfix = if (lines.isEmpty()) "" else "\n"))
             try {
-                java.nio.file.Files.move(
+                Files.move(
                     temp.toPath(),
                     cacheFile.toPath(),
-                    java.nio.file.StandardCopyOption.ATOMIC_MOVE,
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.ATOMIC_MOVE,
+                    StandardCopyOption.REPLACE_EXISTING,
                 )
-            } catch (_: java.nio.file.AtomicMoveNotSupportedException) {
-                java.nio.file.Files.move(
+            } catch (_: AtomicMoveNotSupportedException) {
+                Files.move(
                     temp.toPath(),
                     cacheFile.toPath(),
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.REPLACE_EXISTING,
                 )
             } finally {
                 temp.delete()

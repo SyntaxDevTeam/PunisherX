@@ -4,24 +4,27 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
 import java.util.UUID
+import java.io.File
+import org.bukkit.configuration.file.YamlConfiguration
+import pl.syntaxdevteam.punisher.databases.PunishmentData
 
 /** Presentation policy only: IP ban enforcement and storage remain independent. */
 object IpVisibility {
     @Synchronized
     fun rememberPreference(plugin: PunisherX, player: Player) {
-        val file = java.io.File(plugin.dataFolder, "ip-privacy.yml")
-        val preferences = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(file)
+        val file = File(plugin.dataFolder, "ip-privacy.yml")
+        val preferences = YamlConfiguration.loadConfiguration(file)
         preferences.set(player.uniqueId.toString(), player.isPermissionSet("punisherx.privacy.hide_ip") && player.hasPermission("punisherx.privacy.hide_ip"))
         preferences.save(file)
     }
 
     @Synchronized
     private fun offlinePreference(plugin: PunisherX, uuid: UUID): Boolean =
-        org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(java.io.File(plugin.dataFolder, "ip-privacy.yml")).getBoolean(uuid.toString(), false)
+        YamlConfiguration.loadConfiguration(File(plugin.dataFolder, "ip-privacy.yml")).getBoolean(uuid.toString(), false)
 
     /** BANIP stores the address in the UUID column; never expose it as an identifier. */
     fun displayField(plugin: PunisherX, viewer: CommandSender,
-                     data: pl.syntaxdevteam.punisher.databases.PunishmentData, value: String): String {
+                     data: PunishmentData, value: String): String {
         if (data.type != "BANIP" || value != data.uuid) return value
         if (!canView(plugin, viewer, UUID.nameUUIDFromBytes(data.uuid.toByteArray()), data.name)) return "[hidden]"
         return displayAddress(plugin, viewer, data.uuid)

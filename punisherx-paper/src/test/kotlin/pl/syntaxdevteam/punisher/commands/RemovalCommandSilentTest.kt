@@ -11,6 +11,7 @@ import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.databases.PunishmentData
 import java.util.UUID
 import kotlin.test.Test
+import org.bukkit.configuration.file.YamlConfiguration
 
 class RemovalCommandSilentTest {
     private val plugin = mock<PunisherX>()
@@ -73,7 +74,7 @@ class RemovalCommandSilentTest {
     }
 
     @Test fun `silent unban removes IP ban without broadcasting`() {
-        whenever(plugin.config).thenReturn(org.bukkit.configuration.file.YamlConfiguration().apply { set("privacy.ip.enabled", false) })
+        whenever(plugin.config).thenReturn(YamlConfiguration().apply { set("privacy.ip.enabled", false) })
         val ip = "192.0.2.1"
         whenever(plugin.databaseHandler.getPunishmentsByIP(ip)).thenReturn(listOf(punishment("BANIP", ip)))
         UnBanCommand(plugin).execute(source, arrayOf(ip, "--silent"))

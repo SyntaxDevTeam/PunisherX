@@ -8,6 +8,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import pl.syntaxdevteam.punisher.PunisherX
 import java.util.UUID
+import pl.syntaxdevteam.punisher.identity.canonicalIp
 
 class ModernLoginListener(private val plugin: PunisherX) : Listener {
 
@@ -22,7 +23,7 @@ class ModernLoginListener(private val plugin: PunisherX) : Listener {
 
         val playerName = event.name
 
-        val ip = pl.syntaxdevteam.punisher.identity.canonicalIp(event.address.hostAddress) ?: event.address.hostAddress
+        val ip = canonicalIp(event.address.hostAddress) ?: event.address.hostAddress
         if (ip.isNullOrBlank()) {
             plugin.logger.debug("ModernLogin(pre): brak adresu IP dla $playerName → leaving result ${event.loginResult}")
             return

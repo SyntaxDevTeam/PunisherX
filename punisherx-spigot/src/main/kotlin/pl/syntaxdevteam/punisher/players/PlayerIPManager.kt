@@ -12,6 +12,7 @@ import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 import kotlin.text.Charsets.UTF_8
+import pl.syntaxdevteam.punisher.identity.canonicalIp
 
 class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHandler) {
 
@@ -44,7 +45,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
         val player = event.player
         val playerName = player.name
         val playerUUID = player.uniqueId.toString()
-        val playerIP = player.address?.address?.hostAddress?.let { pl.syntaxdevteam.punisher.identity.canonicalIp(it) }
+        val playerIP = player.address?.address?.hostAddress?.let { canonicalIp(it) }
 
         if (playerIP == null) return
 
@@ -209,7 +210,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
 
 
     fun getPlayersByIP(targetIP: String): List<PlayerInfo> {
-        return getAllDecryptedRecords().filter { it.playerIP == (pl.syntaxdevteam.punisher.identity.canonicalIp(targetIP) ?: targetIP) }
+        return getAllDecryptedRecords().filter { it.playerIP == (canonicalIp(targetIP) ?: targetIP) }
     }
 
     private fun parsePlayerInfo(decryptedLine: String): PlayerInfo? {
@@ -218,7 +219,7 @@ class PlayerIPManager(private val plugin: PunisherX, val geoIPHandler: GeoIPHand
             PlayerInfo(
                 playerName = parts[0],
                 playerUUID = parts[1],
-                playerIP = pl.syntaxdevteam.punisher.identity.canonicalIp(parts[2]) ?: parts[2],
+                playerIP = canonicalIp(parts[2]) ?: parts[2],
                 geoLocation = parts[3],
                 lastUpdated = parts[4]
             )

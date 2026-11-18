@@ -6,6 +6,7 @@ import pl.syntaxdevteam.message.ResourceProvider
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.InputStream
+import kotlin.io.path.createTempDirectory
 
 /** Uses the real library; these regression tests exercise its integration rather than a parser mock. */
 object TestMessages {
@@ -14,7 +15,7 @@ messages:
   literal: '<gray>Reason: <reason></gray>'
 """
     fun create(language: String = this.language): MessageHandler {
-        val folder = kotlin.io.path.createTempDirectory("punisher-messages-test").toFile()
+        val folder = createTempDirectory("punisher-messages-test").toFile()
         folder.deleteOnExit()
         return MessageHandler(object : ResourceProvider {
             override val dataFolder: File = folder

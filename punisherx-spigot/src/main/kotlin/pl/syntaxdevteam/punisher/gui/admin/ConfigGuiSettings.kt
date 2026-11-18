@@ -3,6 +3,8 @@ package pl.syntaxdevteam.punisher.gui.admin
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+import java.util.Locale
+import java.util.UUID
 
 /** Mutation boundary shared by inventory clicks and delayed chat input. */
 internal class ConfigGuiSettings(private val plugin: PunisherX) {
@@ -31,8 +33,8 @@ internal class ConfigGuiSettings(private val plugin: PunisherX) {
         if (!allowed(player, true)) return Result.DENIED
         val values = if (input.trim() == "-") emptyList() else input.trim().split(Regex("""[,\s]+"""))
         if (values.any { value -> !value.matches(Regex("[A-Za-z0-9_]{1,16}")) &&
-                runCatching { java.util.UUID.fromString(value).toString().equals(value, true) }.getOrDefault(false).not() }) return Result.INVALID
-        plugin.config.set("privacy.ip.hidden_players", values.distinctBy { it.lowercase(java.util.Locale.ROOT) })
+                runCatching { UUID.fromString(value).toString().equals(value, true) }.getOrDefault(false).not() }) return Result.INVALID
+        plugin.config.set("privacy.ip.hidden_players", values.distinctBy { it.lowercase(Locale.ROOT) })
         save()
         return Result.SAVED
     }

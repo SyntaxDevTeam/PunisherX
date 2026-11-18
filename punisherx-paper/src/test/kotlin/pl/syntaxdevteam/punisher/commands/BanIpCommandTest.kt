@@ -12,6 +12,7 @@ import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import java.util.UUID
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class BanIpCommandTest {
     private val plugin = mock<PunisherX>()
@@ -113,7 +114,7 @@ class BanIpCommandTest {
         verify(plugin.databaseHandler, times(2)).addPunishment(eq("target"), any(), eq(reason), eq("Admin"),
             eq("BANIP"), starts.capture(), ends.capture(), any())
         starts.allValues.zip(ends.allValues).forEach { (start, end) ->
-            kotlin.test.assertEquals(86_313_600_000L, end - start)
+            assertEquals(86_313_600_000L, end - start)
         }
         verify(plugin.proxyBridgeMessenger, times(2)).notifyIpBan(any(), eq(reason), any())
         verify(player).kick(any<Component>())

@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.players.PlayerIPManager
+import pl.syntaxdevteam.punisher.permissions.IpVisibility
 
 class CheckCommand(private val plugin: PunisherX, private val playerIPManager: PlayerIPManager) : BasicCommand {
 
@@ -56,7 +57,7 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
                     val playerIP = playerInfo?.playerIP
                     val geoLocation = playerInfo?.geoLocation?.takeIf { it.isNotBlank() } ?: "Unknown location"
                     plugin.logger.debug("GeoLocation: $geoLocation")
-                    val fullGeoLocation = when (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, stack.sender, uuid, player)) {
+                    val fullGeoLocation = when (IpVisibility.canView(plugin, stack.sender, uuid, player)) {
                         true -> playerIP?.let { "$it ($geoLocation)" } ?: geoLocation
                         else -> geoLocation
                     }

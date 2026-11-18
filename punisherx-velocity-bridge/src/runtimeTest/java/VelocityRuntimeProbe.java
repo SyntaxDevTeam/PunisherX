@@ -18,6 +18,8 @@ import java.sql.*;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import com.velocitypowered.api.proxy.messages.ChannelMessageSink;
+import com.velocitypowered.api.proxy.messages.ChannelMessageSource;
 
 /** Runs only in the isolated runtime test proxy; never included in the bridge JAR. */
 public final class VelocityRuntimeProbe {
@@ -173,8 +175,8 @@ public final class VelocityRuntimeProbe {
         check(!disconnects.isEmpty(), name);
     }
 
-    private PluginMessageEvent message(com.velocitypowered.api.proxy.messages.ChannelMessageSource source,
-                                       com.velocitypowered.api.proxy.messages.ChannelMessageSink target,
+    private PluginMessageEvent message(ChannelMessageSource source,
+                                       ChannelMessageSink target,
                                        String action, String uuid) throws IOException {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try (DataOutputStream out = new DataOutputStream(bytes)) {

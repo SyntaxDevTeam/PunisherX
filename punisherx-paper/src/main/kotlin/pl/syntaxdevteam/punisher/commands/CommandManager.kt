@@ -6,6 +6,10 @@ import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import org.bukkit.plugin.Plugin
 import pl.syntaxdevteam.punisher.PunisherX
+import com.mojang.brigadier.Command
+import com.mojang.brigadier.tree.LiteralCommandNode
+import io.papermc.paper.command.brigadier.CommandSourceStack
+import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 class CommandManager(private val plugin: PunisherX) {
 
@@ -51,8 +55,8 @@ class CommandManager(private val plugin: PunisherX) {
             commands.register("unmark", "/unmark <player|all> [mark] | pause/resume <mark>", UnmarkCommand(plugin))
             val unpunishCmd = UnpunishCommand(plugin)
             val unpunishNode = Commands.literal("unpunish")
-                .requires { src -> pl.syntaxdevteam.punisher.permissions.PermissionChecker
-                    .hasWithLegacy(src.sender, pl.syntaxdevteam.punisher.permissions.PermissionChecker.PermissionKey.UNPUNISH) }
+                .requires { src -> PermissionChecker
+                    .hasWithLegacy(src.sender, PermissionChecker.PermissionKey.UNPUNISH) }
                 .executes { ctx -> unpunishCmd.execute(ctx.source, emptyArray()); 1 }
                 .then(Commands.argument("player", StringArgumentType.word())
                     .suggests { _, builder ->
@@ -294,20 +298,20 @@ class CommandManager(private val plugin: PunisherX) {
     }
 
     // Keep the registered tree available to dispatcher regression tests.
-    internal fun createPunishNode(): com.mojang.brigadier.tree.LiteralCommandNode<io.papermc.paper.command.brigadier.CommandSourceStack> {
+    internal fun createPunishNode(): LiteralCommandNode<CommandSourceStack> {
         val punishCmd = PunishCommand(plugin)
         return Commands.literal("punish")
-            .requires { src -> pl.syntaxdevteam.punisher.permissions.PermissionChecker
-                .hasWithLegacy(src.sender, pl.syntaxdevteam.punisher.permissions.PermissionChecker.PermissionKey.PUNISH) }
+            .requires { src -> PermissionChecker
+                .hasWithLegacy(src.sender, PermissionChecker.PermissionKey.PUNISH) }
             .executes { ctx ->
                 punishCmd.executeParsed(ctx.source, emptyArray())
-                com.mojang.brigadier.Command.SINGLE_SUCCESS
+                Command.SINGLE_SUCCESS
             }
             .then(
                 Commands.argument("player", StringArgumentType.word())
                     .executes { ctx ->
                         punishCmd.executeParsed(ctx.source, arrayOf(StringArgumentType.getString(ctx, "player")))
-                        com.mojang.brigadier.Command.SINGLE_SUCCESS
+                        Command.SINGLE_SUCCESS
                     }
                     .suggests { _, builder ->
                         plugin.server.onlinePlayers.filter { it.name.startsWith(builder.remaining, ignoreCase = true) }
@@ -326,7 +330,7 @@ class CommandManager(private val plugin: PunisherX) {
                                 val player = StringArgumentType.getString(ctx, "player")
                                 val template = StringArgumentType.getString(ctx, "template")
                                 punishCmd.executeParsed(ctx.source, arrayOf(player, template))
-                                com.mojang.brigadier.Command.SINGLE_SUCCESS
+                                Command.SINGLE_SUCCESS
                             }
                             .then(
                                 Commands.argument("options", StringArgumentType.greedyString())
@@ -350,7 +354,7 @@ class CommandManager(private val plugin: PunisherX) {
                                         val template = StringArgumentType.getString(ctx, "template")
                                         val options = StringArgumentType.getString(ctx, "options").trim().split(Regex("\\s+"))
                                         punishCmd.executeParsed(ctx.source, arrayOf(player, template, *options.toTypedArray()))
-                                        com.mojang.brigadier.Command.SINGLE_SUCCESS
+                                        Command.SINGLE_SUCCESS
                                     }
                             )
                     )

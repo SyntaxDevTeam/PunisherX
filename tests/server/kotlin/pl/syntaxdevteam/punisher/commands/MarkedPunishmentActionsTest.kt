@@ -5,11 +5,13 @@ import org.mockito.kotlin.*
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import kotlin.test.Test
+import org.bukkit.Server
+import org.bukkit.command.ConsoleCommandSender
 
 class MarkedPunishmentActionsTest {
     private val plugin = mock<PunisherX>()
-    private val server = mock<org.bukkit.Server>()
-    private val console = mock<org.bukkit.command.ConsoleCommandSender>()
+    private val server = mock<Server>()
+    private val console = mock<ConsoleCommandSender>()
     private val config = YamlConfiguration()
 
     init {

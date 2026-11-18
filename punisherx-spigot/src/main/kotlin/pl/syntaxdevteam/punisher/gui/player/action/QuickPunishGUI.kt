@@ -10,6 +10,7 @@ import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.templates.PunishTemplate
 import java.util.Locale
+import java.util.UUID
 
 class QuickPunishGUI(plugin: PunisherX) : BaseGUI(plugin) {
 
@@ -52,7 +53,7 @@ class QuickPunishGUI(plugin: PunisherX) : BaseGUI(plugin) {
         })
     }
 
-    internal fun nextLevels(uuid: java.util.UUID, name: String, templates: List<PunishTemplate>): Map<String, Int> =
+    internal fun nextLevels(uuid: UUID, name: String, templates: List<PunishTemplate>): Map<String, Int> =
         templates.associate { template ->
             template.name to (plugin.databaseHandler.countEscalationHistory(uuid.toString(), name, template.reason, template.name) + 1)
         }

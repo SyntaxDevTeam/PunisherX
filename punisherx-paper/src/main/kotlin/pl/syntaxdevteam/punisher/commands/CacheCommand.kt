@@ -4,13 +4,14 @@ import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
+import org.bukkit.command.ConsoleCommandSender
 
 class CacheCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
         val sender = stack.sender
 
-        if (sender !is org.bukkit.command.ConsoleCommandSender) {
+        if (sender !is ConsoleCommandSender) {
             sender.sendRichMessage("Console only!")
             return
         }

@@ -9,6 +9,10 @@ import pl.syntaxdevteam.punisher.compatibility.platform.SchedulerAdapter
 import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 import java.nio.file.Files
 import kotlin.test.*
+import java.util.UUID
+import pl.syntaxdevteam.punisher.basic.PunishmentManager
+import pl.syntaxdevteam.punisher.gui.player.action.QuickPunishGUI
+import pl.syntaxdevteam.punisher.templates.PunishTemplate
 
 class GuiPunishmentUndoTest {
     @Test fun `panel undo removes first mute from escalation and preserves later punishments`() {
@@ -27,7 +31,7 @@ class GuiPunishmentUndoTest {
         whenever(plugin.logger).thenReturn(mock())
         whenever(plugin.guiRuntime).thenReturn(GuiRuntime(plugin))
         whenever(plugin.discordWebhook).thenReturn(mock())
-        whenever(plugin.punishmentManager).thenReturn(pl.syntaxdevteam.punisher.basic.PunishmentManager())
+        whenever(plugin.punishmentManager).thenReturn(PunishmentManager())
         whenever(plugin.messageHandler).thenReturn(mock())
         whenever(plugin.messageHandler.miniMessageFormat(any())).thenReturn(Component.text("Removed"))
         whenever(plugin.schedulerAdapter).thenReturn(scheduler)
@@ -56,13 +60,13 @@ class GuiPunishmentUndoTest {
             assertTrue(history.undone)
             assertEquals("Reviewer", history.undoneBy)
             assertNotNull(history.undoneAt)
-            val template = pl.syntaxdevteam.punisher.templates.PunishTemplate("spam", "Spam", emptyMap())
-            assertEquals(1, pl.syntaxdevteam.punisher.gui.player.action.QuickPunishGUI(plugin)
-                .nextLevels(java.util.UUID.fromString(uuid), "Target", listOf(template))["spam"])
-            val other = pl.syntaxdevteam.punisher.templates.PunishTemplate("other", "Spam", emptyMap())
+            val template = PunishTemplate("spam", "Spam", emptyMap())
+            assertEquals(1, QuickPunishGUI(plugin)
+                .nextLevels(UUID.fromString(uuid), "Target", listOf(template))["spam"])
+            val other = PunishTemplate("other", "Spam", emptyMap())
             db.addTemplatePunishmentHistory("Target", uuid, "Spam", "Admin", "WARN", firstStart, -1, "other", uuid)
-            val preview = pl.syntaxdevteam.punisher.gui.player.action.QuickPunishGUI(plugin)
-                .nextLevels(java.util.UUID.fromString(uuid), "Target", listOf(template, other))
+            val preview = QuickPunishGUI(plugin)
+                .nextLevels(UUID.fromString(uuid), "Target", listOf(template, other))
             assertEquals(1, preview["spam"], "An unrelated template with the same reason must not increase Spam")
             assertEquals(2, preview["other"])
             punish(firstStart + 1000)

@@ -12,19 +12,21 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import pl.syntaxdevteam.punisher.PunisherX
 import java.util.UUID
+import java.util.IdentityHashMap
+import org.bukkit.inventory.meta.SkullMeta
 
 abstract class BaseGUI(protected val plugin: PunisherX) : GUI {
     protected val mH = plugin.messageHandler
     private val generation = plugin.guiRuntime.generation
     private data class HeadBinding(val slot: Int, val uuid: UUID, val name: String)
-    private val heads = java.util.IdentityHashMap<Gui, MutableList<HeadBinding>>()
+    private val heads = IdentityHashMap<Gui, MutableList<HeadBinding>>()
 
     /** The only player-head path for panels: never assign an incomplete owner/profile. */
     protected fun setPlayerHead(gui: Gui, slot: Int, item: ItemStack, uuid: UUID?, name: String,
                                 onClick: ((Player) -> Unit)? = null) {
         // IP bans have no player UUID. This key is for appearance only, never for punishment actions.
         val skinKey = uuid ?: UUID.nameUUIDFromBytes("PunisherX:head:$name".toByteArray(Charsets.UTF_8))
-        val meta = item.itemMeta as org.bukkit.inventory.meta.SkullMeta
+        val meta = item.itemMeta as SkullMeta
         plugin.localPlayerSkins.apply(skinKey, meta)
         item.itemMeta = meta
         gui.setItem(slot, createGuiItem(item, onClick))
@@ -42,7 +44,7 @@ abstract class BaseGUI(protected val plugin: PunisherX) : GUI {
                         if (generation != plugin.guiRuntime.generation || !player.isOnline ||
                             player.openInventory.topInventory !== gui.inventory) return@Runnable
                         val item = gui.inventory.getItem(head.slot) ?: return@Runnable
-                        val meta = item.itemMeta as? org.bukkit.inventory.meta.SkullMeta ?: return@Runnable
+                        val meta = item.itemMeta as? SkullMeta ?: return@Runnable
                         plugin.localPlayerSkins.apply(head.uuid, meta)
                         item.itemMeta = meta
                         gui.updateItem(head.slot, item)

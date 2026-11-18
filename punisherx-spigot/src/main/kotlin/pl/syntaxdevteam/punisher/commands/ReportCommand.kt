@@ -9,6 +9,7 @@ import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.gui.report.ReportReasonGUI
 import pl.syntaxdevteam.punisher.gui.report.ReportSelectorGUI
 import java.util.UUID
+import pl.syntaxdevteam.punisher.books.ReportBookService
 
 class ReportCommand(private val plugin: PunisherX) : BasicCommand {
 
@@ -56,7 +57,7 @@ class ReportCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         if (plugin.config.getString("reports.player-interface", "AUTO").equals("BOOK", true)) {
-            pl.syntaxdevteam.punisher.books.ReportBookService(plugin).openReport(sender, target)
+            ReportBookService(plugin).openReport(sender, target)
             return
         }
 

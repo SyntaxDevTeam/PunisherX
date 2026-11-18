@@ -10,6 +10,7 @@ import pl.syntaxdevteam.punisher.compatibility.platform.SchedulerAdapter
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import pl.syntaxdevteam.punisher.databases.DatabaseHandler
 
 class GuiWarnMessageTest {
     @Test fun `GUI warning count reaches sender target broadcasts and actions`() {
@@ -29,7 +30,7 @@ class GuiWarnMessageTest {
         whenever(target.player).thenReturn(victim)
         whenever(plugin.config).thenReturn(YamlConfiguration())
         whenever(plugin.databaseHandler).thenReturn(mock())
-        pl.syntaxdevteam.punisher.databases.DatabaseHandler::class.java.getDeclaredField("plugin")
+        DatabaseHandler::class.java.getDeclaredField("plugin")
             .apply { isAccessible = true }.set(plugin.databaseHandler, plugin)
         whenever(plugin.databaseHandler.addPunishment(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(42L)
         whenever(plugin.databaseHandler.getActiveWarnCount(uuid.toString())).thenReturn(3)

@@ -3,9 +3,10 @@ package pl.syntaxdevteam.punisher.identity
 import java.sql.DriverManager
 import java.util.UUID
 import kotlin.test.*
+import java.sql.Connection
 
 class IdentityRegistryStoreTest {
-    private fun database(block: (java.sql.Connection) -> Unit) {
+    private fun database(block: (Connection) -> Unit) {
         DriverManager.getConnection("jdbc:sqlite::memory:").use { c ->
             c.createStatement().use { s ->
                 s.execute("CREATE TABLE player_identity_domain (id INTEGER PRIMARY KEY, domain TEXT NOT NULL)")

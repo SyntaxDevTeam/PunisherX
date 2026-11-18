@@ -12,6 +12,7 @@ import pl.syntaxdevteam.punisher.gui.PunisherMain
 import pl.syntaxdevteam.punisher.gui.interfaces.BaseGUI
 import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+import pl.syntaxdevteam.punisher.permissions.IpVisibility
 
 /**
  * GUI displaying currently online administrators.
@@ -49,7 +50,7 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
             meta.lore(
                 listOf(
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to loadMsg)),
-                    if (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, player, target.uniqueId, target.name))
+                    if (IpVisibility.canView(plugin, player, target.uniqueId, target.name))
                         mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to loadMsg)) else Component.empty(),
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to loadMsg)),
                     mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to loadMsg)),
@@ -77,8 +78,8 @@ class AdminListGUI(plugin: PunisherX) : BaseGUI(plugin) {
                     im.lore(
                         listOf(
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.uuid", mapOf("uuid" to target.uniqueId.toString())),
-                            if (pl.syntaxdevteam.punisher.permissions.IpVisibility.canView(plugin, player, target.uniqueId, target.name))
-                                mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to pl.syntaxdevteam.punisher.permissions.IpVisibility.displayAddress(plugin, player, playerIP))) else Component.empty(),
+                            if (IpVisibility.canView(plugin, player, target.uniqueId, target.name))
+                                mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.playerIP", mapOf("playerip" to IpVisibility.displayAddress(plugin, player, playerIP))) else Component.empty(),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.onlineStr", mapOf("onlinestr" to onlineStr)),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.totalStr", mapOf("totalstr" to totalStr)),
                             mH.stringMessageToComponentNoPrefix("GUI", "PlayerList.hover.lastActive", mapOf("lastactive" to lastActive)),

@@ -7,6 +7,7 @@ import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.UUID
+import net.kyori.adventure.text.event.ClickEvent
 
 /** Presentation only: report validation and persistence stay in ReportService and ReportsCommand. */
 class ReportBookService(private val plugin: PunisherX) {
@@ -110,11 +111,11 @@ class ReportBookService(private val plugin: PunisherX) {
             if (report.status == "OPEN" && canManage(player)) {
                 actions = appendLine(actions, menu.button(message("resolve")) {
                     if (canManage(player)) player.sendMessage(message("decision-prompt").append(
-                        message("resolve").clickEvent(net.kyori.adventure.text.event.ClickEvent.suggestCommand("/reports resolve $id "))))
+                        message("resolve").clickEvent(ClickEvent.suggestCommand("/reports resolve $id "))))
                 })
                 actions = appendLine(actions, menu.button(message("reject")) {
                     if (canManage(player)) player.sendMessage(message("decision-prompt").append(
-                        message("reject").clickEvent(net.kyori.adventure.text.event.ClickEvent.suggestCommand("/reports reject $id "))))
+                        message("reject").clickEvent(ClickEvent.suggestCommand("/reports reject $id "))))
                 })
             }
             actions = appendLine(actions, menu.button(message("back")) { openInbox(player) })

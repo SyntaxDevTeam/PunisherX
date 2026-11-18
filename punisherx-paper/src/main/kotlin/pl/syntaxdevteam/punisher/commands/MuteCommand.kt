@@ -7,6 +7,7 @@ import org.bukkit.Bukkit
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+import java.util.UUID
 
 class MuteCommand(private val plugin: PunisherX) : BasicCommand {
 
@@ -22,7 +23,7 @@ class MuteCommand(private val plugin: PunisherX) : BasicCommand {
                 } else {
                     val player = arguments[0]
                     val uuid = (plugin.resolvePlayerUuidOrNotify(player, stack.sender) ?: return).toString()
-                    val targetPlayer = Bukkit.getPlayer(java.util.UUID.fromString(uuid))
+                    val targetPlayer = Bukkit.getPlayer(UUID.fromString(uuid))
                     val isForce = options.force
                     if (targetPlayer != null) {
                         if (!isForce && PermissionChecker.hasWithBypass(targetPlayer, PermissionChecker.PermissionKey.BYPASS_MUTE)) {

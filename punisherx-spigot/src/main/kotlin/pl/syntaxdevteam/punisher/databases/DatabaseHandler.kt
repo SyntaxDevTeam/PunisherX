@@ -12,6 +12,15 @@ import java.time.ZoneId
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
+import java.sql.Timestamp
+import java.time.LocalDateTime
+import java.util.Date
+import java.util.logging.Level
+import org.bukkit.Bukkit
+import pl.syntaxdevteam.punisher.basic.JailClock
+import pl.syntaxdevteam.punisher.identity.IdentityRegistryStore
+import pl.syntaxdevteam.punisher.identity.PlayerIdentity
+import pl.syntaxdevteam.punisher.identity.canonicalIp
 
 data class DatabaseHealthCheckResult(
     val type: DatabaseType,
@@ -67,7 +76,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
             // Keep the caller stack: hot reload can leave several plugin instances
             // sharing the same log prefix, so a message alone cannot identify the owner.
             plugin.server.logger.log(
-                java.util.logging.Level.SEVERE,
+                Level.SEVERE,
                 "[PunisherX] Database lifecycle failure: operation=$operation, " +
                     "enabled=${plugin.isEnabled}, ready=${ready.get()}, " +
                     "pluginInstance=${System.identityHashCode(plugin)}, " +
@@ -133,15 +142,15 @@ class DatabaseHandler(private val plugin: PunisherX) {
     fun bindIdentityDomain() {
         ready.set(false)
         db.withConnection {
-            pl.syntaxdevteam.punisher.identity.IdentityRegistryStore.bind(it, plugin.playerIdentities.settings)
-            pl.syntaxdevteam.punisher.identity.IdentityRegistryStore.normalizeActiveAddresses(it)
+            IdentityRegistryStore.bind(it, plugin.playerIdentities.settings)
+            IdentityRegistryStore.normalizeActiveAddresses(it)
         }
         ready.set(true)
     }
 
-    fun recordIdentityObservation(identity: pl.syntaxdevteam.punisher.identity.PlayerIdentity, observedAt: Long) {
+    fun recordIdentityObservation(identity: PlayerIdentity, observedAt: Long) {
         check(isReady()) { "Database is not ready" }
-        db.withConnection { pl.syntaxdevteam.punisher.identity.IdentityRegistryStore.record(it, identity, observedAt) }
+        db.withConnection { IdentityRegistryStore.record(it, identity, observedAt) }
     }
 
     /** Staff observations never affect punishments or escalation. */
@@ -204,8 +213,8 @@ class DatabaseHandler(private val plugin: PunisherX) {
             (rs.int("id") ?: 0) to (rs.long("endTime") ?: -1L)
         }.forEach { (id, end) ->
             val next = when {
-                pause && plugin.config.getBoolean("jail.online_time_only", false) && end > now -> pl.syntaxdevteam.punisher.basic.JailClock.pause(end, now)
-                !pause && end < -1L -> pl.syntaxdevteam.punisher.basic.JailClock.resume(end, now)
+                pause && plugin.config.getBoolean("jail.online_time_only", false) && end > now -> JailClock.pause(end, now)
+                !pause && end < -1L -> JailClock.resume(end, now)
                 else -> end
             }
             if (next != end) execute("UPDATE punishments SET endTime = ? WHERE id = ? AND endTime = ?", next, id, end)
@@ -213,7 +222,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
     }
 
     private fun jailDisplayDeadline(end: Long): Long =
-        pl.syntaxdevteam.punisher.basic.JailClock.resume(end, System.currentTimeMillis())
+        JailClock.resume(end, System.currentTimeMillis())
 
     fun addPunishment(
         name: String,
@@ -228,7 +237,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
         return try {
             val values = linkedMapOf<String, Any?>(
                 "name" to name, "uuid" to uuid, "reason" to reason, "operator" to operator,
-                "punishmentType" to punishmentType, "start" to start, "endTime" to (if (punishmentType == "JAIL" && end > System.currentTimeMillis() && plugin.config.getBoolean("jail.online_time_only", false) && org.bukkit.Bukkit.getPlayer(java.util.UUID.fromString(uuid)) == null) -(end - System.currentTimeMillis() + 2) else end), "server" to server
+                "punishmentType" to punishmentType, "start" to start, "endTime" to (if (punishmentType == "JAIL" && end > System.currentTimeMillis() && plugin.config.getBoolean("jail.online_time_only", false) && Bukkit.getPlayer(UUID.fromString(uuid)) == null) -(end - System.currentTimeMillis() + 2) else end), "server" to server
             ).mapKeys { PunisherDatabaseSchema.column(db, it.key) }
             val punishmentId = (db.insert("punishments", values).generatedKey as? Number)?.toLong()
             if (punishmentId != null) {
@@ -638,7 +647,7 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     fun getPunishmentsByIP(ip: String): List<PunishmentData> {
         return try {
-            val params = mutableListOf<Any>(pl.syntaxdevteam.punisher.identity.canonicalIp(ip) ?: return emptyList())
+            val params = mutableListOf<Any>(canonicalIp(ip) ?: return emptyList())
             val sql = appendServerFilter("SELECT * FROM punishments WHERE uuid = ? AND punishmentType = 'BANIP'", params, true)
             val rows = query(sql, *params.toTypedArray()) { rs ->
                 PunishmentData(
@@ -927,11 +936,11 @@ class DatabaseHandler(private val plugin: PunisherX) {
 
     private fun reportTimestamp(value: Any?): Instant = when (value) {
         null -> Instant.EPOCH
-        is java.sql.Timestamp -> value.toInstant()
-        is java.util.Date -> value.toInstant()
+        is Timestamp -> value.toInstant()
+        is Date -> value.toInstant()
         is Number -> Instant.ofEpochMilli(value.toLong())
         else -> runCatching { Instant.parse(value.toString()) }.getOrElse {
-            java.time.LocalDateTime.parse(value.toString().replace(' ', 'T')).atZone(ZoneId.systemDefault()).toInstant()
+            LocalDateTime.parse(value.toString().replace(' ', 'T')).atZone(ZoneId.systemDefault()).toInstant()
         }
     }
 

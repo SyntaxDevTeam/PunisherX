@@ -16,6 +16,7 @@ import org.mockito.kotlin.whenever
 import org.mockito.Answers
 import pl.syntaxdevteam.punisher.compatibility.platform.BukkitSchedulerAdapter
 import kotlin.test.Test
+import org.bukkit.Location
 
 class SchedulerAdapterTest {
 
@@ -80,7 +81,7 @@ class SchedulerAdapterTest {
         val plugin = mock<Plugin>()
         val server = mock<Server>()
         val regionScheduler = mock<RegionScheduler>()
-        val location = mock<org.bukkit.Location>()
+        val location = mock<Location>()
 
         whenever(plugin.server).thenReturn(server)
         whenever(server.regionScheduler).thenReturn(regionScheduler)

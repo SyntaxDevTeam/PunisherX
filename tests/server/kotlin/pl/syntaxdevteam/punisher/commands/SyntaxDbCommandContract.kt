@@ -14,6 +14,10 @@ import pl.syntaxdevteam.punisher.databases.SyntaxDbTestFixture
 import pl.syntaxdevteam.punisher.templates.PunishTemplate
 import pl.syntaxdevteam.punisher.templates.PunishTemplateLevel
 import kotlin.test.*
+import org.bukkit.GameMode
+import org.bukkit.Location
+import pl.syntaxdevteam.punisher.players.PlayerIPManager
+import pl.syntaxdevteam.punisher.teleport.SafeTeleportService
 
 /** The platform adapters invoke actual command classes. Only Bukkit/services are mocked, never SyntaxDB. */
 abstract class SyntaxDbCommandContract : SyntaxDbTestFixture() {
@@ -295,7 +299,7 @@ abstract class SyntaxDbCommandContract : SyntaxDbTestFixture() {
         handler.addPunishmentHistory("Target", uuid.toString(), reason, "Admin", "WARN", 0, -1)
         whenever(sender.hasPermission("punisherx.view_ip")).thenReturn(true)
         whenever(plugin.playerIPManager.getPlayerInfoByName("Target")).thenReturn(
-            pl.syntaxdevteam.punisher.players.PlayerIPManager.PlayerInfo("Target", uuid.toString(), "192.0.2.1", "Earth", "now"))
+            PlayerIPManager.PlayerInfo("Target", uuid.toString(), "192.0.2.1", "Earth", "now"))
         for (protected in listOf(false, true)) {
             config.set("privacy.ip.enabled", !protected)
             clearInvocations(plugin.messageHandler)
@@ -438,12 +442,12 @@ abstract class SyntaxDbCommandContract : SyntaxDbTestFixture() {
         sql("CREATE TRIGGER fail_mark BEFORE INSERT ON punishment_marks BEGIN SELECT RAISE(ABORT, 'injected'); END")
         for (command in listOf("jail", "punish")) {
             val target = mock<Player>()
-            val original = org.bukkit.Location(world, 20.0, 70.0, 20.0)
+            val original = Location(world, 20.0, 70.0, 20.0)
             whenever(target.name).thenReturn("Target")
             whenever(target.uniqueId).thenReturn(uuid)
             whenever(target.location).thenReturn(original)
-            whenever(target.gameMode).thenReturn(org.bukkit.GameMode.SURVIVAL)
-            val teleport = mock<pl.syntaxdevteam.punisher.teleport.SafeTeleportService>()
+            whenever(target.gameMode).thenReturn(GameMode.SURVIVAL)
+            val teleport = mock<SafeTeleportService>()
             whenever(plugin.safeTeleportService).thenReturn(teleport)
             doAnswer { invocation -> invocation.getArgument<(Boolean) -> Unit>(2)(true); null }
                 .whenever(teleport).teleportSafely(any(), any(), any())
@@ -452,7 +456,7 @@ abstract class SyntaxDbCommandContract : SyntaxDbTestFixture() {
                 execute(command, "Target", "spam", "1", "--mark", online = target)
             } else execute(command, "Target", reason, "--mark", online = target)
             verify(teleport).teleportSafely(eq(target), eq(original), any())
-            verify(target).gameMode = org.bukkit.GameMode.SURVIVAL
+            verify(target).gameMode = GameMode.SURVIVAL
         }
         assertEquals(0, count("punishments")); assertEquals(0, count("punishmenthistory"))
         verifyNoInteractions(plugin.cache)

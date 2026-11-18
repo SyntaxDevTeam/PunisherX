@@ -7,6 +7,8 @@ import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.basic.JailUtils
 import pl.syntaxdevteam.punisher.databases.PunishmentData
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
+import java.util.UUID
+import org.bukkit.Location
 
 class GuiPunishmentService(private val plugin: PunisherX) {
     private fun permission(type: String) = when (type.uppercase()) {
@@ -41,7 +43,7 @@ class GuiPunishmentService(private val plugin: PunisherX) {
         val start = System.currentTimeMillis()
         val end = if (time.equals("perm", true)) -1L else start + plugin.timeHandler.parseTime(time) * 1000
 
-        fun persist(previousLocation: org.bukkit.Location? = null) {
+        fun persist(previousLocation: Location? = null) {
             plugin.schedulerAdapter.runAsync(Runnable {
                 val id = plugin.databaseHandler.addPunishment(name, target.uniqueId.toString(), reason, operator.name, type.uppercase(), start, end)
                 if (id != null) plugin.databaseHandler.addPunishmentHistory(name, target.uniqueId.toString(), reason, operator.name, type.uppercase(), start, end)
@@ -135,7 +137,7 @@ class GuiPunishmentService(private val plugin: PunisherX) {
                 }
                 if (punishment.type.equals("JAIL", true)) {
                     if (!remainingJails) runCatching {
-                        plugin.cache.removePunishment(java.util.UUID.fromString(punishment.uuid), removeDatabase = false)
+                        plugin.cache.removePunishment(UUID.fromString(punishment.uuid), removeDatabase = false)
                     }
                 }
                 operator.sendMessage(plugin.messageHandler.miniMessageFormat("<green>Removed ${punishment.type} #${punishment.id} from ${punishment.name}.</green>"))

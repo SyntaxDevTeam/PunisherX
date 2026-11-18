@@ -6,13 +6,14 @@ import java.nio.file.Files
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import java.lang.reflect.Proxy
 
 class PlayerStatsServiceTest {
     @Test
     fun `logout coordinates are available immediately and survive reinitialization`() {
         val folder = Files.createTempDirectory("punisher-logout-test").toFile()
         try {
-            val world = java.lang.reflect.Proxy.newProxyInstance(
+            val world = Proxy.newProxyInstance(
                 World::class.java.classLoader, arrayOf(World::class.java)
             ) { _, method, _ ->
                 when (method.name) {

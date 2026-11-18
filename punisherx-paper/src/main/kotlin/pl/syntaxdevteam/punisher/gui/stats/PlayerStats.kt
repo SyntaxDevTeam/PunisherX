@@ -13,6 +13,10 @@ import org.bukkit.NamespacedKey
 import net.kyori.adventure.nbt.BinaryTagIO
 import net.kyori.adventure.nbt.BinaryTagTypes
 import org.bukkit.Location
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.floor
 
 /**
  * Provides access to basic player statistics stored in the vanilla stats JSON files
@@ -21,8 +25,8 @@ import org.bukkit.Location
  */
 object PlayerStatsService {
     private val gson = Gson()
-    private val cache = java.util.concurrent.ConcurrentHashMap<UUID, Cached>()
-    private val logoutLocations = java.util.concurrent.ConcurrentHashMap<UUID, LogoutLocation>()
+    private val cache = ConcurrentHashMap<UUID, Cached>()
+    private val logoutLocations = ConcurrentHashMap<UUID, LogoutLocation>()
     private var locationFolder: File? = null
 
     private data class LogoutLocation(val world: String, val x: Double, val y: Double, val z: Double)
@@ -46,9 +50,9 @@ object PlayerStatsService {
                             val destination = File(folder, "$uuid.json")
                             val temporary = File(folder, "$uuid.json.tmp")
                             temporary.writeText(gson.toJson(snapshot))
-                            java.nio.file.Files.move(
+                            Files.move(
                                 temporary.toPath(), destination.toPath(),
-                                java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                                StandardCopyOption.REPLACE_EXISTING
                             )
                         }
                     }
@@ -146,7 +150,7 @@ object PlayerStatsService {
     @Suppress("UnstableApiUsage")
     fun getLastLocationString(uuid: UUID): String? {
         loadLogoutLocation(uuid)?.let { snapshot ->
-            return "${snapshot.world}: ${kotlin.math.floor(snapshot.x).toInt()}, ${kotlin.math.floor(snapshot.y).toInt()}, ${kotlin.math.floor(snapshot.z).toInt()}"
+            return "${snapshot.world}: ${floor(snapshot.x).toInt()}, ${floor(snapshot.y).toInt()}, ${floor(snapshot.z).toInt()}"
         }
         return try {
             val worldFolder = Bukkit.getWorlds().firstOrNull()?.worldFolder ?: return null
