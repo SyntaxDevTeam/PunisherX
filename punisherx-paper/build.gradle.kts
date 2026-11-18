@@ -117,7 +117,9 @@ val discordSrvTestApiJar = tasks.register<Jar>("discordSrvTestApiJar") {
             "github/scarsz/discordsrv/api/ListenerPriority.class",
             "github/scarsz/discordsrv/api/events/Event.class",
             "github/scarsz/discordsrv/api/events/GameEvent.class",
-            "github/scarsz/discordsrv/api/events/GameChatMessagePreProcessEvent.class"
+            "github/scarsz/discordsrv/api/events/GameChatMessagePreProcessEvent.class",
+            // The event exposes DiscordSRV-owned Adventure types in its API.
+            "github/scarsz/discordsrv/dependencies/kyori/**"
         )
     }
 }
