@@ -9,12 +9,18 @@ import org.mockito.kotlin.never
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class DiscordSrvChatHookTest {
     private val uuid = UUID.randomUUID()
     private val player = mock<Player>().also { whenever(it.uniqueId).thenReturn(uuid) }
     private val event = mock<GameChatMessagePreProcessEvent>().also {
         whenever(it.player).thenReturn(player)
+    }
+
+    @Test
+    fun `full DiscordSRV plugin is absent from the test runtime`() {
+        assertNull(javaClass.classLoader.getResource("github/scarsz/discordsrv/DiscordSRV.class"))
     }
 
     @Test

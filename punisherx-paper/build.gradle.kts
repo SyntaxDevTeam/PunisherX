@@ -99,6 +99,29 @@ repositories {
 
 val mockitoAgent = configurations.create("mockitoAgent")
 
+// DiscordSRV publishes a full plugin JAR. Its bundled libraries/resources
+// must not enter PunisherX's shared unit-test runtime classpath.
+val discordSrvTestApi = configurations.create("discordSrvTestApi") {
+    isCanBeConsumed = false
+    isTransitive = false
+}
+
+val discordSrvTestApiJar = tasks.register<Jar>("discordSrvTestApiJar") {
+    archiveBaseName.set("discordsrv-test-api")
+    archiveVersion.set(libs.versions.discordsrv.get())
+    destinationDirectory.set(layout.buildDirectory.dir("test-libs"))
+    inputs.files(discordSrvTestApi)
+    from({ discordSrvTestApi.files.map { zipTree(it) } }) {
+        include(
+            "github/scarsz/discordsrv/api/Subscribe.class",
+            "github/scarsz/discordsrv/api/ListenerPriority.class",
+            "github/scarsz/discordsrv/api/events/Event.class",
+            "github/scarsz/discordsrv/api/events/GameEvent.class",
+            "github/scarsz/discordsrv/api/events/GameChatMessagePreProcessEvent.class"
+        )
+    }
+}
+
 dependencies {
     compileOnly(libs.paper.api)
     compileOnly(libs.syntaxdb.core) {
@@ -128,7 +151,9 @@ dependencies {
     }
     compileOnly(libs.dscbridge.api)
     compileOnly(libs.discordsrv) { isTransitive = false }
-    testImplementation(libs.discordsrv) { isTransitive = false }
+    testCompileOnly(libs.discordsrv) { isTransitive = false }
+    add(discordSrvTestApi.name, libs.discordsrv)
+    testRuntimeOnly(files(discordSrvTestApiJar))
 
     compileOnly(libs.faststats.bukkit)
 
@@ -159,6 +184,7 @@ tasks {
         val syntaxCoreJars = classpath.filter { it.name.startsWith("syntaxcore-") }
         classpath = files(classpath - syntaxCoreJars, syntaxCoreJars)
         useJUnitPlatform()
+        testLogging { exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL }
         jvmArgs("-javaagent:${mockitoAgent.singleFile}")
     }
     runServer {
