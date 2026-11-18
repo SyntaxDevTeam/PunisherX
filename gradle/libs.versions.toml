@@ -36,6 +36,7 @@ vault = "1.7.1"
 vault-unlocked = "2.15"
 essentialsx = "2.21.2"
 dscbridge = "1.0.0-R0.7-SNAPSHOT"
+discordsrv = "1.29.0"
 faststats = "0.30.2"
 
 sqlite = "3.53.4.0"
@@ -108,6 +109,7 @@ vault-api = { module = "com.github.milkbowl:VaultAPI", version.ref = "vault" }
 vault-unlocked-api = { module = "net.milkbowl.vault:VaultUnlockedAPI", version.ref = "vault-unlocked" }
 essentialsx-spawn = { module = "net.essentialsx:EssentialsXSpawn", version.ref = "essentialsx" }
 dscbridge-api = { module = "pl.syntaxdevteam:DscBridgeAPI", version.ref = "dscbridge" }
+discordsrv = { module = "com.discordsrv:discordsrv", version.ref = "discordsrv" }
 faststats-core = { module = "dev.faststats.metrics:core", version.ref = "faststats" }
 faststats-config = { module = "dev.faststats.metrics:config", version.ref = "faststats" }
 faststats-bukkit = { module = "dev.faststats.metrics:bukkit", version.ref = "faststats" }

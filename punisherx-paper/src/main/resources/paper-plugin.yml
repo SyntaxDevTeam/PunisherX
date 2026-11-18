@@ -46,6 +46,10 @@ dependencies:
     EssentialsSpawn:
       load: BEFORE
       required: false
+    DiscordSRV:
+      load: BEFORE
+      required: false
+      join-classpath: true
     DscBridgeAPI:
       load: BEFORE
       required: false

@@ -109,6 +109,24 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
         }
     }
 
+    private fun restrictsChat(type: String): Boolean =
+        type == "MUTE" || (type == "JAIL" && plugin.config.getBoolean("jail.restrictions.mute", true))
+
+    // Read-only check for external chat bridges. The normal chat listener owns
+    // player notifications, logging and expired punishment cleanup.
+    internal fun isChatRestricted(uuid: UUID): Boolean {
+        if (!plugin.isEnabled || plugin.punishmentChecker !== this) return false
+        return try {
+            plugin.databaseHandler.getPunishments(uuid.toString()).any {
+                restrictsChat(it.type) && plugin.punishmentManager.isPunishmentActive(it)
+            }
+        } catch (e: Exception) {
+            plugin.logger.severe("Failed to check chat restrictions for DiscordSRV: ${e.message}")
+            plugin.reportError(e)
+            false
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerChat(event: AsyncChatEvent) {
         if (!plugin.isEnabled || plugin.punishmentChecker !== this) return
@@ -126,7 +144,7 @@ class PunishmentChecker(private val plugin: PunisherX) : Listener {
             }
 
             for (punishment in punishments) {
-                if (punishment.type != "MUTE" && (punishment.type != "JAIL" || !plugin.config.getBoolean("jail.restrictions.mute", true))) {
+                if (!restrictsChat(punishment.type)) {
                     continue
                 }
 
