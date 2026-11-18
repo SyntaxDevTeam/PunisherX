@@ -2,6 +2,10 @@
 
 ## [1.9.0] Unreleased
 
+### DiscordSRV compatibility
+
+* Fixed Minecraft-to-Discord chat relay bypassing active MUTE and configured JAIL chat restrictions on Paper/Folia and Spigot. The optional DiscordSRV API subscription blocks relay messages before processing, uses the existing active punishment rules, and is removed on disable/reload. DiscordSRV is not required on servers without it. This change does not moderate messages sent directly from Discord.
+
 ### Staff Notes — private moderation observations ([PR #96](https://github.com/SyntaxDevTeam/PunisherX/pull/96))
 
 * **Added private, non-punitive Staff Notes:** `/note add|list|remove` for Paper/Folia and Spigot, with author, creation time, server origin, separate read/manage permissions, pagination and audit logging.

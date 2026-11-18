@@ -41,6 +41,9 @@ repositories {
     }
     // Standard dependencies
     mavenCentral()
+    maven("https://nexus.scarsz.me/content/groups/public/") {
+        content { includeGroup("com.discordsrv") }
+    }
     // AlessioDP
     maven("https://repo.alessiodp.com/releases/") {
         name = "alessioReleases"
@@ -157,6 +160,8 @@ dependencies {
         isTransitive = false
     }
     compileOnly(libs.dscbridge.api)
+    compileOnly(libs.discordsrv) { isTransitive = false }
+    testImplementation(libs.discordsrv) { isTransitive = false }
     compileOnly(libs.faststats.bukkit)
 
     testImplementation(libs.kotlin.test)

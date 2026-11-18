@@ -22,6 +22,7 @@ import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.gui.materials.GuiMaterialResolver
 import pl.syntaxdevteam.punisher.gui.GuiPunishmentService
 import pl.syntaxdevteam.punisher.gui.GuiSearchService
+import pl.syntaxdevteam.punisher.hooks.DiscordSrvChatHook
 import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
 import pl.syntaxdevteam.punisher.listeners.ReloadListener
@@ -44,6 +45,7 @@ import pl.syntaxdevteam.punisher.messages.PunisherMessages
 
 class PluginInitializer(private val plugin: PunisherX) {
     private var databaseHandler: DatabaseHandler? = null
+    private var discordSrvChatHook: DiscordSrvChatHook? = null
 
     fun onEnable() {
         val t0 = System.currentTimeMillis()
@@ -65,6 +67,9 @@ class PluginInitializer(private val plugin: PunisherX) {
     }
 
     fun onDisable() {
+        runCatching { discordSrvChatHook?.unregister() }
+            .onFailure { plugin.logger.warning("Failed to unregister DiscordSRV chat hook: ${it.message}") }
+        discordSrvChatHook = null
         runCatching { plugin.onlinePunishmentWatcher.stop() }
         runCatching { plugin.punishmentActionBarNotifier.stop() }
         runCatching { plugin.server.servicesManager.unregister(PunisherXApi::class.java, plugin.punisherXApi) }
@@ -182,6 +187,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.server.pluginManager.registerEvents(plugin.playerJoinListener, plugin)
         plugin.server.onlinePlayers.forEach { plugin.observePlayerIdentity(it.uniqueId, it.name) }
         plugin.server.pluginManager.registerEvents(plugin.punishmentChecker, plugin)
+        registerDiscordSrvChatHook()
         plugin.server.pluginManager.registerEvents(plugin.bookManager, plugin)
         plugin.server.pluginManager.registerEvents(ModernLoginListener(plugin), plugin)
         plugin.logger.debug("Registered Spigot AsyncPlayerPreLoginEvent listener")
@@ -190,6 +196,19 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.server.servicesManager.register(PunisherXApi::class.java, plugin.punisherXApi, plugin, ServicePriority.Normal)
         if (plugin.hookHandler.checkPlaceholderAPI()) {
             PlaceholderHandler(plugin).register()
+        }
+    }
+
+    private fun registerDiscordSrvChatHook() {
+        if (!plugin.server.pluginManager.isPluginEnabled("DiscordSRV")) return
+        runCatching {
+            val hook = DiscordSrvChatHook(plugin.punishmentChecker::isChatRestricted)
+            hook.register()
+            discordSrvChatHook = hook
+            plugin.logger.debug("Hooked into DiscordSRV chat relay!")
+        }.onFailure {
+            plugin.logger.warning("Failed to register DiscordSRV chat hook: ${it.message}")
+            plugin.reportError(it)
         }
     }
 
