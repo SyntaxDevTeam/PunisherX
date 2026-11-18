@@ -102,7 +102,8 @@ GRANT SELECT ON punisherx.punishments TO 'punisherx_proxy'@'proxy-host';
 | A ban does not reach the proxy | Verify the backend committed an active network-scoped punishment and the proxy SELECT user can read it; check `poll-interval-ms`. |
 | A UUID ban does not block rejoining | The record must have `punishmentType = BAN`, `server = network` and an active expiry, or `endTime = -1` for a permanent ban. |
 | An IP-banned player can reconnect | Verify the IP is stored as an active network-scoped `BANIP` punishment and IP normalization matches the proxy's client address. |
-| SQL is unavailable | New logins/transfers are denied temporarily (fail-closed); restore SQL connectivity and restart the proxy if initialization failed. |\n| Changes to connection settings have no effect | Restart the proxy after editing `bridge.properties`. |
+| SQL is unavailable during startup | New logins and transfers are denied. The bridge retries with a fresh connection pool and resumes checks when it can read `punishments`. The startup error in the proxy log includes the underlying database exception. |
+| Changes to connection settings have no effect | Restart the proxy after editing `bridge.properties`. |
 
 ## 🧱 Build from source
 

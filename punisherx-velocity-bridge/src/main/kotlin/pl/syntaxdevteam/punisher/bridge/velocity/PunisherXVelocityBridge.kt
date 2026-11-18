@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package pl.syntaxdevteam.punisher.bridge.velocity
 
 import com.velocitypowered.api.event.Subscribe
@@ -22,6 +24,7 @@ import java.nio.file.Path
 import com.google.inject.Inject
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.TimeUnit
 
 // Plugin metadata and version come from the Gradle-expanded velocity-plugin.json.
 class PunisherXVelocityBridge @Inject constructor(
@@ -32,7 +35,9 @@ class PunisherXVelocityBridge @Inject constructor(
 
     private val channel: ChannelIdentifier = MinecraftChannelIdentifier.from("punisherx:bridge")
     private lateinit var bridgeConfig: BridgeConfig
-    private lateinit var bridgeDatabase: BridgeDatabase
+    @Volatile private var bridgeDatabase: BridgeDatabase? = null
+    private var stopping = false
+    private var lastStartupFailureAt: Long? = null
     private var pollTask: ScheduledTask? = null
     private val polling = AtomicBoolean(false)
     private val lastDbWarning = AtomicLong(0)
@@ -43,11 +48,34 @@ class PunisherXVelocityBridge @Inject constructor(
         logger.info("PunisherX proxy bridge ready for channel {}", channel.id)
 
         bridgeConfig = BridgeConfig.load(dataDirectory, logger)
-        bridgeDatabase = BridgeDatabase(logger, bridgeConfig)
-        runCatching { bridgeDatabase.ensureSchema() }.onFailure {
-            logger.error("PunisherX proxy access checks are fail-closed: database initialization failed", it)
-        }
+        initializeDatabase()
         schedulePolling()
+    }
+
+    @Synchronized
+    private fun initializeDatabase(): BridgeDatabase? {
+        if (stopping) return null
+        bridgeDatabase?.let { return it }
+        val previousFailure = lastStartupFailureAt
+        if (previousFailure != null && System.nanoTime() - previousFailure < TimeUnit.SECONDS.toNanos(5)) {
+            return null
+        }
+
+        return try {
+            BridgeDatabase(logger, bridgeConfig).also { database ->
+                database.start()
+                bridgeDatabase = database
+                logger.info("PunisherX database access ready")
+            }
+        } catch (error: Exception) {
+            lastStartupFailureAt = System.nanoTime()
+            if (previousFailure == null) {
+                logger.error("PunisherX proxy access checks are fail-closed: database initialization failed; retrying", error)
+            } else {
+                logDbFailure("initialization retry", error)
+            }
+            null
+        }
     }
 
     /** Legacy clients/backends cannot submit punishment commands over plugin messaging.
@@ -64,7 +92,8 @@ class PunisherXVelocityBridge @Inject constructor(
     fun onLogin(event: LoginEvent) {
         try {
             val player = event.player
-            val ban = bridgeDatabase.findActiveBan(
+            val database = checkNotNull(bridgeDatabase) { "PunisherX database has not initialized" }
+            val ban = database.findActiveBan(
                 player.uniqueId, ip = player.remoteAddress.address.hostAddress
             )
             if (ban != null) {
@@ -80,7 +109,8 @@ class PunisherXVelocityBridge @Inject constructor(
     fun onServerPreConnect(event: ServerPreConnectEvent) {
         try {
             val player = event.player
-            val ban = bridgeDatabase.findActiveBan(
+            val database = checkNotNull(bridgeDatabase) { "PunisherX database has not initialized" }
+            val ban = database.findActiveBan(
                 player.uniqueId, ip = player.remoteAddress.address.hostAddress
             )
             if (ban != null) {
@@ -106,11 +136,13 @@ class PunisherXVelocityBridge @Inject constructor(
         Component.text("PunisherX: unable to verify access. Please retry shortly.", NamedTextColor.RED)
 
     @Subscribe
+    @Synchronized
     fun onShutdown(event: ProxyShutdownEvent) {
         pollTask?.cancel()
-        if (::bridgeDatabase.isInitialized) {
-            bridgeDatabase.close()
-        }
+        stopping = true
+        val database = bridgeDatabase
+        bridgeDatabase = null
+        database?.close()
     }
 
     private fun schedulePolling() {
@@ -127,10 +159,11 @@ class PunisherXVelocityBridge @Inject constructor(
     private fun pollOnlinePlayers() {
         if (!polling.compareAndSet(false, true)) return
         try {
+            val database = bridgeDatabase ?: initializeDatabase() ?: return
             val snapshots = server.allPlayers.map {
                 ConnectionIdentity(it.uniqueId, it.remoteAddress.address.hostAddress)
             }
-            val bans = bridgeDatabase.findActiveBans(snapshots)
+            val bans = database.findActiveBans(snapshots)
             snapshots.forEach { snapshot ->
                 val ban = bans[snapshot.uuid] ?: return@forEach
                 server.getPlayer(snapshot.uuid).ifPresent { player ->

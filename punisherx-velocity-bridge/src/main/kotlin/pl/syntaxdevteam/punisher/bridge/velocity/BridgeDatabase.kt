@@ -22,10 +22,10 @@ class BridgeDatabase internal constructor(private val logger: Logger, private va
     })
 
     /** Proxy database accounts require SELECT only; migrations belong to the backend. */
-    fun ensureSchema() {
+    fun start() {
         try {
             database.start()
-            database.query("SELECT 1", emptyList())
+            database.query("SELECT uuid, punishmentType, reason, endTime, server, start FROM punishments WHERE 1 = 0")
         } catch (error: Exception) {
             runCatching { database.close() }.onFailure { error.addSuppressed(it) }
             throw error

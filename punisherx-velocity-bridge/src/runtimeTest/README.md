@@ -21,6 +21,11 @@ Use the current bridge artifact version if it changes. Obtain Velocity from
 [PaperMC](https://papermc.io/downloads/velocity). The tested official 4.3.0 build 44
 has SHA-256 `85be73b90f295acd8d5d45a00ad10bac791d4b72b7554172612a89565ebaaa8f`.
 
+Run the same command with `--startup-outage` to verify recovery after a failed
+database startup. The test starts Velocity with a preexisting schema and a bridge
+account that lacks access, verifies that login is denied, grants `SELECT` on
+`punishments`, then verifies that the proxy enforces a stored ban without restarting.
+
 Logs are retained under `punisherx-velocity-bridge/build/runtime-test/velocity-*/`.
 Database files are created in a temporary directory and removed after shutdown.
 Each run uses a new database, proxy directory and local ports. The proxy uses

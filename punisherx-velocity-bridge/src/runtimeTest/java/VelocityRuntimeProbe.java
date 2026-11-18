@@ -110,7 +110,6 @@ public final class VelocityRuntimeProbe {
         try (Connection db = DriverManager.getConnection(System.getProperty("probe.jdbc"), "probe", "probe")) {
             serverField.set(bridge, discovery);
             try (Statement sql = db.createStatement()) {
-                sql.execute("CREATE TABLE punishments (uuid VARCHAR(36), reason TEXT, endTime BIGINT, punishmentType VARCHAR(16), server VARCHAR(64), start BIGINT)");
                 sql.execute("INSERT INTO punishments VALUES ('" + uuid + "', 'runtime-ban', -1, 'BAN', 'network', 1)");
                 LoginEvent login = server.getEventManager().fire(new LoginEvent(player, null)).join();
                 check(!login.getResult().isAllowed(), "active network BAN denies login event");

@@ -50,7 +50,7 @@ def read_varint(sock):
     raise AssertionError("Invalid VarInt")
 
 
-def wire_login(proxy_port):
+def wire_login(proxy_port, *expected_text):
     def send(sock, data):
         sock.sendall(varint(len(data)) + data)
 
@@ -65,7 +65,7 @@ def wire_login(proxy_port):
             if not chunk:
                 raise AssertionError("Incomplete disconnect packet")
             packet.extend(chunk)
-        assert packet[0] == 0 and b"wire-ban" in packet and b"PunisherX BAN" in packet, packet
+        assert packet[0] == 0 and all(expected in packet for expected in expected_text), packet
 
 
 def main():
@@ -73,6 +73,7 @@ def main():
     parser.add_argument("--proxy-jar", type=Path, required=True)
     parser.add_argument("--bridge-jar", type=Path, required=True)
     parser.add_argument("--java-home", type=Path)
+    parser.add_argument("--startup-outage", action="store_true", help="Grant bridge database access after proxy startup.")
     args = parser.parse_args()
     proxy_jar, bridge_jar = args.proxy_jar.resolve(), args.bridge_jar.resolve()
     java = str(args.java_home / "bin/java") if args.java_home else "java"
@@ -113,19 +114,27 @@ def main():
                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
         wait_for(lambda: db.poll() is None and db_socket.exists() and sql("SELECT 1", False).returncode == 0)
-        sql("CREATE DATABASE punisherx_probe; CREATE USER 'probe'@'127.0.0.1' IDENTIFIED BY 'probe'; "
-            "GRANT ALL ON punisherx_probe.* TO 'probe'@'127.0.0.1';")
-        subprocess.run([javac, "--release", "25", "-proc:none", "-cp", str(proxy_jar), "-d", str(classes),
-                        str(module / "src/runtimeTest/java/VelocityRuntimeProbe.java")], check=True)
-        with zipfile.ZipFile(plugins / "runtime-probe.jar", "w") as jar:
-            for compiled in classes.rglob("*.class"):
-                jar.write(compiled, compiled.relative_to(classes))
-            jar.writestr("velocity-plugin.json", json.dumps({
-                "id": "runtimeprobe", "name": "RuntimeProbe", "version": "test", "main": "VelocityRuntimeProbe",
-                "dependencies": [{"id": "punisherxbridge", "optional": False}]}))
+        sql("CREATE DATABASE punisherx_probe; "
+            "CREATE TABLE punisherx_probe.punishments (uuid VARCHAR(36), reason TEXT, endTime BIGINT, "
+            "punishmentType VARCHAR(16), server VARCHAR(64), start BIGINT); "
+            "CREATE USER 'probe'@'127.0.0.1' IDENTIFIED BY 'probe'; "
+            "GRANT SELECT, INSERT, UPDATE, DELETE ON punisherx_probe.punishments TO 'probe'@'127.0.0.1'; "
+            "CREATE USER 'bridge'@'127.0.0.1' IDENTIFIED BY 'bridge';")
+        grant_bridge_access = "GRANT SELECT ON punisherx_probe.punishments TO 'bridge'@'127.0.0.1';"
+        if not args.startup_outage:
+            sql(grant_bridge_access)
+        if not args.startup_outage:
+            subprocess.run([javac, "--release", "25", "-proc:none", "-cp", str(proxy_jar), "-d", str(classes),
+                            str(module / "src/runtimeTest/java/VelocityRuntimeProbe.java")], check=True)
+            with zipfile.ZipFile(plugins / "runtime-probe.jar", "w") as jar:
+                for compiled in classes.rglob("*.class"):
+                    jar.write(compiled, compiled.relative_to(classes))
+                jar.writestr("velocity-plugin.json", json.dumps({
+                    "id": "runtimeprobe", "name": "RuntimeProbe", "version": "test", "main": "VelocityRuntimeProbe",
+                    "dependencies": [{"id": "punisherxbridge", "optional": False}]}))
         shutil.copy2(bridge_jar, plugins / bridge_jar.name)
         (config / "bridge.properties").write_text(
-            f"host=127.0.0.1\nport={db_port}\ndatabase=punisherx_probe\nusername=probe\npassword=probe\npoll-interval-ms=200\n")
+            f"host=127.0.0.1\nport={db_port}\ndatabase=punisherx_probe\nusername=bridge\npassword=bridge\npoll-interval-ms=200\n")
         (proxy_dir / "velocity.toml").write_text(
             f'config-version = "2.7"\nbind = "127.0.0.1:{proxy_port}"\nonline-mode = false\n'
             'player-info-forwarding-mode = "NONE"\n[servers]\n'
@@ -145,12 +154,23 @@ def main():
                 raise AssertionError(text)
             return "RUNTIME_PROBE_PASS" in text
 
-        wait_for(probe_finished)
+        if args.startup_outage:
+            wait_for(lambda: "Listening on" in log_path.read_text())
+            assert "database initialization failed" in log_path.read_text()
+            wire_login(proxy_port, b"unable to verify access")
+        else:
+            wait_for(probe_finished)
         player_uuid = uuid.UUID(bytes=hashlib.md5(b"OfflinePlayer:WireProbe").digest(), version=3)
         sql("INSERT INTO punisherx_probe.punishments VALUES "
             f"('{player_uuid}', 'wire-ban', -1, 'BAN', 'network', 1)")
+        if args.startup_outage:
+            sql(grant_bridge_access)
+            wait_for(lambda: "PunisherX database access ready" in log_path.read_text())
+            wire_login(proxy_port, b"wire-ban", b"PunisherX BAN")
+            print("PASS: login denied during startup outage; SQL ban enforced after recovery without a restart")
+            return
         for _ in range(2):
-            wire_login(proxy_port)
+            wire_login(proxy_port, b"wire-ban", b"PunisherX BAN")
         wait_for(lambda: log_path.read_text().count("SESSION_PROBE_PASS") == 2)
         assert "SESSION_PROBE_FAIL" not in log_path.read_text()
         proxy.stdin.write("shutdown\n")
