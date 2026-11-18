@@ -47,7 +47,14 @@ class PunisherXVelocityBridge @Inject constructor(
         server.channelRegistrar.register(channel)
         logger.info("PunisherX proxy bridge ready for channel {}", channel.id)
 
-        bridgeConfig = BridgeConfig.load(dataDirectory, logger)
+        val configPath = dataDirectory.resolve("bridge.properties").toAbsolutePath()
+        bridgeConfig = try {
+            BridgeConfig.load(configPath)
+        } catch (error: Exception) {
+            logger.error("PunisherX proxy access checks are fail-closed: cannot load {}. Check the file and restart Velocity.", configPath, error)
+            return
+        }
+        logger.info("PunisherX SQL target {}:{} (configuration: {})", bridgeConfig.host, bridgeConfig.port, configPath)
         initializeDatabase()
         schedulePolling()
     }

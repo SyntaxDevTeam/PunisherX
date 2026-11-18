@@ -60,7 +60,7 @@ Looking for the backend plugin or the BungeeCord artifact? See the **[main Punis
 
 ## 🔧 Configuration
 
-The bridge reads **`bridge.properties`**. Configure a dedicated read-only account. Example:
+Edit **`plugins/punisherxbridge/bridge.properties`** in the Velocity server directory. Configure a dedicated read-only account. Example:
 
 ```properties
 host=localhost
@@ -73,12 +73,15 @@ poll-interval-ms=1000
 
 | Setting | Meaning |
 | --- | --- |
-| `host` / `port` | Address of the shared MySQL server. `localhost` refers to the machine running the proxy. |
+| `host` / `port` | Set `host` to the shared MySQL server's IP or DNS name. Use `localhost` if MySQL runs on the proxy host. The port defaults to 3306. |
 | `database` | The database containing the PunisherX `punishments` table. |
 | `username` / `password` | Credentials with access to those tables. |
 | `poll-interval-ms` | Active-punishment reconciliation interval in milliseconds. Default: **1000**; values below **200** are clamped to 200. |
 
 Match the backend's `database.sql.*` connection settings. Credentials can differ if both database users have the required access to the same database. Restart the proxy after editing this file.
+
+In `bridge.properties`, enter the password without surrounding quotes. Write a
+literal backslash as `\\`.
 
 ## 🔄 How it works
 
@@ -98,7 +101,7 @@ GRANT SELECT ON punisherx.punishments TO 'punisherx_proxy'@'proxy-host';
 
 | Symptom | Check |
 | --- | --- |
-| Database connection fails | Host, port, credentials, database access and connectivity from the proxy. |
+| Database connection fails | Check the `PunisherX SQL target` line for the actual address and configuration path. Test TCP connectivity from the Velocity host or container and verify that MySQL grants the account `SELECT` on `punishments` from that client host. |
 | A ban does not reach the proxy | Verify the backend committed an active network-scoped punishment and the proxy SELECT user can read it; check `poll-interval-ms`. |
 | A UUID ban does not block rejoining | The record must have `punishmentType = BAN`, `server = network` and an active expiry, or `endTime = -1` for a permanent ban. |
 | An IP-banned player can reconnect | Verify the IP is stored as an active network-scoped `BANIP` punishment and IP normalization matches the proxy's client address. |

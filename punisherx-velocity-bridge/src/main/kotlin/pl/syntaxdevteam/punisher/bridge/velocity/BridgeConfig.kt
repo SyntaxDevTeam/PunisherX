@@ -1,7 +1,6 @@
 package pl.syntaxdevteam.punisher.bridge.velocity
 
-import org.slf4j.Logger
-import java.io.IOException
+import java.io.BufferedInputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Duration
@@ -19,28 +18,36 @@ data class BridgeConfig(
 
     companion object {
         private const val DEFAULT_POLL_MS = 1000L
+        private val UTF8_BOM = byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte())
 
-        fun load(dataDirectory: Path, logger: Logger): BridgeConfig {
-            val configPath = dataDirectory.resolve("bridge.properties")
+        fun load(configPath: Path): BridgeConfig {
             if (Files.notExists(configPath)) {
-                Files.createDirectories(dataDirectory)
-                BridgeConfig::class.java.getResourceAsStream("/bridge.properties")?.use { input ->
+                Files.createDirectories(configPath.parent)
+                checkNotNull(BridgeConfig::class.java.getResourceAsStream("/bridge.properties")).use { input ->
                     Files.copy(input, configPath)
                 }
             }
 
             val props = Properties()
-            try {
-                Files.newInputStream(configPath).use(props::load)
-            } catch (ex: IOException) {
-                logger.error("Unable to read bridge.properties, falling back to defaults", ex)
+            BufferedInputStream(Files.newInputStream(configPath)).use { input ->
+                input.mark(UTF8_BOM.size)
+                if (input.readNBytes(UTF8_BOM.size).contentEquals(UTF8_BOM)) {
+                    props.load(input.reader(Charsets.UTF_8))
+                } else {
+                    input.reset()
+                    props.load(input)
+                }
             }
 
+            val host = props.getProperty("host")?.trim().orEmpty()
+            require(host.isNotEmpty()) { "Set host to the MySQL server address" }
+            val port = props.getProperty("port", "3306").trim().toIntOrNull()
+            require(port != null && port in 1..65535) { "Set port to a number between 1 and 65535" }
             val pollMs = props.getProperty("poll-interval-ms")?.toLongOrNull() ?: DEFAULT_POLL_MS
 
             return BridgeConfig(
-                host = props.getProperty("host", "localhost"),
-                port = props.getProperty("port")?.toIntOrNull() ?: 3306,
+                host = host,
+                port = port,
                 database = props.getProperty("database", "punisherx"),
                 username = props.getProperty("username", "punisherx_proxy"),
                 password = props.getProperty("password", ""),

@@ -14,9 +14,9 @@ import uuid
 import zipfile
 
 
-def port():
+def port(host="127.0.0.1"):
     with socket.socket() as sock:
-        sock.bind(("127.0.0.1", 0))
+        sock.bind((host, 0))
         return sock.getsockname()[1]
 
 
@@ -83,7 +83,8 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     work = Path(tempfile.mkdtemp(prefix="velocity-", dir=output))
     print(f"Runtime test artifacts: {work}", flush=True)
-    db_port, proxy_port, backend_port = port(), port(), port()
+    db_host = "127.0.0.2"
+    db_port, proxy_port, backend_port = port(db_host), port(), port()
     proxy_dir, classes = work / "proxy", work / "classes"
     classes.mkdir()
     plugins = proxy_dir / "plugins"
@@ -104,7 +105,7 @@ def main():
         with (work / "db.log").open("w") as log:
             db = subprocess.Popen(["mariadbd", "--no-defaults", f"--datadir={datadir}",
                                    f"--socket={db_socket}", f"--pid-file={socket_dir / 'db.pid'}",
-                                   "--bind-address=127.0.0.1", f"--port={db_port}"],
+                                   f"--bind-address={db_host}", f"--port={db_port}"],
                                   stdout=log, stderr=subprocess.STDOUT)
         processes.append(db)
 
@@ -134,7 +135,8 @@ def main():
                     "dependencies": [{"id": "punisherxbridge", "optional": False}]}))
         shutil.copy2(bridge_jar, plugins / bridge_jar.name)
         (config / "bridge.properties").write_text(
-            f"host=127.0.0.1\nport={db_port}\ndatabase=punisherx_probe\nusername=bridge\npassword=bridge\npoll-interval-ms=200\n")
+            f"host={db_host}\nport={db_port}\ndatabase=punisherx_probe\nusername=bridge\npassword=bridge\npoll-interval-ms=200\n",
+            encoding="utf-8-sig")
         (proxy_dir / "velocity.toml").write_text(
             f'config-version = "2.7"\nbind = "127.0.0.1:{proxy_port}"\nonline-mode = false\n'
             'player-info-forwarding-mode = "NONE"\n[servers]\n'
@@ -143,14 +145,14 @@ def main():
             '[forced-hosts]\n"lobby.example.com" = ["lobby"]\n')
         log_path = work / "proxy.log"
         with log_path.open("w") as log:
-            proxy = subprocess.Popen([java, f"-Dprobe.jdbc=jdbc:mysql://127.0.0.1:{db_port}/punisherx_probe",
+            proxy = subprocess.Popen([java, f"-Dprobe.jdbc=jdbc:mysql://{db_host}:{db_port}/punisherx_probe",
                                       "-jar", str(proxy_jar)], cwd=proxy_dir, stdin=subprocess.PIPE,
                                      stdout=log, stderr=subprocess.STDOUT, text=True)
         processes.append(proxy)
 
         def probe_finished():
             text = log_path.read_text()
-            if "RUNTIME_PROBE_FAIL" in text or proxy.poll() is not None:
+            if "RUNTIME_PROBE_FAIL" in text or "database initialization failed" in text or proxy.poll() is not None:
                 raise AssertionError(text)
             return "RUNTIME_PROBE_PASS" in text
 
@@ -160,6 +162,7 @@ def main():
             wire_login(proxy_port, b"unable to verify access")
         else:
             wait_for(probe_finished)
+        assert f"PunisherX SQL target {db_host}:{db_port}" in log_path.read_text()
         player_uuid = uuid.UUID(bytes=hashlib.md5(b"OfflinePlayer:WireProbe").digest(), version=3)
         sql("INSERT INTO punisherx_probe.punishments VALUES "
             f"('{player_uuid}', 'wire-ban', -1, 'BAN', 'network', 1)")

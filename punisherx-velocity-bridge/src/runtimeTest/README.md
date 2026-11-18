@@ -30,6 +30,9 @@ Logs are retained under `punisherx-velocity-bridge/build/runtime-test/velocity-*
 Database files are created in a temporary directory and removed after shutdown.
 Each run uses a new database, proxy directory and local ports. The proxy uses
 offline mode so the wire test can authenticate without Mojang credentials.
+MariaDB listens on `127.0.0.2` and the generated `bridge.properties` starts
+with a UTF-8 BOM followed by the `host` setting, so the test catches fallback
+to `localhost`.
 
 ## What runs
 
