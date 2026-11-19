@@ -2,11 +2,12 @@
 
 ## [1.9.0] Unreleased
 
-### Identity configuration validation
+### Identity configuration validation and automatic migration
 
-* Validate `identity.realm` and `identity.authority` before configuration migration, database initialization or reload teardown on Paper/Folia and Spigot. `/prx validate` now reports invalid identity settings together with YAML errors.
-* Invalid startup configuration produces actionable console guidance and disables PunisherX cleanly instead of throwing an expected validation stack trace. On first boot, the default configuration is available for editing; existing invalid files are not migrated. Invalid reload requests preserve the running instance.
-* Retained explicit realms for offline/trusted-proxy modes and the existing database identity-domain binding checks; no automatic realm or UUID migration. Added regression tests for valid and invalid modes, missing configuration and read-only preflight.
+* Fixed upgrade and first-start failures on offline and proxy servers with a missing or blank `identity.realm`. Blank realms are now resolved automatically from the existing database binding; on an unbound database, offline and explicitly trusted-proxy installations seed the realm from the existing `server` scope (default `network`), while standalone online mode retains its `online` default.
+* Shared databases keep their identity realm across backend scopes and restarts. Explicit realms and incompatible online/offline domains are still rejected rather than silently rebound; proxy trust remains an explicit administrator setting. Existing player UUIDs and punishment history are not rewritten by realm migration.
+* Configuration version 172 updates the identity settings documentation and migrates existing files with a backup. A previously migrated version 171 with an empty realm also starts without manual edits. Read-only preflight allows automatic realms, still validates explicitly invalid settings, and provides actionable errors before migration or reload teardown.
+* Added regression tests covering legacy and already migrated configurations, shared database realms, preservation of punishment UUIDs, scope fallback, and rejection of conflicting identities.
 
 ### DiscordSRV integration — chat enforcement and public punishment announcements ([PR #101](https://github.com/SyntaxDevTeam/PunisherX/pull/101), [PR #102](https://github.com/SyntaxDevTeam/PunisherX/pull/102))
 

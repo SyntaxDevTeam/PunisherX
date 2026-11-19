@@ -198,9 +198,12 @@ class PunisherX : JavaPlugin(), Listener {
         get() = requireNotNull(identityDirectory) { "Identity directory is not initialized" }
 
     fun resetPlayerIdentities() {
-        identityDirectory = PlayerIdentityDirectory(
-            IdentitySettings.create(
-                config.getString("identity.realm"), config.getString("identity.authority"), server.onlineMode))
+        resetPlayerIdentities(IdentitySettings.create(
+            config.getString("identity.realm"), config.getString("identity.authority"), server.onlineMode))
+    }
+
+    fun resetPlayerIdentities(settings: IdentitySettings) {
+        identityDirectory = PlayerIdentityDirectory(settings)
     }
 
     fun observePlayerIdentity(uuid: UUID, name: String) {

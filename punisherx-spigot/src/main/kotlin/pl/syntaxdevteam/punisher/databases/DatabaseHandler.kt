@@ -139,13 +139,18 @@ class DatabaseHandler(private val plugin: PunisherX) {
         ready.set(true)
     }
 
-    fun bindIdentityDomain() {
+    fun bindIdentityDomain(): pl.syntaxdevteam.punisher.identity.IdentitySettings {
         ready.set(false)
-        db.withConnection {
-            IdentityRegistryStore.bind(it, plugin.playerIdentities.settings)
+        val settings = db.withConnection {
+            val resolved = IdentityRegistryStore.resolveAndBind(
+                it, plugin.config.getString("identity.realm"), plugin.config.getString("identity.authority"),
+                plugin.server.onlineMode, normalizedServerScope()
+            )
             IdentityRegistryStore.normalizeActiveAddresses(it)
+            resolved
         }
         ready.set(true)
+        return settings
     }
 
     fun recordIdentityObservation(identity: PlayerIdentity, observedAt: Long) {

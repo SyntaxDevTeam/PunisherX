@@ -1,4 +1,4 @@
-config-version: 171
+config-version: 172
 
 # /********************************************/
 #    Global settings
@@ -365,9 +365,11 @@ stats:
   enabled: true
 
 # Names resolve only for current local sessions. For offline targets use a full UUID.
-# Set the same realm on servers sharing one account namespace/database.
-# Offline and trusted-proxy modes REQUIRE an explicit realm; online defaults to online.
-# auto follows online-mode; trusted-proxy is an explicit administrator trust assertion:
+# Blank realm automatically reuses the database binding; for a new binding, the
+# server scope seeds offline/trusted-proxy realms and standalone online uses "online".
+# Backends sharing a database inherit its realm even when their scopes differ.
+# Explicit realms must match the stored binding. auto follows online-mode;
+# trusted-proxy is an explicit administrator trust assertion:
 # use only with authenticated forwarding and a backend inaccessible to untrusted connections.
 # Different online/offline domains cannot share one punishment database.
 identity:

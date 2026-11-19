@@ -1,4 +1,4 @@
-> Player identity: nicknames resolve only for current local sessions. Use the full UUID for offline/cross-server targets. IP addresses are separate targets. Offline/proxy installations must configure identity.realm; read [the identity deployment guide](../../development/PLAYER-IDENTITY.md) before upgrading.
+> Player identity: nicknames resolve only for current local sessions. Use the full UUID for offline/cross-server targets. IP addresses are separate targets. A blank `identity.realm` is resolved automatically from the database binding (or the initial server scope for offline/trusted-proxy installations). Proxy trust must still be explicitly configured for authenticated forwarding.
 
 ## Basic commands
 

@@ -72,14 +72,14 @@ class ConfigurationPreflight(private val plugin: PunisherX) {
         val realm = config.getString("identity.realm")
         val authority = config.getString("identity.authority")
         try {
-            IdentitySettings.create(realm, authority, onlineMode)
+            // Missing/blank realm is resolved against the database during initialization.
+            IdentitySettings.create(realm?.takeIf { it.isNotBlank() } ?: "network", authority, onlineMode)
         } catch (error: IllegalArgumentException) {
             val guidance = "Check identity.realm and identity.authority in config.yml " +
                 "(server online-mode=$onlineMode). " +
-                "For an offline server use authority: auto (or offline) and a stable, explicit realm, " +
-                "e.g. realm: my-server. For authenticated proxy forwarding only, use authority: trusted-proxy " +
-                "and the explicitly configured shared realm. For online-mode=true, auto or online may use the default realm. " +
-                "Reuse the existing database's realm; never choose a different one to bypass a mismatch."
+                "An empty realm is resolved automatically from the database or initial server scope. " +
+                "Use authority: auto for standalone servers; trusted-proxy only for authenticated proxy forwarding. " +
+                "An explicitly configured realm must match the database binding."
             issues += ConfigurationValidationIssue(file, "${error.message}. $guidance")
         }
     }

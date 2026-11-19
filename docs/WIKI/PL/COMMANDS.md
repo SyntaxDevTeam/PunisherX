@@ -1,4 +1,4 @@
-> Tożsamość gracza: nick wskazuje wyłącznie bieżącą lokalną sesję. Dla celów offline lub znanych tylko innemu serwerowi podaj pełny UUID. IP jest osobnym typem celu. Serwery offline/proxy muszą ustawić identity.realm; przed aktualizacją przeczytaj [opis wdrożenia](../../development/PLAYER-IDENTITY.md).
+> Tożsamość gracza: nick wskazuje wyłącznie bieżącą lokalną sesję. Dla celów offline lub znanych tylko innemu serwerowi podaj pełny UUID. IP jest osobnym typem celu. Puste `identity.realm` jest automatycznie rozwiązywane na podstawie domeny bazy (lub początkowego zakresu `server` dla offline/trusted-proxy). Zaufanie do proxy nadal wymaga jawnej konfiguracji zabezpieczonego przekazywania tożsamości.
 
 ## Podstawowe komendy
 
