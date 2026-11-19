@@ -24,6 +24,7 @@ import pl.syntaxdevteam.punisher.common.PunishmentActionExecutor
 import pl.syntaxdevteam.punisher.compatibility.VersionChecker
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
 import pl.syntaxdevteam.punisher.compatibility.platform.SchedulerAdapter
+import pl.syntaxdevteam.punisher.config.ConfigurationValidationException
 import pl.syntaxdevteam.punisher.config.ConfigurationPreflight
 import pl.syntaxdevteam.punisher.config.ConfigurationValidationReport
 import pl.syntaxdevteam.punisher.databases.*
@@ -127,6 +128,10 @@ class PunisherX : JavaPlugin(), Listener {
         SyntaxCore.init(this, versionType = "spigot")
         localPlayerSkins.initialize(File(dataFolder, "skin-cache"))
 
+        // First boot must leave an editable default file, even if identity validation fails.
+        // Bukkit only copies the bundled config when the file does not already exist.
+        saveDefaultConfig()
+
         // Language YAML is deliberately excluded here: MessageHandler must be able to
         // preserve a broken translation and start on its bundled in-memory fallback.
         val startupValidation = validateConfiguration(includeLanguageFiles = false)
@@ -136,9 +141,9 @@ class PunisherX : JavaPlugin(), Listener {
                     "[Config validation] ${startupValidation.relativePath(issue.file)}: ${issue.error}"
                 )
             }
-            throw IllegalStateException(
-                "PunisherX startup aborted because YAML validation failed: ${startupValidation.compactMessage()}"
-            )
+            super.getLogger().severe("PunisherX startup aborted. No existing configuration was migrated. Fix the reported settings and restart the server.")
+            server.pluginManager.disablePlugin(this)
+            return
         }
 
         initializePlugin()
@@ -159,8 +164,8 @@ class PunisherX : JavaPlugin(), Listener {
             validation.issues.forEach { issue ->
                 logger.err("[Config validation] ${validation.relativePath(issue.file)}: ${issue.error}")
             }
-            throw IllegalStateException(
-                "Reload aborted because YAML validation failed: ${validation.compactMessage()}"
+            throw ConfigurationValidationException(
+                "Reload aborted before applying changes: ${validation.compactMessage()}"
             )
         }
         reloadMyConfig()

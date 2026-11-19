@@ -2,6 +2,12 @@
 
 ## [1.9.0] Unreleased
 
+### Identity configuration validation
+
+* Validate `identity.realm` and `identity.authority` before configuration migration, database initialization or reload teardown on Paper/Folia and Spigot. `/prx validate` now reports invalid identity settings together with YAML errors.
+* Invalid startup configuration produces actionable console guidance and disables PunisherX cleanly instead of throwing an expected validation stack trace. On first boot, the default configuration is available for editing; existing invalid files are not migrated. Invalid reload requests preserve the running instance.
+* Retained explicit realms for offline/trusted-proxy modes and the existing database identity-domain binding checks; no automatic realm or UUID migration. Added regression tests for valid and invalid modes, missing configuration and read-only preflight.
+
 ### DiscordSRV integration — chat enforcement and public punishment announcements ([PR #101](https://github.com/SyntaxDevTeam/PunisherX/pull/101), [PR #102](https://github.com/SyntaxDevTeam/PunisherX/pull/102))
 
 * **Fixed a chat restriction bypass:** active temporary and permanent MUTE penalties, and JAIL penalties with chat restrictions enabled, now block Minecraft messages before DiscordSRV relays them to Discord. The hook uses the existing active-punishment rules and is unsubscribed on disable/reload.

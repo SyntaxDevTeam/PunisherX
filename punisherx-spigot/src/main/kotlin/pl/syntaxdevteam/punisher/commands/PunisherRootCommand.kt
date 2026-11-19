@@ -27,7 +27,7 @@ class PunisherRootCommand(private val plugin: PunisherX) : BasicCommand {
         if (report.valid) {
             stack.sender.sendMessage(
                 plugin.messageHandler.miniMessageFormat(
-                    "$prefix <green>Configuration validation passed. No YAML syntax errors were found.</green>"
+                    "$prefix <green>Configuration validation passed. YAML and identity settings are valid.</green>"
                 )
             )
             return
