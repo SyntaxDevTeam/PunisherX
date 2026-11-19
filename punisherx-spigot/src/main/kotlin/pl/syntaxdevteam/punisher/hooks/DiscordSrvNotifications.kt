@@ -5,7 +5,7 @@ import pl.syntaxdevteam.punisher.PunisherX
 internal object DiscordSrvNotifications {
     fun publish(plugin: PunisherX, type: String, values: Map<String, String>, silent: Boolean = false) {
         if (silent || !plugin.isEnabled) return
-        if (plugin.server.pluginManager?.isPluginEnabled("DiscordSRV") != true) return
+        if (!plugin.server.pluginManager.isPluginEnabled("DiscordSRV")) return
         runCatching {
             val config = plugin.config
             val text = DiscordSrvNotificationPolicy.render(config, type, values, silent) { key, placeholders ->

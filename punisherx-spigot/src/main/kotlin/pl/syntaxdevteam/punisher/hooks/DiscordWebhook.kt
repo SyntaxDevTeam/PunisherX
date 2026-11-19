@@ -1,5 +1,4 @@
 package pl.syntaxdevteam.punisher.hooks
-import pl.syntaxdevteam.punisher.compatibility.*
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -344,7 +343,7 @@ class DiscordWebhook(plugin: PunisherX) {
             return primary
         }
         val fallback = "https://minotar.net/helm/$identifier"
-        return if (isUrlReachable(fallback)) fallback else fallback
+        return fallback
     }
 
     private fun isUrlReachable(url: String): Boolean {

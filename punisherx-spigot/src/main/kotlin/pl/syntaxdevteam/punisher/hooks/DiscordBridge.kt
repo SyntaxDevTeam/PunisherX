@@ -1,31 +1,18 @@
 package pl.syntaxdevteam.punisher.hooks
-import pl.syntaxdevteam.punisher.identity.findConfirmedPlayerUuid
-import pl.syntaxdevteam.punisher.compatibility.*
 
 import org.bukkit.Bukkit
-import org.bukkit.configuration.ConfigurationSection
-import org.bukkit.configuration.file.YamlConfiguration
-//import org.bukkit.OfflinePlayer
 import org.bukkit.Statistic
 import org.bukkit.attribute.Attribute
+import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
-import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeButton
-import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeEmbed
-import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeEmbedField
-import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeEmbedPlaceholderField
-import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeMessageRequest
-import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeSlashCommand
-import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeSlashCommandOption
-import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeSubmitResult
-import pl.syntaxdevteam.dscbridgeapi.external.model.ButtonStyle
-import pl.syntaxdevteam.dscbridgeapi.external.model.render
+import pl.syntaxdevteam.dscbridgeapi.external.model.*
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.gui.stats.PlayerStatsService
-import java.time.Duration
+import pl.syntaxdevteam.punisher.identity.findConfirmedPlayerUuid
 import java.io.File
+import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.set
-import kotlin.text.trim
 
 class DiscordBridge(var plugin: PunisherX) {
     private val namespace = "punisherx"

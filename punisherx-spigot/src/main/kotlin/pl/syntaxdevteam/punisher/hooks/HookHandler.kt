@@ -1,5 +1,4 @@
 package pl.syntaxdevteam.punisher.hooks
-import pl.syntaxdevteam.punisher.compatibility.*
 
 import com.earth2me.essentials.spawn.IEssentialsSpawn
 import net.luckperms.api.LuckPerms
@@ -12,8 +11,8 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.dscbridgeapi.external.api.BridgeGateway
 import pl.syntaxdevteam.punisher.PunisherX
-import java.util.Locale
 import pl.syntaxdevteam.punisher.messages.NameMetadata
+import java.util.*
 
 /**
  * The [HookHandler] class is responsible for hooking into external services such as LuckPerms, Vault, and VaultUnlocked.
