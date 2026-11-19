@@ -28,13 +28,9 @@ class IdentityConfigurationPreflightTest {
         }
     }
 
-    @Test fun `legacy offline configuration requires an explicit realm before migration`() {
-        checkConfig("config-version: 169\n", false) { report, _ ->
-            assertFalse(report.valid)
-            assertContains(report.compactMessage(), "identity.realm")
-            assertContains(report.compactMessage(), "online-mode=false")
-            assertContains(report.compactMessage(), "existing database")
-        }
+    @Test fun `legacy offline and already migrated blank realm configurations pass preflight`() {
+        checkConfig("config-version: 169\nserver: survival\n", false) { report, _ -> assertTrue(report.valid) }
+        checkConfig("config-version: 171\nidentity:\n  realm: ''\n  authority: auto\n", false) { report, _ -> assertTrue(report.valid) }
     }
 
     @Test fun `online auto mode accepts missing identity settings`() {
@@ -45,8 +41,8 @@ class IdentityConfigurationPreflightTest {
         checkConfig("identity:\n  realm: moonvale\n  authority: auto\n", false) { report, _ -> assertTrue(report.valid) }
     }
 
-    @Test fun `trusted proxy requires explicit shared realm`() {
-        checkConfig("identity:\n  authority: trusted-proxy\n", false) { report, _ -> assertFalse(report.valid) }
+    @Test fun `trusted proxy explicitly selected can use automatic realm`() {
+        checkConfig("identity:\n  authority: trusted-proxy\n", false) { report, _ -> assertTrue(report.valid) }
         checkConfig("identity:\n  authority: trusted-proxy\n  realm: network-a\n", false) { report, _ -> assertTrue(report.valid) }
     }
 

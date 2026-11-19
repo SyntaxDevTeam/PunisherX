@@ -53,7 +53,6 @@ class PluginInitializer(private val plugin: PunisherX) {
         plugin.logger.diag("[TIMING] after setUpLogger: ${System.currentTimeMillis() - t0}ms")
         setupConfig()
         plugin.logger.diag("[TIMING] after setupConfig: ${System.currentTimeMillis() - t0}ms")
-        plugin.resetPlayerIdentities()
         setupDatabase()
         plugin.logger.diag("[TIMING] after setupDatabase: ${System.currentTimeMillis() - t0}ms")
         setupHandlers()
@@ -109,7 +108,9 @@ class PluginInitializer(private val plugin: PunisherX) {
         try {
             database.openConnection()
             database.createTables()
-            database.bindIdentityDomain()
+            val identitySettings = database.bindIdentityDomain()
+            plugin.resetPlayerIdentities(identitySettings)
+            plugin.logger.info("[Identity] Active realm: ${identitySettings.realm} (authority: ${identitySettings.authority})")
         } catch (error: Exception) {
             runCatching { database.closeConnection() }.onFailure { error.addSuppressed(it) }
             throw IllegalStateException("Database initialization failed: ${error.message}", error)

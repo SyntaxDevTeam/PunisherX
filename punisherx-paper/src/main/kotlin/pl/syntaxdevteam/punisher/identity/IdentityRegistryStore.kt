@@ -20,6 +20,44 @@ internal object IdentityRegistryStore {
         check(boundDomain(connection) == domain) { "Identity domain mismatch: use a separate database for different realms or online/offline namespaces" }
     }
 
+    /**
+     * Blank realms are automatic, not an assertion of proxy trust. The database
+     * is authoritative for shared installations, even when backend scopes differ.
+     * Never rewrite an existing binding or cross an online/offline namespace.
+     */
+    fun resolveAndBind(connection: Connection, realm: String?, authority: String?, onlineMode: Boolean, scope: String): IdentitySettings {
+        val explicit = realm?.takeIf { it.isNotBlank() }
+        if (explicit != null) {
+            return IdentitySettings.create(explicit, authority, onlineMode).also { bind(connection, it) }
+        }
+
+        val normalizedScope = scope.trim().lowercase(Locale.ROOT)
+            .takeIf { it.matches(Regex("[a-z0-9][a-z0-9_.-]{0,63}")) } ?: "network"
+        val requested = IdentitySettings.create(normalizedScope, authority, onlineMode)
+        val initial = if (requested.onlineDomain && requested.authority != "trusted-proxy") requested.copy(realm = "online") else requested
+
+        // Use the first committed binding rather than a backend's scope when
+        // several backends initialize the same database at the same time.
+        val existing = boundDomain(connection)
+        if (existing == null) {
+            try {
+                bind(connection, initial)
+            } catch (error: Exception) {
+                if (boundDomain(connection) == null) throw error
+            }
+        }
+        val domain = checkNotNull(boundDomain(connection)) { "Identity domain binding was not persisted" }
+        val separator = domain.lastIndexOf(':')
+        check(separator > 0) { "Invalid stored identity domain" }
+        val mode = domain.substring(separator + 1)
+        check(mode == if (requested.onlineDomain) "online" else "offline") {
+            "Identity domain mismatch: configured authority does not match the database online/offline namespace"
+        }
+        val resolved = IdentitySettings.create(domain.substring(0, separator), authority, onlineMode)
+        bind(connection, resolved)
+        return resolved
+    }
+
     private fun boundDomain(connection: Connection): String? =
         connection.createStatement().use { statement ->
             statement.executeQuery("SELECT domain FROM player_identity_domain WHERE id = 1").use { if (it.next()) it.getString(1) else null }

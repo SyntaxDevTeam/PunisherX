@@ -28,7 +28,7 @@ class ConfigManager(private val plugin: PunisherX) {
         private const val V_166 = 166
         private const val V_167 = 167
         private const val V_168 = 168
-        private const val V_171 = 171
+        private const val V_172 = 172
         // private const val V_170 = 170 // Reserved for future stable release (DscBridgeAPI config migration).
     }
 
@@ -54,7 +54,7 @@ class ConfigManager(private val plugin: PunisherX) {
 
         val sourceVersion = detectSourceVersion(rawUserDoc)
 
-        if (sourceVersion < V_171 && dataFile.exists()) {
+        if (sourceVersion < V_172 && dataFile.exists()) {
             val bak = File(dataFile.parentFile, "$FILE_NAME.$sourceVersion.bak")
             try {
                 Files.copy(dataFile.toPath(), bak.toPath(), StandardCopyOption.REPLACE_EXISTING)
@@ -65,7 +65,7 @@ class ConfigManager(private val plugin: PunisherX) {
             }
         }
 
-        val shouldUpdate = !dataFile.exists() || sourceVersion < V_171
+        val shouldUpdate = !dataFile.exists() || sourceVersion < V_172
 
         config = YamlDocument.create(
             dataFile,
@@ -84,7 +84,7 @@ class ConfigManager(private val plugin: PunisherX) {
             migrateFrom(sourceVersion)
             applyWarnCountOverrides()
 
-            config.set(VERSION_KEY, V_171)
+            config.set(VERSION_KEY, V_172)
             config.save()
             plugin.logger.success("[Config] Done. Current version: ${config.getInt(VERSION_KEY)}")
         } else {

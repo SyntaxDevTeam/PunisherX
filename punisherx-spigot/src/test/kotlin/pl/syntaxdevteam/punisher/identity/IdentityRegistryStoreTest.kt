@@ -23,6 +23,44 @@ class IdentityRegistryStoreTest {
         assertFailsWith<IllegalStateException> { IdentityRegistryStore.bind(c, IdentitySettings.create("network", "offline", false)) }
         assertFailsWith<IllegalStateException> { IdentityRegistryStore.bind(c, IdentitySettings.create("other", "online", true)) }
     }
+    @Test fun `legacy offline migration seeds scope without changing punishment UUIDs`() = database { c ->
+        val uuid = UUID.randomUUID().toString()
+        c.createStatement().use { it.execute("INSERT INTO punishments VALUES(1, '$uuid', 'BAN')") }
+        val a = IdentityRegistryStore.resolveAndBind(c, null, "auto", false, "survival")
+        assertEquals("survival", a.realm)
+        assertEquals("offline", a.authority)
+        val b = IdentityRegistryStore.resolveAndBind(c, "", "auto", false, "skyblock")
+        assertEquals(a, b)
+        c.createStatement().use { s -> s.executeQuery("SELECT uuid FROM punishments WHERE id = 1").use {
+            assertTrue(it.next()); assertEquals(uuid, it.getString(1))
+        } }
+    }
+    @Test fun `existing explicit realm is inherited without changing binding`() = database { c ->
+        val expected = IdentitySettings.create("moonvale", "offline", false)
+        IdentityRegistryStore.bind(c, expected)
+        assertEquals(expected, IdentityRegistryStore.resolveAndBind(c, "", "auto", false, "network"))
+        assertFailsWith<IllegalStateException> {
+            IdentityRegistryStore.resolveAndBind(c, "another", "auto", false, "network")
+        }
+        assertFailsWith<IllegalStateException> {
+            IdentityRegistryStore.resolveAndBind(c, "", "auto", true, "network")
+        }
+        assertEquals(expected, IdentityRegistryStore.resolveAndBind(c, null, "offline", false, "network"))
+    }
+    @Test fun `standalone online keeps previous default and proxy trust is never inferred`() = database { c ->
+        val online = IdentityRegistryStore.resolveAndBind(c, null, "auto", true, "survival")
+        assertEquals("online", online.realm)
+        assertTrue(online.onlineDomain)
+        assertFailsWith<IllegalStateException> {
+            IdentityRegistryStore.resolveAndBind(c, null, "auto", false, "survival")
+        }
+        val proxy = IdentityRegistryStore.resolveAndBind(c, null, "trusted-proxy", false, "skyblock")
+        assertEquals("online", proxy.realm)
+        assertEquals("trusted-proxy", proxy.authority)
+    }
+    @Test fun `invalid server scope does not break automatic migration`() = database { c ->
+        assertEquals("network", IdentityRegistryStore.resolveAndBind(c, "", "auto", false, "invalid scope").realm)
+    }
     @Test fun `older asynchronous observations cannot overwrite later names and same nick never merges accounts`() = database { c ->
         val uuid = UUID.randomUUID()
         val identity = PlayerIdentity("network", uuid, "NewName", "online")
