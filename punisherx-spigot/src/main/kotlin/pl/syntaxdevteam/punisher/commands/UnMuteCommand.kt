@@ -8,6 +8,8 @@ import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.UUID
 
+import pl.syntaxdevteam.punisher.hooks.DiscordSrvNotifications
+
 class UnMuteCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
@@ -19,15 +21,17 @@ class UnMuteCommand(private val plugin: PunisherX) : BasicCommand {
                 val player = arguments[0]
                 val uuid = (plugin.resolvePlayerUuidOrNotify(player, stack.sender) ?: return).toString()
                 val punishments = plugin.databaseHandler.getPunishments(uuid)
-                if (punishments.isNotEmpty()) {
+                if (punishments.any { it.type == "MUTE" }) {
+                    var removed = false
                     punishments.forEach { punishment ->
                         if (punishment.type == "MUTE") {
-                            plugin.databaseHandler.removePunishment(uuid, punishment.type)
+                            removed = plugin.databaseHandler.removePunishment(uuid, punishment.type) || removed
                         }
                     }
                     val placeholders = mapOf("player" to player, "operator" to stack.sender.name)
                     PunishmentCommandUtils.sendSenderMessages(plugin, stack, "unmute", "unmute", placeholders, silent = silent)
                     PunishmentCommandUtils.sendTargetMessages(plugin, Bukkit.getPlayer(UUID.fromString(uuid)), "unmute", "unmute_message", placeholders, silent = silent)
+                    if (removed) DiscordSrvNotifications.publish(plugin, "unmute", placeholders, silent)
                     plugin.logger.info("Player $player ($uuid) has been unmuted")
                 } else {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_found", mapOf("player" to player, "operator" to stack.sender.name)))

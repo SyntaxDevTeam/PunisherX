@@ -669,3 +669,20 @@ command-help:
     - ' <gray>|    <gold>/note remove <player|uuid> <id> <gray>- <white>Deletes a note belonging to that player.'
     - ' <gray>|    <gold>/langfix <gray>- <white>Converts legacy language placeholders to angle brackets.'
     - ' <gray>|    <gold>/cache <gray>- <white>Displays player IP cache entries; console only.'
+
+# Public DiscordSRV announcements (plain text, no private metadata).
+discordsrv:
+  warn: "<player> — تلقى تحذيرًا."
+  mute: "<player> — تم كتمه."
+  kick: "<player> — تم طرده."
+  ban: "<player> — تم حظره."
+  banip: "<player> — تم حظر عنوان IP الخاص به."
+  jail: "<player> — تم سجنه."
+  unwarn: "<player> — تم إلغاء تحذير له."
+  unmute: "<player> — تم إلغاء كتمه."
+  unban: "<player> — تم إلغاء حظره."
+  unjail: "<player> — تم إطلاق سراحه."
+  time: "المدة: <time>"
+  reason: "السبب: <reason>"
+  operator: "المشرف: <operator>"
+  hidden-target: "هدف مخفي"

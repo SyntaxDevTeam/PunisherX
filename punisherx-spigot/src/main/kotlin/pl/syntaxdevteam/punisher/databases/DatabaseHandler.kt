@@ -358,22 +358,25 @@ class DatabaseHandler(private val plugin: PunisherX) {
         false
     }
 
-    fun removePunishment(uuidOrIp: String, punishmentType: String, removeAll: Boolean = false) {
-        try {
+    fun removePunishment(uuidOrIp: String, punishmentType: String, removeAll: Boolean = false): Boolean {
+        return try {
+            var removed = false
             db.transaction {
                 val params = mutableListOf<Any>(uuidOrIp, punishmentType)
                 val filter = appendServerFilter("SELECT id FROM punishments WHERE uuid = ? AND punishmentType = ?", params, true)
                 if (removeAll) {
-                    execute(filter.replace("SELECT id", "DELETE"), params)
+                    removed = execute(filter.replace("SELECT id", "DELETE"), params) > 0
                 } else {
                     val (sql, values) = paginatedSql("$filter ORDER BY start DESC, id DESC LIMIT 1", params)
                     query(sql, values).firstOrNull()?.int("id")?.let { id ->
-                        delete("punishments") { "id" eq id }
+                        removed = execute("DELETE FROM punishments WHERE id = ?", listOf(id)) > 0
                     }
                 }
             }
+            removed
         } catch (e: Exception) {
             logger.err("Failed to remove punishment of type $punishmentType for $uuidOrIp. ${e.message}")
+            false
         }
     }
 

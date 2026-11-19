@@ -2,9 +2,16 @@
 
 ## [1.9.0] Unreleased
 
-### DiscordSRV compatibility
+### DiscordSRV integration — chat enforcement and public punishment announcements ([PR #101](https://github.com/SyntaxDevTeam/PunisherX/pull/101), [PR #102](https://github.com/SyntaxDevTeam/PunisherX/pull/102))
 
-* Fixed Minecraft-to-Discord chat relay bypassing active MUTE and configured JAIL chat restrictions on Paper/Folia and Spigot. The optional DiscordSRV API subscription blocks relay messages before processing, uses the existing active punishment rules, and is removed on disable/reload. DiscordSRV is not required on servers without it. This change does not moderate messages sent directly from Discord.
+* **Fixed a chat restriction bypass:** active temporary and permanent MUTE penalties, and JAIL penalties with chat restrictions enabled, now block Minecraft messages before DiscordSRV relays them to Discord. The hook uses the existing active-punishment rules and is unsubscribed on disable/reload.
+* **Added public punishment announcements** for WARN, MUTE, KICK, BAN, BANIP and JAIL, including penalties issued through `/punish` templates. Standard `/unwarn`, `/unmute`, `/unban` and `/unjail` commands also publish removal announcements when the removal is confirmed.
+* Announcements use the existing DiscordSRV bot and its mapped Minecraft chat channel (default: `global`); no additional webhook or bot token is required. The existing administrative Discord webhook remains independent.
+* Public announcements always respect `--silent`. IP-based targets and common IP address literals are redacted, Discord mentions are neutralized, and moderator names are hidden by default. Reasons and moderator names can be toggled independently.
+* Added configuration version 171 with automatic migration and backup of older configurations. The new `integration.discordsrv` section provides an integration switch, independent chat blocking and notification switches, destination channel, reason/operator visibility and per-punishment notification switches.
+* Added customizable `discordsrv` announcement templates in all 12 bundled languages for both Paper/Folia and Spigot.
+* Added regression tests for relay cancellation, notification formatting, silent mode, privacy and configuration. DiscordSRV remains an optional compile-only dependency; the test runtime isolates its API and relocated Adventure classes from PunisherX libraries.
+* **Scope:** this integration does not moderate messages sent directly from Discord accounts. Automatic punishment expiry, bulk undo and GUI-only removals are not announced by this implementation.
 
 ### Staff Notes — private moderation observations ([PR #96](https://github.com/SyntaxDevTeam/PunisherX/pull/96))
 

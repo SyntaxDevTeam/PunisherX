@@ -16,7 +16,8 @@ class PrivacyConfigMigrationTest {
             whenever(plugin.getResource("config.yml")).thenAnswer { javaClass.classLoader.getResourceAsStream("config.yml") }
             val manager = ConfigManager(plugin)
             manager.load()
-            assertEquals(169, manager.config.getInt("config-version"))
+            assertEquals(171, manager.config.getInt("config-version"))
+            assertTrue(manager.config.getBoolean("integration.discordsrv.notifications.enabled"))
             assertFalse(manager.config.getBoolean("jail.restrictions.mute"))
             assertFalse(manager.config.getBoolean("privacy.ip.enabled"))
             assertTrue(manager.config.getBoolean("jail.restrictions.commands"))

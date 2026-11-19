@@ -660,3 +660,20 @@ command-help:
     - ' <gray>|    <gold>/note remove <player|uuid> <id> <gray>- <white>Deletes a note belonging to that player.'
     - ' <gray>|    <gold>/langfix <gray>- <white>Converts legacy language placeholders to angle brackets.'
     - ' <gray>|    <gold>/cache <gray>- <white>Displays player IP cache entries; console only.'
+
+# Public DiscordSRV announcements (plain text, no private metadata).
+discordsrv:
+  warn: "<player> — 경고를 받았습니다."
+  mute: "<player> — 채팅이 제한되었습니다."
+  kick: "<player> — 서버에서 추방되었습니다."
+  ban: "<player> — 차단되었습니다."
+  banip: "<player> — IP 차단을 받았습니다."
+  jail: "<player> — 감옥에 수감되었습니다."
+  unwarn: "<player> — 경고가 취소되었습니다."
+  unmute: "<player> — 채팅 제한이 해제되었습니다."
+  unban: "<player> — 차단이 해제되었습니다."
+  unjail: "<player> — 감옥에서 석방되었습니다."
+  time: "기간: <time>"
+  reason: "이유: <reason>"
+  operator: "관리자: <operator>"
+  hidden-target: "숨겨진 대상"

@@ -664,3 +664,20 @@ command-help:
     - ' <gray>|    <gold>/note remove <gracz|uuid> <id> <gray>- <white>Usunięcie notatki wskazanego gracza.'
     - ' <gray>|    <gold>/langfix <gray>- <white>Konwersja starszych placeholderów tłumaczeń na nawiasy ostre.'
     - ' <gray>|    <gold>/cache <gray>- <white>Wyświetlenie cache IP graczy; tylko konsola.'
+
+# Public DiscordSRV announcements (plain text, no private metadata).
+discordsrv:
+  warn: "<player> — otrzymał ostrzeżenie."
+  mute: "<player> — został wyciszony."
+  kick: "<player> — został wyrzucony."
+  ban: "<player> — został zbanowany."
+  banip: "<player> — otrzymał blokadę IP."
+  jail: "<player> — został osadzony w więzieniu."
+  unwarn: "<player> — ma cofnięte ostrzeżenie."
+  unmute: "<player> — został odciszony."
+  unban: "<player> — został odbanowany."
+  unjail: "<player> — został zwolniony z więzienia."
+  time: "Czas: <time>"
+  reason: "Powód: <reason>"
+  operator: "Administrator: <operator>"
+  hidden-target: "ukryty cel"

@@ -1,4 +1,4 @@
-config-version: 169
+config-version: 171
 
 # /********************************************/
 #    Global settings
@@ -228,6 +228,30 @@ geoDatabase:
   # To use GeoIP functionality, you need a MaxMind license key.
   # Obtain a free key at: https://www.maxmind.com/en/geolite2/signup
   licenseKey: "LICENSEKEY"
+
+# Public punishment notifications through the existing DiscordSRV bot.
+# Channel is the Minecraft channel name from DiscordSRV's Channels map.
+# --silent always suppresses public announcements.
+integration:
+  discordsrv:
+    enabled: true
+    block-muted-chat: true
+    notifications:
+      enabled: true
+      channel: "global"
+      show-operator: false
+      show-reason: true
+      punishments:
+        warn: true
+        mute: true
+        kick: true
+        ban: true
+        banip: true
+        jail: true
+        unwarn: true
+        unmute: true
+        unban: true
+        unjail: true
 
 # Discord webhook settings.
 webhook:
