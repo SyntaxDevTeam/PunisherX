@@ -209,6 +209,8 @@ class PluginInitializer(private val plugin: PunisherX) {
     }
 
     private fun registerDiscordSrvChatHook() {
+        if (!plugin.config.getBoolean("integration.discordsrv.enabled", true) ||
+            !plugin.config.getBoolean("integration.discordsrv.block-muted-chat", true)) return
         if (!plugin.server.pluginManager.isPluginEnabled("DiscordSRV")) return
         runCatching {
             val hook = DiscordSrvChatHook(plugin.punishmentChecker::isChatRestricted)

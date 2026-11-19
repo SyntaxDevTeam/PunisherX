@@ -2,6 +2,8 @@
 
 ## [1.9.0] Unreleased
 
+* Added public DiscordSRV punishment and removal announcements on Paper/Folia and Spigot. Config 171 adds per-type switches, operator/reason visibility, and optional mute hook; `--silent` always suppresses public notices. IP targets and mentions are redacted; the independent administrative webhook is unchanged.
+
 ### DiscordSRV compatibility
 
 * Fixed Minecraft-to-Discord chat relay bypassing active MUTE and configured JAIL chat restrictions on Paper/Folia and Spigot. The optional DiscordSRV API subscription blocks relay messages before processing, uses the existing active punishment rules, and is removed on disable/reload. DiscordSRV is not required on servers without it. This change does not moderate messages sent directly from Discord.

@@ -8,6 +8,8 @@ import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import org.bukkit.command.CommandSender
 import pl.syntaxdevteam.punisher.permissions.IpVisibility
 
+import pl.syntaxdevteam.punisher.hooks.DiscordSrvNotifications
+
 internal object PunishmentCommandUtils {
     private fun privatePlaceholders(plugin: PunisherX, viewer: CommandSender,
                                     placeholders: Map<String, String>): Map<String, String> =
@@ -113,9 +115,11 @@ internal object PunishmentCommandUtils {
         section: String,
         key: String,
         placeholders: Map<String, String>,
-        silent: Boolean = false
+        silent: Boolean = false,
+        notifyDiscord: Boolean = true
     ) {
         if (silent) return
+        if (notifyDiscord) DiscordSrvNotifications.publish(plugin, section, placeholders, silent)
         val operator = placeholders["operator"]
         plugin.server.onlinePlayers.filterNot { it.name == operator }.forEach { onlinePlayer ->
             if (PermissionChecker.hasWithSee(onlinePlayer, permissionKey)) {

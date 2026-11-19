@@ -624,3 +624,20 @@ command-help:
     - ' <gray>|    <gold>/note remove <player|uuid> <id> <gray>- <white>Deletes a note belonging to that player.'
     - ' <gray>|    <gold>/langfix <gray>- <white>Converts legacy language placeholders to angle brackets.'
     - ' <gray>|    <gold>/cache <gray>- <white>Displays player IP cache entries; console only.'
+
+# Public DiscordSRV announcements (plain text, no private metadata).
+discordsrv:
+  warn: "<player> — recebeu um aviso."
+  mute: "<player> — foi silenciado."
+  kick: "<player> — foi expulso."
+  ban: "<player> — foi banido."
+  banip: "<player> — recebeu um banimento de IP."
+  jail: "<player> — foi preso."
+  unwarn: "<player> — teve um aviso removido."
+  unmute: "<player> — pode voltar a escrever."
+  unban: "<player> — foi desbanido."
+  unjail: "<player> — foi libertado da prisão."
+  time: "Duração: <time>"
+  reason: "Motivo: <reason>"
+  operator: "Moderador: <operator>"
+  hidden-target: "alvo oculto"

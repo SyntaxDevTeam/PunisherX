@@ -62,7 +62,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
         punishments.forEach { punishment ->
             if (punishment.type == "BAN") {
                 plugin.commandLoggerPlugin.logCommand(stack.sender.name, "UNBAN", playerName, "")
-                plugin.databaseHandler.removePunishment(uuid, punishment.type, removeAll = false)
+                if (!plugin.databaseHandler.removePunishment(uuid, punishment.type, removeAll = false)) return@forEach
                 plugin.logger.info("Player $playerName ($uuid) has been unbanned")
                 unbanned = true
             }
@@ -91,7 +91,7 @@ class UnBanCommand(private val plugin: PunisherX) : BasicCommand {
         punishments.forEach { punishment ->
             if (punishment.type == "BANIP") {
                 plugin.commandLoggerPlugin.logCommand(stack.sender.name, "UNBAN (IP)", ip, "")
-                plugin.databaseHandler.removePunishment(ip, punishment.type)
+                if (!plugin.databaseHandler.removePunishment(ip, punishment.type)) return@forEach
                 plugin.logger.info("IP $ip has been unbanned")
                 unbanned = true
             }

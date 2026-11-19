@@ -55,16 +55,16 @@ class PunishmentCache(private val plugin: PunisherX) {
         saveSingleEntry(uuid, punishment)
     }
 
-    fun removePunishment(uuid: UUID, teleportPlayer: Boolean = true, notify: Boolean = true, removeDatabase: Boolean = true) {
+    fun removePunishment(uuid: UUID, teleportPlayer: Boolean = true, notify: Boolean = true, removeDatabase: Boolean = true): Boolean {
         val punishment = cache.getIfPresent(uuid) ?: run {
             removeSingleEntry(uuid)
-            return
+            return false
         }
 
         cache.invalidate(uuid)
         plugin.logger.debug("Usuwam karę dla $uuid")
         removeSingleEntry(uuid)
-        if (removeDatabase) plugin.databaseHandler.removePunishment(uuid.toString(), "JAIL")
+        val removed = !removeDatabase || plugin.databaseHandler.removePunishment(uuid.toString(), "JAIL")
 
         val player = Bukkit.getPlayer(uuid)
         if (player != null) {
@@ -104,6 +104,7 @@ class PunishmentCache(private val plugin: PunisherX) {
                 ).forEach { msg -> player.sendMessage(msg) }
             }
         }
+        return removed
     }
 
     //TODO: zweryfikować czy będzie potrzebne i ewnetualnie wdrożyć lub usunąć

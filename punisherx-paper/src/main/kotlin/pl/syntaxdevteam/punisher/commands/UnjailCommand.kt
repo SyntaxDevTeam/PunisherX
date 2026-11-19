@@ -48,10 +48,10 @@ class UnjailCommand(private val plugin: PunisherX) : BasicCommand {
         }
 
         fun completeUnjail() {
-            plugin.cache.removePunishment(uuid, teleportPlayer = false, notify = false)
+            val removed = plugin.cache.removePunishment(uuid, teleportPlayer = false, notify = false)
 
             val placeholders = mapOf("player" to playerName, "operator" to stack.sender.name)
-            PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_UNJAIL, "unjail", "broadcast", placeholders, silent = silent)
+            PunishmentCommandUtils.sendBroadcast(plugin, PermissionChecker.PermissionKey.SEE_UNJAIL, "unjail", "broadcast", placeholders, silent = silent, notifyDiscord = removed)
             PunishmentCommandUtils.sendSenderMessages(plugin, stack, "unjail", "success", placeholders, silent = silent)
         }
 

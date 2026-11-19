@@ -25,6 +25,7 @@ class RemovalCommandSilentTest {
         whenever(sender.name).thenReturn("Admin")
         whenever(plugin.resolvePlayerUuid("Steve")).thenReturn(uuid)
         whenever(plugin.databaseHandler).thenReturn(mock())
+        whenever(plugin.databaseHandler.removePunishment(any(), any(), any())).thenReturn(true)
         whenever(plugin.logger).thenReturn(mock())
         whenever(plugin.messageHandler).thenReturn(mock())
         whenever(plugin.commandLoggerPlugin).thenReturn(mock())

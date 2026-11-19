@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
+import pl.syntaxdevteam.punisher.hooks.DiscordSrvNotifications
+
 class UnWarnCommand(private val plugin: PunisherX) : BasicCommand {
 
     override fun execute(@NotNull stack: CommandSourceStack, @NotNull args: Array<String>) {
@@ -19,8 +21,9 @@ class UnWarnCommand(private val plugin: PunisherX) : BasicCommand {
                 val punishments = plugin.databaseHandler.getPunishments(uuid)
                 val warnPunishments = punishments.filter { it.type == "WARN" }
                 if (warnPunishments.isNotEmpty()) {
-                    plugin.databaseHandler.removePunishment(uuid, "WARN")
+                    val removed = plugin.databaseHandler.removePunishment(uuid, "WARN")
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("unwarn", if (silent) "silent_success" else "unwarn", mapOf("player" to player, "operator" to stack.sender.name)))
+                    if (removed) DiscordSrvNotifications.publish(plugin, "unwarn", mapOf("player" to player, "operator" to stack.sender.name), silent)
                     plugin.logger.info("Player $player ($uuid) has been unwarned")
                 } else {
                     stack.sender.sendMessage(plugin.messageHandler.stringMessageToComponent("error", "player_not_found", mapOf("player" to player, "operator" to stack.sender.name)))
