@@ -97,6 +97,11 @@ repositories {
     }
 }
 
+// Dialogs and modern login events are loaded only on Paper/Folia 1.21.7+.
+val paperModern = sourceSets.create("paperModern") {
+    compileClasspath += sourceSets.main.get().output
+}
+
 val mockitoAgent = configurations.create("mockitoAgent")
 
 // DiscordSRV publishes a full plugin JAR. Its bundled libraries/resources
@@ -125,6 +130,10 @@ val discordSrvTestApiJar = tasks.register<Jar>("discordSrvTestApiJar") {
 }
 
 dependencies {
+    add(paperModern.compileOnlyConfigurationName, libs.paper.modern.api)
+    add(paperModern.compileOnlyConfigurationName, libs.syntaxcore)
+    add(paperModern.compileOnlyConfigurationName, libs.messagehandler.paper)
+
     compileOnly(libs.paper.api)
     compileOnly(libs.syntaxdb.core) {
         exclude(group = "org.slf4j", module = "slf4j-api")
@@ -139,9 +148,10 @@ dependencies {
     compileOnly(libs.ant)
     compileOnly(libs.caffeine)
     compileOnly(libs.boosted.yaml)
-    compileOnly(libs.triumph.gui)
+    compileOnly(libs.triumph.gui) { exclude(group = "net.kyori") }
 
-    compileOnly(libs.adventure.nbt)
+    // The NBT reader is independent of Adventure components and is absent from Paper.
+    compileOnly(libs.adventure.nbt) { isTransitive = false }
 
     compileOnly(libs.luckperms.api)
     compileOnly(libs.placeholderapi)
@@ -168,6 +178,8 @@ dependencies {
     testImplementation(libs.sqlite.jdbc)
     testImplementation(libs.paper.api)
     testImplementation(libs.messagehandler.paper)
+    testRuntimeOnly("net.kyori:adventure-text-serializer-ansi") // Paper supplies the version via its BOM.
+    testRuntimeOnly(paperModern.output)
     testImplementation(libs.caffeine)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
@@ -219,7 +231,6 @@ val runtimeLibraryVersions = mapOf(
     "geoipVersion" to libs.versions.geoip.get(),
     "antVersion" to libs.versions.ant.get(),
     "faststatsVersion" to libs.versions.faststats.get(),
-    "syntaxcoreVersion" to libs.versions.syntaxcore.get(),
     "messagehandlerVersion" to libs.versions.messagehandler.get(),
 )
 
@@ -238,7 +249,10 @@ tasks.processResources {
     }
 }
 
+tasks.jar { from(paperModern.output) }
+
 tasks.named<ShadowJar>("shadowJar") {
+    from(paperModern.output)
     archiveBaseName.set("PunisherX-Paper")
     archiveClassifier.set("")
     archiveVersion.set(project.version.toString())

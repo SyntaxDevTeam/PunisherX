@@ -10,7 +10,7 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
-import pl.syntaxdevteam.punisher.dialogs.ReportManagementDialogService
+import pl.syntaxdevteam.punisher.compatibility.PaperModernFeatures
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.util.UUID
 import pl.syntaxdevteam.punisher.books.ReportBookService
@@ -145,12 +145,12 @@ class ReportsCommand(private val plugin: PunisherX) : BasicCommand {
     private fun name(uuid: UUID): String = Bukkit.getOfflinePlayer(uuid).name ?: uuid.toString()
 
     private fun openDialogInbox(player: Player, page: Int, closed: Boolean): Boolean =
-        useDialogs() && runCatching { ReportManagementDialogService(plugin).openInbox(player, page, closed) }
+        useDialogs() && runCatching { PaperModernFeatures.load(plugin).openReportInbox(player, page, closed) }
             .onFailure { plugin.logger.warning("Could not open report management dialog, using inventory GUI: ${it.message}") }
             .getOrDefault(false)
 
     private fun openDialogDetails(player: Player, id: Int): Boolean =
-        useDialogs() && runCatching { ReportManagementDialogService(plugin).openDetails(player, id) }
+        useDialogs() && runCatching { PaperModernFeatures.load(plugin).openReportDetails(player, id) }
             .onFailure { plugin.logger.warning("Could not open report details dialog, using chat output: ${it.message}") }
             .getOrDefault(false)
 

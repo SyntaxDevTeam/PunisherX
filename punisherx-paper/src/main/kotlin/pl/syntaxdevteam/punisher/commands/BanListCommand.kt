@@ -7,7 +7,7 @@ import org.bukkit.entity.Player
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.compatibility.DialogSupport
-import pl.syntaxdevteam.punisher.dialogs.PunishmentListDialogService
+import pl.syntaxdevteam.punisher.compatibility.PaperModernFeatures
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import java.text.SimpleDateFormat
 import java.util.*
@@ -101,7 +101,7 @@ class BanListCommand(private val plugin: PunisherX) : BasicCommand {
         } else {
             plugin.databaseHandler.getBannedPlayers(pageSize + 1, offset)
         }
-        PunishmentListDialogService(plugin).open(
+        PaperModernFeatures.load(plugin).openPunishmentList(
             player = player,
             title = mh.stringMessageToComponentNoPrefix("banlist", "title"),
             subtitle = Component.text("${if (historyMode) "--h • " else ""}#$page"),

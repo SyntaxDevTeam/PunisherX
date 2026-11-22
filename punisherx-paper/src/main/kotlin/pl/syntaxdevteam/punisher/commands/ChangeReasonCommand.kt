@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
-import pl.syntaxdevteam.punisher.dialogs.ChangeReasonDialogService
+import pl.syntaxdevteam.punisher.compatibility.PaperModernFeatures
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 
 class ChangeReasonCommand(private val plugin: PunisherX) : BasicCommand {
@@ -26,7 +26,7 @@ class ChangeReasonCommand(private val plugin: PunisherX) : BasicCommand {
                     return
                 }
                 val opened = runCatching {
-                    ChangeReasonDialogService(plugin).open(stack.sender as Player, preselectedId)
+                    PaperModernFeatures.load(plugin).openChangeReason(stack.sender as Player, preselectedId)
                 }.onFailure {
                     plugin.logger.warning("Could not open change-reason dialog: ${it.message}")
                 }.isSuccess

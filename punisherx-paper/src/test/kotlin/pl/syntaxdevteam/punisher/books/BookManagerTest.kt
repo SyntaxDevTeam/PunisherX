@@ -10,7 +10,6 @@ import org.mockito.kotlin.whenever
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class BookManagerTest {
@@ -19,7 +18,8 @@ class BookManagerTest {
         var command = ""
         manager.open(player, Component.text("Reports"), Component.text("PunisherX")) { menu ->
             val button = menu.button(Component.text("Send"), action)
-            command = assertIs<ClickEvent.Payload.Text>(button.clickEvent()!!.payload()).value()
+            command = "/report __prx:book ${menu.actions.keys.single()}"
+            assertEquals(ClickEvent.runCommand(command), button.clickEvent())
             listOf(button)
         }
         return command

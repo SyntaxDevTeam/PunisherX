@@ -13,7 +13,7 @@ libraries:
   - org.eclipse.aether:aether-api:${aetherVersion}
   - org.yaml:snakeyaml:${snakeyamlVersion}
   - com.google.code.gson:gson:${gsonVersion}
-  # MessageHandler libraries
+  # PunisherX cache and player-data libraries
   - com.github.ben-manes.caffeine:caffeine:${caffeineVersion}
   - net.kyori:adventure-nbt:${adventureVersion}
   # GUI libraries
@@ -36,7 +36,5 @@ libraries:
   - coordinate: dev.faststats.metrics:bukkit:${faststatsVersion}
     repository: faststatsReleases
   # SyntaxDevTeam libraries
-  - coordinate: pl.syntaxdevteam:syntaxcore:${syntaxcoreVersion}
-    repository: syntaxdevteam-snapshots
   - coordinate: pl.syntaxdevteam:messageHandler-paper:${messagehandlerVersion}
     repository: syntaxdevteam-snapshots

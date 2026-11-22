@@ -5,6 +5,7 @@ import io.papermc.paper.plugin.loader.PluginLoader;
 import io.papermc.paper.plugin.loader.library.impl.MavenLibraryResolver;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.jspecify.annotations.NonNull;
 import org.yaml.snakeyaml.Yaml;
@@ -41,7 +42,10 @@ public final class SyntaxLoader implements PluginLoader {
                 });
                 return createdResolver;
             });
-            resolver.addDependency(new Dependency(new DefaultArtifact(library.coordinate()), null));
+            // Use Paper's native Adventure for transitive requests, including Triumph GUI.
+            // The explicitly listed adventure-nbt root remains available to the player-data reader.
+            resolver.addDependency(new Dependency(new DefaultArtifact(library.coordinate()), null, false,
+                List.of(new Exclusion("net.kyori", "*", "*", "*"))));
         }
 
         for (final MavenLibraryResolver resolver : resolvers.values()) {

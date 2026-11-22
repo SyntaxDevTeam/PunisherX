@@ -8,7 +8,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.compatibility.VersionCompatibility
-import pl.syntaxdevteam.punisher.dialogs.ReportDialogService
+import pl.syntaxdevteam.punisher.compatibility.PaperModernFeatures
 import pl.syntaxdevteam.punisher.gui.report.ReportReasonGUI
 import pl.syntaxdevteam.punisher.gui.report.ReportSelectorGUI
 import java.util.UUID
@@ -68,7 +68,7 @@ class ReportCommand(private val plugin: PunisherX) : BasicCommand {
         val useDialogs = !mode.equals("GUI", true) && (mode.equals("DIALOG", true) || plugin.config.getBoolean("reports.use-dialogs", true)) &&
             plugin.versionCompatibility.supports(VersionCompatibility.CompatibilityFlag.DIALOGS)
         if (useDialogs) {
-            val opened = runCatching { ReportDialogService(plugin).open(sender, target) }
+            val opened = runCatching { PaperModernFeatures.load(plugin).openReport(sender, target) }
                 .onFailure {
                     plugin.logger.warning("Could not open report dialog, using inventory GUI: ${it.message}")
                 }

@@ -148,8 +148,8 @@ dependencies {
     compileOnly(libs.syntaxdb.core) {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-    compileOnly(libs.syntaxcore)
     compileOnly(libs.messagehandler.spigot)
+    compileOnly(libs.syntaxcore)
 
     compileOnly(libs.aether.api)
     compileOnly(libs.snakeyaml)
@@ -157,23 +157,16 @@ dependencies {
     compileOnly(libs.geoip)
     compileOnly(libs.ant)
     compileOnly(libs.boosted.yaml)
-    compileOnly(libs.triumph.gui)
+    compileOnly(libs.triumph.gui) { isTransitive = false }
 
     compileOnly(libs.caffeine)
     compileOnly(libs.adventure.nbt)
-    compileOnly(libs.adventure.api)
-    compileOnly(libs.adventure.key)
-    compileOnly(libs.adventure.platform.api)
-    compileOnly(libs.adventure.platform.bukkit)
-    compileOnly(libs.adventure.platform.facet)
-    compileOnly(libs.adventure.minimessage)
+    compileOnly(libs.adventure.platform.api) { isTransitive = false }
+    compileOnly(libs.adventure.platform.bukkit) { isTransitive = false }
+    compileOnly(libs.adventure.platform.facet) { isTransitive = false }
+    compileOnly(libs.adventure.bungee) { isTransitive = false }
     compileOnly(libs.adventure.json)
     compileOnly(libs.adventure.gson)
-    compileOnly(libs.adventure.legacy)
-    compileOnly(libs.adventure.plain)
-    compileOnly(libs.adventure.ansi)
-    compileOnly(libs.examination.api)
-    compileOnly(libs.examination.string)
     compileOnly(libs.kyori.option)
 
     compileOnly(libs.luckperms.api)
@@ -194,9 +187,9 @@ dependencies {
     testImplementation(libs.kotlin.test)
     testImplementation(libs.syntaxdb)
     testImplementation(libs.spigot.api)
-    testImplementation(libs.adventure.gson)
-    testImplementation(libs.syntaxcore) { isTransitive = false }
+    testImplementation(libs.adventure.gson) { exclude(group = "net.kyori", module = "adventure-api") }
     testImplementation(libs.messagehandler.spigot)
+    testImplementation(libs.syntaxcore) { isTransitive = false }
     testImplementation(libs.caffeine)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
@@ -223,13 +216,11 @@ val runtimeLibraryVersions = mapOf(
     "caffeineVersion" to libs.versions.caffeine.get(),
     "adventureVersion" to libs.versions.adventure.core.get(),
     "adventurePlatformVersion" to libs.versions.adventure.platform.get(),
-    "examinationVersion" to libs.versions.examination.get(),
     "optionVersion" to libs.versions.kyori.option.get(),
     "triumphGuiVersion" to libs.versions.triumph.gui.get(),
     "geoipVersion" to libs.versions.geoip.get(),
     "antVersion" to libs.versions.ant.get(),
     "faststatsVersion" to libs.versions.faststats.get(),
-    "syntaxcoreVersion" to libs.versions.syntaxcore.get(),
     "messagehandlerVersion" to libs.versions.messagehandler.get(),
 )
 

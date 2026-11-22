@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
 import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.compatibility.DialogSupport
-import pl.syntaxdevteam.punisher.dialogs.PunishmentListDialogService
+import pl.syntaxdevteam.punisher.compatibility.PaperModernFeatures
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.players.PlayerIPManager
 import java.text.SimpleDateFormat
@@ -113,7 +113,7 @@ class HistoryCommand(private val plugin: PunisherX, private val playerIPManager:
         val pageSize = plugin.config.getInt("dialogs.list-page-size", 10).coerceIn(1, 20)
         val offset = (page - 1) * pageSize
         val punishments = plugin.databaseHandler.getPunishmentHistory(uuid, pageSize + 1, offset)
-        PunishmentListDialogService(plugin).open(
+        PaperModernFeatures.load(plugin).openPunishmentList(
             player = viewer,
             title = plugin.messageHandler.stringMessageToComponentNoPrefix("history", "title"),
             subtitle = Component.text("$targetName • $uuid • #$page"),

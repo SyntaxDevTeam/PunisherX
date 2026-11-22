@@ -5,7 +5,7 @@ libraries:
 name: PunisherX
 version: ${version}
 description: ${description}
-api-version: '1.20'
+api-version: '1.20.6'
 
 authors: [SyntaxDevTeam]
 website: github.com/SyntaxDevTeam/PunisherX

@@ -10,22 +10,17 @@ libraries:
   - org.eclipse.aether:aether-api:${aetherVersion}
   - org.yaml:snakeyaml:${snakeyamlVersion}
   - com.google.code.gson:gson:${gsonVersion}
-  # MessageHandler libraries
+  # PunisherX cache and player-data libraries
   - com.github.ben-manes.caffeine:caffeine:${caffeineVersion}
   - net.kyori:adventure-nbt:${adventureVersion}
-  - net.kyori:adventure-api:${adventureVersion}
-  - net.kyori:adventure-key:${adventureVersion}
+  # Adventure extensions used by PunisherX and Triumph GUI
   - net.kyori:adventure-platform-api:${adventurePlatformVersion}
   - net.kyori:adventure-platform-bukkit:${adventurePlatformVersion}
   - net.kyori:adventure-platform-facet:${adventurePlatformVersion}
-  - net.kyori:adventure-text-minimessage:${adventureVersion}
+  - net.kyori:adventure-text-serializer-bungeecord:${adventurePlatformVersion}
+  - net.kyori:adventure-text-serializer-commons:${adventureVersion}
   - net.kyori:adventure-text-serializer-json:${adventureVersion}
   - net.kyori:adventure-text-serializer-gson:${adventureVersion}
-  - net.kyori:adventure-text-serializer-legacy:${adventureVersion}
-  - net.kyori:adventure-text-serializer-plain:${adventureVersion}
-  - net.kyori:adventure-text-serializer-ansi:${adventureVersion}
-  - net.kyori:examination-api:${examinationVersion}
-  - net.kyori:examination-string:${examinationVersion}
   - net.kyori:option:${optionVersion}
   # GUI libraries
   - dev.triumphteam:triumph-gui:${triumphGuiVersion}
@@ -51,7 +46,5 @@ libraries:
   - coordinate: dev.faststats.metrics:bukkit:${faststatsVersion}
     repository: faststatsReleases
   # SyntaxDevTeam libraries
-  - coordinate: pl.syntaxdevteam:syntaxcore:${syntaxcoreVersion}
-    repository: syntaxdevteam-snapshots
   - coordinate: pl.syntaxdevteam:messageHandler-spigot:${messagehandlerVersion}
     repository: syntaxdevteam-snapshots

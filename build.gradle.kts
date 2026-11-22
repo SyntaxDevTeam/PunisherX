@@ -16,6 +16,8 @@ version = "1.9.0-R0.4-SNAPSHOT"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val bridgeVersion = "1.2.1-R0.1-SNAPSHOT"
+val syntaxCoreDependency = libs.syntaxcore
+val messageHandlerVersion = libs.versions.messagehandler.get()
 val databaseRuntimeDependencies = listOf(libs.syntaxdb.core, libs.hikari, libs.mysql.jdbc, libs.protobuf,
     libs.postgresql.jdbc, libs.mssql.jdbc, libs.sqlite.jdbc, libs.kotlin.stdlib)
 
@@ -37,6 +39,20 @@ subprojects {
         extensions.configure<KotlinJvmProjectExtension> {
             sourceSets.named("test") {
                 kotlin.srcDir(rootProject.file("tests/server/kotlin"))
+            }
+        }
+        // SyntaxCore publishes a fat JAR with Adventure. Use the platform's copy on Paper
+        // and MessageHandler's copy on Spigot while retaining SyntaxCore's other dependencies.
+        val syntaxCoreBundle = configurations.create("syntaxCoreBundle") {
+            isCanBeConsumed = false
+            isTransitive = false
+        }
+        dependencies.add(syntaxCoreBundle.name, syntaxCoreDependency)
+        tasks.named<ShadowJar>("shadowJar") {
+            from({ zipTree(syntaxCoreBundle.singleFile) }) {
+                exclude("net/kyori/**", "META-INF/versions/**/net/kyori/**")
+                exclude("kotlin/**", "META-INF/versions/**/kotlin/**", "META-INF/*.kotlin_module")
+                exclude("META-INF/MANIFEST.MF", "META-INF/maven/**", "**/module-info.class")
             }
         }
         // Mirrors the explicit runtime manifests, without optional mapping/coroutine modules.
@@ -105,6 +121,18 @@ subprojects {
                         "com.mysql:mysql-connector-j:", "com.google.protobuf:protobuf-java:",
                         "org.postgresql:postgresql:", "com.microsoft.sqlserver:mssql-jdbc:", "org.xerial:sqlite-jdbc:")
                         .forEach { check(text.contains(it)) { "Missing runtime library $it in ${project.name}" } }
+                    check(jar.entries().asSequence().none { entry ->
+                        entry.name.endsWith(".class") && entry.name.contains("net/kyori/")
+                    }) { "Adventure belongs to the server or its platform MessageHandler artifact" }
+                    check(text.contains("pl.syntaxdevteam:messageHandler-$platform:${messageHandlerVersion}")) {
+                        "Missing platform MessageHandler in ${project.name}"
+                    }
+                    if (platform == "paper") {
+                        check(text.lineSequence().filter { "net.kyori:" in it }
+                            .all { "net.kyori:adventure-nbt:" in it }) {
+                            "Paper supplies the Adventure components and serializers"
+                        }
+                    }
                     if (platform == "spigot") {
                         val descriptor = jar.getInputStream(jar.getEntry("plugin.yml")).bufferedReader().use { it.readText() }
                         check(descriptor.contains("org.jetbrains.kotlin:kotlin-stdlib:")) { "Spigot must bootstrap Kotlin before Libby" }

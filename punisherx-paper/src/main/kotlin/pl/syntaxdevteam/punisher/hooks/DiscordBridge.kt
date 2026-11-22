@@ -6,7 +6,6 @@ import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 //import org.bukkit.OfflinePlayer
 import org.bukkit.Statistic
-import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeButton
 import pl.syntaxdevteam.dscbridgeapi.external.model.BridgeEmbed
@@ -327,7 +326,7 @@ class DiscordBridge(var plugin: PunisherX) {
             val y = loc.blockY
             val z = loc.blockZ
 
-            val maxHealth = online.getAttribute(Attribute.MAX_HEALTH)?.value ?: 20.0
+            val maxHealth = online.maxHealth
             val health = "${online.health.toInt()}/${maxHealth.toInt()}"
             val food = "${online.foodLevel}/20"
             val level = online.level.toString()

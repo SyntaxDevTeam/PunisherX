@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull
 import pl.syntaxdevteam.punisher.PunisherX
 import pl.syntaxdevteam.punisher.compatibility.DialogSupport
 import pl.syntaxdevteam.punisher.databases.PunishmentData
-import pl.syntaxdevteam.punisher.dialogs.PunishmentListDialogService
+import pl.syntaxdevteam.punisher.compatibility.PaperModernFeatures
 import pl.syntaxdevteam.punisher.permissions.PermissionChecker
 import pl.syntaxdevteam.punisher.players.PlayerIPManager
 import pl.syntaxdevteam.punisher.permissions.IpVisibility
@@ -124,7 +124,7 @@ class CheckCommand(private val plugin: PunisherX, private val playerIPManager: P
     ) {
         val pageSize = plugin.config.getInt("dialogs.list-page-size", 10).coerceIn(1, 20)
         val offset = (page - 1) * pageSize
-        PunishmentListDialogService(plugin).open(
+        PaperModernFeatures.load(plugin).openPunishmentList(
             player = viewer,
             title = plugin.messageHandler.stringMessageToComponentNoPrefix("check", "title"),
             subtitle = Component.text("$targetName • $uuid • ${type.uppercase()} • #$page"),

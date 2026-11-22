@@ -28,7 +28,7 @@ import pl.syntaxdevteam.punisher.hooks.DiscordWebhook
 import pl.syntaxdevteam.punisher.hooks.HookHandler
 import pl.syntaxdevteam.punisher.listeners.ReloadListener
 import pl.syntaxdevteam.punisher.listeners.LegacyLoginListener
-import pl.syntaxdevteam.punisher.listeners.ModernLoginListener
+import pl.syntaxdevteam.punisher.compatibility.PaperModernFeatures
 import pl.syntaxdevteam.punisher.listeners.PlayerJoinListener
 import pl.syntaxdevteam.punisher.placeholders.PlaceholderHandler
 import pl.syntaxdevteam.punisher.players.*
@@ -195,7 +195,7 @@ class PluginInitializer(private val plugin: PunisherX) {
         registerDiscordSrvChatHook()
         plugin.server.pluginManager.registerEvents(plugin.bookManager, plugin)
         if (versionChecker.isAtLeast("1.21.7")) {
-            plugin.server.pluginManager.registerEvents(ModernLoginListener(plugin), plugin)
+            plugin.server.pluginManager.registerEvents(PaperModernFeatures.load(plugin).loginListener(), plugin)
             plugin.logger.debug("Registered ModernLoginListener for 1.21.7+")
         } else {
             plugin.server.pluginManager.registerEvents(LegacyLoginListener(plugin), plugin)

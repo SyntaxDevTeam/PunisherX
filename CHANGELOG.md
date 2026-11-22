@@ -2,6 +2,14 @@
 
 ## [1.9.0] Unreleased
 
+### Message formatting and server compatibility
+
+* Updated MessageHandler to `1.3.0-R0.4-SNAPSHOT` on Paper/Folia and Spigot. Punishment messages, book menus and player names retain their colors, formatting and placeholders.
+* Install the same `PunisherX-Paper-*.jar` on Paper or Folia from Minecraft 1.20.6 through 26.3. PunisherX uses the server's Adventure libraries, so message formatting works with both Adventure 4 and 5.
+* Paper and Folia use native Minecraft dialogs and the newer login listener on 1.21.7 and later. Older servers in the supported range use the existing chat input and login listener. Both paths are included in the same JAR.
+* Spigot keeps its own `PunisherX-Spigot-*.jar` and loads a single set of Adventure classes. `./gradlew buildAll` produces both server JARs.
+* Verified startup and message formatting on Paper 1.20.6, 1.21.7, 1.21.11, 26.1.2, 26.2 and 26.3, and on Folia 1.20.6, 26.1.2, 26.2 and 26.3. Spigot passed its automated tests and packaging checks.
+
 ### Identity configuration validation and automatic migration
 
 * Fixed upgrade and first-start failures on offline and proxy servers with a missing or blank `identity.realm`. Blank realms are now resolved automatically from the existing database binding; on an unbound database, offline and explicitly trusted-proxy installations seed the realm from the existing `server` scope (default `network`), while standalone online mode retains its `online` default.
@@ -89,7 +97,7 @@
 * Moved `/prx export` and `/prx import` off the server thread on Paper/Folia and Spigot, with start, success and handled-error messages for the command sender. Another export/import command is rejected while one is running. Added command regression tests and a 100,000-record SQLite backup/restore test. Backup operations still process data in memory; real PostgreSQL and SQL Server export/import tests remain required before a stable release.
 * Improved database-engine migration with source validation, a backup snapshot, refusal to overwrite populated target tables, row-count checks and generated-ID restoration. Configuration switches only after a successful transfer; migrations require a maintenance window.
 * Paper and Spigot now download the required SyntaxDB runtime and JDBC drivers through their library loaders instead of bundling them in the server JARs. Proxy bridges retain bundled database dependencies; build checks verify both packaging contracts.
-* Routed name parsing, component serialization and literal book placeholders through MessageHandler R0.3; removed the separate formatting pipeline from PunisherX.
+* Routed name parsing, component serialization and literal book placeholders through MessageHandler.
 * Added a reusable BookManager with player-bound, single-use, expiring menu actions.
 * Template history now tracks template identity separately from the reason, and kicks in template ladders always enter history. Existing history retains reason-based matching.
 * Expanded automated coverage for database compatibility, backup/import, command behavior, transaction rollback, runtime dependencies, template flags, private silent confirmations and Velocity database operations. Added a Velocity runtime test harness and CI checks for the MessageHandler source version.
