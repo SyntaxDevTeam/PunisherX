@@ -1,8 +1,9 @@
 package pl.syntaxdevteam.punisher.hooks
 
 import org.bukkit.Bukkit
+import org.bukkit.NamespacedKey
+import org.bukkit.Registry
 import org.bukkit.Statistic
-import org.bukkit.attribute.Attribute
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -315,7 +316,9 @@ class DiscordBridge(var plugin: PunisherX) {
             val y = loc.blockY
             val z = loc.blockZ
 
-            val maxHealth = online.getAttribute(Attribute.MAX_HEALTH)?.value ?: 20.0
+            val maxHealthAttribute = Registry.ATTRIBUTE.get(NamespacedKey.minecraft("max_health"))
+                ?: Registry.ATTRIBUTE.get(NamespacedKey.minecraft("generic.max_health"))
+            val maxHealth = maxHealthAttribute?.let(online::getAttribute)?.value ?: 20.0
             val health = "${online.health.toInt()}/${maxHealth.toInt()}"
             val food = "${online.foodLevel}/20"
             val level = online.level.toString()

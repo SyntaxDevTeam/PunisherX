@@ -2,6 +2,7 @@ package pl.syntaxdevteam.punisher.compatibility
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import net.kyori.adventure.text.serializer.json.JSONOptions
 import net.md_5.bungee.chat.ComponentSerializer
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.ChatMessageType
@@ -26,8 +27,12 @@ private fun Component.toSpigotString(): String =
     SyntaxMessages.messages.legacyComponentSerializer(this)
 
 // The old adventure-platform Bungee serializer calls APIs removed in Adventure 5.
+private val spigotComponentSerializer = GsonComponentSerializer.builder()
+    .options(JSONOptions.compatibility())
+    .build()
+
 internal fun Component.toSpigotComponents(): Array<BaseComponent> =
-    ComponentSerializer.parse(GsonComponentSerializer.gson().serialize(this))
+    ComponentSerializer.parse(spigotComponentSerializer.serialize(this))
 
 fun CommandSender.sendMessage(component: Component) {
     spigot().sendMessage(*component.toSpigotComponents())

@@ -8,7 +8,7 @@ plugindeployer = "1.0.6-R0.2-SNAPSHOT"
 
 paper-api = "1.20.6-R0.1-SNAPSHOT"
 paper-modern-api = "1.21.11-R0.1-SNAPSHOT"
-spigot-api = "1.21.11-R0.2-SNAPSHOT"
+spigot-api = "1.20.6-R0.1-SNAPSHOT"
 velocity-api = "4.3.1"
 bungeecord-api = "26.1-R0.1-SNAPSHOT"
 brigadier = "1.0.500"
