@@ -38,3 +38,5 @@ libraries:
   # SyntaxDevTeam libraries
   - coordinate: pl.syntaxdevteam:messageHandler-paper:${messagehandlerVersion}
     repository: syntaxdevteam-snapshots
+  - coordinate: pl.syntaxdevteam:syntaxcore:${syntaxcoreVersion}
+    repository: syntaxdevteam-snapshots

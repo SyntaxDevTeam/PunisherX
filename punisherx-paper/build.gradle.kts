@@ -215,6 +215,7 @@ tasks {
 
 val runtimeLibraryVersions = mapOf(
     "kotlinVersion" to libs.versions.kotlin.get(),
+    "syntaxcoreVersion" to libs.versions.syntaxcore.get(),
     "syntaxdbVersion" to libs.versions.syntaxdb.get(),
     "hikariVersion" to libs.versions.hikari.get(),
     "mysqlVersion" to libs.versions.mysql.get(),

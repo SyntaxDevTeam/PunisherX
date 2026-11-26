@@ -48,3 +48,6 @@ libraries:
   # SyntaxDevTeam libraries
   - coordinate: pl.syntaxdevteam:messageHandler-spigot:${messagehandlerVersion}
     repository: syntaxdevteam-snapshots
+  # Load after MessageHandler so its Adventure classes take precedence.
+  - coordinate: pl.syntaxdevteam:syntaxcore:${syntaxcoreVersion}
+    repository: syntaxdevteam-snapshots

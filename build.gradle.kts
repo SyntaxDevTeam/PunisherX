@@ -16,7 +16,7 @@ version = "1.9.0-R0.4-SNAPSHOT"
 description = "Advanced punishment system for Minecraft servers with commands like warn, mute, jail, ban, kick and more."
 
 val bridgeVersion = "1.2.1-R0.1-SNAPSHOT"
-val syntaxCoreDependency = libs.syntaxcore
+val syntaxCoreVersion = libs.versions.syntaxcore.get()
 val messageHandlerVersion = libs.versions.messagehandler.get()
 val databaseRuntimeDependencies = listOf(libs.syntaxdb.core, libs.hikari, libs.mysql.jdbc, libs.protobuf,
     libs.postgresql.jdbc, libs.mssql.jdbc, libs.sqlite.jdbc, libs.kotlin.stdlib)
@@ -39,20 +39,6 @@ subprojects {
         extensions.configure<KotlinJvmProjectExtension> {
             sourceSets.named("test") {
                 kotlin.srcDir(rootProject.file("tests/server/kotlin"))
-            }
-        }
-        // SyntaxCore publishes a fat JAR with Adventure. Use the platform's copy on Paper
-        // and MessageHandler's copy on Spigot while retaining SyntaxCore's other dependencies.
-        val syntaxCoreBundle = configurations.create("syntaxCoreBundle") {
-            isCanBeConsumed = false
-            isTransitive = false
-        }
-        dependencies.add(syntaxCoreBundle.name, syntaxCoreDependency)
-        tasks.named<ShadowJar>("shadowJar") {
-            from({ zipTree(syntaxCoreBundle.singleFile) }) {
-                exclude("net/kyori/**", "META-INF/versions/**/net/kyori/**")
-                exclude("kotlin/**", "META-INF/versions/**/kotlin/**", "META-INF/*.kotlin_module")
-                exclude("META-INF/MANIFEST.MF", "META-INF/maven/**", "**/module-info.class")
             }
         }
         // Mirrors the explicit runtime manifests, without optional mapping/coroutine modules.
@@ -108,7 +94,7 @@ subprojects {
             )
             ZipFile(bundle.get().archiveFile.get().asFile).use { jar ->
                 if (project.name in setOf("punisherx-paper", "punisherx-spigot")) {
-                    val forbidden = listOf("pl/syntaxdevteam/syntaxdb/", "com/zaxxer/hikari/", "org/sqlite/",
+                    val forbidden = listOf("pl/syntaxdevteam/core/", "pl/syntaxdevteam/syntaxdb/", "com/zaxxer/hikari/", "org/sqlite/",
                         "com/mysql/", "org/postgresql/", "com/microsoft/sqlserver/", "kotlin/", "kotlinx/coroutines/")
                     check(jar.entries().asSequence().none { entry -> forbidden.any { entry.name.startsWith(it) } }) {
                         "Downloaded libraries must not be bundled in ${project.name}"
@@ -126,6 +112,9 @@ subprojects {
                     }) { "Adventure belongs to the server or its platform MessageHandler artifact" }
                     check(text.contains("pl.syntaxdevteam:messageHandler-$platform:${messageHandlerVersion}")) {
                         "Missing platform MessageHandler in ${project.name}"
+                    }
+                    check(text.contains("pl.syntaxdevteam:syntaxcore:${syntaxCoreVersion}")) {
+                        "Missing runtime SyntaxCore in ${project.name}"
                     }
                     if (platform == "paper") {
                         check(text.lineSequence().filter { "net.kyori:" in it }
