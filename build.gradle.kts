@@ -75,7 +75,7 @@ tasks.register("deploySpigotOnly") {
     dependsOn(":punisherx-spigot:deployPluginToSpigot")
 }
 
-// Server plugins download their DB runtime; proxies currently bundle it (no runtime loader).
+// Server plugins and Velocity download their DB runtime. BungeeCord bundles it.
 subprojects {
     val verifyDatabaseBundle = tasks.register("verifyDatabaseBundle") {
         group = "verification"
@@ -125,6 +125,23 @@ subprojects {
                     if (platform == "spigot") {
                         val descriptor = jar.getInputStream(jar.getEntry("plugin.yml")).bufferedReader().use { it.readText() }
                         check(descriptor.contains("org.jetbrains.kotlin:kotlin-stdlib:")) { "Spigot must bootstrap Kotlin before Libby" }
+                    }
+                } else if (project.name == "punisherx-velocity-bridge") {
+                    check(bundle.get().archiveFile.get().asFile.length() < 10_000_000) {
+                        "Velocity bridge must stay below the 10 MB Hangar upload limit"
+                    }
+                    val forbidden = listOf("pl/syntaxdevteam/syntaxdb/", "com/zaxxer/hikari/",
+                        "com/mysql/", "com/google/protobuf/", "org/sqlite/", "org/postgresql/", "com/microsoft/sqlserver/")
+                    check(jar.entries().asSequence().none { entry -> forbidden.any { entry.name.startsWith(it) } }) {
+                        "Database libraries must not be bundled in the Velocity bridge"
+                    }
+                    val manifest = requireNotNull(jar.getEntry("velocity-libraries.txt"))
+                    val coordinates = jar.getInputStream(manifest).bufferedReader().use { it.readLines().filter(String::isNotBlank) }
+                    check(coordinates == listOf(libs.syntaxdb.core, libs.hikari, libs.mysql.jdbc, libs.protobuf).map { it.get().toString() }) {
+                        "Velocity runtime library manifest does not match the version catalog"
+                    }
+                    check(jar.getEntry("pl/syntaxdevteam/punisher/bridge/velocity/libs/libby/VelocityLibraryManager.class") != null) {
+                        "Missing relocated Libby loader in the Velocity bridge"
                     }
                 } else {
                     required.forEach { entry ->

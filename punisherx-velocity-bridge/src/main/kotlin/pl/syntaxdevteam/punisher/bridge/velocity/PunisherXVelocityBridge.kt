@@ -34,6 +34,7 @@ class PunisherXVelocityBridge @Inject constructor(
 ) {
 
     private val channel: ChannelIdentifier = MinecraftChannelIdentifier.from("punisherx:bridge")
+    private val runtimeLibraries by lazy { VelocityLibraryLoader(logger, dataDirectory, server.pluginManager, this) }
     private lateinit var bridgeConfig: BridgeConfig
     @Volatile private var bridgeDatabase: BridgeDatabase? = null
     private var stopping = false
@@ -69,6 +70,7 @@ class PunisherXVelocityBridge @Inject constructor(
         }
 
         return try {
+            runtimeLibraries.load()
             BridgeDatabase(logger, bridgeConfig).also { database ->
                 database.start()
                 bridgeDatabase = database

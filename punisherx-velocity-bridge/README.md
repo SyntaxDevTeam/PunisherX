@@ -48,6 +48,7 @@ Looking for the backend plugin or the BungeeCord artifact? See the **[main Punis
 | Backend plugin | PunisherX for Paper/Folia or Spigot. |
 | Storage | A shared **MySQL database**, reachable from the proxy and backends. |
 | Database access | **SELECT-only** on the `punishments` table; no table creation or write permission required. |
+| Runtime downloads | On first startup, the proxy needs HTTPS access to Maven Central and the SyntaxDevTeam Maven snapshot repository. Libby stores the downloaded libraries in the bridge data directory under `lib/`. |
 
 ## 🚀 Quick start
 

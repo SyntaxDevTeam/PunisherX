@@ -78,6 +78,7 @@ syntaxcore-proxy = { module = "pl.syntaxdevteam:syntaxcore-proxy", version.ref =
 messagehandler-paper = { module = "pl.syntaxdevteam:messageHandler-paper", version.ref = "messagehandler" }
 messagehandler-spigot = { module = "pl.syntaxdevteam:messageHandler-spigot", version.ref = "messagehandler" }
 libby-bukkit = { module = "net.byteflux:libby-bukkit", version.ref = "libby" }
+libby-velocity = { module = "net.byteflux:libby-velocity", version.ref = "libby" }
 aether-api = { module = "org.eclipse.aether:aether-api", version.ref = "aether" }
 snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
