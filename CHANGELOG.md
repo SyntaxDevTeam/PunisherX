@@ -1,139 +1,129 @@
 # Changelog
 
+See the [Proxy Bridge changelog](docs/proxy-bridge/CHANGELOG.md) for the Velocity and BungeeCord version history.
+
 ## [1.9.0] Unreleased
 
-### Message formatting and server compatibility
+### Functional changes
 
-* Updated MessageHandler to `1.3.0-R0.4-SNAPSHOT` on Paper/Folia and Spigot. Punishment messages, book menus and player names retain their colors, formatting and placeholders.
-* Install the same `PunisherX-Paper-*.jar` on Paper or Folia from Minecraft 1.20.6 through 26.3. PunisherX uses the server's Adventure libraries, so message formatting works with both Adventure 4 and 5.
-* Paper and Folia use native Minecraft dialogs and the newer login listener on 1.21.7 and later. Older servers in the supported range use the existing chat input and login listener. Both paths are included in the same JAR.
-* Spigot keeps its own `PunisherX-Spigot-*.jar` and loads a single set of Adventure classes. `./gradlew buildAll` produces both server JARs.
-* Verified startup and message formatting on Paper 1.20.6, 1.21.7, 1.21.11, 26.1.2, 26.2 and 26.3, and on Folia 1.20.6, 26.1.2, 26.2 and 26.3. Spigot passed its automated tests and packaging checks.
+* **Added Staff Notes — private moderation observations.** [PR #96](https://github.com/SyntaxDevTeam/PunisherX/pull/96)
+  * Use `/note add|list|remove` on Paper/Folia and Spigot, or open Staff Notes from the player management panel. Notes record the author, creation time and server of origin. The list is paginated and changes are audited.
+  * `punisherx.see.notes` grants read access. `punisherx.manage.notes` grants read, add and remove access. Deletion is scoped to the specified player.
+  * Notes accept 3–500 characters, reject control characters and display the text literally. They are separate from punishment history and escalation.
+  * Trusted JVM integrations can read notes through the PunisherX API. Database exports and imports include notes, and Paper's UUID migration and rollback support them. Polish and English guides cover commands, permissions, storage and API usage.
 
-### Identity configuration validation and automatic migration
+* **Added anti-cheat marks and `/unmark`.**
+  * All punishment commands on Paper/Folia and Spigot support `--mark` and `--mark=check`. Use `/unmark <player|all> [check]` to reverse marked penalties while preserving audit history.
+  * `/unmark pause <check>` persistently suppresses future penalties for that check. `/unmark resume <check>` restores them. Automatic PunisherX penalties inherit the originating mark, and manual punishments are preserved.
 
-* Fixed upgrade and first-start failures on offline and proxy servers with a missing or blank `identity.realm`. Blank realms are now resolved automatically from the existing database binding; on an unbound database, offline and explicitly trusted-proxy installations seed the realm from the existing `server` scope (default `network`), while standalone online mode retains its `online` default.
-* Shared databases keep their identity realm across backend scopes and restarts. Explicit realms and incompatible online/offline domains are still rejected rather than silently rebound; proxy trust remains an explicit administrator setting. Existing player UUIDs and punishment history are not rewritten by realm migration.
-* Configuration version 172 updates the identity settings documentation and migrates existing files with a backup. A previously migrated version 171 with an empty realm also starts without manual edits. Read-only preflight allows automatic realms, still validates explicitly invalid settings, and provides actionable errors before migration or reload teardown.
-* Added regression tests covering legacy and already migrated configurations, shared database realms, preservation of punishment UUIDs, scope fallback, and rejection of conflicting identities.
+* **Added `/unpunish <player> <template> [--silent]`.**
+  * Reverses the latest matching template punishment and its escalation step on Paper/Folia and Spigot, including expired or previously revoked punishments. The audited history is preserved. A multi-IP ban counts as one escalation step.
 
-### DiscordSRV integration — chat enforcement and public punishment announcements ([PR #101](https://github.com/SyntaxDevTeam/PunisherX/pull/101), [PR #102](https://github.com/SyntaxDevTeam/PunisherX/pull/102))
+* **Added DiscordSRV public punishment announcements.** [PR #101](https://github.com/SyntaxDevTeam/PunisherX/pull/101), [PR #102](https://github.com/SyntaxDevTeam/PunisherX/pull/102)
+  * Announces WARN, MUTE, KICK, BAN, BANIP and JAIL, including template punishments. Removal announcements cover confirmed `/unwarn`, `/unmute`, `/unban` and `/unjail` commands. Automatic expiry, bulk undo and GUI-only removals are outside this scope.
+  * Uses the existing DiscordSRV bot and mapped Minecraft chat channel, `global` by default. A separate webhook or token is unnecessary. The administrative Discord webhook operates independently.
+  * Respects `--silent`, redacts IP targets and common IP address literals, neutralizes mentions and hides moderator names by default. Reasons and moderator names can be toggled independently.
+  * The `integration.discordsrv` section controls chat blocking, announcements, the destination channel, reason and moderator visibility, and which punishment types to announce. Paper/Folia and Spigot include customizable announcement templates in all 12 bundled languages.
 
-* **Fixed a chat restriction bypass:** active temporary and permanent MUTE penalties, and JAIL penalties with chat restrictions enabled, now block Minecraft messages before DiscordSRV relays them to Discord. The hook uses the existing active-punishment rules and is unsubscribed on disable/reload.
-* **Added public punishment announcements** for WARN, MUTE, KICK, BAN, BANIP and JAIL, including penalties issued through `/punish` templates. Standard `/unwarn`, `/unmute`, `/unban` and `/unjail` commands also publish removal announcements when the removal is confirmed.
-* Announcements use the existing DiscordSRV bot and its mapped Minecraft chat channel (default: `global`); no additional webhook or bot token is required. The existing administrative Discord webhook remains independent.
-* Public announcements always respect `--silent`. IP-based targets and common IP address literals are redacted, Discord mentions are neutralized, and moderator names are hidden by default. Reasons and moderator names can be toggled independently.
-* Added configuration version 171 with automatic migration and backup of older configurations. The new `integration.discordsrv` section provides an integration switch, independent chat blocking and notification switches, destination channel, reason/operator visibility and per-punishment notification switches.
-* Added customizable `discordsrv` announcement templates in all 12 bundled languages for both Paper/Folia and Spigot.
-* Added regression tests for relay cancellation, notification formatting, silent mode, privacy and configuration. DiscordSRV remains an optional compile-only dependency; the test runtime isolates its API and relocated Adventure classes from PunisherX libraries.
-* **Scope:** this integration does not moderate messages sent directly from Discord accounts. Automatic punishment expiry, bulk undo and GUI-only removals are not announced by this implementation.
+* **Added player-specific IP privacy.**
+  * Control IP visibility on Paper/Folia and Spigot with `punisherx.privacy.hide_ip`, protected UUID/name lists, a global display switch and an option to require an explicit IP-view permission for operators.
+  * The policy covers `/check`, `/history`, online and offline player lists, administrator GUI lists and BANIP identifiers in punishment lists and details. Permission preferences are saved at join and logout for offline display.
+  * The configuration panel exposes IP visibility, operator restrictions and protected-player lists. It validates player input and checks permissions when users click controls or submit chat input.
 
-### Staff Notes — private moderation observations ([PR #96](https://github.com/SyntaxDevTeam/PunisherX/pull/96))
+* **Added jail restrictions and online-only sentences.**
+  * Configure JAIL chat and command restrictions independently. JAIL can block chat without creating a separate MUTE, and any existing MUTE remains in effect.
+  * The optional online-only countdown pauses when the player disconnects and persists across logout and graceful shutdown. Unexpected process termination can lose the logout checkpoint. Back up before downgrading because paused deadlines use a new negative encoding.
+  * The configuration panel exposes the chat, command and countdown settings. It checks permissions when users click controls or submit chat input. The countdown mode can be changed once all active jail sentences end.
 
-* **Added private, non-punitive Staff Notes:** `/note add|list|remove` for Paper/Folia and Spigot, with author, creation time, server origin, separate read/manage permissions, pagination and audit logging.
-* Added staff notes access from the player management panel and a trusted read-only PunisherX JVM API.
-* Notes are stored in SyntaxDB, included in database exports/imports, and supported by the Paper UUID migration/rollback journal. They are not part of punishment history or escalation.
-* Note text is rendered literally; notes accept 3–500 characters, reject control characters and can only be deleted for the specified player. Reading requires `punisherx.see.notes`; adding/removing requires `punisherx.manage.notes` (which also allows reading).
-* Updated `/prx help` on Paper/Folia and Spigot with staff notes, marked punishments, templates, reports and missing administration commands. Preserved `<...>` placeholders when resolving the PR translation conflicts.
-* Moved all `/prx help` text, command entries, layout and clickable page navigation to the `command-help` section of every bundled language file. Added Polish help text; pagination follows the translated list and safely handles an empty list.
-* Added Polish and English staff notes guides with examples, permissions, storage and API details.
+* **Added report books.**
+  * Configurable book interfaces let players submit reports and staff manage them through paginated menus, confirmations, history and existing decision commands. The existing GUI and dialog options remain available. Includes Polish and English messages.
 
+* **Added LuckPerms display names and message placeholders.**
+  * Paper/Folia and Spigot support configurable nickname color metadata and separate display layouts for the punished player and the operator.
+  * `<player_display>` and `<operator_display>` show the prefix, nickname and suffix. Use `<player_prefix>`, `<operator_prefix>`, `<player_suffix>` and `<operator_suffix>` for individual parts.
 
-### CRITICAL SECURITY FIXES — proxy bridges (2026-11-10)
+* **Added Discord webhook time placeholders.**
+  * On Paper/Folia and Spigot, `{t_start}` shows when a punishment was issued. `{t_end}` shows when it ends, and `{time}` shows the time remaining when the webhook is sent. For permanent punishments, the end and remaining-time placeholders use the configured permanent-punishment label.
 
-* **SECURITY / CRITICAL: Removed executable punishment commands from the client-accessible `punisherx:bridge` plugin messaging channel.** BungeeCord previously accepted unauthenticated `BAN`/`BANIP` payloads from connected players, allowing arbitrary player disconnections without moderation permissions. Both BungeeCord and Velocity now consume the legacy channel without executing any received payload; Paper/Folia and Spigot no longer emit commands on it.
-* **SECURITY / CRITICAL: Proxy punishment enforcement now requires an active, network-scoped SQL record.** Both bridges independently reconcile online UUID and IP bans and check active bans when players log in. Expired, revoked, backend-local, malformed and replayed events can no longer trigger a proxy ban. Active IP bans are also verified at login/transfer.
-* **SECURITY / HIGH: Changed login database verification from fail-open to fail-closed.** Unavailable or invalid SQL state denies new sessions (and Velocity transfers) with a generic retry message; BungeeCord no longer queries SQL synchronously in `ServerConnectEvent`. Existing online sessions are reconciled when SQL recovers.
-* **SECURITY / HIGH: Removed the global `bridge_events.processed` queue from proxy delivery.** Multiple proxy instances now read committed state independently with bounded, batched SQL queries, avoiding cross-proxy event loss and stale queue-triggered disconnects. Proxy bridge database users now need only `SELECT` access to `punishments` (no table creation or event acknowledgment writes).
-* **DEPLOYMENT / SECURITY:** Update the proxy bridge(s) and backend PunisherX JARs together. The legacy message/queue delivery scheme is no longer used; the new bridge detects changes through `poll-interval-ms` (default 1000 ms, minimum 200 ms). For existing installations, set a dedicated read-only SQL account and verify access to `punishments`. Added regression tests for forged messages, scope, expiry, BANIP, multi-proxy reconciliation and error handling.
+* **Changed punishment command options and feedback.**
+  * Punishment and removal commands support `--silent`, including `kick all`, `/punish`, `/unpunish` and `/clearall`. Silent mode suppresses target chat notifications and staff broadcasts, and the operator gets a private confirmation marked as silent. Errors, disconnect screens, enforcement, history and logs still apply.
+  * `/punish` accepts independent `--force` and `--silent` flags for every template punishment type. The flags can appear on either side of the optional level, and configured follow-up PunisherX punishment commands inherit silent mode.
+  * Customizable `silent_success` messages are available in all bundled languages. Confirmations include the relevant target, reason, duration and punishment ID where applicable.
 
+* **Changed punishment panel undo.**
+  * The panel now opens a paginated list of active punishments. Administrators select and confirm one event to reverse. Cancelling leaves the punishments unchanged. Confirmation and history-audit texts are translated into all bundled languages.
 
-### Functional changes:
+* **Changed command help and panel localization.**
+  * `/prx help` covers staff notes, marked punishments, templates, reports and additional administration commands. The `command-help` section in each bundled language file controls the text, command entries, layout and clickable navigation. Added Polish help and preserved `<...>` placeholders. Pagination follows the translated list and handles an empty list.
+  * On Paper/Folia and Spigot, the server name in `/panel` comes from `GUI.PunisherMain.serwerInfo.name` in the language file. All 12 bundled languages supply a default, and the name displays without the plugin message prefix.
 
-* Added player-specific IP privacy on Paper/Folia and Spigot: `punisherx.privacy.hide_ip`, protected UUID/name lists, a global display switch and an option requiring explicitly assigned IP-view permission for operators. Protection applies to `/check`, `/history`, online/offline and administrator GUI lists, and structured BANIP identifiers in punishment lists and details; permission preferences are saved on join/logout for offline display.
-* Added independent JAIL chat and command restrictions, plus optional online-only countdowns persisted across logout and graceful shutdown. JAIL chat blocking does not create a separate MUTE; independent MUTE penalties remain effective.
-* Added configuration-panel controls on Paper/Folia and Spigot for IP visibility, operator restrictions, protected players, jail mute, jail command blocking and online-only countdowns. Protected-player input is validated, permissions are checked on clicks and chat submission, and countdown-mode changes are blocked while active jail sentences exist.
+* **Changed database configuration, backups and migration.**
+  * Existing `database.type`, `database.sql.*`, table names and SQLite file paths carry over to SyntaxDB. Added default database ports, a MariaDB alias and the optional `database.sql.jdbc-url` setting.
+  * `/prx export` and `/prx import` run off the server thread on Paper/Folia and Spigot. They report start, success and handled errors, and allow one backup operation at a time. Backups cover all PunisherX tables, including reports, decisions, player cache, bridge events and identity migration records.
+  * Imports append records in a transaction and roll back if a conflict occurs, such as reimporting the same backup. The importer validates supported INSERT statements and accepts PunisherX backups. Database dumps from tools such as `mysqldump` and `pg_dump` are outside its supported formats.
+  * Database-engine migration validates the source, takes a backup, checks row counts, restores generated IDs and rejects populated targets. The configuration changes after a successful transfer. Run migrations during a maintenance window.
 
-* **Added anti-cheat marks on Paper/Folia and Spigot.** All punishment commands support `--mark` and `--mark=check`; `/unmark <player|all> [check]` reverses marked entries while retaining audit history. `/unmark pause <check>` also persistently suppresses future penalties, and `/unmark resume <check>` restores them. Automatic PunisherX penalties inherit their originating mark; manual punishments are preserved.
+* **Removed H2 database support.** Export and transfer existing H2 data to a supported engine before upgrading. Selecting a different database type only changes the connection settings.
+* **Removed Bulk Undo from the punishment panel.** The old bulk action was removed when the panel switched to confirmation for individual punishments.
 
-* **Added `/unpunish <player> <template> [--silent]` on Paper and Spigot.** It reverses the latest punishment and its escalation step while preserving an audited history entry. It also works with expired or previously revoked punishments and treats a multi-IP ban as one escalation step.
-* **Added `--silent` to punishment and removal commands**, including `kick all`, `/punish`, `/unpunish` and `/clearall`. Target chat notifications and staff broadcasts are suppressed, while the operator receives a private confirmation marked as silent. Errors, disconnect screens, enforcement, history and logs remain active.
-* Added independent `--force` and `--silent` options to `/punish` for every template punishment type. Both flags can appear before or after the optional level; configured follow-up PunisherX punishment commands inherit silent mode.
-* Added configurable nickname color metadata and independent display name layouts for LuckPerms-based player and operator names on Paper and Spigot.
-* Added configurable book interfaces for submitting and managing reports, with paginated menus, confirmation, history and existing decision commands. Existing GUI and dialog choices remain available.
+### Technical changes
 
-* Added player and operator display name, prefix and suffix placeholders for punishment messages:
+* **Message formatting and platform compatibility.**
+  * Updated MessageHandler to `1.3.0-R0.4-SNAPSHOT` on Paper/Folia and Spigot. It handles name parsing, component serialization and literal book placeholders while preserving colors, formatting and placeholders in messages, books and player names.
+  * One `PunisherX-Paper-*.jar` supports Paper and Folia from Minecraft 1.20.6 through 26.3 and uses the server's Adventure 4 or 5 libraries. On 1.21.7 and later it uses native Minecraft dialogs and the newer login listener. Older supported versions use chat input and the legacy login listener.
+  * Spigot uses its own `PunisherX-Spigot-*.jar` and loads one set of Adventure classes. `./gradlew buildAll` produces both server JARs.
+  * Verified startup and message formatting on Paper 1.20.6, 1.21.7, 1.21.11, 26.1.2, 26.2 and 26.3, and on Folia 1.20.6, 26.1.2, 26.2 and 26.3. Spigot passed its automated tests and packaging checks.
 
-| Placeholder | Displays |
-| --- | --- |
-| `<player_display>` | Prefix + nickname + suffix of the punished player |
-| `<operator_display>` | Prefix + nickname + suffix of the operator |
-| `<player_prefix>`, `<operator_prefix>` | The prefix only |
-| `<player_suffix>`, `<operator_suffix>` | The suffix only |
+* **SyntaxDB and backup internals.**
+  * SyntaxDB replaces SyntaxCore's database layer on Paper/Folia and Spigot for connection pooling, queries, generated IDs, transactions and schema initialization. Both modules download their database libraries at startup. Gradle checks the packaged artifacts.
+  * New MySQL/MariaDB tables use `utf8mb4` and server plugins connect with UTF-8 encoding. Existing table encodings are preserved and may need conversion to store Unicode punishment reasons.
+  * Backup files are replaced atomically. Backup operations still process data in memory. Tests cover the commands and a 100,000-record SQLite backup and restore. PostgreSQL and SQL Server backup and restore still need verification before a stable release.
 
-* Added punishment start/end timestamps and remaining-time placeholders to Discord webhooks on Paper and Spigot:
+* **Configuration migrations.**
+  * Version 168 adds the report book settings. Version 169 adds `privacy.ip.enabled`, `privacy.ip.restrict_operators`, `privacy.ip.hidden_players`, `jail.restrictions.mute`, `jail.restrictions.commands` and `jail.online_time_only`. The 168-to-169 migration backs up the file and preserves administrator settings and existing defaults. `punisherx.view_ip` and `punisherx.privacy.hide_ip` use `default: false`. The display policy retains OP access when operator restrictions are disabled.
+  * Version 171 adds the DiscordSRV settings and automatically migrates older files with a backup. Version 172 updates identity settings documentation and migrates existing files with a backup.
 
-| Placeholder | Displays |
-| --- | --- |
-| `{t_start}` | The date and time the punishment was issued |
-| `{t_end}` | The punishment end date and time, or the configured permanent-punishment label |
-| `{time}` | The remaining punishment time when the webhook is sent, or the configured permanent-punishment label |
+* **Integration and history internals.**
+  * DiscordSRV remains an optional compile-only dependency. Tests isolate its API and relocated Adventure classes and cover relay cancellation, formatting, silent mode, privacy and configuration.
+  * BookManager provides reusable player-bound, single-use menu actions that expire.
+  * Template history tracks template identity independently of the reason and records kicks in template ladders. Earlier history still uses reason-based matching.
+  * Expanded coverage for database compatibility, backup and import, rollback, commands, runtime dependencies, template flags, private confirmations and identity migration. CI checks the MessageHandler source version.
 
-### Configuration and language safety:
+### Bug fixes
 
-* Added configuration version 169 with `privacy.ip.enabled`, `privacy.ip.restrict_operators`, `privacy.ip.hidden_players`, `jail.restrictions.mute`, `jail.restrictions.commands` and `jail.online_time_only`. Migration preserves administrator settings and creates a backup when upgrading configuration 168 to 169. Defaults preserve existing display and jail behavior; `punisherx.view_ip` and `punisherx.privacy.hide_ip` are declared with `default: false`, while unrestricted OP access is retained by the display policy. Paused jail deadlines use a new negative encoding in the database; back up before downgrading. Unexpected process termination cannot save a logout checkpoint.
+* **Proxy bridge security update.** Paper/Folia and Spigot stopped sending executable punishment messages over the legacy bridge channel. Update the backend and proxy JARs together. [Proxy Bridge upgrade notes](docs/proxy-bridge/CHANGELOG.md#120-r01-snapshot--2026-11-11)
 
-* Moved the server name shown in `/panel` to `GUI.PunisherMain.serwerInfo.name` in the language files on Paper/Folia and Spigot. Added translated defaults to all 12 bundled languages in both modules; administrators can customize this entry instead of `server.properties`. The name is read without the plugin message prefix.
-* Added separate, customizable `silent_success` messages for punishment and removal commands in all bundled languages. Silent confirmations include the relevant target, reason, duration and punishment ID where applicable.
-* Added configuration migration 168 and Polish/English messages for the report book interfaces.
-* Preserved existing `database.type`, `database.sql.*`, table names and SQLite file paths when switching the database layer to SyntaxDB. Added default database ports, a MariaDB alias and optional `database.sql.jdbc-url` configuration.
-* **Removed H2 support from the new database layer.** Existing H2 installations must export and transfer their data to a supported engine before upgrading; selecting another database type alone does not migrate data.
-* New MySQL/MariaDB tables use `utf8mb4`, with UTF-8 connection encoding for server plugins. Existing table encodings are preserved and may require a separate conversion to store Unicode punishment reasons.
+* **DiscordSRV chat restrictions.** Active temporary and permanent MUTE penalties and JAIL penalties with chat restrictions now block Minecraft messages before DiscordSRV relays them. The hook uses the existing active-punishment rules and unsubscribes on disable or reload. The hook applies to messages originating in Minecraft.
 
-### Technical changes:
+* **Identity configuration on upgrade and first startup.**
+  * Resolves a missing or blank `identity.realm` from the existing database binding. On an unbound database, offline and explicitly trusted-proxy installations seed it from the configured `server` scope, which defaults to `network`. Standalone online mode retains the `online` default.
+  * Shared databases keep their realm across backend scopes and restarts. Conflicting explicit realms and incompatible online/offline domains are rejected. Proxy trust still requires explicit configuration. Existing UUIDs and punishment history are preserved.
+  * Version 171 files with a blank realm also start without manual edits. Read-only preflight allows automatically resolved realms and reports invalid explicit settings before migration or reload teardown. Regression tests cover legacy and migrated files, shared realms, UUID preservation, scope fallback and identity conflicts.
 
-* **Replaced SyntaxCore database access with SyntaxDB across the Paper, Spigot, Velocity and BungeeCord modules**, covering pooled connections, queries, generated IDs, transactions and schema initialization.
-* Expanded database exports to all PunisherX data tables, including reports, decisions, player cache, bridge events and identity migration records. Backup files are replaced atomically; imports validate supported INSERT statements and restore records in one transaction without executing arbitrary SQL from the file. Imports append data without clearing or overwriting existing records; importing the same backup again can cause a key conflict and roll back the entire transaction. Only PunisherX backups are supported, not arbitrary mysqldump or pg_dump files.
-* Moved `/prx export` and `/prx import` off the server thread on Paper/Folia and Spigot, with start, success and handled-error messages for the command sender. Another export/import command is rejected while one is running. Added command regression tests and a 100,000-record SQLite backup/restore test. Backup operations still process data in memory; real PostgreSQL and SQL Server export/import tests remain required before a stable release.
-* Improved database-engine migration with source validation, a backup snapshot, refusal to overwrite populated target tables, row-count checks and generated-ID restoration. Configuration switches only after a successful transfer; migrations require a maintenance window.
-* Paper and Spigot now download the required SyntaxDB runtime and JDBC drivers through their library loaders instead of bundling them in the server JARs. Proxy bridges retain bundled database dependencies; build checks verify both packaging contracts.
-* Routed name parsing, component serialization and literal book placeholders through MessageHandler.
-* Added a reusable BookManager with player-bound, single-use, expiring menu actions.
-* Template history now tracks template identity separately from the reason, and kicks in template ladders always enter history. Existing history retains reason-based matching.
-* Expanded automated coverage for database compatibility, backup/import, command behavior, transaction rollback, runtime dependencies, template flags, private silent confirmations and Velocity database operations. Added a Velocity runtime test harness and CI checks for the MessageHandler source version.
+* **IP privacy and jail settings.**
+  * Fixed `/history` bypassing IP privacy, protected-player settings and operator restrictions on Paper/Folia and Spigot. Removed the default OP grant of `punisherx.view_ip` so explicit permission checks work. Permission-provider and group grants remain supported.
+  * Redacted BANIP identifiers in ban lists, punishment panels and native Paper details, as well as sender and broadcast placeholders for IP unbans and IP-ban failure reports. The policy also protects an address shared with a known protected player.
+  * Saving panel settings invalidates open plugin inventories so IP details from the prior policy are cleared. Setting a jail location preserves the configured radius.
 
-### Bug fixes:
+* **GUI compatibility, reload and player heads.**
+  * Restored Spigot recognition of Minecraft `26.3` and `26.3.0` and parity with the shared GUI helpers. Tests cover supported versions, reload protection and cross-module version and template parity.
+  * Fixed `/panel` losing click handling and inventory protection after reload. Reload preserves Triumph GUI's one-time listeners and SyntaxCore lifecycle listeners, invalidates old callbacks and closes only plugin menus. Listener, service and repeating-task cleanup now uses the active database handler after reinitialization.
+  * Fixed Mojang profile lookups and replaced direct skull owners and name-based GUI profiles with shared, cached skin binding for online and offline players, administrators, report targets, active punishments, bans and jail entries. Lookups are asynchronous and use default heads for missing textures. Late updates preserve item descriptions and skip obsolete menus. An architecture check covers both server editions.
 
-* Fixed `/history` bypassing global IP privacy, protected-player settings and operator restrictions on Paper/Folia and Spigot.
-* Fixed the default OP grant of `punisherx.view_ip` defeating the option requiring assigned permissions. Permission-provider and group grants remain supported.
-* Redacted IP addresses stored as BANIP identifiers in ban lists, punishment inventory panels and native Paper details, as well as sender/broadcast placeholders for IP unbans and IP-ban failure reports. Known protected players sharing an address also prevent its disclosure.
-* Configuration-panel saves now invalidate existing plugin inventory panels so IP lore allowed by the previous policy does not remain open. Setting a jail location from the panel preserves the configured radius instead of overwriting it with `5.0`.
+* **Template escalation and punishment commands.**
+  * Template preview now uses the same counter as `/punish`, excluding undone entries and unrelated templates with the same reason. History shows who reversed a punishment and when.
+  * Panel Undo reverses the selected event and its escalation contribution atomically, preserves audited history and rejects stale selections. A multi-IP template ban is reversed as one event.
+  * Changed the bundled Spigot `AltAccountAbuse` third escalation step from `90d` to a permanent ban to match Paper. Existing server-defined templates are preserved.
+  * Fixed the missing `<warn_no>` value in warning messages, broadcasts and GUI actions on Paper/Folia and Spigot.
+  * On Paper/Folia, `/punish` and `/punish <player>` show configured, localized usage to authorized senders. On Paper/Folia and Spigot, template suggestions match case-insensitively, escape names that require quotes, and suggest configured levels and unused flags.
 
-* Restored Spigot parity for Minecraft `26.3` / `26.3.0` recognition and the shared GUI base helpers without introducing Paper-only APIs. Added Spigot regression tests for supported versions, GUI reload protection, and cross-module version/template parity.
-* Aligned the bundled Spigot `AltAccountAbuse` third escalation step with Paper (`permanent` instead of `90d`). This only changes the bundled default template, not existing server-defined templates.
+* **Punishment data and database recovery.**
+  * Failed `/banip` writes no longer create permanent vanilla IP bans. Direct and template IP bans record history only for persisted addresses. Partial failures report saved and failed addresses separately, with follow-up actions reserved for successful operations.
+  * Expiry cleanup removes the expired record by ID, preserving newer active punishments of the same type. Fixed pagination for tied timestamps and corrected row-count and server-scope checks when deleting punishments or editing history reasons.
+  * Player data and report or decision deletions now use transactions to prevent partial cleanup and orphaned records.
+  * Improved database startup error reporting and cleanup. Failed schema initialization leaves the database unavailable, and punishment checks skip it until it is ready.
 
-* Fixed `/panel` losing click handling and inventory protection after plugin reload. Reload preserves Triumph GUI's one-time listeners and SyntaxCore lifecycle listeners, invalidates old menu callbacks, and closes previously open plugin menus without closing unrelated inventories.
-* Routed every player-head panel through shared cached skin binding: players online/offline, administrators, report targets, active punishments, bans and jailed players. Removed direct skull owners and name-based profile creation from GUI code; late skin updates preserve current item descriptions and ignore obsolete menus. Added an architecture regression check covering both Paper/Folia and Spigot GUI sources.
-
-* Fixed the panel template preview counting undone history entries and unrelated templates with the same reason. Preview levels now use the same escalation counter as `/punish`; history remains intact and shows who reversed a punishment and when.
-* Fixed the missing `<warn_no>` value in warning messages, broadcasts and actions issued from the GUI on Paper/Folia and Spigot.
-* Replaced the panel’s bulk Undo action with a paginated active-punishment list. Administrators select one event and confirm before it is reversed; cancelling leaves all punishments unchanged. Added confirmation and history-audit translations to all bundled languages.
-
-* Fixed the punishment panel's Undo action on Paper/Folia and Spigot leaving template escalation unchanged. It now reverses the selected active event and its escalation contribution atomically, preserves audited history, and rejects stale selections instead of undoing a newer punishment. Multi-IP template bans are reversed as one event.
-
-* Fixed Mojang profile lookups from heads in the online player GUI on Paper/Folia and Spigot. Online and offline lists now use the same SyntaxCore skin cache and controlled asynchronous lookups, including default heads for missing textures and updates when skins become available.
-* Fixed `/punish` and `/punish <player>` showing Brigadier's unknown/incomplete command error on Paper/Folia. Both now display the configured, localized command usage for authorized senders.
-
-* **Fixed `/punish` suggestions on Paper and Spigot.** Template names match the entered prefix without case sensitivity, names requiring quotes are escaped correctly, and basic command entry points suggest configured levels and unused flags.
-* **Fixed failed `/banip` writes creating permanent vanilla IP bans.** Direct and template IP bans now record history and publish bridge events only for successfully persisted addresses; partial failures report both saved and failed IPs without an overall success message or follow-up action.
-* Fixed expired punishment cleanup removing a newer active punishment of the same type; cleanup now removes the expired record by ID.
-* Made punishment and history pagination deterministic when timestamps match, and corrected row-count checks and server scoping when deleting punishments or editing history reasons.
-* Made player-data deletion and report/decision deletion transactional to prevent partial cleanup and orphaned records.
-* Improved database startup failure reporting and cleanup. A failed schema initialization no longer leaves the database marked as ready, and punishment checks skip an unavailable database.
-* Improved reload cleanup of listeners, services and repeating punishment tasks, and ensured the active database handler is used after reinitialization.
-* Fixed Velocity 4 login ban enforcement by denying login through the event result and checking bans asynchronously before backend connections. Proxy plugin metadata now uses the Gradle-expanded descriptor.
-* Fixed Spigot component conversion with Adventure 5 while preserving text, colors, hover text and clickable commands.
-* Improved kick and ban disconnect message formatting across bundled translations.
+* **Message compatibility.** Fixed Spigot Adventure 5 component conversion while preserving text, colors, hover text and clickable commands. Improved kick and ban disconnect formatting across bundled translations.
 
 ## [1.8.0] - 2026-10-08
 
@@ -166,11 +156,9 @@ PunisherX takes a major step forward in everyday moderation: a native Spigot edi
 
 ### Technical changes:
 
-* Reorganized the project into separate Paper, Spigot, Velocity and BungeeCord modules with selectable builds.
+* Reorganized Paper and Spigot into separate Gradle modules with selectable builds. Both server modules target Java 21.
 * Replaced the previous inventory GUI implementation with **Triumph GUI** in both server editions.
 * Added player-aware scheduling for GUI updates and interactions, improving compatibility with Folia's region threading model.
-* Expanded the Velocity bridge with active network ban checks at login, in addition to queued punishment events. A player with an active network-wide ban can be refused at the proxy even after the original event has been processed.
-* Updated the Velocity bridge for Velocity 4. **The server plugin targets Java 21; the Velocity 4 bridge requires Java 25 or newer.**
 * Added a controlled `OFFLINE UUID -> PREMIUM UUID` migration service on Paper for integration with AuthGatewayX. It covers punishments, punishment history, reports, bridge targets, IP cache and jail cache, with migration journals, backups and rollback support.
 * Added namespaced world keys to jail and unjail locations while retaining compatibility with existing world names and older jail cache entries.
 * Improved database schema checks, including SQLite column detection and PostgreSQL handling for server-scoped punishments.
@@ -192,7 +180,6 @@ PunisherX takes a major step forward in everyday moderation: a native Spigot edi
 * Adjusted chat listener priority and cancellation handling for better interaction with other chat plugins.
 * Improved GeoIP license-key validation and database preparation error handling, with contributions from **@d0ddn**.
 * Improved SQLite schema queries based on work by **@d0ddn**.
-* Fixed shaded MySQL JDBC driver discovery in the Velocity bridge.
 * Improved Discord webhook delivery diagnostics and added punishment start and end times to embed fields.
 
 ## [1.7.2] - 2026-04-11
@@ -227,8 +214,6 @@ PunisherX takes a major step forward in everyday moderation: a native Spigot edi
     * Fixes IllegalStateException when loading chunks on non-main thread.
 * HOTFIX: Avoid global scheduler hop in Folia join handling
 * FIX: Fixed Folia async scheduling
-* FIX: Fixed Gradle deprecation in bridge resource processing
-* FIX: Update Velocity API dependency to 3.5.0-SNAPSHOT and change import statement for Inject
 * FIX: Fixed duplicate PlaceholderAPI hook log
 * FIX: Fixed annoying no loading messages notifications for GUI
 * Minor fixes and updates
@@ -238,12 +223,10 @@ PunisherX takes a major step forward in everyday moderation: a native Spigot edi
 ## [1.6.2] - 2026-03-09
 ### Technical changes:
 * Added support for the new version numbering system for Minecraft.
-* Updated Velocity API dependency to 3.5.0-SNAPSHOT
 * Updated all dependencies and libraries
 
 ### Bug fixes:
 * Fixed duplicate player unban messages
-* Fixed Gradle deprecation in bridge resource processing
 * Resolved Folia thread safety issues for chunk access by @technot80
 * Avoid global scheduler hop in Folia join handling
 * 
@@ -393,7 +376,6 @@ server: "network"
   - `PunishmentChecker` performs async queries.
   - Folia reload runs in an async task.
 - [x] Added new API methods.
-- [x] Added Sync-Bridge modules for both BungeeCord and Velocity.
 - [x] Introduced a diagnostic command.
 - [x] Version 1.6.0 debuts an automatic `config.yml` migration system:
   - The plugin checks the config version on startup and upgrades it if needed.

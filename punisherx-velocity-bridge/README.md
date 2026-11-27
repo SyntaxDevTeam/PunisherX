@@ -124,6 +124,6 @@ and player session API checks, see [runtime compatibility tests](src/runtimeTest
 
 ## 📚 Links
 
-**[PunisherX](../README.md)** · **[Admin guide (EN)](../docs/WIKI/EN/ADMIN-GUIDE.md)** · **[Admin guide (PL)](../docs/WIKI/PL/ADMIN-GUIDE.md)** · **[Changelog](../CHANGELOG.md)** · **[Report an issue](https://github.com/SyntaxDevTeam/PunisherX/issues)**
+**[PunisherX](../README.md)** · **[Admin guide (EN)](../docs/WIKI/EN/ADMIN-GUIDE.md)** · **[Admin guide (PL)](../docs/WIKI/PL/ADMIN-GUIDE.md)** · **[Changelog](../docs/proxy-bridge/CHANGELOG.md)** · **[Report an issue](https://github.com/SyntaxDevTeam/PunisherX/issues)**
 
 Licensed under the **[MIT License](../LICENSE)**. Created by **SyntaxDevTeam**.

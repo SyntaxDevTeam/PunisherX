@@ -46,4 +46,4 @@ From the repository root:
 
 Security regression tests cover current BAN and BANIP records, backend-local and expired records, removal, multi-proxy independent reads, batching and SQL errors.
 
-See the [project changelog](../CHANGELOG.md) for the critical security update.
+See the [Proxy Bridge changelog](../docs/proxy-bridge/CHANGELOG.md) for version history and upgrade notes.
